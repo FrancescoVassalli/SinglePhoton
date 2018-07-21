@@ -1,9 +1,21 @@
 #include <TVector3.h>
+#include <TLorentzVector.h>
 #include "Track.h"
 #include <iostream>
 using namespace std;
 
+namespace {
+	const float kEmass = 0.000511;
+}
+
 void plot(TH1F* plot,string x){
+  TCanvas* tc = new TCanvas();
+  //plot->Scale(1/plot->Integral());
+  fixOffset(plot);
+  axisTitles(plot,x.c_str(),"");
+  plot->Draw();
+}
+void plotLog(TH1F* plot,string x){
   TCanvas* tc = new TCanvas();
   gPad->SetLogy();
   //plot->Scale(1/plot->Integral());
@@ -89,15 +101,19 @@ void makeTracks(TNtuple *file){
 	Track tracks[kEntries];
 
 
-	TH1F *ptR = new TH1F("pTR","",20,0,2);
-	TH2F *matchAngle =new TH2F("match1","",10,-1.5,1.5,10,-1*TMath::Pi(),TMath::Pi());
+	TH1F *ptR = new TH1F("pTR","",60,0,2);
+	TH1F *matchAngle =new TH1F("match1","",20,0,TMath::Pi());
+	TH1F *truthVRadius = new TH1F("conRad","",200,0,25);
+	//TH2F *responseR = new TH2F("resR","",20,2,25,60,0,2);  INTT doesn't seem to be fully implemented 
 
 	for (int i = 0; i < kEntries; ++i)
 	{
 		file->GetEvent(i);
 		TVector3 p1(rpx,rpy,rpz);
+		TLorentzVector p2(p1,pToE(p1,kEmass));
 		ptR->Fill(rpt/tpt);
 		if(TMath::Abs((int)charge)!=1) cout<<"Not charge 1: "<<i<<endl;
+		if(TMath::Abs((int)flavor)!=11) cout<<"Not flavor 11: "<<i<<endl;
 		float thisEta = reta;
 		float thisPhi = rphi;
 		float thisDR =-1;
@@ -117,14 +133,18 @@ void makeTracks(TNtuple *file){
 				spot=j;
 			}
 		}
+		if (thisDR>.1) cout<<"Large dR at: "<<spot<<" ="<<thisDR<<endl;
 		file->GetEvent(spot);
 		TVector3 pMatch(rpx,rpy,rpz);
-		pMatch-=p1;
-		matchAngle->Fill(pMatch.Eta(),pMatch.Phi());
+		TLorentzVector pMatch2(pMatch,pToE(pMatch,kEmass));
+		matchAngle->Fill((float)pMatch.Angle(p1));
+		//cout<<quadrature(vx,vy)<<'\n';
+		truthVRadius->Fill(quadrature(vx,vy));
 		//cout<<"Match index: "<<spot<<" with dR="<<thisDR<<" at: "<<thisEta<<","<<thisPhi<<endl;
 	}
 	plot(ptR,"Track pT reco/ pT truth");
-	plot(matchAngle,"Matching Track #Delta#eta","#Delta#phi");
+	plot(matchAngle,"Matching Angle");
+	plotLog(truthVRadius, "conversion radius [cm]");
 }
 
 void makeRatios(TNtuple file){
