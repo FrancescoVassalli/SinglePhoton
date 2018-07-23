@@ -1,14 +1,12 @@
 #include <iostream>
 using namespace std;
 
-int Fun4All_G4_sPHENIX()
+int Fun4All_G4_sPHENIX(
+    const int nEvents = 1,
+    const char *inputFile = "/sphenix/data/data02/review_2017-08-02/single_particle/spacal2d/fieldmap/G4Hits_sPHENIX_e-_eta0_8GeV-0002.root",
+    const char *outputFile = "G4sPHENIX.root",
+    const char *embed_input_file = "/sphenix/data/data02/review_2017-08-02/sHijing/fm_0-4.list")
 {
-
-	const int nEvents = 50;
-  const char *outputDST="outDST.root";
-  const char* outputTree="outTree.root";
-	const char *embed_input_file = "/sphenix/data/data02/review_2017-08-02/sHijing/fm_0-4.list";
-	const char *inputFile = "/sphenix/data/data02/review_2017-08-02/single_particle/spacal2d/fieldmap/G4Hits_sPHENIX_e-_eta0_8GeV-0002.root";
 
   //===============
   // Input options
@@ -56,9 +54,9 @@ int Fun4All_G4_sPHENIX()
   bool do_pipe = true;
 
   bool do_svtx = true;
-  bool do_svtx_cell = do_svtx && true; // these need to be on for my tracking anaylsis
-  bool do_svtx_track = do_svtx_cell && true;//this too
-  bool do_svtx_eval = do_svtx_track && false; // not this 
+  bool do_svtx_cell = do_svtx && true;
+  bool do_svtx_track = do_svtx_cell && true;
+  bool do_svtx_eval = do_svtx_track && true;
 
   bool do_pstof = false;
 
@@ -86,7 +84,7 @@ int Fun4All_G4_sPHENIX()
   bool do_plugdoor = false;
 
   bool do_global = true;
-  bool do_global_fastsim = false;
+  bool do_global_fastsim = true;
 
   bool do_calotrigger = true && do_cemc_twr && do_hcalin_twr && do_hcalout_twr;
 
@@ -112,7 +110,6 @@ int Fun4All_G4_sPHENIX()
   gSystem->Load("libg4testbench.so");
   gSystem->Load("libg4hough.so");
   gSystem->Load("libg4eval.so");
-//  gSystem->Load("libTreeMaker.so");//get a different afterburner
 
   // establish the geometry and reconstruction setup
   gROOT->LoadMacro("G4Setup_sPHENIX.C");
@@ -195,7 +192,7 @@ int Fun4All_G4_sPHENIX()
     {
       // toss low multiplicity dummy events
       PHG4SimpleEventGenerator *gen = new PHG4SimpleEventGenerator();
-      gen->add_particles("photon", 1);  // mu+,e+,proton,pi+,Upsilon
+      gen->add_particles("gamma", 1);  // mu+,e+,proton,pi+,Upsilon
       //gen->add_particles("pi+",100); // 100 pion option
       if (readhepmc || do_embedding || runpythia8 || runpythia6)
       {
@@ -215,7 +212,7 @@ int Fun4All_G4_sPHENIX()
       gen->set_eta_range(-1.0, 1.0);
       gen->set_phi_range(-1.0 * TMath::Pi(), 1.0 * TMath::Pi());
       //gen->set_pt_range(0.1, 50.0);
-      gen->set_pt_range(12, 12);
+      gen->set_pt_range(0.1, 20.0);
       gen->Embed(2);
       gen->Verbosity(0);
 
@@ -395,7 +392,7 @@ int Fun4All_G4_sPHENIX()
   //----------------------
   // Simulation evaluation
   //----------------------
-/*
+
   if (do_svtx_eval) Svtx_Eval(string(outputFile) + "_g4svtx_eval.root");
 
   if (do_cemc_eval) CEMC_Eval(string(outputFile) + "_g4cemc_eval.root");
@@ -405,7 +402,7 @@ int Fun4All_G4_sPHENIX()
   if (do_hcalout_eval) HCALOuter_Eval(string(outputFile) + "_g4hcalout_eval.root");
 
   if (do_jet_eval) Jet_Eval(string(outputFile) + "_g4jet_eval.root");
-*/
+
   //--------------
   // IO management
   //--------------
@@ -496,7 +493,7 @@ int Fun4All_G4_sPHENIX()
     //Convert DST to human command readable TTree for quick poke around the outputs
     gROOT->LoadMacro("G4_DSTReader.C");
 
-    G4DSTreader(outputDST,  //
+    G4DSTreader(outputFile,  //
                 /*int*/ absorberactive,
                 /*bool*/ do_svtx,
                 /*bool*/ do_pstof,
@@ -510,7 +507,7 @@ int Fun4All_G4_sPHENIX()
                 /*bool*/ do_hcalout_twr);
   }
 
-    Fun4AllDstOutputManager *out = new Fun4AllDstOutputManager("DSTOUT", outputDST);
+  Fun4AllDstOutputManager *out = new Fun4AllDstOutputManager("DSTOUT", outputFile);
    if (do_dst_compress) DstCompress(out);
     se->registerOutputManager(out);
 
@@ -528,9 +525,6 @@ int Fun4All_G4_sPHENIX()
     cout << "it will run forever, so I just return without running anything" << endl;
     return;
   }
-
-//  TreeMaker *treemaker = new TreeMaker(outputTree);
-  //se->registerSubsystem(treemaker);
 
   se->run(nEvents);
 
