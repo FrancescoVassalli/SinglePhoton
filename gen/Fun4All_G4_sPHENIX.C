@@ -4,7 +4,7 @@ using namespace std;
 int Fun4All_G4_sPHENIX(const char *outputDST="outDST.root", const char* outputTree="outTree.root")
 {
 
-	const int nEvents = 10;
+	const int nEvents = 50;
 	const char *embed_input_file = "/sphenix/data/data02/review_2017-08-02/sHijing/fm_0-4.list";
 	const char *inputFile = "/sphenix/data/data02/review_2017-08-02/single_particle/spacal2d/fieldmap/G4Hits_sPHENIX_e-_eta0_8GeV-0002.root";
 
@@ -54,8 +54,8 @@ int Fun4All_G4_sPHENIX(const char *outputDST="outDST.root", const char* outputTr
   bool do_pipe = true;
 
   bool do_svtx = true;
-  bool do_svtx_cell = do_svtx && false; // these need to be on for my tracking anaylsis
-  bool do_svtx_track = do_svtx_cell && false;//this too
+  bool do_svtx_cell = do_svtx && true; // these need to be on for my tracking anaylsis
+  bool do_svtx_track = do_svtx_cell && true;//this too
   bool do_svtx_eval = do_svtx_track && false; // not this 
 
   bool do_pstof = false;
@@ -110,7 +110,7 @@ int Fun4All_G4_sPHENIX(const char *outputDST="outDST.root", const char* outputTr
   gSystem->Load("libg4testbench.so");
   gSystem->Load("libg4hough.so");
   gSystem->Load("libg4eval.so");
-  gSystem->Load("libTreeMaker.so");//get a different afterburner
+//  gSystem->Load("libTreeMaker.so");//get a different afterburner
 
   // establish the geometry and reconstruction setup
   gROOT->LoadMacro("G4Setup_sPHENIX.C");
