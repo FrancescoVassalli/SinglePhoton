@@ -1,3 +1,4 @@
+*.root
 condor_log*
 vis.mac
 MASTER*

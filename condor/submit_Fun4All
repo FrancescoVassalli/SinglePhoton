@@ -6,7 +6,7 @@ Universe        = vanilla
 Notification    = Never
 
 # The executable we want to run.
-Executable   =  /phenix/u/vassalli/sphenix/single/CondorSinglePhoton.csh
+Executable   =  /phenix/u/vassalli/sphenix/single/condor/CondorSinglePhoton.csh
 
  # The argument to pass to the executable.
 Arguments       = $(Process)
@@ -24,7 +24,7 @@ Rank		= CPU_Speed
 
 # Jobs with higher numerical priority will run before jobs 
 # with lower numerical priority (-20 to 20).
-Priority        = +10
+Priority        = +1
 
 # Used to give jobs a directory with respect to file input 
 # and output.
@@ -52,8 +52,8 @@ Notify_user     = frva5829@colorado.edu
 Requirements = (CPU_Experiment == "phenix")
 
 # Since this is an analysis job we set this to "cas".
-+Job_Type       = "cas"
-#+Job_Type       = "highmem"
+#+Job_Type       = "cas"
++Job_Type       = "highmem"
 
 # This should be the last command and tells condor to queue the
 # job.  If a number is placed after the command (i.e. Queue 15)
