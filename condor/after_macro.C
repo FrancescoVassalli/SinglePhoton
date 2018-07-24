@@ -1,9 +1,7 @@
-int run_macro_isolation( 
-			std::string infile = "XjPhi3_pT5_98_dst.root",
-			std::string outfile = "test_output.root"
-	       )
+int after_macro( std::string infile = "XjPhi3_pT5_98_dst.root")
 {
   
+	std::string outfile = infile+"truth.root";
   gSystem->Load("libfun4all.so");
   gSystem->Load("libg4detectors.so");
   gSystem->Load("libphhepmc.so");
@@ -25,7 +23,7 @@ int run_macro_isolation(
   hitsin->fileopen( infile );
   se->registerInputManager(hitsin);
  
-  SinglePhotonAfter *truther = new SinglePhotonAfter("truthinfo");
+  SinglePhotonAfter *truther = new SinglePhotonAfter(outfile);
   se->registerSubsystem(truther);
 
   se->run();
