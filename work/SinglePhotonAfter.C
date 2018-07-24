@@ -10,26 +10,8 @@
 
 #include <calotrigger/CaloTriggerInfo.h>
 
-#include <calobase/RawClusterContainer.h>
-#include <calobase/RawCluster.h>
-#include <calobase/RawClusterUtility.h>
-
-#include <calobase/RawTowerGeom.h>
-#include <calobase/RawTower.h>
-#include <calobase/RawTowerContainer.h>
-#include <calobase/RawTowerGeomContainer_Cylinderv1.h>
-#include <calobase/RawTowerGeomContainer.h>
-
-//#include <g4jets/JetMap.h>
-//#include <g4jets/Jet.h>
-
 #include <g4main/PHG4TruthInfoContainer.h>
 #include <g4main/PHG4Particle.h>
-
-#include <jetbackground/TowerBackground.h>
-
-#include <g4vertex/GlobalVertex.h>
-#include <g4vertex/GlobalVertexMap.h>
 
 SinglePhotonAfter::SinglePhotonAfter(const std::string &name) : SubsysReco("SinglePhoton")
 {
