@@ -1,5 +1,6 @@
 *.root
 *.pdf
+Fun/*
 condor_log*
 vis.mac
 MASTER*
