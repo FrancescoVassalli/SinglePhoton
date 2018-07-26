@@ -61,13 +61,13 @@ std::vector<std::vector<Photon>> makePhotons(TTree* file){
 	return r;
 }
 
-std::map<int, Photon> map matchTracks(TNtuple* tracks,TNtuple* verticies){
+std::map<int, Photon> matchTracks(TNtuple* tracks,TNtuple* verticies){
 	const int kVertexTupleLength=verticies->GetEntries();
 	
 	float vx,vy,vz,vevent,ntracks;
-	verticies->SetBranchAddress("vx",&vvx);
-	verticies->SetBranchAddress("vy",&vvy);
-	verticies->SetBranchAddress("vz",&vvz);
+	verticies->SetBranchAddress("vx",&vx);
+	verticies->SetBranchAddress("vy",&vy);
+	verticies->SetBranchAddress("vz",&vz);
 	verticies->SetBranchAddress("event",&vevent);
 	verticies->SetBranchAddress("ntracks",&ntracks);
 	
@@ -84,19 +84,22 @@ std::map<int, Photon> map matchTracks(TNtuple* tracks,TNtuple* verticies){
 	tracks->SetBranchAddress("gpy",&tpy);
 	tracks->SetBranchAddress("gpz",&tpz);
 
-	TH1F *ptR = new TH1F("pTR","",60,0,2);
+	TH1F *pTR = new TH1F("pTR","",60,0,2);
 	TH1F *matchAngle =new TH1F("match1","",200,0,.1);
 	TH1F *truthVRadius = new TH1F("conRad","",200,0,25);
 	TH2F *rvz = new TH2F("conZdepend","",200,0,25,200,0,20);
-	TH2F *anglespace = new TH2F("anglespace","",20,0,.003,20,0,.1);
-	TH2F *anglespaceTruth = new TH2F("anglespaceTruth","",20,0,.003,20,0,.1);
-	//TH2F *responseR = new TH2F("resR","",20,2,25,60,0,2);
-	std::map<int, Photon> map;
+	TH2F *anglespace = new TH2F("anglespace","",20,0,.005,20,0,.1);
+	TH2F *anglespaceTruth = new TH2F("anglespaceTruth","",20,0,.005,20,0,.1);
+	TH2F *plotXY = new TH2F("map","",100,-10,10,100,-10,10);
+	TH2F *anglepT = new TH2F(getNextPlotName(&plotcount).c_str(),"",40,0,10,200,0.,1)
+	TH2F *responseR = new TH2F("resR","",200,0,25,60,0,2);
+	
+	std::map<int, Photon> map; //return value
 	int slide=0;
 	for (int i = 0; i < kVertexTupleLength; ++i)
 	{
 		verticies->GetEvent(i);
-		if (vvx!=NAN&&ntracks==2)
+		if (vx!=NAN&&ntracks==2)
 		{
 			do{
 				tracks->GetEvent(slide);
@@ -114,15 +117,19 @@ std::map<int, Photon> map matchTracks(TNtuple* tracks,TNtuple* verticies){
 			TLorentzVector lv2(p2,pToE(p2,kEmass));
 			float truthpT2=tpt;
 			TVector3 p2Truth(tpx,tpy,tpz);
-			map[i]=Photon(lv2+lv1);
+			map[(int)vevent]=Photon(lv2+lv1);
 
-			pTR->Fill(p1.Pt()/truthpT1);
-			pTR->Fill(p2.Pt()/truthpT2);
+			pTR->Fill((float)p1.Pt()/truthpT1);
+			pTR->Fill((float)p2.Pt()/truthpT2);
 			matchAngle->Fill((float)p1.Angle(p2));
-			truthVRadius->Fill(truthVertex.XYvector().Norm());
-			rvz->Fill(truthVertex.XYvector().Norm(),tvz);
+			truthVRadius->Fill((float)truthVertex.XYvector().Mod());
+			rvz->Fill(truthVertex.XYvector().Mod(),tvz);
 			anglespace->Fill((float)TMath::Abs(p2.Eta()-p1.Eta()),deltaPhi(p2.Phi(),p1.Phi()));
-			anglespaceTruth->Fill((float)TMath::Abs(p2Truth.Eta()-p1Truth.Eta()),deltaPhi(p2Truth.Phi(),p1Truth.Phi()))
+			anglespaceTruth->Fill((float)TMath::Abs(p2Truth.Eta()-p1Truth.Eta()),deltaPhi(p2Truth.Phi(),p1Truth.Phi()));
+			plotXY->Fill(tvx,tvy);
+			anglepT->Fill((float)(lv1+lv2).Pt(),(float)p1.Angle(p2));
+			responseR->Fill((float)truthVertex.XYvector().Mod(),(float)p1.Pt()/truthpT1);
+			responseR->Fill((float)truthVertex.XYvector().Mod(),(float)p2.Pt()/truthpT2);
 		}
 	}
 	plot(pTR,"Track pT #frac{reco}{truth}");
@@ -131,7 +138,41 @@ std::map<int, Photon> map matchTracks(TNtuple* tracks,TNtuple* verticies){
 	plot(rvz,"truth conversion radius [cm]","z [cm]");
 	plot(anglespace,"reco #Delta#eta","#Delta#phi");
 	plot(anglespaceTruth,"truth #Delta#eta","#Delta#phi");
+	plot(plotXY,"truth conversion x","y");
+	plot(anglepT,"reco pT #gamma","track match angle");
 	return map;
+}
+
+void matchPhotons(TTree *truth,std::map<int, Photon> reco){
+	int N;
+	float pT[100];
+	float eta[100];
+	float phi[100];
+	truth->SetBranchAddress("particle_n",&N);
+	truth->SetBranchAddress("particle_pt",pT);
+	truth->SetBranchAddress("particle_eta",eta);
+	truth->SetBranchAddress("particle_phi",phi);
+
+	TH1F *p_dR = new TH1F(getNextPlotName(&plotcount).c_str(),"",20,0,TMath::Pi());
+	TH1F *ptr = new TH1F(getNextPlotName(&plotcount).c_str(),"",20,0,2);
+
+	for(auto it :reco){
+		truth->GetEvent(it->first());
+		int spot =0;
+		float tdR = it->second().deltaR(eta[0],phi[0]);
+		for (int i = 1; i < N; ++i)
+		{
+			ndR=it->second().deltaR(eta[i],phi[i]);
+			if(ndR<tdR){
+				spot=i;
+				tdR=ndR;
+			}
+		}
+		p_dR->Fill(tdr);
+		ptr->Fill(it->second().getpT().value/pT[spot]);
+	}
+	plot(p_dR,"#DeltaR #gamma");
+	plot(ptr,"pT #gama #frac{reco}{truth}")
 }
 
 void makeRatios(std::vector<Pair<Photon>> pairs){
@@ -154,6 +195,7 @@ void evalAnalysis(){
 	TFile *tf = new TFile((location+name).c_str(),"READ");
 	TTree *truthInfo;
 	truthInfo = (TTree*) tf->Get("ttree");
-	matchTracks(track,vertex);
+	//matchTracks(track,vertex);
+	matchPhoton(truthInfo,matchTracks(track,vertex));
 
 }

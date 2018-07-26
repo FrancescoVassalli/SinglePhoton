@@ -36,13 +36,9 @@ public:
 		if(truth) return thits;
 		else return rhits;
 	}
-	inline TVector3 getCartesianVec(bool truth)const {
-		if(truth) return tcartesianVec;
-		else return rcartesianVec;
-	}
-	inline TVector3 getPolarVec(bool truth)const {
-		if(truth) return tpolarVec;
-		else return rpolarVec;
+	inline TVector3 getVec(bool truth)const {
+		if(truth) return tVec;
+		else return rVec;
 	}
 	inline TLorentzVector getVertex()const {return vertex;}
 	inline void setEvent(int e){
@@ -65,13 +61,13 @@ public:
 		else rhits=h;
 	}
 	inline void setVec(TVector3 v, bool truth){
-		if(truth) tcartesianVec=v;
-		else rcartesianVec=v;
+		if(truth) tVec=v;
+		else rVec=v;
 	}
 	inline void setVec(float x, float y, float z, bool truth){
 		TVector3 v(x,y,z);
-		if(truth) tcartesianVec=v;
-		else rcartesianVec=v;
+		if(truth) tVec=v;
+		else rVec=v;
 	}
 
 	inline void setVertex(TLorentzVector t){
