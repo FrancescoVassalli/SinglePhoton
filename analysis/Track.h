@@ -19,6 +19,11 @@ class Track
 {
 public:
 	Track(){}
+	Track(TVector3 recomomentum, int charge, int recoID){
+		rVec=recomomentum;
+		rID=recoID;
+		this->charge=charge;
+	}
 	~Track(){}
 	inline int getEvent()const {return event;}
 	inline int getCharge()const {return charge;}
@@ -59,24 +64,16 @@ public:
 		if(truth) thits=h;
 		else rhits=h;
 	}
-	inline void setCartesianVec(TVector3 v, bool truth){
+	inline void setVec(TVector3 v, bool truth){
 		if(truth) tcartesianVec=v;
 		else rcartesianVec=v;
 	}
-	inline void setCartesianVec(float x, float y, float z, bool truth){
+	inline void setVec(float x, float y, float z, bool truth){
 		TVector3 v(x,y,z);
 		if(truth) tcartesianVec=v;
 		else rcartesianVec=v;
 	}
-	inline void setPolarVec(TVector3 v, bool truth){
-		if(truth) tpolarVec=v;
-		else rpolarVec=v;
-	}
-	inline void setPolarVec(float x, float y, float z, bool truth){
-		TVector3 v(x,y,z);
-		if(truth) tpolarVec=v;
-		else rpolarVec=v;
-	}
+
 	inline void setVertex(TLorentzVector t){
 		vertex=t;
 	}
@@ -94,14 +91,12 @@ private:
 	int charge;
 	float quality;
 	Hits rhits;
-	TVector3 rcartesianVec;
-	TVector3 rpolarVec;
+	TVector3 rVec;
 
 	int tID;
 	int tflavor;
 	Hits thits;
-	TVector3 tcartesianVec;
-	TVector3 tpolarVec;
+	TVector3 tVec;
 	TLorentzVector vertex;
 	
 };
