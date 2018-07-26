@@ -54,14 +54,14 @@ std::vector<std::vector<Photon>> makePhotons(TTree* file){
 		std::vector<Photon> eventPhotons;
 		for (int j = 0; j < N; ++j)
 		{
-			eventPhotons.push_back(Photon(pT[j],phi[j],eta[j],i));
+			eventPhotons.push_back(Photon(i,pT[j],phi[j],eta[j]));
 		}
 		r.push_back(eventPhotons);
 	}
 	return r;
 }
 
-std::vector<std::vector<Photon>> makeTracks(TNtuple *file){
+std::vector<std::vector<Photon>> makeRecoPhotons(TNtuple *file){
 	const int kEntries = file->GetEntries();
 	float event;
 	float rID;
@@ -128,9 +128,11 @@ std::vector<std::vector<Photon>> makeTracks(TNtuple *file){
 	std::vector<Photon> eventPhotons;
 	/*plots */ 
 	TH1F *ptR = new TH1F("pTR","",60,0,2);
-	TH1F *matchAngle =new TH1F("match1","",200,0,.1);
+	//TH1F *matchAngle =new TH1F("match1","",200,0,.1);
 	TH1F *truthVRadius = new TH1F("conRad","",200,0,25);
-	TH2F *anglespace = new TH2F("anglespace","",20,0,.003,20,0,.1);
+	TH2F *rvz = new TH2F("conZdepend","",200,0,25,200,0,20);
+	//TH2F *anglespace = new TH2F("anglespace","",20,0,.003,20,0,.1);
+	//TH2F *anglespaceTruth = new TH2F("anglespaceTruth","",20,0,.003,20,0,.1);
 	//TH2F *responseR = new TH2F("resR","",20,2,25,60,0,2);  INTT doesn't seem to be fully implemented 
 	
 	std::cout<<"Starting reco track extraction"<<std::endl;
@@ -157,42 +159,43 @@ std::vector<std::vector<Photon>> makeTracks(TNtuple *file){
 		if(TMath::Abs((int)charge)!=1) cout<<"Not charge 1: "<<i<<endl;
 		if(TMath::Abs((int)flavor)!=11) cout<<"Not flavor 11: "<<i<<endl;
 		
-		/*reconstructed conversion vertex*/
-		float thisEta = reta;
-		float thisPhi = rphi;
-
-		/*used to match the lepton pairs*/
-		int thischarge = (int) charge;
-		float thisDR = -1;  
-		//cout<<"First track: "<<thisEta<<","<<thisPhi<<endl;
-		
-		slide=-1;
-		for (int j = range.x; j < range.y; ++j) //finding the pair
-		{
-			if(j==i)continue; //can't pair with yourself
-			file->GetEvent(j);
-			float nextDR = deltaR(thisEta,thisPhi,reta,rphi);
-			if ((int)charge==thischarge*-1 &&(nextDR<thisDR ||thisDR<0)) //pair must have opposite charge and smallest dR
-			{
-				thisDR=nextDR;
-				thisEta=reta;
-				thisPhi=rphi;
-				slide=j;
-			}
-		}
+		/*reconstructed conversion vertex*/ // this iswrong need to use vertex finder 
+		//float thisEta = reta; // this is a momentum in polar coordinates 
+		//float thisPhi = rphi;
+//
+		///*used to match the lepton pairs*/
+		//int thischarge = (int) charge;
+		//float thisDR = -1;  
+		////cout<<"First track: "<<thisEta<<","<<thisPhi<<endl;
+		//
+		//slide=-1;
+		//for (int j = range.x; j < range.y; ++j) //finding the pair
+		//{
+		//	if(j==i)continue; //can't pair with yourself
+		//	file->GetEvent(j);
+		//	float nextDR = deltaR(thisEta,thisPhi,reta,rphi);
+		//	if ((int)charge==thischarge*-1 &&(nextDR<thisDR ||thisDR<0)) //pair must have opposite charge and smallest dR
+		//	{
+		//		thisDR=nextDR;
+		//		thisEta=reta;
+		//		thisPhi=rphi;
+		//		slide=j;
+		//	}
+		//}
 
 		//if (thisDR>.1) cout<<"Large dR at: "<<slide<<" ="<<thisDR<<endl;
-		
-		/*making the pair*/
-		file->GetEvent(slide);
-		TVector3 pMatch(rpx,rpy,rpz);
-		file->GetEvent(i); //once the pair has been made switch the values back to the original lepton
-		TLorentzVector pMatch2(pMatch,pToE(pMatch,kEmass));
-		cout<<(float)pMatch.Angle(p1)<<'\n';
-		matchAngle->Fill((float)pMatch.Angle(p1));
-		anglespace->Fill((float)TMath::Abs(pMatch.Eta()-p1.Eta()),deltaPhi(pMatch.Phi(),p1.Phi()));
-		truthVRadius->Fill(quadrature(vx,vy));
-
+		//
+		///*making the pair*/
+		//file->GetEvent(slide);
+		//TVector3 pMatch(rpx,rpy,rpz);
+		////file->GetEvent(i); //once the pair has been made switch the values back to the original lepton
+		//TLorentzVector pMatch2(pMatch,pToE(pMatch,kEmass));
+		//cout<<(float)pMatch.Angle(p1)<<'\n';
+		//matchAngle->Fill((float)pMatch.Angle(p1));
+		//anglespace->Fill((float)TMath::Abs(pMatch.Eta()-p1.Eta()),deltaPhi(pMatch.Phi(),p1.Phi()));
+		int truthRadius =quadrature(vx,vy);
+		truthVRadius->Fill(truthRadius);
+		rvz->Fill(truthRadius,vz);
 		eventPhotons.push_back(Photon(p2+pMatch2),event); //preping the return 
 		
 		/*more event location stuff*/
@@ -211,20 +214,24 @@ std::vector<std::vector<Photon>> makeTracks(TNtuple *file){
 	}
 	std::cout<<"Done with reco extraction now plotting"<<std::endl;
 	plot(ptR,"Track pT reco/ pT truth");
-	plot(matchAngle,"Matching Angle");
-	plot(anglespace,"#Delta#eta","#Delta#phi");
+	//plot(matchAngle,"Matching Angle");
+	//plot(anglespace,"#Delta#eta","#Delta#phi");
 	plotLog(truthVRadius, "conversion radius [cm]");
+	plot(rvz,"conversion radius [cm]","z [cm]")
 	return recoPhotons;
 }
 
 std::vector<Pair<Photon>> makeMatches(std::vector<std::vector<Photon>> truth,std::vector<std::vector<Photon>> reco){
 	std::vector<Pair<Photon>> matches;
 	cout<<"Matching"<<endl;
-	for (unsigned int i = 0; i < reco.size(); ++i)
+	for (unsigned int i = 0; i < reco.size(); ++i) //for every reco event 
 	{
-		int spot=-1;
+		int event = reco[i][0].getPosition(); //get the event number 
+		for (int k = 0; k < reco[i].size(); ++k) //for every reco photon in the event 
+		{
+			int spot=-1;
 		float dR= reco[i].deltaR(truth[0]);
-		for (unsigned int j = 0; j < truth.size(); ++j)
+		for (unsigned int j = 0; j < truth.size(); ++j) // for every truth photon in the evet 
 		{
 			float thisdR = reco[i].deltaR(truth[j]);
 			if (thisdR<dR)
@@ -233,6 +240,8 @@ std::vector<Pair<Photon>> makeMatches(std::vector<std::vector<Photon>> truth,std
 				spot=j;
 			}
 		}
+		}
+		
 		//remove the truth photon after pairing 
 		matches.push_back(Pair<Photon>(truth[spot],reco[i]));
 	}
@@ -259,7 +268,7 @@ void evalAnalysis(){
 	TFile *tf = new TFile((location+name).c_str(),"READ");
 	TTree *truthInfo;
 	truthInfo = (TTree*) tf->Get("ttree");
-	std::vector<Photon> recoPhotons =makeTracks(track);
+	std::vector<std::vector<Photon>> recoPhotons =makeTracks(track);
 	//std::vector<Photon> truthPhotons =makePhotons(truthInfo) ;
 	//makeRatios(makeMatches(truthPhotons,recoPhotons));
 	//cout<<truthTrack->GetEntries()<<endl;
