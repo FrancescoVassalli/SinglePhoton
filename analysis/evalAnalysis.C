@@ -140,7 +140,7 @@ std::map<int, Photon> matchTracks(TNtuple* tracks,TNtuple* verticies){
 	//plot(anglespaceTruth,"truth #Delta#eta","#Delta#phi");
 	//plot(plotXY,"truth conversion x","y");
 	plot(anglepT,"reco pT #gamma","track match angle");
-	plot(responseR,"truth conversion radius","Track pT #frac{reco}{truth}")
+	plot(responseR,"truth conversion radius","Track pT #frac{reco}{truth}");
 	return map;
 }
 
