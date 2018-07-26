@@ -36,7 +36,7 @@ void plot(TH2F* plot,string x, string y){
   plot->Draw("colz");
 }
 
-std::vector<Photon> makePhotons(TTree* file){
+std::vector<std::vector<Photon>> makePhotons(TTree* file){
 	const int kEntries = file->GetEntries();
 	int N;
 	float pT[100];
@@ -46,20 +46,22 @@ std::vector<Photon> makePhotons(TTree* file){
 	file->SetBranchAddress("particle_pt",pT);
 	file->SetBranchAddress("particle_eta",eta);
 	file->SetBranchAddress("particle_phi",phi);
-	std::vector<Photon> r;
+	std::vector<std::vector<Photon>> r;
 	cout<<"Making Truth Photons"<<endl;
 	for (int i = 0; i < kEntries; ++i)
 	{
 		file->GetEvent(i);
+		std::vector<Photon> eventPhotons;
 		for (int j = 0; j < N; ++j)
 		{
-			r.push_back(Photon(pT[j],phi[j],eta[j]));
+			eventPhotons.push_back(Photon(pT[j],phi[j],eta[j],i));
 		}
+		r.push_back(eventPhotons);
 	}
 	return r;
 }
 
-std::vector<Photon> makeTracks(TNtuple *file){
+std::vector<std::vector<Photon>> makeTracks(TNtuple *file){
 	const int kEntries = file->GetEntries();
 	float event;
 	float rID;
@@ -122,12 +124,13 @@ std::vector<Photon> makeTracks(TNtuple *file){
 	file->SetBranchAddress("gvz",&vz);
 	file->SetBranchAddress("gvt",&vt);
 
-	std::vector<Photon> recoPhotons; // the return value 
-
+	std::vector<std::vector<Photon>> recoPhotons; // the return value 
+	std::vector<Photon> eventPhotons;
 	/*plots */ 
 	TH1F *ptR = new TH1F("pTR","",60,0,2);
-	TH1F *matchAngle =new TH1F("match1","",20,0,TMath::Pi());
+	TH1F *matchAngle =new TH1F("match1","",200,0,.1);
 	TH1F *truthVRadius = new TH1F("conRad","",200,0,25);
+	TH2F *anglespace = new TH2F("anglespace","",20,0,.003,20,0,.1);
 	//TH2F *responseR = new TH2F("resR","",20,2,25,60,0,2);  INTT doesn't seem to be fully implemented 
 	
 	std::cout<<"Starting reco track extraction"<<std::endl;
@@ -139,7 +142,7 @@ std::vector<Photon> makeTracks(TNtuple *file){
 	do{
 		slide++;
 		file->GetEvent(slide);
-	}while(thisEvent==event);
+	}while(thisEvent==event&&slide<kEntries);
 	Pair<int> range(0,slide);
 
 
@@ -151,7 +154,7 @@ std::vector<Photon> makeTracks(TNtuple *file){
 		TLorentzVector p2(p1,pToE(p1,kEmass));  //the lepton
 		ptR->Fill(rpt/tpt); // ratio of reco track pT to truth track pT 
 		
-		if(TMath::Abs((int)(charge+.5))!=1) cout<<"Not charge 1: "<<i<<endl;
+		if(TMath::Abs((int)charge)!=1) cout<<"Not charge 1: "<<i<<endl;
 		if(TMath::Abs((int)flavor)!=11) cout<<"Not flavor 11: "<<i<<endl;
 		
 		/*reconstructed conversion vertex*/
@@ -178,18 +181,19 @@ std::vector<Photon> makeTracks(TNtuple *file){
 			}
 		}
 
-		if (thisDR>.1) cout<<"Large dR at: "<<slide<<" ="<<thisDR<<endl;
+		//if (thisDR>.1) cout<<"Large dR at: "<<slide<<" ="<<thisDR<<endl;
 		
 		/*making the pair*/
 		file->GetEvent(slide);
 		TVector3 pMatch(rpx,rpy,rpz);
 		file->GetEvent(i); //once the pair has been made switch the values back to the original lepton
 		TLorentzVector pMatch2(pMatch,pToE(pMatch,kEmass));
-		
+		cout<<(float)pMatch.Angle(p1)<<'\n';
 		matchAngle->Fill((float)pMatch.Angle(p1));
+		anglespace->Fill((float)TMath::Abs(pMatch.Eta()-p1.Eta()),deltaPhi(pMatch.Phi(),p1.Phi()));
 		truthVRadius->Fill(quadrature(vx,vy));
 
-		recoPhotons.push_back(Photon(p2+pMatch2)); //preping the return 
+		eventPhotons.push_back(Photon(p2+pMatch2),event); //preping the return 
 		
 		/*more event location stuff*/
 		if(i==range.y-1){
@@ -198,19 +202,22 @@ std::vector<Photon> makeTracks(TNtuple *file){
 			do{
 				slide++;
 				file->GetEvent(slide);
-			}while(thisEvent==event);
+			}while(thisEvent==event&&slide<kEntries);
 			range.x=range.y;
 			range.y=slide;
+			recoPhotons.push_back(eventPhotons);
+			eventPhotons.clear();
 		}
 	}
 	std::cout<<"Done with reco extraction now plotting"<<std::endl;
 	plot(ptR,"Track pT reco/ pT truth");
 	plot(matchAngle,"Matching Angle");
+	plot(anglespace,"#Delta#eta","#Delta#phi");
 	plotLog(truthVRadius, "conversion radius [cm]");
 	return recoPhotons;
 }
 
-std::vector<Pair<Photon>> makeMatches(std::vector<Photon> truth, std::vector<Photon> reco){
+std::vector<Pair<Photon>> makeMatches(std::vector<std::vector<Photon>> truth,std::vector<std::vector<Photon>> reco){
 	std::vector<Pair<Photon>> matches;
 	cout<<"Matching"<<endl;
 	for (unsigned int i = 0; i < reco.size(); ++i)
@@ -253,8 +260,8 @@ void evalAnalysis(){
 	TTree *truthInfo;
 	truthInfo = (TTree*) tf->Get("ttree");
 	std::vector<Photon> recoPhotons =makeTracks(track);
-	std::vector<Photon> truthPhotons =makePhotons(truthInfo) ;
-	makeRatios(makeMatches(truthPhotons,recoPhotons));
+	//std::vector<Photon> truthPhotons =makePhotons(truthInfo) ;
+	//makeRatios(makeMatches(truthPhotons,recoPhotons));
 	//cout<<truthTrack->GetEntries()<<endl;
 	/* out of 10k events I got 940 tracks or equivently 470 converted photons*/
 
