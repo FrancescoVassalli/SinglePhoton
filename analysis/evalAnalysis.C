@@ -6,17 +6,18 @@ using namespace std;
 
 namespace {
 	const float kEmass = 0.000511;
+	int plotcount=0;
 }
 
 void plot(TH1F* plot,string x){
-  TCanvas* tc = new TCanvas();
+  TCanvas* tc = new TCanvas(getNextPlotName(&plotcount).c_str(),x.c_str());
   //plot->Scale(1/plot->Integral());
   fixOffset(plot);
   axisTitles(plot,x.c_str(),"");
   plot->Draw();
 }
 void plotLog(TH1F* plot,string x){
-  TCanvas* tc = new TCanvas();
+  TCanvas* tc = new TCanvas(getNextPlotName(&plotcount).c_str(),x.c_str());
   gPad->SetLogy();
   //plot->Scale(1/plot->Integral());
   fixOffset(plot);
@@ -25,7 +26,7 @@ void plotLog(TH1F* plot,string x){
 }
 
 void plot(TH2F* plot,string x, string y){
-  TCanvas* tc = new TCanvas();
+  TCanvas* tc = new TCanvas(getNextPlotName(&plotcount).c_str(),x.c_str());
   tc->SetRightMargin(.15);
   tc->SetLeftMargin(.1);
   gPad->SetLogz();
@@ -35,130 +36,167 @@ void plot(TH2F* plot,string x, string y){
   plot->Draw("colz");
 }
 
-void makeTracks(TNtuple *file){
+std::vector<std::vector<Photon>> makePhotons(TTree* file){
 	const int kEntries = file->GetEntries();
-	float event;
-	float rID;
-	float tID;
-	float thits;
-	float tmap;
-	float tintt;
-	float ttpc;
-	float rhits;
-	float rmap;
-	float rintt;
-	float rtpc;
-	float flavor;
-	float charge;
-	float rpx;
-	float rpy;
-	float rpz;
-	float reta;
-	float rphi;
-	float rpt;
-	float tpx;
-	float tpy;
-	float tpz;
-	float teta;
-	float tphi;
-	float tpt;
-	float quality;
-	float vx;
-	float vy;
-	float vz;
-	float vt;
-	file->SetBranchAddress("event",&event);
-	file->SetBranchAddress("trackID",&rID);
-	file->SetBranchAddress("gtrackID",&tID);
-	file->SetBranchAddress("nhits",&thits);
-	file->SetBranchAddress("nmaps",&tmap);
-	file->SetBranchAddress("nintt",&tintt);
-	file->SetBranchAddress("ntpc",&ttpc);
-	file->SetBranchAddress("gnhits",&rhits);
-	file->SetBranchAddress("gnmaps",&rmap);
-	file->SetBranchAddress("gnintt",&rintt);
-	file->SetBranchAddress("gntpc",&rtpc);
-	file->SetBranchAddress("gflavor",&flavor);
-	file->SetBranchAddress("charge",&charge);
-	file->SetBranchAddress("px",&rpx);
-	file->SetBranchAddress("py",&rpy);
-	file->SetBranchAddress("pz",&rpz);
-	file->SetBranchAddress("eta",&reta);
-	file->SetBranchAddress("phi",&rphi);
-	file->SetBranchAddress("pt",&rpt);
-	file->SetBranchAddress("gpx",&tpx);
-	file->SetBranchAddress("gpy",&tpy);
-	file->SetBranchAddress("gpz",&tpz);
-	file->SetBranchAddress("geta",&teta);
-	file->SetBranchAddress("gphi",&tphi);
-	file->SetBranchAddress("gpt",&tpt);
-	file->SetBranchAddress("quality",&quality);
-	file->SetBranchAddress("gvx",&vx);
-	file->SetBranchAddress("gvy",&vy);
-	file->SetBranchAddress("gvz",&vz);
-	file->SetBranchAddress("gvt",&vt);
-
-	Track tracks[kEntries];
-
-
-	TH1F *ptR = new TH1F("pTR","",60,0,2);
-	TH1F *matchAngle =new TH1F("match1","",20,0,TMath::Pi());
-	TH1F *truthVRadius = new TH1F("conRad","",200,0,25);
-	//TH2F *responseR = new TH2F("resR","",20,2,25,60,0,2);  INTT doesn't seem to be fully implemented 
-
+	int N;
+	float pT[100];
+	float eta[100];
+	float phi[100];
+	file->SetBranchAddress("particle_n",&N);
+	file->SetBranchAddress("particle_pt",pT);
+	file->SetBranchAddress("particle_eta",eta);
+	file->SetBranchAddress("particle_phi",phi);
+	std::vector<std::vector<Photon>> r;
+	cout<<"Making Truth Photons"<<endl;
 	for (int i = 0; i < kEntries; ++i)
 	{
 		file->GetEvent(i);
-		TVector3 p1(rpx,rpy,rpz);
-		TLorentzVector p2(p1,pToE(p1,kEmass));
-		ptR->Fill(rpt/tpt);
-		if(TMath::Abs((int)charge)!=1) cout<<"Not charge 1: "<<i<<endl;
-		if(TMath::Abs((int)flavor)!=11) cout<<"Not flavor 11: "<<i<<endl;
-		float thisEta = reta;
-		float thisPhi = rphi;
-		float thisDR =-1;
-		int thischarge = (int) charge;
-		//cout<<"First track: "<<thisEta<<","<<thisPhi<<endl;
-		int spot=-1;
-		for (int j = 0; j < kEntries; ++j)
+		std::vector<Photon> eventPhotons;
+		for (int j = 0; j < N; ++j)
 		{
-			if(j==i)continue;
-			file->GetEvent(j);
-			float nextDR = deltaR(thisEta,thisPhi,reta,rphi);
-			if ((int)charge==thischarge*-1 &&(nextDR<thisDR ||thisDR<0))
-			{
-				thisDR=nextDR;
-				thisEta=reta;
-				thisPhi=rphi;
-				spot=j;
-			}
+			eventPhotons.push_back(Photon(i,pT[j],phi[j],eta[j]));
 		}
-		if (thisDR>.1) cout<<"Large dR at: "<<spot<<" ="<<thisDR<<endl;
-		file->GetEvent(spot);
-		TVector3 pMatch(rpx,rpy,rpz);
-		TLorentzVector pMatch2(pMatch,pToE(pMatch,kEmass));
-		matchAngle->Fill((float)pMatch.Angle(p1));
-		//cout<<quadrature(vx,vy)<<'\n';
-		truthVRadius->Fill(quadrature(vx,vy));
-		//cout<<"Match index: "<<spot<<" with dR="<<thisDR<<" at: "<<thisEta<<","<<thisPhi<<endl;
+		r.push_back(eventPhotons);
 	}
-	plot(ptR,"Track pT reco/ pT truth");
-	plot(matchAngle,"Matching Angle");
-	plotLog(truthVRadius, "conversion radius [cm]");
+	return r;
 }
 
-void makeRatios(TNtuple file){
+std::map<int, Photon> matchTracks(TNtuple* tracks,TNtuple* verticies){
+	const int kVertexTupleLength=verticies->GetEntries();
+	
+	float vx,vy,vz,vevent,ntracks;
+	verticies->SetBranchAddress("vx",&vx);
+	verticies->SetBranchAddress("vy",&vy);
+	verticies->SetBranchAddress("vz",&vz);
+	verticies->SetBranchAddress("event",&vevent);
+	verticies->SetBranchAddress("ntracks",&ntracks);
+	
+	float tevent,tvx,tvy,tvz,rpx,rpy,rpz,tpt,tpx,tpy,tpz;
+	tracks->SetBranchAddress("gvx",&tvx);
+	tracks->SetBranchAddress("gvy",&tvy);
+	tracks->SetBranchAddress("gvz",&tvz);
+	tracks->SetBranchAddress("gpt",&tpt);
+	tracks->SetBranchAddress("event",&tevent);
+	tracks->SetBranchAddress("px",&rpx);
+	tracks->SetBranchAddress("py",&rpy);
+	tracks->SetBranchAddress("pz",&rpz);
+	tracks->SetBranchAddress("gpx",&tpx);
+	tracks->SetBranchAddress("gpy",&tpy);
+	tracks->SetBranchAddress("gpz",&tpz);
 
+	TH1F *pTR = new TH1F("pTR","",60,0,2);
+	TH1F *matchAngle =new TH1F("match1","",200,0,.1);
+	TH1F *truthVRadius = new TH1F("conRad","",200,0,25);
+	TH2F *rvz = new TH2F("conZdepend","",200,0,25,200,0,20);
+	TH2F *anglespace = new TH2F("anglespace","",20,0,.005,20,0,.1);
+	TH2F *anglespaceTruth = new TH2F("anglespaceTruth","",20,0,.005,20,0,.1);
+	TH2F *plotXY = new TH2F("map","",100,-10,10,100,-10,10);
+	TH2F *anglepT = new TH2F(getNextPlotName(&plotcount).c_str(),"",40,0,10,200,0.,1);
+	TH2F *responseR = new TH2F("resR","",200,0,25,60,0,2);
+	
+	std::map<int, Photon> map; //return value
+	int slide=0;
+	for (int i = 0; i < kVertexTupleLength; ++i)
+	{
+		verticies->GetEvent(i);
+		if (vx!=NAN&&ntracks==2)
+		{
+			do{
+				tracks->GetEvent(slide);
+				slide++;
+			}while(tevent!=vevent);
+
+			TVector3 p1(rpx,rpy,rpz);
+			TLorentzVector lv1(p1,pToE(p1,kEmass));
+			float truthpT1=tpt;
+			TVector3 truthVertex(tvx,tvy,tvz);
+			TVector3 p1Truth(tpx,tpy,tpz);
+
+			tracks->GetEvent(slide);
+			TVector3 p2(rpx,rpy,rpz);
+			TLorentzVector lv2(p2,pToE(p2,kEmass));
+			float truthpT2=tpt;
+			TVector3 p2Truth(tpx,tpy,tpz);
+			map[(int)vevent]=Photon(lv2+lv1);
+
+			pTR->Fill((float)p1.Pt()/truthpT1);
+			pTR->Fill((float)p2.Pt()/truthpT2);
+			matchAngle->Fill((float)p1.Angle(p2));
+			truthVRadius->Fill((float)truthVertex.XYvector().Mod());
+			rvz->Fill(truthVertex.XYvector().Mod(),tvz);
+			anglespace->Fill((float)TMath::Abs(p2.Eta()-p1.Eta()),deltaPhi(p2.Phi(),p1.Phi()));
+			anglespaceTruth->Fill((float)TMath::Abs(p2Truth.Eta()-p1Truth.Eta()),deltaPhi(p2Truth.Phi(),p1Truth.Phi()));
+			plotXY->Fill(tvx,tvy);
+			anglepT->Fill((float)(lv1+lv2).Pt(),(float)p1.Angle(p2));
+			responseR->Fill((float)truthVertex.XYvector().Mod(),(float)p1.Pt()/truthpT1);
+			responseR->Fill((float)truthVertex.XYvector().Mod(),(float)p2.Pt()/truthpT2);
+		}
+	}
+	//plot(pTR,"Track pT #frac{reco}{truth}");
+	//plot(matchAngle,"matching track angle reco");
+	//plot(truthVRadius,"truth conversion radius [cm]");
+	//plot(rvz,"truth conversion radius [cm]","z [cm]");
+	//plot(anglespace,"reco #Delta#eta","#Delta#phi");
+	//plot(anglespaceTruth,"truth #Delta#eta","#Delta#phi");
+	//plot(plotXY,"truth conversion x","y");
+	plot(anglepT,"reco pT #gamma","track match angle");
+	plot(responseR,"truth conversion radius","Track pT #frac{reco}{truth}");
+	return map;
+}
+
+void matchPhotons(TTree *truth,std::map<int, Photon> reco){
+	int N;
+	float pT[100];
+	float eta[100];
+	float phi[100];
+	truth->SetBranchAddress("particle_n",&N);
+	truth->SetBranchAddress("particle_pt",pT);
+	truth->SetBranchAddress("particle_eta",eta);
+	truth->SetBranchAddress("particle_phi",phi);
+
+	TH1F *p_dR = new TH1F(getNextPlotName(&plotcount).c_str(),"",20,0,TMath::Pi());
+	TH1F *ptr = new TH1F(getNextPlotName(&plotcount).c_str(),"",20,0,2);
+
+	for(auto it :reco){
+		truth->GetEvent(it.first);
+		int spot =0;
+		float tdR = it.second.deltaR(eta[0],phi[0]);
+		for (int i = 1; i < N; ++i)
+		{
+			float ndR=it.second.deltaR(eta[i],phi[i]);
+			if(ndR<tdR){
+				spot=i;
+				tdR=ndR;
+			}
+		}
+		p_dR->Fill(tdR);
+		ptr->Fill(it.second.getpT().value/pT[spot]);
+	}
+	plot(p_dR,"#DeltaR #gamma");
+	plot(ptr,"pT #gama #frac{reco}{truth}");
+}
+
+void makeRatios(std::vector<Pair<Photon>> pairs){
+	TH1F *pTratio = new TH1F("ratio","",20,0,2);
+	for (std::vector<Pair<Photon>>::iterator i = pairs.begin(); i != pairs.end(); ++i)
+	{
+		pTratio->Fill((*i).y.getpT().value/(*i).x.getpT().value);
+	}
+	plot(pTratio,"#frac{reco pT #gamma}{truth pT #gamma}");
 }
 
 void evalAnalysis(){
 	string location ="/home/user/Droptemp/SinglePhoton/";
 	string name ="eval.root";
+	TFile *ef = new TFile((location+name).c_str(),"READ");
+	TNtuple *track, *vertex;
+	track = (TNtuple*) ef->Get("ntp_track");
+	vertex = (TNtuple*) ef->Get("ntp_vertex");
+	name="truth.root";
 	TFile *tf = new TFile((location+name).c_str(),"READ");
-	TNtuple *truthTrack, *g4Track;
-	truthTrack = (TNtuple*) tf->Get("ntp_track");
-	makeTracks(truthTrack);
-	//cout<<truthTrack->GetEntries()<<endl;
-	/* out of 10k events I got 940 tracks or equivently 470 converted photons*/
+	TTree *truthInfo;
+	truthInfo = (TTree*) tf->Get("ttree");
+	//matchTracks(track,vertex);
+	matchPhotons(truthInfo,matchTracks(track,vertex));
 
 }
