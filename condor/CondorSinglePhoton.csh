@@ -1,7 +1,7 @@
 #!/bin/csh 
-@ p = $1
+@ p = $1+100
 #
-set OUT_FILE="/sphenix/user/vassalli/G4SinglePhoton/out${1}.root"
+set OUT_FILE="/sphenix/user/vassalli/singlesamples/Photon5/out${p}.root"
 #
 set SCRATCH_AREA="$_CONDOR_SCRATCH_DIR"                                                                                                              
 #

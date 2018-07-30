@@ -1,4 +1,4 @@
-int after_macro( std::string infile = "XjPhi3_pT5_98_dst.root",std::string outfile)
+int after_DST( std::string infile = "XjPhi3_pT5_98_dst.root",std::string outfile)
 {
   
   gSystem->Load("libfun4all.so");
@@ -10,6 +10,7 @@ int after_macro( std::string infile = "XjPhi3_pT5_98_dst.root",std::string outfi
   gSystem->Load("libg4eval.so");
   gSystem->Load("libcalotrigger.so");
   gSystem->Load("libSinglePhotonAnalysis.so");
+  gSystem->Load("libFastTrackingEval.so");
 
   int verbosity = 0;
 
@@ -24,6 +25,10 @@ int after_macro( std::string infile = "XjPhi3_pT5_98_dst.root",std::string outfi
  
   SinglePhotonAfter *truther = new SinglePhotonAfter(outfile);
   se->registerSubsystem(truther);
+  
+  FastTrackingEval *evaluator = new FastTrackingEval("FastTrackingEval",outfile+"eval.root");
+  se->registerSubsystem(evaluator);
+
 
   se->run();
 

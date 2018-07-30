@@ -6,7 +6,7 @@ int Fun4All_G4_sPHENIX(
     const char *embed_input_file = "/sphenix/data/data02/review_2017-08-02/sHijing/fm_0-4.list")
 {
 
-    const int nEvents = 100;
+    const int nEvents = 500;
     const char *inputFile = "/sphenix/data/data02/review_2017-08-02/single_particle/spacal2d/fieldmap/G4Hits_sPHENIX_e-_eta0_8GeV-0002.root";
   //===============
   // Input options
@@ -192,7 +192,7 @@ int Fun4All_G4_sPHENIX(
     {
       // toss low multiplicity dummy events
       PHG4SimpleEventGenerator *gen = new PHG4SimpleEventGenerator();
-      gen->add_particles("gamma", 10);  // mu+,e+,proton,pi+,Upsilon
+      gen->add_particles("gamma", 8);  // mu+,e+,proton,pi+,Upsilon
       //gen->add_particles("pi+",100); // 100 pion option
       if (readhepmc || do_embedding || runpythia8 || runpythia6)
       {
