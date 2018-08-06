@@ -91,11 +91,15 @@ std::map<int, Photon> matchTracks(TNtuple* tracks,TNtuple* verticies){
 	TH2F *anglespace = new TH2F("anglespace","",20,0,.005,20,0,.1);
 	TH2F *anglespaceTruth = new TH2F("anglespaceTruth","",20,0,.005,20,0,.1);
 	TH2F *plotXY = new TH2F("map","",100,-10,10,100,-10,10);
-	TH2F *anglepT = new TH2F(getNextPlotName(&plotcount).c_str(),"",40,0,10,200,0.,1);
+	TH2F *anglepT = new TH2F(getNextPlotName(&plotcount).c_str(),"",40,0,10,200,0,.2);
 	TH2F *responseR = new TH2F("resR","",200,0,25,60,0,2);
+	TH2F *responseZ = new TH2F("resZ","",100,0,10,200,0.6,1.8);
 	
 	std::map<int, Photon> map; //return value
 	int slide=0;
+	int total=kVertexTupleLength;
+	int toomanytrackscounter=0;
+	int nancount=0;
 	for (int i = 0; i < kVertexTupleLength; ++i)
 	{
 		verticies->GetEvent(i);
@@ -130,6 +134,16 @@ std::map<int, Photon> matchTracks(TNtuple* tracks,TNtuple* verticies){
 			anglepT->Fill((float)(lv1+lv2).Pt(),(float)p1.Angle(p2));
 			responseR->Fill((float)truthVertex.XYvector().Mod(),(float)p1.Pt()/truthpT1);
 			responseR->Fill((float)truthVertex.XYvector().Mod(),(float)p2.Pt()/truthpT2);
+			responseZ->Fill(tvz,(float)p2.Pt()/truthpT2);
+			responseZ->Fill(tvz,(float)p1.Pt()/truthpT1);
+		}
+		else{
+			if(ntracks>2){
+				toomanytrackscounter++;
+			}
+			if(vx!=vx){
+				nancount++;
+			}
 		}
 	}
 	//plot(pTR,"Track pT #frac{reco}{truth}");
@@ -141,6 +155,10 @@ std::map<int, Photon> matchTracks(TNtuple* tracks,TNtuple* verticies){
 	//plot(plotXY,"truth conversion x","y");
 	plot(anglepT,"reco pT #gamma","track match angle");
 	plot(responseR,"truth conversion radius","Track pT #frac{reco}{truth}");
+	plot(responseZ,"truth conversion z","Track pT #frac{reco}{truth}");
+	cout<<"Rejected "<<toomanytrackscounter<<" verticies out of "<<total<<" due to too many tracks \n"<<endl;
+	cout<<nancount<<" nan verticies \n";
+	cout<<map.size()/(float)total*100<<"\% of conversions reconstructed \n";
 	return map;
 }
 
@@ -172,8 +190,8 @@ void matchPhotons(TTree *truth,std::map<int, Photon> reco){
 		p_dR->Fill(tdR);
 		ptr->Fill(it.second.getpT().value/pT[spot]);
 	}
-	plot(p_dR,"#DeltaR #gamma");
-	plot(ptr,"pT #gama #frac{reco}{truth}");
+	plot(p_dR,"reco-truth #DeltaR #gamma");
+	plot(ptr,"pT #gamma #frac{reco}{truth}");
 }
 
 void makeRatios(std::vector<Pair<Photon>> pairs){
