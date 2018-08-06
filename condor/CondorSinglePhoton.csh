@@ -1,5 +1,5 @@
 #!/bin/csh 
-@ p = $1+100
+@ p = ( ${1} + 100 )
 #
 set OUT_FILE="/sphenix/user/vassalli/singlesamples/Photon5/out${p}.root"
 #
