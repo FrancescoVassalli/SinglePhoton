@@ -61,7 +61,7 @@ int ConvertedPhotonReconstructor::process_event(PHCompositeNode *topNode) {
     _svtxevalstack->next_event(topNode);
   }
 
-  reconstruct(_svtxevalstack);
+  reconstruct(_svtxevalstack,topNode);
   event++;
   return Fun4AllReturnCodes::EVENT_OK;
 }
@@ -76,7 +76,7 @@ int ConvertedPhotonReconstructor::End(PHCompositeNode *topNode) {
 void ConvertedPhotonReconstructor::reconstruct(SvtxEvalStack *stack,PHCompositeNode *topNode){
 	
 	SvtxVertexMap* vertexmap = findNode::getClass<SvtxVertexMap>(topNode,"SvtxVertexMap");
-	SvtxTrackMap* trackmap = findNode::getClass<SvtxTrackMap>(topNode,_trackmapname.c_str());
+	SvtxTrackMap* trackmap = findNode::getClass<SvtxTrackMap>(topNode,"SvtxTrackMap");
 	SvtxVertexEval* vertexeval = _svtxevalstack->get_vertex_eval();
 	SvtxTrackEval* trackeval = _svtxevalstack->get_track_eval();
 
@@ -91,8 +91,8 @@ void ConvertedPhotonReconstructor::reconstruct(SvtxEvalStack *stack,PHCompositeN
 		vy = vertex->get_y();
 		vz = vertex->get_z();
 		float charge1;
-		SvtxTrackMap::Iter iter = trackmap->begin(); 
-		SvtxTrack* track = iter->second;
+		SvtxTrackMap::Iter titer = trackmap->begin(); 
+		SvtxTrack* track = titer->second;
 		charge1 = track->get_charge();
 		if(abs(charge1)!=1) continue; //only considering electron positron conversion 
 		float t1x,t1y,t1z,t2x,t2y,t2z,charge2;
@@ -100,24 +100,31 @@ void ConvertedPhotonReconstructor::reconstruct(SvtxEvalStack *stack,PHCompositeN
 		t1y = track->get_py();
 		t1z = track->get_pz();
 		PHG4Particle* truth1 = trackeval->max_truth_particle_by_nclusters(track);	
-		++iter;
+		++titer;
+    track= titer->second;
 		charge2 = track->get_charge();
 		if(charge1!= -1*charge2)continue; //tracks must have opposite charge 
 		t2x = track->get_px();
 		t2y = track->get_py();
 		t2z = track->get_pz();
+
 		PHG4Particle* truth2 = trackeval->max_truth_particle_by_nclusters(track);	
-		TVector3 track1(t1x,t1y,t1z),track2(t1x,t1y,t1z);
-		TLorentzVector recotlv(
+		TVector3 track1(t1x,t1y,t1z),track2(t2x,t2y,t2z);
+		PHG4VtxPoint* point = vertexeval->max_truth_point_by_ntracks(vertex); 
+    TVector3 tTrack1(truth1->get_px(),truth1->get_py(),truth1->get_pz()),
+             tTrack2(truth2->get_px(),truth2->get_py(),truth2->get_pz());
+
+		
+    TLorentzVector recotlv(
 			TLorentzVector(track1,pToE(track1,kEmass))
 			+TLorentzVector(track2,pToE(track2,kEmass))
 		); // make the tlv for the reco photon 
-
-		PHG4VtxPoint* point = vertexeval->max_truth_point_by_ntracks(vertex); 
+    TVector3 recoVertex(vx,vy,vz);
 		//do i care about the truth number of particles ?
 		TVector3 truthConversionVertex(point->get_x(),point->get_y(),point->get_z());
-		TVector3 truthtlv(TLorentzVector(truth1,pToE(truth1,kEmass))
-			+TLorentzVector(truth2,pToE(truth2,kEmass))
+   		TLorentzVector truthtlv(
+        TLorentzVector(tTrack1,pToE(tTrack1,kEmass))
+			+TLorentzVector( tTrack2,pToE(tTrack2,kEmass))
 		);
 
 

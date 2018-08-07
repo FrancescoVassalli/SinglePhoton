@@ -19,11 +19,11 @@
 class ReconstructedConvertedPhoton
 {
 public:
-  ReconstructedConvertedPhoton();
+  ReconstructedConvertedPhoton(){}
   ReconstructedConvertedPhoton(int event, const TLorentzVector& reco,const TLorentzVector& truth, const TVector3& truthVert)
   : event(event), recovec(reco), truthvec(truth), truthVertex(truthVert){}
   //probably a track based contructor 
-  ~ReconstructedConvertedPhoton();
+  ~ReconstructedConvertedPhoton(){}
 inline friend std::ostream& operator<<(std::ostream& os, ReconstructedConvertedPhoton const & tc) {
        return os <<"Converted Photon: \n \t pvec:" << tc.recovec.Pt()
         <<"\n \t truth pvec:"<<tc.truthvec.Pt()<<'\n';

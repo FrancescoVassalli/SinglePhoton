@@ -19,8 +19,7 @@ include_HEADERS = \
   ConvertedPhotonReconstructorLinkDef.h 
 
 libConvertedPhotonReconstructor_la_SOURCES = \
-  ConvertedPhotonReconstructor.cc\
-  ConvertedPhotonReconstructor_Dict.cc
+  ConvertedPhotonReconstructor.cc
 
 libConvertedPhotonReconstructor_la_LIBADD = \
   -lg4dst \
