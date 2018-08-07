@@ -8,13 +8,14 @@
 //===============================================
 
 
-#include <phool/PHCompositeNode.h>
 #include <fun4all/SubsysReco.h>
-#include <string>
 #include <g4eval/SvtxEvalStack.h>
-#include<iostream>
 #include <TVector3.h>
 #include <TLorentzVector.h>
+#include<iostream>
+#include <string>
+
+class PHCompositeNode;
 
 class ReconstructedConvertedPhoton
 {
@@ -22,12 +23,14 @@ public:
   ReconstructedConvertedPhoton(){}
   ReconstructedConvertedPhoton(int event, const TLorentzVector& reco,const TLorentzVector& truth, const TVector3& truthVert)
   : event(event), recovec(reco), truthvec(truth), truthVertex(truthVert){}
-  //probably a track based contructor 
+  
   ~ReconstructedConvertedPhoton(){}
-inline friend std::ostream& operator<<(std::ostream& os, ReconstructedConvertedPhoton const & tc) {
+
+  inline friend std::ostream& operator<<(std::ostream& os, ReconstructedConvertedPhoton const & tc) {
        return os <<"Converted Photon: \n \t pvec:" << tc.recovec.Pt()
         <<"\n \t truth pvec:"<<tc.truthvec.Pt()<<'\n';
     }
+
 private:
   int event;
   //probably some stuff about the tracks 
@@ -35,8 +38,6 @@ private:
   TLorentzVector truthvec;
   TVector3 truthVertex;
 };
-
-class PHCompositeNode;
 
 class ConvertedPhotonReconstructor : public SubsysReco {
   
@@ -49,13 +50,16 @@ public:
   int process_event(PHCompositeNode *topNode);
   int End(PHCompositeNode *topNode);
   std::vector<ReconstructedConvertedPhoton> getPhotons() const {return reconstructedConvertedPhotons;}
- private:
+ 
+protected:
+  const float kEmass = 0.000511;
+
+private:
   int event;
   SvtxEvalStack* _svtxevalstack; 
   std::vector<ReconstructedConvertedPhoton> reconstructedConvertedPhotons;
-  //can make a reconstruct method that takes no arguments and only does reco
+  
   void reconstruct(SvtxEvalStack *stack,PHCompositeNode *topNode);
-  const float kEmass = 0.000511;
   inline float pToE(TVector3 v, float mass){
     return quadrature((float) quadrature(v.x(),v.y()),(float) quadrature((float)v.z(),mass));
   }

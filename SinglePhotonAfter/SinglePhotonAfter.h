@@ -5,8 +5,8 @@
 #include <fun4all/SubsysReco.h>
 #include <vector>
 
-#include "TTree.h"
-#include "TFile.h"
+#include <TTree.h>
+#include <TFile.h>
 
 class PHCompositeNode;
 
