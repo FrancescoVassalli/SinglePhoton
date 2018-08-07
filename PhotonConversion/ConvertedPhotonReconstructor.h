@@ -12,6 +12,8 @@
 #include <g4eval/SvtxEvalStack.h>
 #include <TVector3.h>
 #include <TLorentzVector.h>
+#include <TTree.h>
+#include <TFile.h>
 #include<iostream>
 #include <string>
 
@@ -20,9 +22,8 @@ class PHCompositeNode;
 class ReconstructedConvertedPhoton
 {
 public:
-  ReconstructedConvertedPhoton(){}
-  ReconstructedConvertedPhoton(int event, const TLorentzVector& reco,const TLorentzVector& truth, const TVector3& truthVert)
-  : event(event), recovec(reco), truthvec(truth), truthVertex(truthVert){}
+  ReconstructedConvertedPhoton(const std::string& name, int event, const TLorentzVector& reco,const TVector3& recoVert,const TLorentzVector& truth, const TVector3& truthVert)
+  : event(event), recovec(reco), recoVertex(recoVert),truthvec(truth), truthVertex(truthVert){}
   
   ~ReconstructedConvertedPhoton(){}
 
@@ -37,6 +38,7 @@ private:
   TLorentzVector recovec;
   TLorentzVector truthvec;
   TVector3 truthVertex;
+  TVector3 recoVertex;
 };
 
 class ConvertedPhotonReconstructor : public SubsysReco {
@@ -56,8 +58,15 @@ protected:
 
 private:
   int event;
+  string name;
   SvtxEvalStack* _svtxevalstack; 
   std::vector<ReconstructedConvertedPhoton> reconstructedConvertedPhotons;
+  TFile *_file;
+  TTree *_tree;
+  TLorentzVector b_recovec;
+  TLorentzVector b_truthvec;
+  TVector3       b_truthVertex;
+  TVector3       b_recoVertex;
   
   void reconstruct(SvtxEvalStack *stack,PHCompositeNode *topNode);
   inline float pToE(TVector3 v, float mass){

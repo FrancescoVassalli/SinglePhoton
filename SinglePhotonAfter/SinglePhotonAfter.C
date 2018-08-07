@@ -22,7 +22,7 @@ SinglePhotonAfter::SinglePhotonAfter(const std::string &name) : SubsysReco("Sing
 
 int SinglePhotonAfter::Init(PHCompositeNode *topNode)
 {
-  _f = new TFile( _foutname.c_str(), "RECREATE");
+  _f = new TFile( _foutname.c_str(), "UPDATE");
   _tree = new TTree("ttree","a succulent orange tree");
   _tree->SetAutoSave(300);
   _tree->Branch("particle_n", &_b_particle_n,"particle_n/I");

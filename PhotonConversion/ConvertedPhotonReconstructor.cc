@@ -1,4 +1,3 @@
-
 #include "ConvertedPhotonReconstructor.h"
 
 #include <fun4all/Fun4AllReturnCodes.h>
@@ -8,35 +7,36 @@
 #include <g4hough/SvtxVertex.h>
 #include <g4hough/SvtxTrackMap.h>
 #include <g4hough/SvtxTrack.h>
-#include <g4hough/SvtxClusterMap.h>
-#include <g4hough/SvtxCluster.h>
-#include <g4hough/SvtxHitMap.h>
-#include <g4hough/SvtxHit.h>
+//#include <g4hough/SvtxClusterMap.h>
+//#include <g4hough/SvtxCluster.h>
+//#include <g4hough/SvtxHitMap.h>
+//#include <g4hough/SvtxHit.h>
 
-#include <g4main/PHG4Hit.h>
+//#include <g4main/PHG4Hit.h>
 #include <g4main/PHG4Particle.h>
 #include <g4main/PHG4VtxPoint.h>
 #include <g4main/PHG4TruthInfoContainer.h>
 
-#include <g4detectors/PHG4Cell.h>
-#include <g4detectors/PHG4CylinderCellGeom.h>
-#include <g4detectors/PHG4CylinderCellGeomContainer.h>
-
-
 #include <iostream>
-#include <set>
-#include <cmath>
-#include <cassert>
+#include <cmath> //probably should switch from TMath to cmath
 #include <algorithm>
 
 using namespace std;
 
 ConvertedPhotonReconstructor::ConvertedPhotonReconstructor(const string &name) :
   SubsysReco("ConvertedPhotonReconstructor"),
-  _svtxevalstack(nullptr)
+  _svtxevalstack(nullptr), name(name)
 {
   verbosity = 0;
   event=0;
+  _file = new TFile( name.c_str(), "UPDATE");
+  _tree = new TTree("conveteredphotontree","tracks reconstructed to converted photons");
+  _tree->SetAutoSave(300);
+
+  _tree->Branch("truth_vertex",b_recovec);
+  _tree->Branch("truth_tlv", b_truthvec);
+  _tree->Branch("reco_vertex", b_truthVertex);
+  _tree->Branch("reco_tlv", b_recoVertex);
 }
 
 int ConvertedPhotonReconstructor::Init(PHCompositeNode *topNode) {
@@ -67,7 +67,7 @@ int ConvertedPhotonReconstructor::process_event(PHCompositeNode *topNode) {
 }
 
 int ConvertedPhotonReconstructor::End(PHCompositeNode *topNode) {
-
+  _tree->Write();
   delete _svtxevalstack;
   
   return Fun4AllReturnCodes::EVENT_OK;
@@ -115,21 +115,22 @@ void ConvertedPhotonReconstructor::reconstruct(SvtxEvalStack *stack,PHCompositeN
              tTrack2(truth2->get_px(),truth2->get_py(),truth2->get_pz());
 
 		
-    TLorentzVector recotlv(
-			TLorentzVector(track1,pToE(track1,kEmass))
-			+TLorentzVector(track2,pToE(track2,kEmass))
-		); // make the tlv for the reco photon 
-    TVector3 recoVertex(vx,vy,vz);
-		//do i care about the truth number of particles ?
-		TVector3 truthConversionVertex(point->get_x(),point->get_y(),point->get_z());
-   		TLorentzVector truthtlv(
+    b_recovec(
+        TLorentzVector(track1,pToE(track1,kEmass))
+        +TLorentzVector(track2,pToE(track2,kEmass))
+        ); // make the tlv for the reco photon 
+    b_recoVertex(vx,vy,vz);
+    //do i care about the truth number of particles ?
+    b_truthVertex(point->get_x(),point->get_y(),point->get_z());
+    b_truthvec(
         TLorentzVector(tTrack1,pToE(tTrack1,kEmass))
-			+TLorentzVector( tTrack2,pToE(tTrack2,kEmass))
-		);
+        +TLorentzVector( tTrack2,pToE(tTrack2,kEmass))
+        );
 
 
 		reconstructedConvertedPhotons.push_back(
-			ReconstructedConvertedPhoton(event,recotlv,truthtlv,truthConversionVertex)
+			ReconstructedConvertedPhoton(event,recotlv,recoVertex,truthtlv,truthConversionVertex)
 		);
+    _tree->Fill();
 	}
 }
