@@ -22,8 +22,12 @@ class PHCompositeNode;
 class ReconstructedConvertedPhoton
 {
 public:
-  ReconstructedConvertedPhoton(const std::string& name, int event, const TLorentzVector& reco,const TVector3& recoVert,const TLorentzVector& truth, const TVector3& truthVert)
-  : event(event), recovec(reco), recoVertex(recoVert),truthvec(truth), truthVertex(truthVert){}
+  ReconstructedConvertedPhoton(int event, const TLorentzVector& reco,const TVector3& recoVert,const TLorentzVector& truth, const TVector3& truthVert): event(event){
+    recovec    =reco;
+    truthvec   = truth;
+    truthVertex= truthVert;
+    recoVertex = recoVert;
+  }
   
   ~ReconstructedConvertedPhoton(){}
 

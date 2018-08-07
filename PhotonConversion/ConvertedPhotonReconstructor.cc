@@ -24,19 +24,20 @@
 using namespace std;
 
 ConvertedPhotonReconstructor::ConvertedPhotonReconstructor(const string &name) :
-  SubsysReco("ConvertedPhotonReconstructor"),
-  _svtxevalstack(nullptr), name(name)
+  SubsysReco("ConvertedPhotonReconstructor")
 {
+  this->name=name;
+  _svtxevalstack=nullptr;
   verbosity = 0;
   event=0;
   _file = new TFile( name.c_str(), "UPDATE");
   _tree = new TTree("conveteredphotontree","tracks reconstructed to converted photons");
   _tree->SetAutoSave(300);
 
-  _tree->Branch("truth_vertex",b_recovec);
-  _tree->Branch("truth_tlv", b_truthvec);
-  _tree->Branch("reco_vertex", b_truthVertex);
-  _tree->Branch("reco_tlv", b_recoVertex);
+  _tree->Branch("reco_tlv",     &b_recovec);
+  _tree->Branch("truth_tlv",    &b_truthvec);
+  _tree->Branch("truth_vertex", &b_truthVertex);
+  _tree->Branch("reco_vertex",  &b_recoVertex);
 }
 
 int ConvertedPhotonReconstructor::Init(PHCompositeNode *topNode) {
@@ -115,21 +116,17 @@ void ConvertedPhotonReconstructor::reconstruct(SvtxEvalStack *stack,PHCompositeN
              tTrack2(truth2->get_px(),truth2->get_py(),truth2->get_pz());
 
 		
-    b_recovec(
-        TLorentzVector(track1,pToE(track1,kEmass))
-        +TLorentzVector(track2,pToE(track2,kEmass))
-        ); // make the tlv for the reco photon 
-    b_recoVertex(vx,vy,vz);
+    b_recovec= TLorentzVector(track1,pToE(track1,kEmass))
+        +TLorentzVector(track2,pToE(track2,kEmass)); // make the tlv for the reco photon 
+    b_recoVertex=TVector3(vx,vy,vz);
     //do i care about the truth number of particles ?
-    b_truthVertex(point->get_x(),point->get_y(),point->get_z());
-    b_truthvec(
-        TLorentzVector(tTrack1,pToE(tTrack1,kEmass))
-        +TLorentzVector( tTrack2,pToE(tTrack2,kEmass))
-        );
+    b_truthVertex=TVector3(point->get_x(),point->get_y(),point->get_z());
+    b_truthvec= TLorentzVector(tTrack1,pToE(tTrack1,kEmass))
+        +TLorentzVector( tTrack2,pToE(tTrack2,kEmass));
 
 
 		reconstructedConvertedPhotons.push_back(
-			ReconstructedConvertedPhoton(event,recotlv,recoVertex,truthtlv,truthConversionVertex)
+			ReconstructedConvertedPhoton(event,b_recovec,b_recoVertex,b_truthvec,b_truthVertex)
 		);
     _tree->Fill();
 	}

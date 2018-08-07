@@ -11,7 +11,7 @@ int after_macro( std::string infile = "XjPhi3_pT5_98_dst.root")
   gSystem->Load("libg4eval.so");
   gSystem->Load("libcalotrigger.so");
   gSystem->Load("libSinglePhotonAnalysis.so");
-
+  gSystem->Load("libConvertedPhotonReconstructor.so");
   int verbosity = 0;
 
   Fun4AllServer *se = Fun4AllServer::instance();
@@ -25,7 +25,7 @@ int after_macro( std::string infile = "XjPhi3_pT5_98_dst.root")
  
   SinglePhotonAfter *truther = new SinglePhotonAfter(outfile);
   se->registerSubsystem(truther);
-
+  se->registerSubsystem(new ConvertedPhotonReconstructor(outfile);
   se->run();
 
   se->End();
