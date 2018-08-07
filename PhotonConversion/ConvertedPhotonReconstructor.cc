@@ -1,9 +1,6 @@
 
 #include "ConvertedPhotonReconstructor.h"
 
-#include "SvtxEvalStack.h"
-
-#include <phool/PHCompositeNode.h>
 #include <fun4all/Fun4AllReturnCodes.h>
 #include <phool/getClass.h>
 
@@ -25,6 +22,7 @@
 #include <g4detectors/PHG4CylinderCellGeom.h>
 #include <g4detectors/PHG4CylinderCellGeomContainer.h>
 
+
 #include <iostream>
 #include <set>
 #include <cmath>
@@ -35,7 +33,7 @@ using namespace std;
 
 ConvertedPhotonReconstructor::ConvertedPhotonReconstructor(const string &name) :
   SubsysReco("ConvertedPhotonReconstructor"),
-  _svtxevalstack(nullptr),
+  _svtxevalstack(nullptr)
 {
   verbosity = 0;
   event=0;
@@ -51,8 +49,8 @@ int ConvertedPhotonReconstructor::InitRun(PHCompositeNode *topNode) {
   
 int ConvertedPhotonReconstructor::process_event(PHCompositeNode *topNode) {
   //progress report
-  if ((verbosity > 0)&&(_ievent%100==0)) {  
-    cout << "ConvertedPhotonReconstructor::process_event - Event = " << _ievent << endl;
+  if ((verbosity > 0)&&(event%100==0)) {  
+    cout << "ConvertedPhotonReconstructor::process_event - Event = " << event << endl;
   }
   //let the stack get the info from the node
   if (!_svtxevalstack) {
@@ -75,7 +73,7 @@ int ConvertedPhotonReconstructor::End(PHCompositeNode *topNode) {
   return Fun4AllReturnCodes::EVENT_OK;
 }
 
-void ConvertedPhotonReconstructor::reconstruct(SvtxEvalStack *stack){
+void ConvertedPhotonReconstructor::reconstruct(SvtxEvalStack *stack,PHCompositeNode *topNode){
 	
 	SvtxVertexMap* vertexmap = findNode::getClass<SvtxVertexMap>(topNode,"SvtxVertexMap");
 	SvtxTrackMap* trackmap = findNode::getClass<SvtxTrackMap>(topNode,_trackmapname.c_str());
