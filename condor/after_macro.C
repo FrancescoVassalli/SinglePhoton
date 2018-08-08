@@ -25,7 +25,7 @@ int after_macro( std::string infile = "XjPhi3_pT5_98_dst.root")
  
   SinglePhotonAfter *truther = new SinglePhotonAfter(outfile);
   se->registerSubsystem(truther);
-  se->registerSubsystem(new ConvertedPhotonReconstructor(outfile);
+  se->registerSubsystem(new ConvertedPhotonReconstructor(outfile));
   se->run();
 
   se->End();
