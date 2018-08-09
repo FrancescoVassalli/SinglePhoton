@@ -56,34 +56,24 @@ void plot(TH2F* plot,string x, string y){
   plot->Draw("colz");
 }
 
-
-/*void makeRatios(std::vector<Pair<Photon>> pairs){
-	TH1F *pTratio = new TH1F("ratio","",20,0,2);
-	for (std::vector<Pair<Photon>>::iterator i = pairs.begin(); i != pairs.end(); ++i)
-	{
-		pTratio->Fill((*i).y.getpT().value/(*i).x.getpT().value);
-	}
-	plot(pTratio,"#frac{reco pT #gamma}{truth pT #gamma}");
-}*/
-
 void nicePlotter(){
 	string name ="trackFile.root";
 	TFile *ef = new TFile((name).c_str(),"READ");
 	//track plots 
-	//reco/truth comparison
-	TH1F* pTR =(TH1F*) ef->Get("pTR");T
-	H2F* responsedepR=(TH2F*) ef->Get("resR"); //response x axis measures truth
-	TH2F* responsedepX=(TH2F*) ef->Get("resZ");
-	//track reco and truth data
-	TH1F* recomatchAngle =(TH1F*) ef->Get("match1");
-	TH1F* truthRadius=(TH1F*) ef->Get("conRad");
-	TH2F* truthRz=(TH2F*) ef->Get("conRadZdepend");
-	TH2F* precoanglespace=(TH2F*) ef->Get("anglespace");
-	TH2F* ptruthanglespace=(TH2F*) ef->Get("anglespaceTruth");
-	TH2F* recoRadio=(TH2F*) ef->Get("pXY");
-	TH2F* recomatchAngleDeppT=(TH2F*) ef->Get("daangle");
-	//photon plots 
-	TH1F* photMatchAng=(TH1F*) ef->Get("rtDrg");
-	TH1F* photResponse=(TH1F*) ef->Get("pTgfrt");
+	
+
+	TH1F *pTR = (TH1F*) ef->Get("pTR");
+	TH1F *matchAngle =(TH1F*) ef->Get("matchAngle");
+	TH2F *anglespace = (TH1F*) ef->Get("ranglespace");
+	TH2F *responseR = (TH1F*) ef->Get("tresR"); 
+	TH2F *responseZ = (TH1F*) ef->Get("tresZ");
+	TH1F *truthVEta= (TH1F*) ef->Get("trutheta");
+	TH1F *recoVEta= (TH1F*) ef->Get("recoeta"); 
+	TH1F *truthVRadius = (TH1F*) ef->Get("truthRadius");
+	TH1F *recoVRadius = (TH1F*) ef->Get("recoRadius"); 
+	TH2F *truthVrz = (TH1F*) ef->Get("truthconZdepend");
+	TH2F *recoVrz = (TH1F*) ef->Get("recoconZdepend"); 
+	TH2F *truthplotXY = (TH1F*) ef->Get("tpXY"); 
+	TH2F *recoplotXY = (TH1F*) ef->Get("rpXY"); 
 
 }
