@@ -115,7 +115,7 @@ std::map<int, Photon> matchTracks(TNtuple* tracks,TNtuple* verticies){
 	TH2F *rvz = new TH2F("conZdepend","",200,0,25,200,0,20);
 	TH2F *anglespace = new TH2F("anglespace","",20,0,.005,20,0,.1);
 	TH2F *anglespaceTruth = new TH2F("anglespaceTruth","",20,0,.005,20,0,.1);
-	TH2F *plotXY = new TH2F("pXY","",100,-10,10,100,-10,10);
+	TH2F *plotXY = new TH2F("pXY","",100,-20,20,100,-20,20);
 	TH2F *anglepT = new TH2F("daangle","",40,0,10,200,0,.2);
 	TH2F *responseR = new TH2F("resR","",200,0,25,60,0,2);
 	TH2F *responseZ = new TH2F("resZ","",100,0,10,200,0.6,1.8);
