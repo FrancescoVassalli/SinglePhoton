@@ -68,9 +68,10 @@ int ConvertedPhotonReconstructor::process_event(PHCompositeNode *topNode) {
 }
 
 int ConvertedPhotonReconstructor::End(PHCompositeNode *topNode) {
-  _tree->Write();
+  _file->Write();
+  _file->Close();
   delete _svtxevalstack;
-  
+  delete _file;
   return Fun4AllReturnCodes::EVENT_OK;
 }
 

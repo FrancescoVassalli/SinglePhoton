@@ -63,10 +63,8 @@ int SinglePhotonAfter::process_event(PHCompositeNode *topNode)
 
 int SinglePhotonAfter::End(PHCompositeNode *topNode)
 {
-  _tree->Write();
   _f->Write();
   _f->Close();
-
   return 0;
 }
 

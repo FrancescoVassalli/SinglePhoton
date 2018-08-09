@@ -13,7 +13,6 @@ int after_DST( std::string infile = "XjPhi3_pT5_98_dst.root",std::string outfile
   gSystem->Load("libConvertedPhotonReconstructor.so");
 
   int verbosity = 0;
-
   Fun4AllServer *se = Fun4AllServer::instance();
   se->Verbosity( 0 );
   // just if we set some flags somewhere in this macro
