@@ -204,7 +204,7 @@ void matchPhotons(TTree *truth,std::map<int, Photon> reco){
 	truth->SetBranchAddress("particle_phi",phi);
 
   TFile *file = new TFile("trackFile.root","UPDATE");
-	TH1F *p_dR = new TH1F("rtDrg","",20,0,TMath::Pi());
+	TH1F *p_dR = new TH1F("gamMatchdR","",20,0,TMath::Pi());
 	TH1F *ptr = new TH1F("pTgfrt","",20,0,2);
   int loopcount=0;
 	for(std::map<int, Photon>::iterator it =reco.begin(); it!=reco.end();it++){
