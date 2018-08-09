@@ -1,7 +1,7 @@
 int after_macro( std::string infile = "XjPhi3_pT5_98_dst.root")
 {
   
-	std::string outfile = infile+"truth.root";
+	std::string outfile = infile+"burned.root";
   gSystem->Load("libfun4all.so");
   gSystem->Load("libg4detectors.so");
   gSystem->Load("libphhepmc.so");
@@ -12,6 +12,7 @@ int after_macro( std::string infile = "XjPhi3_pT5_98_dst.root")
   gSystem->Load("libcalotrigger.so");
   gSystem->Load("libSinglePhotonAnalysis.so");
   gSystem->Load("libConvertedPhotonReconstructor.so");
+
   int verbosity = 0;
 
   Fun4AllServer *se = Fun4AllServer::instance();

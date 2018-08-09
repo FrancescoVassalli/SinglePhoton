@@ -10,7 +10,7 @@ int after_DST( std::string infile = "XjPhi3_pT5_98_dst.root",std::string outfile
   gSystem->Load("libg4eval.so");
   gSystem->Load("libcalotrigger.so");
   gSystem->Load("libSinglePhotonAnalysis.so");
-  gSystem->Load("libFastTrackingEval.so");
+  gSystem->Load("libConvertedPhotonReconstructor.so");
 
   int verbosity = 0;
 
@@ -25,11 +25,7 @@ int after_DST( std::string infile = "XjPhi3_pT5_98_dst.root",std::string outfile
  
   SinglePhotonAfter *truther = new SinglePhotonAfter(outfile);
   se->registerSubsystem(truther);
-  
-  FastTrackingEval *evaluator = new FastTrackingEval("FastTrackingEval",outfile+"eval.root");
-  se->registerSubsystem(evaluator);
-
-
+  se->registerSubsystem(new ConvertedPhotonReconstructor(outfile));
   se->run();
 
   se->End();
