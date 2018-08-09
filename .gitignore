@@ -1,6 +1,6 @@
 *.root
 *.pdf
-Fun/*
+/gen/Fun/*
 condor_log*
 */vis.mac
 */config.*
