@@ -19,13 +19,13 @@ include_HEADERS = \
   ConvertedPhotonReconstructorLinkDef.h 
 
 libConvertedPhotonReconstructor_la_SOURCES = \
-  ConvertedPhotonReconstructor.cc
+  ConvertedPhotonReconstructor.cc\
+  ConvertedPhotonReconstructor_Dict.C 
 
 libConvertedPhotonReconstructor_la_LIBADD = \
   -lg4dst \
   -lg4eval \
   -lcalotrigger \
-  -ljetbackground \
   -lphool
 
 BUILT_SOURCES = \
