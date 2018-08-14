@@ -125,6 +125,8 @@ std::map<int, Photon> matchTracks(TNtuple* tracks,TNtuple* verticies){
 	int total=kVertexTupleLength;
 	int toomanytrackscounter=0;
 	int nancount=0;
+  int goodVerticies=0;
+  int recoPhotons=0;
 	for (int i = 0; i < kVertexTupleLength; ++i)
 	{
     if(i%10000==0){
@@ -133,6 +135,7 @@ std::map<int, Photon> matchTracks(TNtuple* tracks,TNtuple* verticies){
 		verticies->GetEvent(i);
 		if (vx==vx&&ntracks==2)
 		{
+      goodVerticies++;
 			do{
 				tracks->GetEvent(slide);
 				slide++;
@@ -173,6 +176,8 @@ std::map<int, Photon> matchTracks(TNtuple* tracks,TNtuple* verticies){
 				nancount++;
 			}
 		}
+    cout<<total<<"=totalverticies\n";
+    cout<<goodVerticies/total<<"\% Reconstructed\n";
 	}
 	//plot(pTR,"Track pT #frac{reco}{truth}");
 	//plot(matchAngle,"matching track angle reco");

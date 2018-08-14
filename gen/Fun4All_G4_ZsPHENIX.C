@@ -1,7 +1,7 @@
 #include <iostream>
 using namespace std;
 
-int Fun4All_G4_sPHENIX(
+int Fun4All_G4_ZsPHENIX(
     const char *outputFile = "G4sPHENIX.root",
     const char *embed_input_file = "/sphenix/data/data02/review_2017-08-02/sHijing/fm_0-4.list")
 {
@@ -209,7 +209,7 @@ int Fun4All_G4_sPHENIX(
       }
       gen->set_vertex_size_function(PHG4SimpleEventGenerator::Uniform);
       gen->set_vertex_size_parameters(0.0, 0.0);
-      gen->set_eta_range(-.2,0.2);
+      gen->set_eta_range(-1.1,0.9);
       gen->set_phi_range(-1.0 * TMath::Pi(), 1.0 * TMath::Pi());
       gen->set_pt_range(5.0,5.0);
       gen->Embed(2);

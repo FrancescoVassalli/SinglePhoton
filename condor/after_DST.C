@@ -15,7 +15,6 @@ int after_DST( std::string infile = "XjPhi3_pT5_98_dst.root",std::string outfile
   int verbosity = 0;
   Fun4AllServer *se = Fun4AllServer::instance();
   se->Verbosity( 0 );
-  // just if we set some flags somewhere in this macro
   recoConsts *rc = recoConsts::instance();
 
   Fun4AllInputManager *hitsin = new Fun4AllDstInputManager("DSTin");

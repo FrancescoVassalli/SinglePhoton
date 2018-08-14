@@ -15,7 +15,7 @@ analysis/*.h
 */ltmain.sh
 *#*
 *.d
-*.in
+*/Makefile.in
 */build/*
 MASTER*
 DisplayOn.C
