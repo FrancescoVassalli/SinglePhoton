@@ -2,23 +2,19 @@
 
 #include <fun4all/Fun4AllReturnCodes.h>
 #include <phool/getClass.h>
+#include <phool/PHDataNode.h>
 
 #include <g4hough/SvtxVertexMap.h>
 #include <g4hough/SvtxVertex.h>
 #include <g4hough/SvtxTrackMap.h>
-#include <g4hough/SvtxTrack.h>
-//#include <g4hough/SvtxClusterMap.h>
-//#include <g4hough/SvtxCluster.h>
-//#include <g4hough/SvtxHitMap.h>
-//#include <g4hough/SvtxHit.h>
+#include <g4eval/SvtxEvalStack.h>
 
-//#include <g4main/PHG4Hit.h>
 #include <g4main/PHG4Particle.h>
 #include <g4main/PHG4VtxPoint.h>
 #include <g4main/PHG4TruthInfoContainer.h>
 
 #include <iostream>
-#include <cmath> //probably should switch from TMath to cmath
+#include <cmath> 
 #include <algorithm>
 
 using namespace std;
@@ -27,7 +23,6 @@ ConvertedPhotonReconstructor::ConvertedPhotonReconstructor(const string &name) :
   SubsysReco("ConvertedPhotonReconstructor")
 {
   this->name=name;
-  _svtxevalstack=nullptr;
   verbosity = 0;
   event=0;
   _file = new TFile( name.c_str(), "UPDATE");
@@ -54,23 +49,20 @@ int ConvertedPhotonReconstructor::process_event(PHCompositeNode *topNode) {
     cout << "ConvertedPhotonReconstructor::process_event - Event = " << event << endl;
   }
   //let the stack get the info from the node
-  if (!_svtxevalstack) {
+  SvtxEvalStack *_svtxevalstack;
     _svtxevalstack = new SvtxEvalStack(topNode);
     _svtxevalstack->set_strict(false); //no idea what this does 
     _svtxevalstack->set_verbosity(verbosity+1); //might be able to lower this 
-  } else {
-    _svtxevalstack->next_event(topNode);
-  }
 
   reconstruct(_svtxevalstack,topNode);
   event++;
+  delete _svtxevalstack;
   return Fun4AllReturnCodes::EVENT_OK;
 }
 
 int ConvertedPhotonReconstructor::End(PHCompositeNode *topNode) {
   _file->Write();
   _file->Close();
-  delete _svtxevalstack;
   delete _file;
   return Fun4AllReturnCodes::EVENT_OK;
 }
@@ -79,9 +71,9 @@ void ConvertedPhotonReconstructor::reconstruct(SvtxEvalStack *stack,PHCompositeN
 	
 	SvtxVertexMap* vertexmap = findNode::getClass<SvtxVertexMap>(topNode,"SvtxVertexMap");
 	SvtxTrackMap* trackmap = findNode::getClass<SvtxTrackMap>(topNode,"SvtxTrackMap");
-	SvtxVertexEval* vertexeval = _svtxevalstack->get_vertex_eval();
-	SvtxTrackEval* trackeval = _svtxevalstack->get_track_eval();
-
+	SvtxVertexEval* vertexeval = stack->get_vertex_eval();
+	SvtxTrackEval* trackeval =   stack->get_track_eval();
+  std::vector<ReconstructedConvertedPhoton>* reconstructedConvertedPhotons=new std::vector<ReconstructedConvertedPhoton>();
 
 	for (SvtxVertexMap::Iter iter = vertexmap->begin(); iter != vertexmap->end(); ++iter) {
 		SvtxVertex* vertex = iter->second;
@@ -103,6 +95,7 @@ void ConvertedPhotonReconstructor::reconstruct(SvtxEvalStack *stack,PHCompositeN
 		t1z = track->get_pz();
 		PHG4Particle* truth1 = trackeval->max_truth_particle_by_nclusters(track);	
 		++titer;
+    SvtxTrack* ftrack=track;
     track= titer->second;
 		charge2 = track->get_charge();
 		if(charge1!= -1*charge2)continue; //tracks must have opposite charge 
@@ -125,10 +118,19 @@ void ConvertedPhotonReconstructor::reconstruct(SvtxEvalStack *stack,PHCompositeN
     b_truthvec= TLorentzVector(tTrack1,pToE(tTrack1,kEmass))
         +TLorentzVector( tTrack2,pToE(tTrack2,kEmass));
 
-
-		reconstructedConvertedPhotons.push_back(
-			ReconstructedConvertedPhoton(event,b_recovec,b_recoVertex,b_truthvec,b_truthVertex)
+    if(!ftrack->get_positive_charge()){ // will want ot match these tracks to a truth particle 
+      SvtxTrack* temp=ftrack;
+      ftrack=track;
+      track=temp;
+    }
+		reconstructedConvertedPhotons->push_back(
+			ReconstructedConvertedPhoton(event,b_recovec,b_recoVertex,b_truthvec,b_truthVertex,ftrack,track)
 		);
     _tree->Fill();
+    // add the vector to the node tree 
+    PHDataNode<std::vector<ReconstructedConvertedPhoton>>* vecNode = 
+      new PHDataNode<std::vector<ReconstructedConvertedPhoton>>(
+        reconstructedConvertedPhotons,"ReconstructedConvertedPhotons");
+    topNode->addNode(vecNode);
 	}
 }

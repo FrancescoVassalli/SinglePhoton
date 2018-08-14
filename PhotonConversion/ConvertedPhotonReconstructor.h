@@ -9,15 +9,17 @@
 
 
 #include <fun4all/SubsysReco.h>
-#include <g4eval/SvtxEvalStack.h>
+#include <g4hough/SvtxTrack.h>
 #include <TVector3.h>
 #include <TLorentzVector.h>
 #include <TTree.h>
 #include <TFile.h>
-#include<iostream>
+#include <iostream>
 #include <string>
+#include <vector>
 
 class PHCompositeNode;
+class SvtxEvalStack;
 
 class ReconstructedConvertedPhoton
 {
@@ -28,13 +30,27 @@ public:
     truthVertex= truthVert;
     recoVertex = recoVert;
   }
+  ReconstructedConvertedPhoton(int event, const TLorentzVector& reco,const TVector3& recoVert,const TLorentzVector& truth, const TVector3& truthVert,SvtxTrack* ptrack,SvtxTrack* etrack)
+    : event(event), positron(ptrack),electron(etrack){
+    recovec    =reco;
+    truthvec   = truth;
+    truthVertex= truthVert;
+    recoVertex = recoVert;
+  }
   
-  ~ReconstructedConvertedPhoton(){}
+  ~ReconstructedConvertedPhoton(){
+    delete positron;
+    delete electron;
+  }
 
   inline friend std::ostream& operator<<(std::ostream& os, ReconstructedConvertedPhoton const & tc) {
        return os <<"Converted Photon: \n \t pvec:" << tc.recovec.Pt()
         <<"\n \t truth pvec:"<<tc.truthvec.Pt()<<'\n';
     }
+  void setPositron(SvtxTrack* track){positron=track;}
+  void setElectron(SvtxTrack* track){electron=track;}
+  inline SvtxTrack* get_positron() const{return positron;}
+  inline SvtxTrack* get_electron() const{return electron;}
 
 private:
   int event;
@@ -43,6 +59,8 @@ private:
   TLorentzVector truthvec;
   TVector3 truthVertex;
   TVector3 recoVertex;
+  SvtxTrack* positron;
+  SvtxTrack* electron;
 };
 
 class ConvertedPhotonReconstructor : public SubsysReco {
@@ -55,16 +73,14 @@ public:
   int InitRun(PHCompositeNode *topNode);
   int process_event(PHCompositeNode *topNode);
   int End(PHCompositeNode *topNode);
-  std::vector<ReconstructedConvertedPhoton> getPhotons() const {return reconstructedConvertedPhotons;}
+  //std::vector<ReconstructedConvertedPhoton> getPhotons() const {return reconstructedConvertedPhotons;}//i removed this as a class member but I may re add it.  It is declared in the reconstruct method
  
 protected:
   const float kEmass = 0.000511;
 
 private:
   int event;
-  string name;
-  SvtxEvalStack* _svtxevalstack; 
-  std::vector<ReconstructedConvertedPhoton> reconstructedConvertedPhotons;
+  std::string name;
   TFile *_file;
   TTree *_tree;
   TLorentzVector b_recovec;

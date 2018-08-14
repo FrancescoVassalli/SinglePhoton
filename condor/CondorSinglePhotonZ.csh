@@ -3,7 +3,7 @@
 #
 set OUT_LOCATION="/sphenix/user/vassalli/singlesamples/ZPhoton5/"
 set OUT_FILE=${OUT_LOCATION}onlineanalysis${p}.root
-set IN_FILE="/sphenix/user/vassalli/singlesamples/iZPhoton5/out${p}.root"
+set IN_FILE="/sphenix/user/vassalli/singlesamples/ZPhoton5/out${p}.root"
 #
 set SCRATCH_AREA="$_CONDOR_SCRATCH_DIR"                                                                                                              
 #
