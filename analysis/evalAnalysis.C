@@ -230,7 +230,7 @@ void matchPhotons(TTree *truth,std::map<int, Photon> reco){
 //	plot(ptr,"pT #gamma #frac{reco}{truth}");
  // ptr->Write();
  // p_dR->Write();
-	file->Write();
+		file->Write();
   file->Close();
   delete file;
 }

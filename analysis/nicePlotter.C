@@ -60,7 +60,6 @@ void nicePlotter(){
 	string name ="trackFile.root";
 	TFile *ef = new TFile((name).c_str(),"READ");
 	//track plots 
-	
 
 	TH1F *pTR = (TH1F*) ef->Get("pTR");
 	TH1F *matchAngle =(TH1F*) ef->Get("matchAngle");
