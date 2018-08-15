@@ -56,23 +56,49 @@ void plot(TH2F* plot,string x, string y){
   plot->Draw("colz");
 }
 
+void plot(TH1F** plots, const int kSIZE, string* names){
+	for (int i = 0; i < kSIZE; ++i)
+	{
+		plot(plots[i],names[i]);
+	}
+}
+void plot(TH2F** plots, const int kSIZE, string* namesX, string* namesY){
+	for (int i = 0; i < kSIZE; ++i)
+	{
+		plot(plots[i],namesX[i],namesY[i]);
+	}
+}
+
 void nicePlotter(){
 	string name ="trackFile.root";
 	TFile *ef = new TFile((name).c_str(),"READ");
 	//track plots 
-
-	TH1F *pTR = (TH1F*) ef->Get("pTR");
-	TH1F *matchAngle =(TH1F*) ef->Get("matchAngle");
-	TH2F *anglespace = (TH1F*) ef->Get("ranglespace");
-	TH2F *responseR = (TH1F*) ef->Get("tresR"); 
-	TH2F *responseZ = (TH1F*) ef->Get("tresZ");
-	TH1F *truthVEta= (TH1F*) ef->Get("trutheta");
-	TH1F *recoVEta= (TH1F*) ef->Get("recoeta"); 
-	TH1F *truthVRadius = (TH1F*) ef->Get("truthRadius");
-	TH1F *recoVRadius = (TH1F*) ef->Get("recoRadius"); 
-	TH2F *truthVrz = (TH1F*) ef->Get("truthconZdepend");
-	TH2F *recoVrz = (TH1F*) ef->Get("recoconZdepend"); 
-	TH2F *truthplotXY = (TH1F*) ef->Get("tpXY"); 
-	TH2F *recoplotXY = (TH1F*) ef->Get("rpXY"); 
+	const int kNUM1DPLOTS= 5;
+	const int kNUM2DPLOTS= 8;
+	string 1dplotNames[kNUM1DPLOTS] = {"pTR","match1","truthmatchangle","truthRadius",
+		"conRad","recoconRad","gamMatchdR","pTgfrt"};
+	string 1dplotXNames[kNUM1DPLOTS] = {"track pT #frac{reco}{truth}","opening angle reco",
+		"opening angle truth","truth conversion #eta","reco conversion #eta",
+		"truth conversion r","reco conversion r","#Delta R","pT #gamma #frac{reco}{truth}"};
+	string 2dplotNames[kNUM2DPLOTS] = {"conZdepend","anglespace","anglespaceTruth",
+		"pXY","pXYT","daangle","resR","resZ"};
+	string 2dplotXNames[kNUM2DPLOTS] = {"truth conversion r","reco #Delta#eta",
+	"truth #Delta#eta","truth conversion r","reco conversion x","truth conversion x"
+	"reco #gamma pT","truth conversion x","truth conversion z"};
+	string 2dplotYNames[kNUM2DPLOTS] = {"truth conversion z","reco #Delta#phi",
+		"truth #Delta#phi","reco conversion y", "truth conversion y","reco opening angle"
+		"track pT #frac{reco}{truth}","track pT #frac{reco}{truth}"}
+	TH1F* h1plots[kNUM1DPLOTS];
+	TH2F* h2plots[kNUM2DPLOTS];
+	for (int i = 0; i < kNUM1DPLOTS; ++i)
+	{
+		h1plots[i] = (TH1F*) ef->Get(1dplotNames[i]);
+	} 
+	for (int j = 0; j < kNUM2DPLOTS; ++j)
+	{
+		h2plots[j] = (TH2F*) ef->Get(2dplotNames[j]);
+	}
+	plot(&h1plots[0],kNUM1DPLOTS,1dplotXNames);
+	plot(&h2plots[0],kNUM2DPLOTS,2dplotXNames,2dplotYNames);
 
 }

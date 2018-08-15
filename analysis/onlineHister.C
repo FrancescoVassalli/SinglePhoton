@@ -77,7 +77,7 @@ void makeHists(TTree* truth, TTree* recovery, const string& outname){
 
 void onlineHister(){
   const string location ="/sphenix/user/vassalli/singlesamples/Photon5/";
-  string outname
+  string outname = "onlineTrackFile.root"
 	string inname ="track1.root";
 	TFile *tf = new TFile((location+inname).c_str(),"READ");
 	TTree *truthInfo, *recoveryTree;

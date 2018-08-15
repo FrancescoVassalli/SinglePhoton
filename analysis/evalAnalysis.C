@@ -111,11 +111,14 @@ std::map<int, Photon> matchTracks(TNtuple* tracks,TNtuple* verticies){
   TFile *file = new TFile("trackFile.root","RECREATE");
 	TH1F *pTR = new TH1F("pTR","",60,0,2);
 	TH1F *matchAngle =new TH1F("match1","",200,0,.1);
+	TH1F *matchAngleTruth = new TH1F("truthmatchangle","",200,0,.1);
 	TH1F *truthVRadius = new TH1F("conRad","",200,0,25);
+	TH1F *recoVRadius = new TH1F("recoconRad","",200,0,25);
 	TH2F *rvz = new TH2F("conZdepend","",200,0,25,200,0,20);
 	TH2F *anglespace = new TH2F("anglespace","",20,0,.005,20,0,.1);
 	TH2F *anglespaceTruth = new TH2F("anglespaceTruth","",20,0,.005,20,0,.1);
 	TH2F *plotXY = new TH2F("pXY","",100,-20,20,100,-20,20);
+	TH2F *plotXYTruth = new TH2F("pXYT","",100,-20,20,100,-20,20);
 	TH2F *anglepT = new TH2F("daangle","",40,0,10,200,0,.2);
 	TH2F *responseR = new TH2F("resR","",200,0,25,60,0,2);
 	TH2F *responseZ = new TH2F("resZ","",100,0,10,200,0.6,1.8);
@@ -145,6 +148,7 @@ std::map<int, Photon> matchTracks(TNtuple* tracks,TNtuple* verticies){
 			TLorentzVector lv1(p1,pToE(p1,kEmass));
 			float truthpT1=tpt;
 			TVector3 truthVertex(tvx,tvy,tvz);
+			TVector3 recoVertex(vx,vy,vz);
 			TVector3 p1Truth(tpx,tpy,tpz);
 
 			tracks->GetEvent(slide);
@@ -157,11 +161,14 @@ std::map<int, Photon> matchTracks(TNtuple* tracks,TNtuple* verticies){
 			pTR->Fill((float)p1.Pt()/truthpT1);
 			pTR->Fill((float)p2.Pt()/truthpT2);
 			matchAngle->Fill((float)p1.Angle(p2));
+			matchAngleTruth->Fill((float)p1Truth.Angle(p2Truth));
 			truthVRadius->Fill((float)truthVertex.XYvector().Mod());
+			recoVRadius->Fill((float)recoVertex.XYvector().Mod());
 			rvz->Fill(truthVertex.XYvector().Mod(),tvz);
 			anglespace->Fill((float)TMath::Abs(p2.Eta()-p1.Eta()),deltaPhi(p2.Phi(),p1.Phi()));
 			anglespaceTruth->Fill((float)TMath::Abs(p2Truth.Eta()-p1Truth.Eta()),deltaPhi(p2Truth.Phi(),p1Truth.Phi()));
 			plotXY->Fill(vx,vy);
+			plotXYTruth->Fill(tvx,tvy);
 			anglepT->Fill((float)(lv1+lv2).Pt(),(float)p1.Angle(p2));
 			responseR->Fill((float)truthVertex.XYvector().Mod(),(float)p1.Pt()/truthpT1);
 			responseR->Fill((float)truthVertex.XYvector().Mod(),(float)p2.Pt()/truthpT2);
@@ -214,9 +221,9 @@ void matchPhotons(TTree *truth,std::map<int, Photon> reco){
   int loopcount=0;
 	for(std::map<int, Photon>::iterator it =reco.begin(); it!=reco.end();it++){
 		truth->GetEvent(it->first);
-		int spot =0;
+		int spot =0; //location of closet truth 
 		float tdR = it->second.deltaR(eta[0],phi[0]);
-		for (int i = 1; i < N; ++i)
+		for (int i = 1; i < N; ++i)//loop over truth particles 
 		{
 			float ndR=it->second.deltaR(eta[i],phi[i]);
 			if(ndR<tdR){
