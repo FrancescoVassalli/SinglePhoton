@@ -7,8 +7,8 @@
 #include <TCanvas.h>
 #include <iostream>
 #include <cmath>
+#include "NicePlots.C"
 using namespace std;
-
 namespace {
   const float kEmass = 0.000511;
   int plotcount=0;
@@ -59,8 +59,11 @@ void plot(TH2F* plot,string x, string y){
 void plot(TH1F** plots, const int kSIZE, string* names){
 	for (int i = 0; i < kSIZE; ++i)
 	{
+
+		cout<<"here"<<endl;
 		plot(plots[i],names[i]);
 	}
+
 }
 void plot(TH2F** plots, const int kSIZE, string* namesX, string* namesY){
 	for (int i = 0; i < kSIZE; ++i)
@@ -70,35 +73,36 @@ void plot(TH2F** plots, const int kSIZE, string* namesX, string* namesY){
 }
 
 void nicePlotter(){
-	string name ="trackFile.root";
+	gStyle->SetOptStat(0);
+	string name ="lastOfflineTrackFile.root";
 	TFile *ef = new TFile((name).c_str(),"READ");
 	//track plots 
-	const int kNUM1DPLOTS= 5;
+	const int kNUM1DPLOTS= 7;
 	const int kNUM2DPLOTS= 8;
-	string 1dplotNames[kNUM1DPLOTS] = {"pTR","match1","truthmatchangle","truthRadius",
+	string plotNames1d[kNUM1DPLOTS] = {"pTR","match1","truthmatchangle",
 		"conRad","recoconRad","gamMatchdR","pTgfrt"};
-	string 1dplotXNames[kNUM1DPLOTS] = {"track pT #frac{reco}{truth}","opening angle reco",
-		"opening angle truth","truth conversion #eta","reco conversion #eta",
-		"truth conversion r","reco conversion r","#Delta R","pT #gamma #frac{reco}{truth}"};
-	string 2dplotNames[kNUM2DPLOTS] = {"conZdepend","anglespace","anglespaceTruth",
-		"pXY","pXYT","daangle","resR","resZ"};
-	string 2dplotXNames[kNUM2DPLOTS] = {"truth conversion r","reco #Delta#eta",
+	string plotXNames1d[kNUM1DPLOTS] = {"track pT #frac{reco}{truth}","opening angle reco",
+		"opening angle truth","truth conversion r","reco conversion r",
+		"#Delta R","pT #gamma #frac{reco}{truth}"};
+	string plotNames2d[kNUM2DPLOTS] = {"conZdepend","anglespace","anglespaceTruth",
+		"pXYT","pXY","daangle","resR","resZ"};
+	string plotNamesX2d[kNUM2DPLOTS] = {"truth conversion r","reco #Delta#eta",
 	"truth #Delta#eta","truth conversion r","reco conversion x","truth conversion x"
-	"reco #gamma pT","truth conversion x","truth conversion z"};
-	string 2dplotYNames[kNUM2DPLOTS] = {"truth conversion z","reco #Delta#phi",
+	"reco #gamma pT","truth conversion r","truth conversion z"};
+	string plotNamesY2d[kNUM2DPLOTS] = {"truth conversion z","reco #Delta#phi",
 		"truth #Delta#phi","reco conversion y", "truth conversion y","reco opening angle"
-		"track pT #frac{reco}{truth}","track pT #frac{reco}{truth}"}
+		"track pT #frac{reco}{truth}","track pT #frac{reco}{truth}"};
 	TH1F* h1plots[kNUM1DPLOTS];
 	TH2F* h2plots[kNUM2DPLOTS];
 	for (int i = 0; i < kNUM1DPLOTS; ++i)
 	{
-		h1plots[i] = (TH1F*) ef->Get(1dplotNames[i]);
+		h1plots[i] = (TH1F*) ef->Get(plotNames1d[i].c_str());
 	} 
 	for (int j = 0; j < kNUM2DPLOTS; ++j)
 	{
-		h2plots[j] = (TH2F*) ef->Get(2dplotNames[j]);
+		h2plots[j] = (TH2F*) ef->Get(plotNames2d[j].c_str());
 	}
-	plot(&h1plots[0],kNUM1DPLOTS,1dplotXNames);
-	plot(&h2plots[0],kNUM2DPLOTS,2dplotXNames,2dplotYNames);
+	plot(&h1plots[0],kNUM1DPLOTS,plotXNames1d);
+	plot(&h2plots[0],kNUM2DPLOTS,plotNamesX2d,plotNamesY2d);
 
 }
