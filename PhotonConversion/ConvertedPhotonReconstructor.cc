@@ -44,8 +44,7 @@ int ConvertedPhotonReconstructor::InitRun(PHCompositeNode *topNode) {
 }
   
 int ConvertedPhotonReconstructor::process_event(PHCompositeNode *topNode) {
-  //progress report
-  if ((verbosity > 0)&&(event%100==0)) {  
+  if (true||((verbosity > 0)&&(event%100==0))) {  ///////////////////////////////////////////////////////////////////////////////////////////////
     cout << "ConvertedPhotonReconstructor::process_event - Event = " << event << endl;
   }
   //let the stack get the info from the node

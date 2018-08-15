@@ -1,9 +1,9 @@
 #!/bin/csh 
 @ p = ( ${1} + 100 )
 #
-set OUT_LOCATION="/sphenix/user/vassalli/singlesamples/Photon5/"
+set OUT_LOCATION="/sphenix/user/vassalli/singlesamples/Photon5/test"
 set OUT_FILE=${OUT_LOCATION}onlineanalysis${p}.root
-set IN_FILE="/sphenix/user/vassalli/singlesamples/Photon5/out${p}.root"
+set IN_FILE="/sphenix/user/vassalli/singlesamples/Photon5/test/out${p}.root"
 #
 set SCRATCH_AREA="$_CONDOR_SCRATCH_DIR"                                                                                                              
 #
