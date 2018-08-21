@@ -29,6 +29,8 @@ public:
     truthvec   = truth;
     truthVertex= truthVert;
     recoVertex = recoVert;
+		positron=nullptr;
+		electron=nullptr;
   }
   ReconstructedConvertedPhoton(int event, const TLorentzVector& reco,const TVector3& recoVert,const TLorentzVector& truth, const TVector3& truthVert,SvtxTrack* ptrack,SvtxTrack* etrack)
     : event(event), positron(ptrack),electron(etrack){
@@ -36,6 +38,7 @@ public:
     truthvec   = truth;
     truthVertex= truthVert;
     recoVertex = recoVert;
+		removeClusters();
   }
   
   ~ReconstructedConvertedPhoton(){
@@ -43,15 +46,19 @@ public:
     delete electron;
   }
 
-  inline friend std::ostream& operator<<(std::ostream& os, ReconstructedConvertedPhoton const & tc) {
-       return os <<"Converted Photon: \n \t pvec:" << tc.recovec.Pt()
-        <<"\n \t truth pvec:"<<tc.truthvec.Pt()<<'\n';
-    }
   void setPositron(SvtxTrack* track){positron=track;}
   void setElectron(SvtxTrack* track){electron=track;}
   inline SvtxTrack* get_positron() const{return positron;}
   inline SvtxTrack* get_electron() const{return electron;}
+	
+	//one the e pairs are set remove their clusters from the event and add the recovered photon to the list of photons 
+	void removeClusters();
+	void removeClusters(SvtxTrack* t1,SvtxTrack* t2);
 
+	inline friend std::ostream& operator<<(std::ostream& os, ReconstructedConvertedPhoton const & tc) {
+		return os <<"Converted Photon: \n \t pvec:" << tc.recovec.Pt()
+			<<"\n \t truth pvec:"<<tc.truthvec.Pt()<<'\n';
+	}
 private:
   int event;
   //probably some stuff about the tracks 
@@ -59,6 +66,7 @@ private:
   TLorentzVector truthvec;
   TVector3 truthVertex;
   TVector3 recoVertex;
+	//maybe an std::pair would be better 
   SvtxTrack* positron;
   SvtxTrack* electron;
 };

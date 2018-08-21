@@ -83,14 +83,14 @@ void nicePlotter(){
 		"conRad","recoconRad","gamMatchdR","pTgfrt"};
 	string plotXNames1d[kNUM1DPLOTS] = {"track pT #frac{reco}{truth}","opening angle reco",
 		"opening angle truth","truth conversion r","reco conversion r",
-		"#Delta R","pT #gamma #frac{reco}{truth}"};
+		"#Delta R match #gamma","pT #gamma #frac{reco}{truth}"};
 	string plotNames2d[kNUM2DPLOTS] = {"conZdepend","anglespace","anglespaceTruth",
 		"pXYT","pXY","daangle","resR","resZ"};
 	string plotNamesX2d[kNUM2DPLOTS] = {"truth conversion r","reco #Delta#eta",
-	"truth #Delta#eta","truth conversion r","reco conversion x","truth conversion x"
+	"truth #Delta#eta","truth conversion x","reco conversion x",
 	"reco #gamma pT","truth conversion r","truth conversion z"};
 	string plotNamesY2d[kNUM2DPLOTS] = {"truth conversion z","reco #Delta#phi",
-		"truth #Delta#phi","reco conversion y", "truth conversion y","reco opening angle"
+		"truth #Delta#phi","truth conversion y", "reco conversion y","reco opening angle",
 		"track pT #frac{reco}{truth}","track pT #frac{reco}{truth}"};
 	TH1F* h1plots[kNUM1DPLOTS];
 	TH2F* h2plots[kNUM2DPLOTS];

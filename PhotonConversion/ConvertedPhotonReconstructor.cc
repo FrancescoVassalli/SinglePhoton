@@ -19,12 +19,31 @@
 
 using namespace std;
 
+void ReconstructedConvertedPhoton::removeClusters(){
+	if(positron==nullptr||electron==nullptr){
+		cout<<"Error in "<<Name()<<" e pairs must be set before clusters can be removed"<<endl;
+	}
+	else{
+			cout<<"TEST\n";
+			for (std::map<CAL_LAYER,int>::iterator i = positron->_cal_cluster_id.begin(); i != positron->_cal_cluster_id.end(); ++i)
+			{
+				positron->find_cluster(i)->identify();
+				//positron->erase_cluster(i);
+			}
+			for (std::map<CAL_LAYER,int>::iterator i = electron->_cal_cluster_id.begin(); i != electron->_cal_cluster_id.end(); ++i)
+			{
+				electron->find_cluster(i)->identify();
+				//electron->erase_cluster(i);
+			}
+	}
+}
+
 ConvertedPhotonReconstructor::ConvertedPhotonReconstructor(const string &name) :
-  SubsysReco("ConvertedPhotonReconstructor")
+	SubsysReco("ConvertedPhotonReconstructor")
 {
-  this->name=name;
-  verbosity = 0;
-  event=0;
+	this->name=name;
+	verbosity = 0;
+	event=0;
   _file = new TFile( name.c_str(), "UPDATE");
   _tree = new TTree("conveteredphotontree","tracks reconstructed to converted photons");
   _tree->SetAutoSave(300);
