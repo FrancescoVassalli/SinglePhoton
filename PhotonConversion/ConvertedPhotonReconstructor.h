@@ -9,7 +9,7 @@
 
 
 #include <fun4all/SubsysReco.h>
-#include <g4hough/SvtxTrack.h>
+#include <g4hough/SvtxTrack_v1.h>
 #include <TVector3.h>
 #include <TLorentzVector.h>
 #include <TTree.h>
@@ -32,7 +32,7 @@ public:
 		positron=nullptr;
 		electron=nullptr;
   }
-  ReconstructedConvertedPhoton(int event, const TLorentzVector& reco,const TVector3& recoVert,const TLorentzVector& truth, const TVector3& truthVert,SvtxTrack* ptrack,SvtxTrack* etrack)
+  ReconstructedConvertedPhoton(int event, const TLorentzVector& reco,const TVector3& recoVert,const TLorentzVector& truth, const TVector3& truthVert,SvtxTrack_v1* ptrack,SvtxTrack_v1* etrack)
     : event(event), positron(ptrack),electron(etrack){
     recovec    =reco;
     truthvec   = truth;
@@ -47,14 +47,14 @@ public:
     delete electron;
   }
 
-  void setPositron(SvtxTrack* track){positron=track;}
-  void setElectron(SvtxTrack* track){electron=track;}
+  void setPositron(SvtxTrack_v1* track){positron=track;}
+  void setElectron(SvtxTrack_v1* track){electron=track;}
   inline SvtxTrack* get_positron() const{return positron;}
   inline SvtxTrack* get_electron() const{return electron;}
 	
   //one the e pairs are set remove their clusters from the event and add the recovered photon to the list of photons 
 	void removeClusters();
-	void removeClusters(SvtxTrack* t1,SvtxTrack* t2);
+	void removeClusters(SvtxTrack_v1* t1,SvtxTrack_v1* t2);
 
 	inline friend std::ostream& operator<<(std::ostream& os, ReconstructedConvertedPhoton const & tc) {
 		return os <<"Converted Photon: \n \t pvec:" << tc.recovec.Pt()
@@ -69,8 +69,8 @@ private:
   TVector3 truthVertex;
   TVector3 recoVertex;
 	//maybe an std::pair would be better 
-  SvtxTrack* positron;
-  SvtxTrack* electron;
+  SvtxTrack_v1* positron;
+  SvtxTrack_v1* electron;
 };
 
 class ConvertedPhotonReconstructor : public SubsysReco {
