@@ -36,6 +36,7 @@ public:
     truthvec   = truth;
     truthVertex= truthVert;
     recoVertex = recoVert;
+    subtracted = false;
   }
   
   ~ReconstructedConvertedPhoton(){
@@ -46,14 +47,16 @@ public:
   inline friend std::ostream& operator<<(std::ostream& os, ReconstructedConvertedPhoton const & tc) {
        return os <<"Converted Photon: \n \t pvec:" << tc.recovec.Pt()
         <<"\n \t truth pvec:"<<tc.truthvec.Pt()<<'\n';
-    }
+  }
   void setPositron(SvtxTrack* track){positron=track;}
   void setElectron(SvtxTrack* track){electron=track;}
   inline SvtxTrack* get_positron() const{return positron;}
   inline SvtxTrack* get_electron() const{return electron;}
-
+  void subtractEClusters();
+  void subtractEClusters(SvtxTrack* track,SvtxTrack* track2);
 private:
   int event;
+  bool subtracted;
   //probably some stuff about the tracks 
   TLorentzVector recovec;
   TLorentzVector truthvec;

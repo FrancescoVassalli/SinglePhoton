@@ -61,19 +61,19 @@ std::map<int, Photon> matchTracks(TNtuple* tracks,TNtuple* verticies){
 	tracks->SetBranchAddress("gpz",&tpz);
 
   TFile *file = new TFile("trackFile.root","RECREATE");
-	TH1F *pTR = new TH1F("pTR","",60,0,2);
+	TH1F *pTR = new TH1F("pTR","",100,0.6,1.4);
 	TH1F *matchAngle =new TH1F("match1","",200,0,.07);
 	TH1F *matchAngleTruth = new TH1F("truthmatchangle","",200,0,.035);
 	TH1F *truthVRadius = new TH1F("conRad","",200,0,25);
 	TH1F *recoVRadius = new TH1F("recoconRad","",200,0,25);
 	TH2F *rvz = new TH2F("conZdepend","",200,0,25,200,0,20);
-	TH2F *anglespace = new TH2F("anglespace","",20,0,.005,20,0,.1);
-	TH2F *anglespaceTruth = new TH2F("anglespaceTruth","",20,0,.005,20,0,.1);
-	TH2F *plotXY = new TH2F("pXY","",100,-20,20,100,-20,20);
-	TH2F *plotXYTruth = new TH2F("pXYT","",100,-20,20,100,-20,20);
+	TH2F *anglespace = new TH2F("anglespace","",20,0,.02,20,0,.1);
+	TH2F *anglespaceTruth = new TH2F("anglespaceTruth","",20,0,.02,20,0,.1);
+	TH2F *plotXY = new TH2F("pXY","",100,-30,30,100,-30,30);
+	TH2F *plotXYTruth = new TH2F("pXYT","",100,-30,30,100,-30,30);
 	TH2F *anglepT = new TH2F("daangle","",40,0,10,200,0,.2);
-	TH2F *responseR = new TH2F("resR","",200,0,25,60,0,1.8);
-	TH2F *responseZ = new TH2F("resZ","",100,0,10,200,0.6,1.4);
+	TH2F *responseR = new TH2F("resR","",200,0,25,60,0,1.4);
+	TH2F *responseZ = new TH2F("resZ","",100,0,6.5,200,0.6,1.4);
 	
 	std::map<int, Photon> map; //return value
 	int slide=0;
@@ -158,7 +158,7 @@ void matchPhotons(TTree *truth,std::map<int, Photon> reco){
 	truth->SetBranchAddress("particle_phi",phi);
 
   TFile *file = new TFile("trackFile.root","UPDATE");
-	TH1F *p_dR = new TH1F("gamMatchdR","",60,0,2);
+	TH1F *p_dR = new TH1F("gamMatchdR","",30,0,2);
 	TH1F *ptr = new TH1F("pTgfrt","",60,.4,1.6);
   int loopcount=0;
 	for(std::map<int, Photon>::iterator it =reco.begin(); it!=reco.end();it++){
