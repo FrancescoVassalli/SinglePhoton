@@ -38,6 +38,25 @@ void ReconstructedConvertedPhoton::removeClusters(){
 	}
 }
 
+//remove the clusters associated with the parameters and set the parameters to the class 
+void ReconstructedConvertedPhoton::removeClusters(SvtxTrack* positron, SvtxTrack* electron){
+	this->positron=positron;
+	this->electron=electron;
+	else{
+			cout<<"TEST\n";
+			for (std::map<CAL_LAYER,int>::iterator i = positron->_cal_cluster_id.begin(); i != positron->_cal_cluster_id.end(); ++i)
+			{
+				positron->find_cluster(i)->identify();
+				//positron->erase_cluster(i);
+			}
+			for (std::map<CAL_LAYER,int>::iterator i = electron->_cal_cluster_id.begin(); i != electron->_cal_cluster_id.end(); ++i)
+			{
+				electron->find_cluster(i)->identify();
+				//electron->erase_cluster(i);
+			}
+	}
+}
+
 ConvertedPhotonReconstructor::ConvertedPhotonReconstructor(const string &name) :
 	SubsysReco("ConvertedPhotonReconstructor")
 {
@@ -88,7 +107,6 @@ int ConvertedPhotonReconstructor::End(PHCompositeNode *topNode) {
 void ConvertedPhotonReconstructor::reconstruct(SvtxEvalStack *stack,PHCompositeNode *topNode){
 	
 	SvtxVertexMap* vertexmap = findNode::getClass<SvtxVertexMap>(topNode,"SvtxVertexMap");
-	SvtxTrackMap* trackmap = findNode::getClass<SvtxTrackMap>(topNode,"SvtxTrackMap");
 	SvtxVertexEval* vertexeval = stack->get_vertex_eval();
 	SvtxTrackEval* trackeval =   stack->get_track_eval();
   std::vector<ReconstructedConvertedPhoton>* reconstructedConvertedPhotons=new std::vector<ReconstructedConvertedPhoton>();
@@ -98,6 +116,73 @@ void ConvertedPhotonReconstructor::reconstruct(SvtxEvalStack *stack,PHCompositeN
 		float ntracks;
 		ntracks= vertex->size_tracks();
 		if(ntracks!=2)continue; //now i assume thet there are only 2 tracks in the event 
+		float vx,vy,vz;
+		vx = vertex->get_x();
+		vy = vertex->get_y();
+		vz = vertex->get_z();
+		float charge1;
+		TrackIter titer = vertex->begin_tracks(); 
+		SvtxTrack* track = titer->second;
+		charge1 = track->get_charge();
+		if(abs(charge1)!=1) continue; //only considering electron positron conversion 
+		float t1x,t1y,t1z,t2x,t2y,t2z,charge2;
+		t1x = track->get_px();
+		t1y = track->get_py();
+		t1z = track->get_pz();
+		PHG4Particle* truth1 = trackeval->max_truth_particle_by_nclusters(track);	
+		++titer;
+    SvtxTrack* ftrack=track;
+    track= titer->second;
+		charge2 = track->get_charge();
+		if(charge1!= -1*charge2)continue; //tracks must have opposite charge 
+		t2x = track->get_px();
+		t2y = track->get_py();
+		t2z = track->get_pz();
+
+		PHG4Particle* truth2 = trackeval->max_truth_particle_by_nclusters(track);	
+		TVector3 track1(t1x,t1y,t1z),track2(t2x,t2y,t2z);
+		PHG4VtxPoint* point = vertexeval->max_truth_point_by_ntracks(vertex); 
+    TVector3 tTrack1(truth1->get_px(),truth1->get_py(),truth1->get_pz()),
+             tTrack2(truth2->get_px(),truth2->get_py(),truth2->get_pz());
+
+		
+    b_recovec= TLorentzVector(track1,pToE(track1,kEmass))
+        +TLorentzVector(track2,pToE(track2,kEmass)); // make the tlv for the reco photon 
+    b_recoVertex=TVector3(vx,vy,vz);
+    //do i care about the truth number of particles ?
+    b_truthVertex=TVector3(point->get_x(),point->get_y(),point->get_z());
+    b_truthvec= TLorentzVector(tTrack1,pToE(tTrack1,kEmass))
+        +TLorentzVector( tTrack2,pToE(tTrack2,kEmass));
+
+    if(!ftrack->get_positive_charge()){ // will want ot match these tracks to a truth particle 
+      SvtxTrack* temp=ftrack;
+      ftrack=track;
+      track=temp;
+    }
+		reconstructedConvertedPhotons->push_back(
+			ReconstructedConvertedPhoton(event,b_recovec,b_recoVertex,b_truthvec,b_truthVertex,ftrack,track)
+		);
+    _tree->Fill();
+    // add the vector to the node tree 
+    PHDataNode<std::vector<ReconstructedConvertedPhoton>>* vecNode = 
+      new PHDataNode<std::vector<ReconstructedConvertedPhoton>>(
+        reconstructedConvertedPhotons,"ReconstructedConvertedPhotons");
+    topNode->addNode(vecNode);
+	}
+}
+void reconstructTracks(SvtxEvalStack *stack,PHCompositeNode *topNode){
+	
+	SvtxVertexMap* vertexmap = findNode::getClass<SvtxVertexMap>(topNode,"SvtxVertexMap");
+	SvtxTrackMap* trackmap = findNode::getClass<SvtxTrackMap>(topNode,"SvtxTrackMap");
+	SvtxVertexEval* vertexeval = stack->get_vertex_eval();
+	SvtxTrackEval* trackeval =   stack->get_track_eval();
+  std::vector<ReconstructedConvertedPhoton>* reconstructedConvertedPhotons=new std::vector<ReconstructedConvertedPhoton>();
+
+	for (SvtxVertexMap::Iter iter = vertexmap->begin(); iter != vertexmap->end(); ++iter) {
+		SvtxVertex* vertex = iter->second;
+		float ntracks;
+		ntracks= vertex->size_tracks();
+		std::pair<SvtxTrack*,SvtxTrack*> trackPair = getTrackPair(vertex);
 		float vx,vy,vz;
 		vx = vertex->get_x();
 		vy = vertex->get_y();
@@ -151,4 +236,8 @@ void ConvertedPhotonReconstructor::reconstruct(SvtxEvalStack *stack,PHCompositeN
         reconstructedConvertedPhotons,"ReconstructedConvertedPhotons");
     topNode->addNode(vecNode);
 	}
+}
+
+std::pair<SvtxTrack*,SvtxTrack*> getTrackPair(SvtxVertex* vertex)const{
+
 }
