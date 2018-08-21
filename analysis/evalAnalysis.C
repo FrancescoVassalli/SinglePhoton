@@ -198,6 +198,34 @@ void matchPhotons(TTree *truth,std::map<int, Photon> reco){
 	plot(pTratio,"#frac{reco pT #gamma}{truth pT #gamma}");
 }*/
 
+inline bool hasConversion(int* ids, const int kSIZE)const{
+	for (int i = 0; i < kSIZE; ++i)
+	{
+		if (ids[i]!=22)
+		{
+			return true;
+		}
+	}
+	return false;
+}
+
+
+float getConversionEfficency(TTree *truth, const int kRecoSize){
+	int* thispid;
+	int N;
+	truth->SetBranchAddress("particle_n",&N);
+	truth->SetBranchAddress("particle_id",thispid);
+	int count=0;
+	for (int i = 0; i < truth->GetEntries(); ++i)
+	{
+		truth->GetEvent(i);
+		if(hasConversion(thispid,N)){
+			count++;
+		}
+	}
+	return kRecoSize/((float)count);
+}
+
 void evalAnalysis(){
   string location ="/sphenix/user/vassalli/singlesamples/Photon5/";
 	string name ="track1.root";
@@ -210,5 +238,7 @@ void evalAnalysis(){
 	TTree *truthInfo;
 	truthInfo = (TTree*) tf->Get("ttree");
 	//matchTracks(track,vertex);
-	matchPhotons(truthInfo,matchTracks(track,vertex));
+	std::map<int, Photon> recoPhotons = matchTracks(track,vertex);
+	cout<<"Conversion Efficency"<<getConversionEfficency(truthInfo,recoPhotons.size())<<'\n';
+	matchPhotons(truthInfo,recoPhotons);
 }
