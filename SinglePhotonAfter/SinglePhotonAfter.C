@@ -20,18 +20,21 @@ SinglePhotonAfter::SinglePhotonAfter(const std::string &name) : SubsysReco("Sing
 
 }
 
+SinglePhotonAfter::~SinglePhotonAfter(){
+  delete _f;
+}
+
 int SinglePhotonAfter::InitRun(PHCompositeNode *topNode)
 {
   _f = new TFile( _foutname.c_str(), "UPDATE");
   _tree = new TTree("ttree","a succulent orange tree");
-  _tree->SetAutoSave(300);
-  _tree->Branch("particle_n", &_b_particle_n,"particle_n/I");
+  //_tree->SetAutoSave(300);
+  _tree->Branch("particle_n", &_b_particle_n);
   _tree->Branch("particle_pt", _b_particle_pt,"particle_pt[particle_n]/F");
   _tree->Branch("particle_eta", _b_particle_eta,"particle_eta[particle_n]/F");
   _tree->Branch("particle_phi", _b_particle_phi,"particle_phi[particle_n]/F");
   _tree->Branch("particle_id", _b_particle_id,"particle_id[particle_n]/I");
   return 0;
-
 }
 
 int SinglePhotonAfter::process_event(PHCompositeNode *topNode)
