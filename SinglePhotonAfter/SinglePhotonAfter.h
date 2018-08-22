@@ -31,10 +31,10 @@ class SinglePhotonAfter: public SubsysReco
   TTree *_tree;
   std::string _foutname;
   int _b_particle_n;
-  float _b_particle_pt[1000];
-  float _b_particle_eta[1000];
-  int _b_particle_id[1000];
-  float _b_particle_phi[1000];
+  float _b_particle_pt[100];
+  float _b_particle_eta[100];
+  int _b_particle_id[100];
+  float _b_particle_phi[100];
 };
 
 #endif // __SINGLEPHOTONAFTER_H__
