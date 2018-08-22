@@ -20,6 +20,7 @@
 
 class PHCompositeNode;
 class SvtxEvalStack;
+class SvtxClusterMap;
 
 class ReconstructedConvertedPhoton
 {
@@ -32,14 +33,14 @@ public:
 		positron=nullptr;
 		electron=nullptr;
   }
-  ReconstructedConvertedPhoton(int event, const TLorentzVector& reco,const TVector3& recoVert,const TLorentzVector& truth, const TVector3& truthVert,SvtxTrack_v1* ptrack,SvtxTrack_v1* etrack)
+  ReconstructedConvertedPhoton(int event, const TLorentzVector& reco,const TVector3& recoVert,const TLorentzVector& truth, const TVector3& truthVert,SvtxTrack_v1* ptrack,SvtxTrack_v1* etrack,SvtxClusterMap* clustermap)
     : event(event), positron(ptrack),electron(etrack){
     recovec    =reco;
     truthvec   = truth;
     truthVertex= truthVert;
     recoVertex = recoVert;
     subtracted = false;
-		removeClusters();
+		removeClusters(clustermap);
   }
   
   ~ReconstructedConvertedPhoton(){
@@ -53,8 +54,8 @@ public:
   inline SvtxTrack* get_electron() const{return electron;}
 	
   //one the e pairs are set remove their clusters from the event and add the recovered photon to the list of photons 
-	void removeClusters();
-	void removeClusters(SvtxTrack_v1* t1,SvtxTrack_v1* t2);
+	void removeClusters(SvtxClusterMap* map);
+	void removeClusters(SvtxClusterMap* map,SvtxTrack_v1* t1,SvtxTrack_v1* t2);
 
 	inline friend std::ostream& operator<<(std::ostream& os, ReconstructedConvertedPhoton const & tc) {
 		return os <<"Converted Photon: \n \t pvec:" << tc.recovec.Pt()
