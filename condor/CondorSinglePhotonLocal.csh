@@ -16,10 +16,11 @@ mkdir $SCRATCH_AREA
 cp  $SOURCE_PHOTONMAKER $SCRATCH_AREA/
 cp $BURNER $SCRATCH_AREA/
 #
+rm $OUTFILE
 cd $SCRATCH_AREA
-root -b Fun4All_G4_sPHENIX.C\(2,\"$IN_FILE\"\) 
+root -b Fun4All_G4_sPHENIX.C\(5,\"$IN_FILE\"\) 
 echo $LD_LIBRARY_PATH
-#root -b -q after_DST.C\(\"$IN_FILE\",\"$OUT_FILE\"\)
+root -b -q after_DST.C\(\"$IN_FILE\",\"$OUT_FILE\"\)
 #
 rm -rf $SCRATCH_AREA
 #
