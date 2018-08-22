@@ -14,7 +14,7 @@ class SinglePhotonAfter: public SubsysReco
 
  public:
   SinglePhotonAfter(const std::string &name="SinglePhotonAfter.root");
-  int Init(PHCompositeNode*);
+  int InitRun(PHCompositeNode*);
   int process_event(PHCompositeNode*);
   int End(PHCompositeNode*);
 
