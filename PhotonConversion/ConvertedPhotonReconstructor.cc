@@ -173,7 +173,6 @@ void ConvertedPhotonReconstructor::reconstruct(SvtxEvalStack *stack,PHCompositeN
 void reconstructTracks(SvtxEvalStack *stack,PHCompositeNode *topNode){
 	
 	SvtxVertexMap* vertexmap = findNode::getClass<SvtxVertexMap>(topNode,"SvtxVertexMap");
-	SvtxTrackMap* trackmap = findNode::getClass<SvtxTrackMap>(topNode,"SvtxTrackMap");
 	SvtxVertexEval* vertexeval = stack->get_vertex_eval();
 	SvtxTrackEval* trackeval =   stack->get_track_eval();
   std::vector<ReconstructedConvertedPhoton>* reconstructedConvertedPhotons=new std::vector<ReconstructedConvertedPhoton>();
@@ -188,7 +187,6 @@ void reconstructTracks(SvtxEvalStack *stack,PHCompositeNode *topNode){
 		vy = vertex->get_y();
 		vz = vertex->get_z();
 		float charge1;
-		SvtxTrackMap::Iter titer = trackmap->begin(); 
 		SvtxTrack* track = titer->second;
 		charge1 = track->get_charge();
 		if(abs(charge1)!=1) continue; //only considering electron positron conversion 
@@ -239,5 +237,25 @@ void reconstructTracks(SvtxEvalStack *stack,PHCompositeNode *topNode){
 }
 
 std::pair<SvtxTrack*,SvtxTrack*> getTrackPair(SvtxVertex* vertex)const{
-
+	std::pair<SvtxTrack*,SvtxTrack*> r;
+	r.first=nullptr;
+	r.second=nullptr;
+	if (vertex->size_tracks()<2)
+	{
+		cout<<"Warning not enough tracks to pair\n";
+	}
+	else if(vertex->size_tracks()=2){
+		TrackIter titer=vertex->begin_tracks();
+		r.first = *(titer);
+		titer++;
+		r.second= *(titer);
+	}
+	else{
+		TrackIter min=vertex->begin_tracks();
+		for (TrackIter i = min; i != vertex->end_tracks(); ++i)
+		{
+			
+		}
+	}
+	
 }

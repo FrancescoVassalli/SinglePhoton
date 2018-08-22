@@ -1,4 +1,5 @@
 *.root
+*.zip
 *.pdf
 /gen/Fun/*
 condor_log*
