@@ -2,11 +2,10 @@
 using namespace std;
 
 int Fun4All_G4_sPHENIX(
-    const char *outputFile = "G4sPHENIX.root",
-    const char *embed_input_file = "/sphenix/data/data02/review_2017-08-02/sHijing/fm_0-4.list")
+    const int nEvents = 1,
+    const char *outputFile = "G4sPHENIX.root")
 {
-
-    const int nEvents = 1;
+    const char *embed_input_file = "/sphenix/data/data02/review_2017-08-02/sHijing/fm_0-4.list"
     const char *inputFile = "/sphenix/data/data02/review_2017-08-02/single_particle/spacal2d/fieldmap/G4Hits_sPHENIX_e-_eta0_8GeV-0002.root";
   //===============
   // Input options
@@ -56,7 +55,7 @@ int Fun4All_G4_sPHENIX(
   bool do_svtx = true;
   bool do_svtx_cell = do_svtx && true;
   bool do_svtx_track = do_svtx_cell && true;
-  bool do_svtx_eval = do_svtx_track && true;
+  bool do_svtx_eval = do_svtx_track && false;
 
   bool do_pstof = false;
 

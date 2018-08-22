@@ -1,5 +1,6 @@
 *.root
 *.zip
+*.swp
 *.pdf
 /gen/Fun/*
 condor_log*
