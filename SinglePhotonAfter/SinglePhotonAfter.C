@@ -20,7 +20,7 @@ SinglePhotonAfter::SinglePhotonAfter(const std::string &name) : SubsysReco("Sing
 
 }
 
-int SinglePhotonAfter::Init(PHCompositeNode *topNode)
+int SinglePhotonAfter::InitRun(PHCompositeNode *topNode)
 {
   _f = new TFile( _foutname.c_str(), "UPDATE");
   _tree = new TTree("ttree","a succulent orange tree");
