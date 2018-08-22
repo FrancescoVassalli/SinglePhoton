@@ -136,6 +136,10 @@ void ConvertedPhotonReconstructor::reconstruct(SvtxEvalStack *stack,PHCompositeN
     t1y = track->get_py();
     t1z = track->get_pz();
     PHG4Particle* truth1 = trackeval->max_truth_particle_by_nclusters(track);	
+    if(truth1==nullptr){
+      cout<<"truth1 is null"<<endl;
+      continue;
+    }
     ++titer;
     SvtxTrack* ftrack=track;
     track= trackmap->get(*titer);
@@ -150,6 +154,10 @@ void ConvertedPhotonReconstructor::reconstruct(SvtxEvalStack *stack,PHCompositeN
     t2z = track->get_pz();
 
     PHG4Particle* truth2 = trackeval->max_truth_particle_by_nclusters(track);	
+    if(truth2==nullptr){
+      cout<<"truth2 is null"<<endl;
+      continue;
+    }
     TVector3 track1(t1x,t1y,t1z),track2(t2x,t2y,t2z);
     PHG4VtxPoint* point = vertexeval->max_truth_point_by_ntracks(vertex); 
     TVector3 tTrack1(truth1->get_px(),truth1->get_py(),truth1->get_pz()),
