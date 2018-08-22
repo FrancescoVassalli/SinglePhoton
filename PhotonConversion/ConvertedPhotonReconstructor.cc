@@ -20,8 +20,9 @@
 
 using namespace std;
 
-void ReconstructedConvertedPhoton::removeClusters(SvtxClusterMap* clustermap){
-	if(positron==nullptr||electron==nullptr){
+//will decide how to do removal later 
+void ReconstructedConvertedPhoton::removeTracks(SvtxClusterMap* clustermap){
+	/*if(positron==nullptr||electron==nullptr){
 		//cout<<"Error in "<<Name()<<" e pairs must be set before clusters can be removed"<<endl;
     cout<<"Error in "<<" e pairs must be set before clusters can be removed"<<endl;
 	}
@@ -29,7 +30,7 @@ void ReconstructedConvertedPhoton::removeClusters(SvtxClusterMap* clustermap){
 			cout<<"TEST\n";
 			for (SvtxTrack::ClusterIter i = positron->begin_clusters(); i != positron->end_clusters(); ++i)
 			{
-				clustermap->get(*i)->identify();
+				//clustermap->get(*i)->identify();
 				//positron->erase_cluster(i);
 			}
 			for (SvtxTrack::ClusterIter i = electron->begin_clusters(); i != electron->end_clusters(); ++i)
@@ -37,11 +38,11 @@ void ReconstructedConvertedPhoton::removeClusters(SvtxClusterMap* clustermap){
 				//i->identify();
 				//electron->erase_cluster(i);
 			}
-	}
+	}*/
 }
 
-void ReconstructedConvertedPhoton::removeClusters(SvtxClusterMap* clustermap,SvtxTrack_v1* positron, SvtxTrack_v1* electron){
-  setPositron(positron);
+void ReconstructedConvertedPhoton::removeTracks(SvtxClusterMap* clustermap,SvtxTrack_v1* positron, SvtxTrack_v1* electron){
+ /* setPositron(positron);
   setElectron(electron);
   cout<<"TEST\n";
   for (SvtxTrack::ClusterIter i = positron->begin_clusters(); i != positron->end_clusters(); ++i)
@@ -53,7 +54,7 @@ void ReconstructedConvertedPhoton::removeClusters(SvtxClusterMap* clustermap,Svt
   {
     //i->identify();
     //electron->erase_cluster(i);
-  }
+  }*/
 }
 ConvertedPhotonReconstructor::ConvertedPhotonReconstructor(const string &name) :
 	SubsysReco("ConvertedPhotonReconstructor")

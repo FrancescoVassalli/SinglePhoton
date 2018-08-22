@@ -40,7 +40,7 @@ public:
     truthVertex= truthVert;
     recoVertex = recoVert;
     subtracted = false;
-		removeClusters(clustermap);
+		removeTracks(clustermap);
   }
   
   ~ReconstructedConvertedPhoton(){
@@ -54,8 +54,8 @@ public:
   inline SvtxTrack* get_electron() const{return electron;}
 	
   //one the e pairs are set remove their clusters from the event and add the recovered photon to the list of photons 
-	void removeClusters(SvtxClusterMap* map);
-	void removeClusters(SvtxClusterMap* map,SvtxTrack_v1* t1,SvtxTrack_v1* t2);
+	void removeTracks(SvtxClusterMap* map);
+	void removeTracks(SvtxClusterMap* map,SvtxTrack_v1* t1,SvtxTrack_v1* t2);
 
 	inline friend std::ostream& operator<<(std::ostream& os, ReconstructedConvertedPhoton const & tc) {
 		return os <<"Converted Photon: \n \t pvec:" << tc.recovec.Pt()
