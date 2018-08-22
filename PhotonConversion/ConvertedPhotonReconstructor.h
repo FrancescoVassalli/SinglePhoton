@@ -92,6 +92,7 @@ protected:
 private:
   int event;
   std::string name;
+  SvtxEvalStack *_svtxevalstack;
   TFile *_file;
   TTree *_tree;
   TLorentzVector b_recovec;
