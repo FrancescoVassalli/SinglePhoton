@@ -29,6 +29,7 @@ int SinglePhotonAfter::Init(PHCompositeNode *topNode)
   _tree->Branch("particle_pt", _b_particle_pt,"particle_pt[particle_n]/F");
   _tree->Branch("particle_eta", _b_particle_eta,"particle_eta[particle_n]/F");
   _tree->Branch("particle_phi", _b_particle_phi,"particle_phi[particle_n]/F");
+  _tree->Branch("particle_id", _b_particle_id,"particle_id[particle_n]/I");
   return 0;
 
 }
@@ -49,6 +50,7 @@ int SinglePhotonAfter::process_event(PHCompositeNode *topNode)
     if (fabs(truth_eta) > 1.1) continue;
     float truth_phi = t.Phi();
 
+		_b_particle_id[ _b_particle_n ] = g4particle->get_pid();
     _b_particle_pt[ _b_particle_n ] = truth_pt;
     _b_particle_eta[ _b_particle_n ] = truth_eta;
     _b_particle_phi[ _b_particle_n ] = truth_phi;

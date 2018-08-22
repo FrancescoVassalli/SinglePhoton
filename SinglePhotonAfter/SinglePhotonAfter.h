@@ -33,6 +33,7 @@ class SinglePhotonAfter: public SubsysReco
   int _b_particle_n;
   float _b_particle_pt[1000];
   float _b_particle_eta[1000];
+  int _b_particle_id[1000];
   float _b_particle_phi[1000];
 };
 
