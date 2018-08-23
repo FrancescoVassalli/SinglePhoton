@@ -26,7 +26,7 @@ SinglePhotonAfter::~SinglePhotonAfter(){
 
 int SinglePhotonAfter::InitRun(PHCompositeNode *topNode)
 {
-  _f = new TFile( _foutname.c_str(), "UPDATE");
+  _f = new TFile( _foutname.c_str(), "RECREATE");
   _tree = new TTree("ttree","a succulent orange tree");
   //_tree->SetAutoSave(300);
   _tree->Branch("particle_n", &_b_particle_n);
@@ -39,7 +39,7 @@ int SinglePhotonAfter::InitRun(PHCompositeNode *topNode)
 
 int SinglePhotonAfter::process_event(PHCompositeNode *topNode)
 {
-
+  std::cout<<"Single Photon process"<<std::endl;
   _b_particle_n = 0;
   
   PHG4TruthInfoContainer* truthinfo = findNode::getClass<PHG4TruthInfoContainer>(topNode,"G4TruthInfo");
