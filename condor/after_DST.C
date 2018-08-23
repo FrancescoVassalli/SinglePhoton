@@ -14,7 +14,7 @@ int after_DST( std::string infile = "XjPhi3_pT5_98_dst.root",std::string outfile
 
   int verbosity = 0;
   Fun4AllServer *se = Fun4AllServer::instance();
-  se->Verbosity( 0 );
+  se->Verbosity(0 );
   recoConsts *rc = recoConsts::instance();
 
   Fun4AllInputManager *hitsin = new Fun4AllDstInputManager("DSTin");
@@ -23,7 +23,8 @@ int after_DST( std::string infile = "XjPhi3_pT5_98_dst.root",std::string outfile
  
   SinglePhotonAfter *truther = new SinglePhotonAfter(outfile);
   se->registerSubsystem(truther);
-  se->registerSubsystem(new ConvertedPhotonReconstructor(outfile));
+  ConvertedPhotonReconstructor *converter=new ConvertedPhotonReconstructor(outfile);
+  se->registerSubsystem(converter);
   se->run();
 
   se->End();
