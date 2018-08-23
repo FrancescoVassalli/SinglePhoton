@@ -34,8 +34,6 @@ class ReconstructedConvertedPhoton
     }
     ReconstructedConvertedPhoton(int event, const TLorentzVector& reco,const TVector3& recoVert,const TLorentzVector& truth, const TVector3& truthVert,SvtxTrack* ptrack,SvtxTrack* etrack,SvtxClusterMap* clustermap)
       : event(event){
-        
-        std::cout<<"in recovered photon constructor"<<std::endl;
         positron = dynamic_cast<SvtxTrack_v1*>(ptrack->Clone());
         electron = dynamic_cast<SvtxTrack_v1*>(etrack->Clone());
         if(!positron||!electron){
@@ -50,7 +48,6 @@ class ReconstructedConvertedPhoton
           subtracted = false;
           removeTracks(clustermap);
         }
-        std::cout<<"done constructing"<<std::endl;
       }
 
     ~ReconstructedConvertedPhoton(){

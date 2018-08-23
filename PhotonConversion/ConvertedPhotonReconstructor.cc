@@ -150,9 +150,6 @@ ReconstructedConvertedPhoton* ConvertedPhotonReconstructor::reconstruct(PHCompos
       cout<<"null track"<<endl;
       continue;
     }
-    else{
-      cout<<"Got Track 1"<<endl;
-    }
     charge1 = track->get_charge();
     if(abs(charge1)!=1){
       cout<<"Quiting photon recovery due to charge="<<charge1<<endl;
@@ -173,9 +170,6 @@ ReconstructedConvertedPhoton* ConvertedPhotonReconstructor::reconstruct(PHCompos
     if(!track){
       cout<<"null track"<<endl;
       continue;
-    }
-    else{
-      cout<<"Got Track 2"<<endl;
     }
     charge2 = track->get_charge();
     if(charge1!= -1*charge2){
