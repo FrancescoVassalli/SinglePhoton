@@ -2,12 +2,12 @@
 using namespace std;
 
 int Fun4All_G4_ZsPHENIX(
-    const char *outputFile = "G4sPHENIX.root",
-    const char *embed_input_file = "/sphenix/data/data02/review_2017-08-02/sHijing/fm_0-4.list")
+    const int nEvents = 500,
+    const char *outputFile = "G4sPHENIX.root")
 {
 
-    const int nEvents = 500;
-    const char *inputFile = "/sphenix/data/data02/review_2017-08-02/single_particle/spacal2d/fieldmap/G4Hits_sPHENIX_e-_eta0_8GeV-0002.root";
+    const char *inputFile = "";
+    const char *embed_input_file = "";
   //===============
   // Input options
   //===============
@@ -211,7 +211,7 @@ int Fun4All_G4_ZsPHENIX(
       gen->set_vertex_size_parameters(0.0, 0.0);
       gen->set_eta_range(-1.1,0.9);
       gen->set_phi_range(-1.0 * TMath::Pi(), 1.0 * TMath::Pi());
-      gen->set_pt_range(5.0,5.0);
+      gen->set_pt_range(5.0,30);
       gen->Embed(2);
       gen->Verbosity(0);
 
