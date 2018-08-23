@@ -17,7 +17,6 @@
 #include <iostream>
 #include <string>
 #include <vector>
-
 class PHCompositeNode;
 class SvtxEvalStack;
 class SvtxClusterMap;
@@ -36,7 +35,7 @@ class ReconstructedConvertedPhoton
     ReconstructedConvertedPhoton(int event, const TLorentzVector& reco,const TVector3& recoVert,const TLorentzVector& truth, const TVector3& truthVert,SvtxTrack* ptrack,SvtxTrack* etrack,SvtxClusterMap* clustermap)
       : event(event){
         
-        std::cout<<"in recovered phton constructor"<<std::endl;
+        std::cout<<"in recovered photon constructor"<<std::endl;
         positron = dynamic_cast<SvtxTrack_v1*>(ptrack->Clone());
         electron = dynamic_cast<SvtxTrack_v1*>(etrack->Clone());
         if(!positron||!electron){
@@ -105,13 +104,13 @@ class ConvertedPhotonReconstructor : public SubsysReco {
     std::string name;
     TFile *_file;
     TTree *_tree;
-    std::vector<ReconstructedConvertedPhoton>* reconstructedConvertedPhotons;
+    std::vector<ReconstructedConvertedPhoton*> recoveredPhotonVec;
     TLorentzVector *b_recovec;
     TLorentzVector *b_truthvec;
     TVector3       *b_truthVertex;
     TVector3       *b_recoVertex;
 
-    void reconstruct(PHCompositeNode *topNode);
+    ReconstructedConvertedPhoton* reconstruct(PHCompositeNode *topNode);
     inline float pToE(TVector3 v, float mass){
       return quadrature((float) quadrature(v.x(),v.y()),(float) quadrature((float)v.z(),mass));
     }

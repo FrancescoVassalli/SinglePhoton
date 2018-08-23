@@ -62,8 +62,8 @@ ConvertedPhotonReconstructor::ConvertedPhotonReconstructor(const string &name) :
 	this->name=name+"recovered.root";
 verbosity = 0;
 	event=0;
-  /*_file = new TFile( this->name.c_str(), "RECREATE");
-  _tree = new TTree("conveteredphotontree","tracks reconstructed to converted photons");
+  _file = new TFile( this->name.c_str(), "RECREATE");
+  _tree = new TTree("convertedphotontree","tracks reconstructed to converted photons");
   //_tree->SetAutoSave(300);
   b_recovec = new TLorentzVector();
   b_truthvec = new TLorentzVector();
@@ -73,8 +73,7 @@ verbosity = 0;
   _tree->Branch("truth_tlv",   "TLorentzVector", &b_truthvec);
   _tree->Branch("truth_vertex","TVector3",       &b_truthVertex);
   _tree->Branch("reco_vertex", "TVector3",       &b_recoVertex);
-  cout<<"Branches made"<<endl;*/
-  reconstructedConvertedPhotons=new std::vector<ReconstructedConvertedPhoton>();
+  cout<<"Branches made"<<endl;
 }
 
 int ConvertedPhotonReconstructor::Init(PHCompositeNode *topNode) {
@@ -89,28 +88,31 @@ int ConvertedPhotonReconstructor::process_event(PHCompositeNode *topNode) {
   if (true||((verbosity > 0)&&(event%100==0))) {  ///////////////////////////////////////////////////////////////////////////////////////////////
     cout << "ConvertedPhotonReconstructor::process_event - Event = " << event << endl;
   }
-  reconstruct(topNode);
+  ReconstructedConvertedPhoton* recovered=reconstruct(topNode);
+  if(recovered){
+    recoveredPhotonVec.push_back(recovered);
+  }
   event++;
   return Fun4AllReturnCodes::EVENT_OK;
 }
 
 ConvertedPhotonReconstructor::~ConvertedPhotonReconstructor(){
 
-/*  _file->Write();
+  _file->Write();
   _file->Close();
-  delete _file;*/
+  delete _file;
 }
 
 int ConvertedPhotonReconstructor::End(PHCompositeNode *topNode) {
   return Fun4AllReturnCodes::EVENT_OK;
 }
 
-void ConvertedPhotonReconstructor::reconstruct(PHCompositeNode *topNode){
+ReconstructedConvertedPhoton* ConvertedPhotonReconstructor::reconstruct(PHCompositeNode *topNode){
   //let the stack get the info from the node
   SvtxEvalStack *stack = new SvtxEvalStack(topNode);
   if(!stack){
     cout<<"Evaluator is null"<<endl;
-    return;
+    return nullptr;
   }
   stack->set_strict(false); //no idea what this does 
   stack->set_verbosity(verbosity+1); //might be able to lower this 
@@ -121,7 +123,7 @@ void ConvertedPhotonReconstructor::reconstruct(PHCompositeNode *topNode){
   SvtxTrackEval* trackeval =   stack->get_track_eval();
   if(!vertexeval||!trackeval){
     cout<<"Evaluator is null"<<endl;
-    return;
+    return nullptr;
   }
   cout<<"In reconstruct num vertex="<<vertexmap->size()<<endl;
   for (SvtxVertexMap::Iter iter = vertexmap->begin(); iter != vertexmap->end(); ++iter) {
@@ -207,26 +209,17 @@ void ConvertedPhotonReconstructor::reconstruct(PHCompositeNode *topNode){
       ftrack=track;
       track=temp;
     }
-    
-    ReconstructedConvertedPhoton tempphoton = 
-      ReconstructedConvertedPhoton(event,*b_recovec,*b_recoVertex,*b_truthvec,*b_truthVertex,ftrack,track,clustermap);
-    cout<<"ready to push"<<endl;
-    reconstructedConvertedPhotons->push_back(tempphoton);
+    _tree->Fill();
+    delete stack;
+    return new ReconstructedConvertedPhoton(event,*b_recovec,*b_recoVertex,*b_truthvec,*b_truthVertex,ftrack,track,clustermap);
 
-    cout<<"Photon pushed"<<endl;
-    //_tree->Fill();
-    /*delete stack;
-    delete b_recovec;
-    delete b_recoVertex;
-    delete b_truthvec;
-    delete b_truthVertex;*/
-    cout<<"Module2 done "<<endl;
 // add the vector to the node tree 
 /* PHDataNode<std::vector<ReconstructedConvertedPhoton>>* vecNode = 
        new PHDataNode<std::vector<ReconstructedConvertedPhoton>>(
        reconstructedConvertedPhotons,"ReconstructedConvertedPhotons");
        topNode->addNode(vecNode);*/
   }
+  return nullptr;
 }
 /*void reconstructTracks(SvtxEvalStack *stack,PHCompositeNode *topNode){
 	
