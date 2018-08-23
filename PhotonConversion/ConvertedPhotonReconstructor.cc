@@ -62,14 +62,19 @@ ConvertedPhotonReconstructor::ConvertedPhotonReconstructor(const string &name) :
 	this->name=name+"recovered.root";
 verbosity = 0;
 	event=0;
-  _file = new TFile( this->name.c_str(), "RECREATE");
+  /*_file = new TFile( this->name.c_str(), "RECREATE");
   _tree = new TTree("conveteredphotontree","tracks reconstructed to converted photons");
   //_tree->SetAutoSave(300);
-
-  _tree->Branch("reco_tlv",     &b_recovec);
-  _tree->Branch("truth_tlv",    &b_truthvec);
-  _tree->Branch("truth_vertex", &b_truthVertex);
-  _tree->Branch("reco_vertex",  &b_recoVertex);
+  b_recovec = new TLorentzVector();
+  b_truthvec = new TLorentzVector();
+  b_truthVertex = new TVector3();
+  b_recoVertex = new  TVector3();
+  _tree->Branch("reco_tlv",    "TLorentzVector", &b_recovec);
+  _tree->Branch("truth_tlv",   "TLorentzVector", &b_truthvec);
+  _tree->Branch("truth_vertex","TVector3",       &b_truthVertex);
+  _tree->Branch("reco_vertex", "TVector3",       &b_recoVertex);
+  cout<<"Branches made"<<endl;*/
+  reconstructedConvertedPhotons=new std::vector<ReconstructedConvertedPhoton>();
 }
 
 int ConvertedPhotonReconstructor::Init(PHCompositeNode *topNode) {
@@ -77,10 +82,6 @@ int ConvertedPhotonReconstructor::Init(PHCompositeNode *topNode) {
 }
 
 int ConvertedPhotonReconstructor::InitRun(PHCompositeNode *topNode) {
-  //let the stack get the info from the node
-  _svtxevalstack = new SvtxEvalStack(topNode);
-  _svtxevalstack->set_strict(false); //no idea what this does 
-  _svtxevalstack->set_verbosity(verbosity+1); //might be able to lower this 
   return Fun4AllReturnCodes::EVENT_OK;
 }
   
@@ -88,34 +89,52 @@ int ConvertedPhotonReconstructor::process_event(PHCompositeNode *topNode) {
   if (true||((verbosity > 0)&&(event%100==0))) {  ///////////////////////////////////////////////////////////////////////////////////////////////
     cout << "ConvertedPhotonReconstructor::process_event - Event = " << event << endl;
   }
-  reconstruct(_svtxevalstack,topNode);
+  reconstruct(topNode);
   event++;
   return Fun4AllReturnCodes::EVENT_OK;
 }
 
-int ConvertedPhotonReconstructor::End(PHCompositeNode *topNode) {
-  _file->Write();
+ConvertedPhotonReconstructor::~ConvertedPhotonReconstructor(){
+
+/*  _file->Write();
   _file->Close();
-  delete _file;
+  delete _file;*/
+}
+
+int ConvertedPhotonReconstructor::End(PHCompositeNode *topNode) {
   return Fun4AllReturnCodes::EVENT_OK;
 }
 
-void ConvertedPhotonReconstructor::reconstruct(SvtxEvalStack *stack,PHCompositeNode *topNode){
-
+void ConvertedPhotonReconstructor::reconstruct(PHCompositeNode *topNode){
+  //let the stack get the info from the node
+  SvtxEvalStack *stack = new SvtxEvalStack(topNode);
+  if(!stack){
+    cout<<"Evaluator is null"<<endl;
+    return;
+  }
+  stack->set_strict(false); //no idea what this does 
+  stack->set_verbosity(verbosity+1); //might be able to lower this 
   SvtxVertexMap* vertexmap = findNode::getClass<SvtxVertexMap>(topNode,"SvtxVertexMap");
   SvtxTrackMap* trackmap = findNode::getClass<SvtxTrackMap>(topNode,"SvtxTrackMap");
   SvtxClusterMap* clustermap = findNode::getClass<SvtxClusterMap>(topNode,"SvtxClusterMap"); 
   SvtxVertexEval* vertexeval = stack->get_vertex_eval();
   SvtxTrackEval* trackeval =   stack->get_track_eval();
-  std::vector<ReconstructedConvertedPhoton>* reconstructedConvertedPhotons=new std::vector<ReconstructedConvertedPhoton>();
+  if(!vertexeval||!trackeval){
+    cout<<"Evaluator is null"<<endl;
+    return;
+  }
   cout<<"In reconstruct num vertex="<<vertexmap->size()<<endl;
   for (SvtxVertexMap::Iter iter = vertexmap->begin(); iter != vertexmap->end(); ++iter) {
     cout<<"Enter loop"<<endl;
     SvtxVertex* vertex = iter->second;
+    if(!vertex){
+      cout<<"Vertex is null"<<endl;
+      continue;
+    }
     float ntracks;
     ntracks= vertex->size_tracks();
     if(ntracks!=2){
-      cout<<"Quiting photon recovery due to "<<ntracks<<"tracks"<<endl;
+      cout<<"Quiting photon recovery due to "<<ntracks<<" tracks"<<endl;
       continue; //now i assume thet there are only 2 tracks in the event 
     }
     float vx,vy,vz;
@@ -125,7 +144,13 @@ void ConvertedPhotonReconstructor::reconstruct(SvtxEvalStack *stack,PHCompositeN
     float charge1;
     SvtxVertex::TrackIter titer = vertex->begin_tracks(); 
     SvtxTrack* track = trackmap->get(*titer);
-    cout<<"Got Track 1"<<endl;
+    if(!track){
+      cout<<"null track"<<endl;
+      continue;
+    }
+    else{
+      cout<<"Got Track 1"<<endl;
+    }
     charge1 = track->get_charge();
     if(abs(charge1)!=1){
       cout<<"Quiting photon recovery due to charge="<<charge1<<endl;
@@ -136,14 +161,20 @@ void ConvertedPhotonReconstructor::reconstruct(SvtxEvalStack *stack,PHCompositeN
     t1y = track->get_py();
     t1z = track->get_pz();
     PHG4Particle* truth1 = trackeval->max_truth_particle_by_nclusters(track);	
-    if(truth1==nullptr){
+    if(!truth1){
       cout<<"truth1 is null"<<endl;
       continue;
     }
     ++titer;
     SvtxTrack* ftrack=track;
     track= trackmap->get(*titer);
-    cout<<"Got Track 2"<<endl;
+    if(!track){
+      cout<<"null track"<<endl;
+      continue;
+    }
+    else{
+      cout<<"Got Track 2"<<endl;
+    }
     charge2 = track->get_charge();
     if(charge1!= -1*charge2){
       cout<<"Quiting Photon recovery due to lack of charge parity"<<endl;
@@ -154,7 +185,7 @@ void ConvertedPhotonReconstructor::reconstruct(SvtxEvalStack *stack,PHCompositeN
     t2z = track->get_pz();
 
     PHG4Particle* truth2 = trackeval->max_truth_particle_by_nclusters(track);	
-    if(truth2==nullptr){
+    if(!truth2){
       cout<<"truth2 is null"<<endl;
       continue;
     }
@@ -163,14 +194,13 @@ void ConvertedPhotonReconstructor::reconstruct(SvtxEvalStack *stack,PHCompositeN
     TVector3 tTrack1(truth1->get_px(),truth1->get_py(),truth1->get_pz()),
              tTrack2(truth2->get_px(),truth2->get_py(),truth2->get_pz());
 
-    TLorentzVector temp=
-    b_recovec= TLorentzVector(track1,pToE(track1,kEmass))
-      +TLorentzVector(track2,pToE(track2,kEmass)); // make the tlv for the reco photon 
-    b_recoVertex=TVector3(vx,vy,vz);
+    b_recovec= new TLorentzVector(track1,pToE(track1,kEmass));
+    *b_recovec+=TLorentzVector(track2,pToE(track2,kEmass)); // make the tlv for the reco photon 
+    b_recoVertex= new TVector3(vx,vy,vz);
     //do i care about the truth number of particles ?
-    b_truthVertex=TVector3(point->get_x(),point->get_y(),point->get_z());
-    b_truthvec= TLorentzVector(tTrack1,pToE(tTrack1,kEmass))
-      +TLorentzVector( tTrack2,pToE(tTrack2,kEmass));
+    b_truthVertex= new TVector3(point->get_x(),point->get_y(),point->get_z());
+    b_truthvec= new TLorentzVector(tTrack1,pToE(tTrack1,kEmass));
+    *b_truthvec+=TLorentzVector( tTrack2,pToE(tTrack2,kEmass));
 
     if(!ftrack->get_positive_charge()){ // will want to match these tracks to a truth particle 
       SvtxTrack* temp=ftrack;
@@ -178,14 +208,19 @@ void ConvertedPhotonReconstructor::reconstruct(SvtxEvalStack *stack,PHCompositeN
       track=temp;
     }
     reconstructedConvertedPhotons->push_back(
-        ReconstructedConvertedPhoton(event,b_recovec,b_recoVertex,b_truthvec,b_truthVertex,dynamic_cast<SvtxTrack_v1*>(ftrack),dynamic_cast<SvtxTrack_v1*>(track),clustermap)
+        ReconstructedConvertedPhoton(event,*b_recovec,*b_recoVertex,*b_truthvec,*b_truthVertex,dynamic_cast<SvtxTrack_v1*>(ftrack),dynamic_cast<SvtxTrack_v1*>(track),clustermap)
     );
 
     cout<<"Photon pushed"<<endl;
-    _tree->Fill();
+    //_tree->Fill();
+    /*delete stack;
+    delete b_recovec;
+    delete b_recoVertex;
+    delete b_truthvec;
+    delete b_truthVertex;*/
     cout<<"Module2 done "<<endl;
-    // add the vector to the node tree 
-    /* PHDataNode<std::vector<ReconstructedConvertedPhoton>>* vecNode = 
+// add the vector to the node tree 
+/* PHDataNode<std::vector<ReconstructedConvertedPhoton>>* vecNode = 
        new PHDataNode<std::vector<ReconstructedConvertedPhoton>>(
        reconstructedConvertedPhotons,"ReconstructedConvertedPhotons");
        topNode->addNode(vecNode);*/

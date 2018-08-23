@@ -79,7 +79,7 @@ class ConvertedPhotonReconstructor : public SubsysReco {
 public:
  
   ConvertedPhotonReconstructor(const std::string &name = "CONVERTEDPHOTONRECONSTRUCTOR");
-		
+	~ConvertedPhotonReconstructor();	
   int Init(PHCompositeNode *topNode);
   int InitRun(PHCompositeNode *topNode);
   int process_event(PHCompositeNode *topNode);
@@ -92,15 +92,15 @@ protected:
 private:
   int event;
   std::string name;
-  SvtxEvalStack *_svtxevalstack;
   TFile *_file;
   TTree *_tree;
-  TLorentzVector b_recovec;
-  TLorentzVector b_truthvec;
-  TVector3       b_truthVertex;
-  TVector3       b_recoVertex;
+  std::vector<ReconstructedConvertedPhoton>* reconstructedConvertedPhotons;
+  TLorentzVector *b_recovec;
+  TLorentzVector *b_truthvec;
+  TVector3       *b_truthVertex;
+  TVector3       *b_recoVertex;
   
-  void reconstruct(SvtxEvalStack *stack,PHCompositeNode *topNode);
+  void reconstruct(PHCompositeNode *topNode);
   inline float pToE(TVector3 v, float mass){
     return quadrature((float) quadrature(v.x(),v.y()),(float) quadrature((float)v.z(),mass));
   }
