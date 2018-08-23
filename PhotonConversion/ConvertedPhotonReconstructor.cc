@@ -207,9 +207,11 @@ void ConvertedPhotonReconstructor::reconstruct(PHCompositeNode *topNode){
       ftrack=track;
       track=temp;
     }
-    reconstructedConvertedPhotons->push_back(
-        ReconstructedConvertedPhoton(event,*b_recovec,*b_recoVertex,*b_truthvec,*b_truthVertex,dynamic_cast<SvtxTrack_v1*>(ftrack),dynamic_cast<SvtxTrack_v1*>(track),clustermap)
-    );
+    
+    ReconstructedConvertedPhoton tempphoton = 
+      ReconstructedConvertedPhoton(event,*b_recovec,*b_recoVertex,*b_truthvec,*b_truthVertex,ftrack,track,clustermap);
+    cout<<"ready to push"<<endl;
+    reconstructedConvertedPhotons->push_back(tempphoton);
 
     cout<<"Photon pushed"<<endl;
     //_tree->Fill();

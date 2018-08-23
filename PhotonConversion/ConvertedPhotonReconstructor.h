@@ -24,90 +24,101 @@ class SvtxClusterMap;
 
 class ReconstructedConvertedPhoton
 {
-public:
-  ReconstructedConvertedPhoton(int event, const TLorentzVector& reco,const TVector3& recoVert,const TLorentzVector& truth, const TVector3& truthVert): event(event){
-    recovec    =reco;
-    truthvec   = truth;
-    truthVertex= truthVert;
-    recoVertex = recoVert;
-		positron=nullptr;
-		electron=nullptr;
-  }
-  ReconstructedConvertedPhoton(int event, const TLorentzVector& reco,const TVector3& recoVert,const TLorentzVector& truth, const TVector3& truthVert,SvtxTrack_v1* ptrack,SvtxTrack_v1* etrack,SvtxClusterMap* clustermap)
-    : event(event), positron(ptrack),electron(etrack){
-    recovec    =reco;
-    truthvec   = truth;
-    truthVertex= truthVert;
-    recoVertex = recoVert;
-    subtracted = false;
-		removeTracks(clustermap);
-  }
-  
-  ~ReconstructedConvertedPhoton(){
-    delete positron;
-    delete electron;
-  }
+  public:
+    ReconstructedConvertedPhoton(int event, const TLorentzVector& reco,const TVector3& recoVert,const TLorentzVector& truth, const TVector3& truthVert): event(event){
+      recovec    =reco;
+      truthvec   = truth;
+      truthVertex= truthVert;
+      recoVertex = recoVert;
+      positron=nullptr;
+      electron=nullptr;
+    }
+    ReconstructedConvertedPhoton(int event, const TLorentzVector& reco,const TVector3& recoVert,const TLorentzVector& truth, const TVector3& truthVert,SvtxTrack* ptrack,SvtxTrack* etrack,SvtxClusterMap* clustermap)
+      : event(event){
+        
+        std::cout<<"in recovered phton constructor"<<std::endl;
+        positron = dynamic_cast<SvtxTrack_v1*>(ptrack->Clone());
+        electron = dynamic_cast<SvtxTrack_v1*>(etrack->Clone());
+        if(!positron||!electron){
+          std::cout<<"Null tracks in photon contructor dropping tracks"<<std::endl;
+          *this = ReconstructedConvertedPhoton(event,reco,recoVert,truth,truthVert); 
+        }
+        else{
+          recovec    =reco;
+          truthvec   = truth;
+          truthVertex= truthVert;
+          recoVertex = recoVert;
+          subtracted = false;
+          removeTracks(clustermap);
+        }
+        std::cout<<"done constructing"<<std::endl;
+      }
 
-  void setPositron(SvtxTrack_v1* track){positron=track;}
-  void setElectron(SvtxTrack_v1* track){electron=track;}
-  inline SvtxTrack* get_positron() const{return positron;}
-  inline SvtxTrack* get_electron() const{return electron;}
-	
-  //one the e pairs are set remove their clusters from the event and add the recovered photon to the list of photons 
-	void removeTracks(SvtxClusterMap* map);
-	void removeTracks(SvtxClusterMap* map,SvtxTrack_v1* t1,SvtxTrack_v1* t2);
+    ~ReconstructedConvertedPhoton(){
+      if(positron) delete positron;
+      if(positron) delete electron;
+    }
 
-	inline friend std::ostream& operator<<(std::ostream& os, ReconstructedConvertedPhoton const & tc) {
-		return os <<"Converted Photon: \n \t pvec:" << tc.recovec.Pt()
-			<<"\n \t truth pvec:"<<tc.truthvec.Pt()<<'\n';
-	}
-private:
-  int event;
-  bool subtracted;
-  //probably some stuff about the tracks 
-  TLorentzVector recovec;
-  TLorentzVector truthvec;
-  TVector3 truthVertex;
-  TVector3 recoVertex;
-	//maybe an std::pair would be better 
-  SvtxTrack_v1* positron;
-  SvtxTrack_v1* electron;
+    void setPositron(SvtxTrack_v1* track){positron=static_cast<SvtxTrack_v1*>(track->Clone());}
+    void setElectron(SvtxTrack_v1* track){electron=static_cast<SvtxTrack_v1*>(track->Clone());}
+    inline SvtxTrack_v1* get_positron() const{return positron;}
+    inline SvtxTrack_v1* get_electron() const{return electron;}
+
+    //one the e pairs are set remove their clusters from the event and add the recovered photon to the list of photons 
+    void removeTracks(SvtxClusterMap* map);
+    void removeTracks(SvtxClusterMap* map,SvtxTrack_v1* t1,SvtxTrack_v1* t2);
+
+    inline friend std::ostream& operator<<(std::ostream& os, ReconstructedConvertedPhoton const & tc) {
+      return os <<"Converted Photon: \n \t pvec:" << tc.recovec.Pt()
+        <<"\n \t truth pvec:"<<tc.truthvec.Pt()<<'\n';
+    }
+  private:
+    int event;
+    bool subtracted;
+    //probably some stuff about the tracks 
+    TLorentzVector recovec;
+    TLorentzVector truthvec;
+    TVector3 truthVertex;
+    TVector3 recoVertex;
+    //maybe an std::pair would be better 
+    SvtxTrack_v1* positron;
+    SvtxTrack_v1* electron;
 };
 
 class ConvertedPhotonReconstructor : public SubsysReco {
-  
-public:
- 
-  ConvertedPhotonReconstructor(const std::string &name = "CONVERTEDPHOTONRECONSTRUCTOR");
-	~ConvertedPhotonReconstructor();	
-  int Init(PHCompositeNode *topNode);
-  int InitRun(PHCompositeNode *topNode);
-  int process_event(PHCompositeNode *topNode);
-  int End(PHCompositeNode *topNode);
-  //std::vector<ReconstructedConvertedPhoton> getPhotons() const {return reconstructedConvertedPhotons;}//i removed this as a class member but I may re add it.  It is declared in the reconstruct method
- 
-protected:
-  const float kEmass = 0.000511;
 
-private:
-  int event;
-  std::string name;
-  TFile *_file;
-  TTree *_tree;
-  std::vector<ReconstructedConvertedPhoton>* reconstructedConvertedPhotons;
-  TLorentzVector *b_recovec;
-  TLorentzVector *b_truthvec;
-  TVector3       *b_truthVertex;
-  TVector3       *b_recoVertex;
-  
-  void reconstruct(PHCompositeNode *topNode);
-  inline float pToE(TVector3 v, float mass){
-    return quadrature((float) quadrature(v.x(),v.y()),(float) quadrature((float)v.z(),mass));
-  }
-  template<class T>
-  T quadrature(T d1, T d2){
-      return TMath::Sqrt((double)d1*d1+d2*d2);
-  }
+  public:
+
+    ConvertedPhotonReconstructor(const std::string &name = "CONVERTEDPHOTONRECONSTRUCTOR");
+    ~ConvertedPhotonReconstructor();	
+    int Init(PHCompositeNode *topNode);
+    int InitRun(PHCompositeNode *topNode);
+    int process_event(PHCompositeNode *topNode);
+    int End(PHCompositeNode *topNode);
+    //std::vector<ReconstructedConvertedPhoton> getPhotons() const {return reconstructedConvertedPhotons;}//i removed this as a class member but I may re add it.  It is declared in the reconstruct method
+
+  protected:
+    const float kEmass = 0.000511;
+
+  private:
+    int event;
+    std::string name;
+    TFile *_file;
+    TTree *_tree;
+    std::vector<ReconstructedConvertedPhoton>* reconstructedConvertedPhotons;
+    TLorentzVector *b_recovec;
+    TLorentzVector *b_truthvec;
+    TVector3       *b_truthVertex;
+    TVector3       *b_recoVertex;
+
+    void reconstruct(PHCompositeNode *topNode);
+    inline float pToE(TVector3 v, float mass){
+      return quadrature((float) quadrature(v.x(),v.y()),(float) quadrature((float)v.z(),mass));
+    }
+    template<class T>
+      T quadrature(T d1, T d2){
+        return TMath::Sqrt((double)d1*d1+d2*d2);
+      }
 };
 
 #endif // __CONVERTEDPHOTONRECONSTRUCTOR_H__
