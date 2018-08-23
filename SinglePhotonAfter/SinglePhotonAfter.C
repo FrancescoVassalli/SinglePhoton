@@ -39,7 +39,6 @@ int SinglePhotonAfter::InitRun(PHCompositeNode *topNode)
 
 int SinglePhotonAfter::process_event(PHCompositeNode *topNode)
 {
-  std::cout<<"Single Photon process"<<std::endl;
   _b_particle_n = 0;
   
   PHG4TruthInfoContainer* truthinfo = findNode::getClass<PHG4TruthInfoContainer>(topNode,"G4TruthInfo");
@@ -68,6 +67,7 @@ int SinglePhotonAfter::process_event(PHCompositeNode *topNode)
 
 int SinglePhotonAfter::End(PHCompositeNode *topNode)
 {
+  std::cout<<"Writing truth tree"<<std::endl;
   _f->Write();
   _f->Close();
   return 0;
