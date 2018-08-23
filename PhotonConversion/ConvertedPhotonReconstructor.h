@@ -46,7 +46,7 @@ class ReconstructedConvertedPhoton
           truthVertex= truthVert;
           recoVertex = recoVert;
           subtracted = false;
-          removeTracks(clustermap);
+         // removeTracks(clustermap);
         }
       }
 
@@ -59,10 +59,6 @@ class ReconstructedConvertedPhoton
     void setElectron(SvtxTrack_v1* track){electron=static_cast<SvtxTrack_v1*>(track->Clone());}
     inline SvtxTrack_v1* get_positron() const{return positron;}
     inline SvtxTrack_v1* get_electron() const{return electron;}
-
-    //one the e pairs are set remove their clusters from the event and add the recovered photon to the list of photons 
-    void removeTracks(SvtxClusterMap* map);
-    void removeTracks(SvtxClusterMap* map,SvtxTrack_v1* t1,SvtxTrack_v1* t2);
 
     inline friend std::ostream& operator<<(std::ostream& os, ReconstructedConvertedPhoton const & tc) {
       return os <<"Converted Photon: \n \t pvec:" << tc.recovec.Pt()
@@ -85,7 +81,7 @@ class ConvertedPhotonReconstructor : public SubsysReco {
 
   public:
 
-    ConvertedPhotonReconstructor(const std::string &name = "CONVERTEDPHOTONRECONSTRUCTOR");
+    ConvertedPhotonReconstructor(const std::string &name);
     ~ConvertedPhotonReconstructor();	
     int Init(PHCompositeNode *topNode);
     int InitRun(PHCompositeNode *topNode);
