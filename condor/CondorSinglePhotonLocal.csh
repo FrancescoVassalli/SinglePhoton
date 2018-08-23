@@ -1,7 +1,7 @@
 #!/bin/csh 
 @ p = ( ${1} )
 #
-set LD_LIBRARY_PATH=$LD_LIB_NOLOCAL
+#set LD_LIBRARY_PATH=$LD_LIB_NOLOCAL
 set OUT_LOCATION="/sphenix/user/vassalli/singlesamples/Photon5/test/"
 set OUT_FILE=${OUT_LOCATION}onlineanalysis${p}.root
 set IN_FILE="/sphenix/user/vassalli/singlesamples/Photon5/test/out${p}.root"
@@ -16,9 +16,9 @@ mkdir $SCRATCH_AREA
 cp  $SOURCE_PHOTONMAKER $SCRATCH_AREA/
 cp $BURNER $SCRATCH_AREA/
 #
-rm $OUTFILE
+rm $OUT_FILE
 cd $SCRATCH_AREA
-root -b Fun4All_G4_sPHENIX.C\(5,\"$IN_FILE\"\) 
+#root -b Fun4All_G4_sPHENIX.C\(1,\"$IN_FILE\"\) 
 echo $LD_LIBRARY_PATH
 root -b -q after_DST.C\(\"$IN_FILE\",\"$OUT_FILE\"\)
 #
