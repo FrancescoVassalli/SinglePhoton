@@ -30,13 +30,13 @@ namespace {
 void makeHists(TTree* truth, TTree* recovery, const string& outname){
 	TFile *outfile = new TFile(outname.c_str(),"RECREATE");
 	
-	TLorentzVector recotlv, truthtlv;
-	TVector3 recoVert,truthVert;
+	TLorentzVector *recotlv, *truthtlv;
+	TVector3 *recoVert,*truthVert;
 
-	recovery->SetBranchAddress("",&recotlv);
-	recovery->SetBranchAddress("",&truthtlv);
-	recovery->SetBranchAddress("",&recoVert);
-	recovery->SetBranchAddress("",&truthVert);
+	recovery->SetBranchAddress("reco_tlv",&recotlv);
+	recovery->SetBranchAddress("truth_tlv",&truthtlv);
+	recovery->SetBranchAddress("reco_vertex",&recoVert);
+	recovery->SetBranchAddress("truth_vertex",&truthVert);
 	
 	TH1F *pTR = new TH1F("pTR","",60,0,2);
 	TH1F *matchAngle =new TH1F("matchAngle","",200,0,.1);
@@ -55,19 +55,19 @@ void makeHists(TTree* truth, TTree* recovery, const string& outname){
 	for (int i = 0; i < recovery->GetEntries(); ++i)
 	{
 		recovery->GetEntry(i);
-		pTR->Fill(recotlv.Pt()/truthtlv.Pt());
-		truthVEta->Fill(truthVert.Eta());
-		recoVEta->Fill(recoVert.Eta());
-		matchAngle->Fill(truthtlv.Angle(recotlv.Vect()));
-		truthVRadius->Fill(truthVert.XYvector().Mod());
-		recoVRadius->Fill(recoVert.XYvector().Mod());
-		truthVrz->Fill(truthVert.Z(),truthVert.XYvector().Mod());
-		recoVrz->Fill(recoVert.Z(),recoVert.XYvector().Mod());
-		anglespace->Fill(TMath::Abs(truthtlv.Eta()-recotlv.Eta()),deltaPhi(truthtlv.Phi(),recotlv.Phi()));
-		truthplotXY->Fill(truthVert.X(),truthVert.Y());
-		recoplotXY->Fill(recoVert.X(),recoVert.Y());
-		responseR->Fill(truthVert.XYvector().Mod(),recotlv.Pt()/truthtlv.Pt());
-		responseZ->Fill(truthVert.Z(),recotlv.Pt()/truthtlv.Pt());
+		pTR->Fill(recotlv->Pt()/truthtlv->Pt());
+		truthVEta->Fill(truthVert->Eta());
+		recoVEta->Fill(recoVert->Eta());
+		matchAngle->Fill(truthtlv->Angle(recotlv->Vect()));
+		truthVRadius->Fill(truthVert->XYvector().Mod());
+		recoVRadius->Fill(recoVert->XYvector().Mod());
+		truthVrz->Fill(truthVert->Z(),truthVert->XYvector().Mod());
+		recoVrz->Fill(recoVert->Z(),recoVert->XYvector().Mod());
+		anglespace->Fill(TMath::Abs(truthtlv->Eta()-recotlv->Eta()),deltaPhi(truthtlv->Phi(),recotlv->Phi()));
+		truthplotXY->Fill(truthVert->X(),truthVert->Y());
+		recoplotXY->Fill(recoVert->X(),recoVert->Y());
+		responseR->Fill(truthVert->XYvector().Mod(),recotlv->Pt()/truthtlv->Pt());
+		responseZ->Fill(truthVert->Z(),recotlv->Pt()/truthtlv->Pt());
 	}
 
 	outfile->Write();
@@ -77,10 +77,13 @@ void makeHists(TTree* truth, TTree* recovery, const string& outname){
 
 void onlineHister(){
   const string location ="/sphenix/user/vassalli/singlesamples/Photon5/";
-  string outname = "onlineTrackFile.root"
-	string inname ="track1.root";
-	TFile *tf = new TFile((location+inname).c_str(),"READ");
+  string outname = "onlineTrackFile.root";
+	string intruth ="truth.root";
+	string inreco ="reco.root";
+	TFile *f_truth = new TFile((location+intruth).c_str(),"READ");
+	TFile *f_reco = new TFile((location+inreco).c_str(),"READ");
 	TTree *truthInfo, *recoveryTree;
-	truthInfo = (TTree*) tf->Get("ttree");
+	truthInfo = (TTree*) f_truth->Get("ttree");
+	recoveryTree = (TTree*) f_reco->Get("convertedphotontree");
 	makeHists(truthInfo,recoveryTree,location+outname);
 }
