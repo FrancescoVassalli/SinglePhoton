@@ -42,15 +42,21 @@ void makeHists(TTree* truth, TTree* recovery, const string& outname){
 	TH1F *matchAngle =new TH1F("matchAngle","",200,0,.1);
 	TH2F *anglespace = new TH2F("ranglespace","",20,0,.005,20,0,.1);
 	TH2F *responseR = new TH2F("tresR","",200,0,25,60,0,2);
-	TH2F *responseZ = new TH2F("tresZ","",100,0,10,200,0.6,1.8);
+	TH2F *responseZ = new TH2F("tresZ","",100,-20,20,200,0.6,1.8);
 	TH1F *truthVEta= new TH1F("trutheta","",200,-1,1);
 	TH1F *recoVEta= new TH1F("recoeta","",200,-1,1);
 	TH1F *truthVRadius = new TH1F("truthRadius","",200,0,25);
-	TH1F *recoVRadius = new TH1F("recoRadius","",200,0,25);
-	TH2F *truthVrz = new TH2F("truthconZdepend","",200,0,25,200,0,20);
-	TH2F *recoVrz = new TH2F("recoconZdepend","",200,0,25,200,0,20);
+	TH1F *recoVRadius = new TH1F("recoRadius","",200,0,40);
+	TH2F *truthVrz = new TH2F("truthconZdepend","",200,-20,20,200,0,20);
+	TH2F *recoVrz = new TH2F("recoconZdepend","",200,-20,20,200,0,20);
 	TH2F *truthplotXY = new TH2F("tpXY","",100,-20,20,100,-20,20);
 	TH2F *recoplotXY = new TH2F("rpXY","",100,-20,20,100,-20,20);
+
+	TH1F* VR1 = new TH1F("VR1","",100,0,10);
+	TH1F* VR2 = new TH1F("VR2","",100,0,10);
+	TH1F* VR3 = new TH1F("VR3","",100,0,10);
+
+	TH1F* tRHighres = new TH1F("tRHighres",100,0,60);
 
 	for (int i = 0; i < recovery->GetEntries(); ++i)
 	{
@@ -68,7 +74,48 @@ void makeHists(TTree* truth, TTree* recovery, const string& outname){
 		recoplotXY->Fill(recoVert->X(),recoVert->Y());
 		responseR->Fill(truthVert->XYvector().Mod(),recotlv->Pt()/truthtlv->Pt());
 		responseZ->Fill(truthVert->Z(),recotlv->Pt()/truthtlv->Pt());
+
+		if (truthVert->XYvector().Mod()<5)
+		{
+			VR1->Fill(TMath::Abs(truthVert->XYvector().Mod()-recoVert->XYvector().Mod()));
+		}
+		else if (truthVert->XYvector().Mod()<15)
+		{
+			VR2->Fill(TMath::Abs(truthVert->XYvector().Mod()-recoVert->XYvector().Mod()));
+		}
+		else
+		{
+			VR3->Fill(TMath::Abs(truthVert->XYvector().Mod()-recoVert->XYvector().Mod()));
+		}
+		if (recotlv->Pt()/truthtlv->Pt()>1.2)
+		{
+			tRHighres->Fill(truthVert->XYvector().Mod());
+		}
 	}
+
+	int truthN;
+	int *ids;
+	truth->SetBranchAddress("particle_id",ids);
+	truth->SetBranchAddress("particle_n",&truthN);
+
+	int truthConversionCount=0;
+
+
+	for (int i = 0; i < truth->GetEntries(); ++i)
+	{
+		truth->GetEntry(i);
+		for (int j = 0; j < truthN; ++j)
+		{
+			if (particle_id[j]!=22)
+			{
+				truthConversionCount++;
+				continue;
+			}
+		}
+	}
+
+	TH1F *efficency = new TH1F("efficency","",1000,0,1);
+	efficency->Fill(recovery->GetEntries()/truthConversionCount);
 
 	outfile->Write();
 	outfile->Close();
