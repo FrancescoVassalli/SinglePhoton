@@ -75,7 +75,7 @@ ReconstructedConvertedPhoton* ConvertedPhotonReconstructor::reconstruct(PHCompos
   //let the stack get the info from the node
   SvtxEvalStack *stack = new SvtxEvalStack(topNode);
   if(!stack){
-    cout<<"Evaluator is null"<<endl;
+    cout<<"Evaluator is null quiting photon recovery\n";
     return nullptr;
   }
   stack->set_strict(false); //no idea what this does 
@@ -86,37 +86,41 @@ ReconstructedConvertedPhoton* ConvertedPhotonReconstructor::reconstruct(PHCompos
   SvtxVertexEval* vertexeval = stack->get_vertex_eval();
   SvtxTrackEval* trackeval =   stack->get_track_eval();
   if(!vertexeval||!trackeval){
-    cout<<"Evaluator is null"<<endl;
+    cout<<"Evaluator is null quiting photon recovery\n";
     return nullptr;
   }
   cout<<"In reconstruct num vertex="<<vertexmap->size()<<endl;
   for (SvtxVertexMap::Iter iter = vertexmap->begin(); iter != vertexmap->end(); ++iter) {
-    cout<<"Enter loop"<<endl;
+    //cout<<"Enter loop"<<endl;
     SvtxVertex* vertex = iter->second;
     if(!vertex){
-      cout<<"Vertex is null"<<endl;
+      cout<<"Vertex is null \n";
       continue;
     }
     float ntracks;
     ntracks= vertex->size_tracks();
     if(ntracks!=2){
-      cout<<"Quiting photon recovery due to "<<ntracks<<" tracks"<<endl;
+      cout<<"Quiting photon recovery due to "<<ntracks<<" tracks\n";
       continue; //now i assume thet there are only 2 tracks in the event 
     }
     float vx,vy,vz;
     vx = vertex->get_x();
     vy = vertex->get_y();
     vz = vertex->get_z();
+    if(vx==0&&vy==0&&vz==0){
+      cout<<"Quitting photon reovery due to trivial vertex\n";
+      continue;
+    }
     float charge1;
     SvtxVertex::TrackIter titer = vertex->begin_tracks(); 
     SvtxTrack* track = trackmap->get(*titer);
     if(!track){
-      cout<<"null track"<<endl;
+      cout<<"null track quting photon recovery\n";
       continue;
     }
     charge1 = track->get_charge();
     if(abs(charge1)!=1){
-      cout<<"Quiting photon recovery due to charge="<<charge1<<endl;
+      cout<<"Quiting photon recovery due to charge="<<charge1<<'\n';
       continue; //only considering electron positron conversion 
     }
     float t1x,t1y,t1z,t2x,t2y,t2z,charge2;
@@ -125,19 +129,19 @@ ReconstructedConvertedPhoton* ConvertedPhotonReconstructor::reconstruct(PHCompos
     t1z = track->get_pz();
     PHG4Particle* truth1 = trackeval->max_truth_particle_by_nclusters(track);	
     if(!truth1){
-      cout<<"truth1 is null"<<endl;
+      cout<<"truth1 is null quting photon recovery \n";
       continue;
     }
     ++titer;
     SvtxTrack* ftrack=track;
     track= trackmap->get(*titer);
     if(!track){
-      cout<<"null track"<<endl;
+      cout<<"null track quting photon recovery\n";
       continue;
     }
     charge2 = track->get_charge();
     if(charge1!= -1*charge2){
-      cout<<"Quiting Photon recovery due to lack of charge parity"<<endl;
+      cout<<"Quiting Photon recovery due to lack of charge parity\n";
       continue; //tracks must have opposite charge 
     }
     t2x = track->get_px();
@@ -146,7 +150,7 @@ ReconstructedConvertedPhoton* ConvertedPhotonReconstructor::reconstruct(PHCompos
 
     PHG4Particle* truth2 = trackeval->max_truth_particle_by_nclusters(track);	
     if(!truth2){
-      cout<<"truth2 is null"<<endl;
+      cout<<"truth2 is null quting photon recovery \n";
       continue;
     }
     TVector3 track1(t1x,t1y,t1z),track2(t2x,t2y,t2z);
