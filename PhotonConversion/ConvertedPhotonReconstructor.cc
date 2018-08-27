@@ -119,6 +119,7 @@ ReconstructedConvertedPhoton* ConvertedPhotonReconstructor::reconstruct(PHCompos
       cout<<"null track quting photon recovery\n";
       continue;
     }
+    cout<<"Got track1"<<endl;
     charge1 = track->get_charge();
     if(abs(charge1)!=1){
       cout<<"Quiting photon recovery due to charge="<<charge1<<'\n';
@@ -140,6 +141,7 @@ ReconstructedConvertedPhoton* ConvertedPhotonReconstructor::reconstruct(PHCompos
       cout<<"null track quting photon recovery\n";
       continue;
     }
+    cout<<"Got track2"<<endl;
     charge2 = track->get_charge();
     if(charge1!= -1*charge2){
       cout<<"Quiting Photon recovery due to lack of charge parity\n";
@@ -166,13 +168,14 @@ ReconstructedConvertedPhoton* ConvertedPhotonReconstructor::reconstruct(PHCompos
     b_truthVertex= new TVector3(point->get_x(),point->get_y(),point->get_z());
     b_truthvec= new TLorentzVector(tTrack1,pToE(tTrack1,kEmass));
     *b_truthvec+=TLorentzVector( tTrack2,pToE(tTrack2,kEmass));
-
+   cout<<"made tree compenents"<<endl;
     if(!ftrack->get_positive_charge()){ // will want to match these tracks to a truth particle 
       SvtxTrack* temp=ftrack;
       ftrack=track;
       track=temp;
     }
     _tree->Fill();
+    cout<<"Filled"<<endl;
     delete stack;
     return new ReconstructedConvertedPhoton(event,*b_recovec,*b_recoVertex,*b_truthvec,*b_truthVertex,ftrack,track,clustermap);
 
