@@ -42,7 +42,7 @@ int SinglePhotonAfter::process_event(PHCompositeNode *topNode)
   _b_particle_n = 0;
   
   PHG4TruthInfoContainer* truthinfo = findNode::getClass<PHG4TruthInfoContainer>(topNode,"G4TruthInfo");
-  PHG4TruthInfoContainer::Range range = truthinfo->GetPrimaryParticleRange();
+  PHG4TruthInfoContainer::Range range = truthinfo->GetParticleRange();
 
   for ( PHG4TruthInfoContainer::ConstIterator iter = range.first; iter != range.second; ++iter ) {
     PHG4Particle* g4particle = iter->second; // You may ask yourself, why second?
