@@ -44,7 +44,7 @@ int SinglePhotonAfter::process_event(PHCompositeNode *topNode)
 {
   std::cout<<"In process"<<std::endl;
   _b_particle_n = 0;
-  BaseTruthEval* truthEvaluator= findNode::getClass<BaseTruthEval>(topNode,"BaseTruthEval"); 
+  BaseTruthEval* truthEvaluator= new BaseTruthEval(topNode); 
   PHG4TruthInfoContainer* truthinfo = findNode::getClass<PHG4TruthInfoContainer>(topNode,"G4TruthInfo");
   if(!truthEvaluator||!truthinfo){
     std::cout<<"null node exiting"<<std::endl;
@@ -52,7 +52,7 @@ int SinglePhotonAfter::process_event(PHCompositeNode *topNode)
   }
   PHG4TruthInfoContainer::Range range = truthinfo->GetParticleRange();
   std::cout<<"Got nodes"<<std::endl;
-  /*for ( PHG4TruthInfoContainer::ConstIterator iter = range.first; iter != range.second; ++iter ) {
+  for ( PHG4TruthInfoContainer::ConstIterator iter = range.first; iter != range.second; ++iter ) {
     PHG4Particle* g4particle = iter->second; // You may ask yourself, why second?
     //PHG4VtxPoint* thisVtx = truthinfo->GetVtx(g4particle->get_vtx_id());
     //std::cout<<"Particle:"<<g4particle->get_pid()<<" eid="<<truthEvaluator->get_embed(truthinfo->GetParticle(g4particle->get_parent_id()));
@@ -71,7 +71,7 @@ int SinglePhotonAfter::process_event(PHCompositeNode *topNode)
       _b_particle_n++;
     }
   }
-  _tree->Fill();*/
+  _tree->Fill();
   std::cout<<"Filled "<<_b_particle_n<<" particles"<<std::endl;
 
   return 0;
