@@ -10,8 +10,11 @@
 
 #include <calotrigger/CaloTriggerInfo.h>
 
+#include <g4eval/BaseTruthEval.h>
+
 #include <g4main/PHG4TruthInfoContainer.h>
 #include <g4main/PHG4Particle.h>
+#include <g4main/PHG4VtxPoint.h>
 
 SinglePhotonAfter::SinglePhotonAfter(const std::string &name) : SubsysReco("SinglePhoton")
 {
@@ -39,31 +42,40 @@ int SinglePhotonAfter::InitRun(PHCompositeNode *topNode)
 
 int SinglePhotonAfter::process_event(PHCompositeNode *topNode)
 {
+  std::cout<<"In process"<<std::endl;
   _b_particle_n = 0;
-  
+  BaseTruthEval* truthEvaluator= findNode::getClass<BaseTruthEval>(topNode,"BaseTruthEval"); 
   PHG4TruthInfoContainer* truthinfo = findNode::getClass<PHG4TruthInfoContainer>(topNode,"G4TruthInfo");
-  PHG4TruthInfoContainer::Range range = truthinfo->GetParticleRange();
-
-  for ( PHG4TruthInfoContainer::ConstIterator iter = range.first; iter != range.second; ++iter ) {
-    PHG4Particle* g4particle = iter->second; // You may ask yourself, why second?
-    TLorentzVector t; t.SetPxPyPzE( g4particle->get_px(), g4particle->get_py(), g4particle->get_pz(), g4particle->get_e() );
-    float truth_pt = t.Pt();
-    float truth_eta = t.Eta();
-    if (fabs(truth_eta) > 1.1) continue;
-    float truth_phi = t.Phi();
-
-		_b_particle_id[ _b_particle_n ] = g4particle->get_pid();
-    _b_particle_pt[ _b_particle_n ] = truth_pt;
-    _b_particle_eta[ _b_particle_n ] = truth_eta;
-    _b_particle_phi[ _b_particle_n ] = truth_phi;
-    _b_particle_n++;
+  if(!truthEvaluator||!truthinfo){
+    std::cout<<"null node exiting"<<std::endl;
+    exit(1);
   }
+  PHG4TruthInfoContainer::Range range = truthinfo->GetParticleRange();
+  std::cout<<"Got nodes"<<std::endl;
+  /*for ( PHG4TruthInfoContainer::ConstIterator iter = range.first; iter != range.second; ++iter ) {
+    PHG4Particle* g4particle = iter->second; // You may ask yourself, why second?
+    //PHG4VtxPoint* thisVtx = truthinfo->GetVtx(g4particle->get_vtx_id());
+    //std::cout<<"Particle:"<<g4particle->get_pid()<<" eid="<<truthEvaluator->get_embed(truthinfo->GetParticle(g4particle->get_parent_id()));
+    std::cout<<"Particle:"<<g4particle->get_pid()<<" parent="<<g4particle->get_parent_id();
+    if(truthEvaluator->get_embed(truthinfo->GetParticle(g4particle->get_parent_id()))==2){
+      TLorentzVector t;
+      t.SetPxPyPzE( g4particle->get_px(), g4particle->get_py(), g4particle->get_pz(), g4particle->get_e() );
+      float truth_pt = t.Pt();
+      float truth_eta = t.Eta();
+      if (fabs(truth_eta) > 1.1) continue;
+      float truth_phi = t.Phi();
+      _b_particle_id[ _b_particle_n ] = g4particle->get_pid();
+      _b_particle_pt[ _b_particle_n ] = truth_pt;
+      _b_particle_eta[ _b_particle_n ] = truth_eta;
+      _b_particle_phi[ _b_particle_n ] = truth_phi;
+      _b_particle_n++;
+    }
+  }
+  _tree->Fill();*/
+  std::cout<<"Filled "<<_b_particle_n<<" particles"<<std::endl;
 
-  _tree->Fill();
   return 0;
 }
-
-
 
 int SinglePhotonAfter::End(PHCompositeNode *topNode)
 {

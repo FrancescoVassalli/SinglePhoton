@@ -28,8 +28,8 @@ int after_DST( std::string infile = "XjPhi3_pT5_98_dst.root",std::string outfile
   se->run();
 
   se->End();
-  std::cout << "All done" << std::endl;
   delete se;
+  std::cout << "All done" << std::endl;
 
   gSystem->Exit(0);
 }

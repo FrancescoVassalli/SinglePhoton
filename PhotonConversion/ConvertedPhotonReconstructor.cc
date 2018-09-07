@@ -54,9 +54,15 @@ int ConvertedPhotonReconstructor::process_event(PHCompositeNode *topNode) {
   }
   ReconstructedConvertedPhoton* recovered=reconstruct(topNode);
   if(recovered){
-    recoveredPhotonVec.push_back(recovered);
+    cout<<"recovered"<<endl;
+    //recoveredPhotonVec.push_back(recovered);
+    cout<<"pushed"<<endl;
+  }
+  else{
+    cout<<"no recovery"<<endl;
   }
   event++;
+  cout<<"return event::ok"<<endl;
   return Fun4AllReturnCodes::EVENT_OK;
 }
 
@@ -157,7 +163,7 @@ ReconstructedConvertedPhoton* ConvertedPhotonReconstructor::reconstruct(PHCompos
       continue;
     }
     TVector3 track1(t1x,t1y,t1z),track2(t2x,t2y,t2z);
-    PHG4VtxPoint* point = vertexeval->max_truth_point_by_ntracks(vertex); 
+    PHG4VtxPoint* point = vertexeval->max_truth_point_by_ntracks(vertex); //not entirely sure what this does
     TVector3 tTrack1(truth1->get_px(),truth1->get_py(),truth1->get_pz()),
              tTrack2(truth2->get_px(),truth2->get_py(),truth2->get_pz());
 
@@ -174,8 +180,8 @@ ReconstructedConvertedPhoton* ConvertedPhotonReconstructor::reconstruct(PHCompos
       ftrack=track;
       track=temp;
     }
-    _tree->Fill();
-    cout<<"Filled"<<endl;
+   // _tree->Fill();
+   // cout<<"Filled"<<endl;
     delete stack;
     return new ReconstructedConvertedPhoton(event,*b_recovec,*b_recoVertex,*b_truthvec,*b_truthVertex,ftrack,track,clustermap);
 
