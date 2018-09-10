@@ -12,8 +12,6 @@
 
 #include <g4eval/BaseTruthEval.h>
 
-#include <g4main/PHG4TruthInfoContainer.h>
-#include <g4main/PHG4Particle.h>
 #include <g4main/PHG4VtxPoint.h>
 
 SinglePhotonAfter::SinglePhotonAfter(const std::string &name) : SubsysReco("SinglePhoton")
@@ -44,26 +42,35 @@ int SinglePhotonAfter::process_event(PHCompositeNode *topNode)
 {
   std::cout<<"In process"<<std::endl;
   _b_particle_n = 0;
-  BaseTruthEval* truthEvaluator= new BaseTruthEval(topNode); 
+  //  BaseTruthEval* truthEvaluator= new BaseTruthEval(topNode); 
+  //truthEvaluator->set_strict(true);
   PHG4TruthInfoContainer* truthinfo = findNode::getClass<PHG4TruthInfoContainer>(topNode,"G4TruthInfo");
-  if(!truthEvaluator||!truthinfo){
+  /*if(!truthEvaluator||!truthinfo){
     std::cout<<"null node exiting"<<std::endl;
     exit(1);
-  }
+    }*/
   PHG4TruthInfoContainer::Range range = truthinfo->GetParticleRange();
   std::cout<<"Got nodes"<<std::endl;
   for ( PHG4TruthInfoContainer::ConstIterator iter = range.first; iter != range.second; ++iter ) {
     PHG4Particle* g4particle = iter->second; // You may ask yourself, why second?
     //PHG4VtxPoint* thisVtx = truthinfo->GetVtx(g4particle->get_vtx_id());
     //std::cout<<"Particle:"<<g4particle->get_pid()<<" eid="<<truthEvaluator->get_embed(truthinfo->GetParticle(g4particle->get_parent_id()));
-    std::cout<<"Particle:"<<g4particle->get_pid()<<" parent="<<g4particle->get_parent_id();
-    if(truthEvaluator->get_embed(truthinfo->GetParticle(g4particle->get_parent_id()))==2){
-      TLorentzVector t;
-      t.SetPxPyPzE( g4particle->get_px(), g4particle->get_py(), g4particle->get_pz(), g4particle->get_e() );
-      float truth_pt = t.Pt();
-      float truth_eta = t.Eta();
-      if (fabs(truth_eta) > 1.1) continue;
-      float truth_phi = t.Phi();
+    //  std::cout<<"Particle:"<<g4particle->get_pid()<<" parent="<<g4particle->get_parent_id();
+    PHG4Particle* parent =truthinfo->GetParticle(g4particle->get_parent_id());
+    bool goodEmbed;
+    if(!parent){
+    goodEmbed=get_embed(g4particle,truthinfo)==2;
+    }
+    else{
+    goodEmbed=get_embed(parent,truthinfo)==2;
+    }
+    TLorentzVector t;
+    t.SetPxPyPzE( g4particle->get_px(), g4particle->get_py(), g4particle->get_pz(), g4particle->get_e() );
+    float truth_pt = t.Pt();
+    float truth_eta = t.Eta();
+    if (fabs(truth_eta) > 1.1) continue;
+    float truth_phi = t.Phi();
+    if(goodEmbed){
       _b_particle_id[ _b_particle_n ] = g4particle->get_pid();
       _b_particle_pt[ _b_particle_n ] = truth_pt;
       _b_particle_eta[ _b_particle_n ] = truth_eta;
@@ -71,9 +78,11 @@ int SinglePhotonAfter::process_event(PHCompositeNode *topNode)
       _b_particle_n++;
     }
   }
+
   _tree->Fill();
   std::cout<<"Filled "<<_b_particle_n<<" particles"<<std::endl;
-
+  //delete truthEvaluator;
+  //std::cout<<"Deleted evaluator"<<std::endl;
   return 0;
 }
 

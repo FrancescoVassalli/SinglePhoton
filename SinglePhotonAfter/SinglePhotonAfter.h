@@ -3,6 +3,8 @@
 
 // --- need to check all these includes...
 #include <fun4all/SubsysReco.h>
+#include <g4main/PHG4TruthInfoContainer.h>
+#include <g4main/PHG4Particle.h>
 #include <vector>
 #include <TTree.h>
 #include <TFile.h>
@@ -38,4 +40,8 @@ class SinglePhotonAfter: public SubsysReco
   float _b_particle_phi[100];
 };
 
+inline int get_embed(PHG4Particle* particle, PHG4TruthInfoContainer* truthinfo){
+  //PHG4Particle* primary = particle->
+  return truthinfo->isEmbeded(particle->get_track_id());
+}
 #endif // __SINGLEPHOTONAFTER_H__
