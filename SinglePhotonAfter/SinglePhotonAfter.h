@@ -5,6 +5,7 @@
 #include <fun4all/SubsysReco.h>
 #include <g4main/PHG4TruthInfoContainer.h>
 #include <g4main/PHG4Particle.h>
+#include <g4main/PHG4VtxPoint.h>
 #include <vector>
 #include <TTree.h>
 #include <TFile.h>
@@ -41,7 +42,9 @@ class SinglePhotonAfter: public SubsysReco
 };
 
 inline int get_embed(PHG4Particle* particle, PHG4TruthInfoContainer* truthinfo){
-  //PHG4Particle* primary = particle->
   return truthinfo->isEmbeded(particle->get_track_id());
+}
+inline bool withinR(PHG4VtxPoint* vtx,double r){
+  return sqrt(vtx->get_x()*vtx->get_x()+vtx->get_y()*vtx->get_y())<r;
 }
 #endif // __SINGLEPHOTONAFTER_H__

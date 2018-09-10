@@ -1,18 +1,14 @@
 #include "SinglePhotonAfter.h"
 
-#include <phool/getClass.h>
 #include <fun4all/Fun4AllServer.h>
 
 #include <phool/PHCompositeNode.h>
-
-#include "TLorentzVector.h"
-#include <iostream>
+#include <phool/getClass.h>
 
 #include <calotrigger/CaloTriggerInfo.h>
 
-#include <g4eval/BaseTruthEval.h>
-
-#include <g4main/PHG4VtxPoint.h>
+#include "TLorentzVector.h"
+#include <iostream>
 
 SinglePhotonAfter::SinglePhotonAfter(const std::string &name) : SubsysReco("SinglePhoton")
 {
@@ -40,15 +36,8 @@ int SinglePhotonAfter::InitRun(PHCompositeNode *topNode)
 
 int SinglePhotonAfter::process_event(PHCompositeNode *topNode)
 {
-  std::cout<<"In process"<<std::endl;
   _b_particle_n = 0;
-  //  BaseTruthEval* truthEvaluator= new BaseTruthEval(topNode); 
-  //truthEvaluator->set_strict(true);
   PHG4TruthInfoContainer* truthinfo = findNode::getClass<PHG4TruthInfoContainer>(topNode,"G4TruthInfo");
-  /*if(!truthEvaluator||!truthinfo){
-    std::cout<<"null node exiting"<<std::endl;
-    exit(1);
-    }*/
   PHG4TruthInfoContainer::Range range = truthinfo->GetParticleRange();
   std::cout<<"Got nodes"<<std::endl;
   for ( PHG4TruthInfoContainer::ConstIterator iter = range.first; iter != range.second; ++iter ) {
@@ -57,12 +46,12 @@ int SinglePhotonAfter::process_event(PHCompositeNode *topNode)
     //std::cout<<"Particle:"<<g4particle->get_pid()<<" eid="<<truthEvaluator->get_embed(truthinfo->GetParticle(g4particle->get_parent_id()));
     //  std::cout<<"Particle:"<<g4particle->get_pid()<<" parent="<<g4particle->get_parent_id();
     PHG4Particle* parent =truthinfo->GetParticle(g4particle->get_parent_id());
-    bool goodEmbed;
+    bool goodEmbed; //need to check that not only is it the embed but it converts within my radius 
     if(!parent){
     goodEmbed=get_embed(g4particle,truthinfo)==2;
     }
     else{
-    goodEmbed=get_embed(parent,truthinfo)==2;
+      goodEmbed=withinR(truthinfo->GetVtx(g4particle->get_vtx_id()),21);//checks that the vtx is within the 21cm tpc range 
     }
     TLorentzVector t;
     t.SetPxPyPzE( g4particle->get_px(), g4particle->get_py(), g4particle->get_pz(), g4particle->get_e() );
@@ -81,8 +70,6 @@ int SinglePhotonAfter::process_event(PHCompositeNode *topNode)
 
   _tree->Fill();
   std::cout<<"Filled "<<_b_particle_n<<" particles"<<std::endl;
-  //delete truthEvaluator;
-  //std::cout<<"Deleted evaluator"<<std::endl;
   return 0;
 }
 
