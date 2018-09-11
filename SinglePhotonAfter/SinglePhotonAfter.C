@@ -48,7 +48,8 @@ int SinglePhotonAfter::process_event(PHCompositeNode *topNode)
     PHG4Particle* parent =truthinfo->GetParticle(g4particle->get_parent_id());
     bool goodEmbed; //need to check that not only is it the embed but it converts within my radius 
     if(!parent){
-    goodEmbed=get_embed(g4particle,truthinfo)==2;
+      goodEmbed=get_embed(g4particle,truthinfo)==2;
+
     }
     else{
       goodEmbed=withinR(truthinfo->GetVtx(g4particle->get_vtx_id()),21);//checks that the vtx is within the 21cm tpc range 
