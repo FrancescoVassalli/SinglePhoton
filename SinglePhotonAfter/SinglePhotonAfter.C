@@ -27,6 +27,7 @@ int SinglePhotonAfter::InitRun(PHCompositeNode *topNode)
   _tree = new TTree("ttree","a succulent orange tree");
   //_tree->SetAutoSave(300);
   _tree->Branch("particle_n", &_b_particle_n);
+  _tree->Branch("nVtx", &_b_nVtx);
   _tree->Branch("particle_pt", _b_particle_pt,"particle_pt[particle_n]/F");
   _tree->Branch("particle_eta", _b_particle_eta,"particle_eta[particle_n]/F");
   _tree->Branch("particle_phi", _b_particle_phi,"particle_phi[particle_n]/F");
@@ -37,22 +38,22 @@ int SinglePhotonAfter::InitRun(PHCompositeNode *topNode)
 int SinglePhotonAfter::process_event(PHCompositeNode *topNode)
 {
   _b_particle_n = 0;
+  _b_nVtx = 0;
   PHG4TruthInfoContainer* truthinfo = findNode::getClass<PHG4TruthInfoContainer>(topNode,"G4TruthInfo");
   PHG4TruthInfoContainer::Range range = truthinfo->GetParticleRange();
   std::cout<<"Got nodes"<<std::endl;
+  std::list<int> vtxList;
   for ( PHG4TruthInfoContainer::ConstIterator iter = range.first; iter != range.second; ++iter ) {
     PHG4Particle* g4particle = iter->second; // You may ask yourself, why second?
-    //PHG4VtxPoint* thisVtx = truthinfo->GetVtx(g4particle->get_vtx_id());
-    //std::cout<<"Particle:"<<g4particle->get_pid()<<" eid="<<truthEvaluator->get_embed(truthinfo->GetParticle(g4particle->get_parent_id()));
-    //  std::cout<<"Particle:"<<g4particle->get_pid()<<" parent="<<g4particle->get_parent_id();
     PHG4Particle* parent =truthinfo->GetParticle(g4particle->get_parent_id());
-    bool goodEmbed; //need to check that not only is it the embed but it converts within my radius 
     if(!parent){
-      goodEmbed=get_embed(g4particle,truthinfo)==2;
-
+      if(get_embed(g4particle,truthinfo)!=2) continue;
     }
     else{
-      goodEmbed=withinR(truthinfo->GetVtx(g4particle->get_vtx_id()),21);//checks that the vtx is within the 21cm tpc range 
+      if(get_embed(parent,truthinfo)!=2) continue;
+      PHG4VtxPoint* vtx=truthinfo->GetVtx(g4particle->get_vtx_id());
+      if(!withinR(vtx,21))continue;//ensures that the vtx is within the 21cm tpc range 
+      vtxList.push_back(vtx->get_id());
     }
     TLorentzVector t;
     t.SetPxPyPzE( g4particle->get_px(), g4particle->get_py(), g4particle->get_pz(), g4particle->get_e() );
@@ -60,15 +61,14 @@ int SinglePhotonAfter::process_event(PHCompositeNode *topNode)
     float truth_eta = t.Eta();
     if (fabs(truth_eta) > 1.1) continue;
     float truth_phi = t.Phi();
-    if(goodEmbed){
-      _b_particle_id[ _b_particle_n ] = g4particle->get_pid();
-      _b_particle_pt[ _b_particle_n ] = truth_pt;
-      _b_particle_eta[ _b_particle_n ] = truth_eta;
-      _b_particle_phi[ _b_particle_n ] = truth_phi;
-      _b_particle_n++;
-    }
+    _b_particle_id[ _b_particle_n ] = g4particle->get_pid();
+    _b_particle_pt[ _b_particle_n ] = truth_pt;
+    _b_particle_eta[ _b_particle_n ] = truth_eta;
+    _b_particle_phi[ _b_particle_n ] = truth_phi;
+    _b_particle_n++;
   }
 
+  _b_nVtx=numUnique(vtxList);
   _tree->Fill();
   std::cout<<"Filled "<<_b_particle_n<<" particles"<<std::endl;
   return 0;

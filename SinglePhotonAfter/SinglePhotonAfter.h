@@ -7,6 +7,7 @@
 #include <g4main/PHG4Particle.h>
 #include <g4main/PHG4VtxPoint.h>
 #include <vector>
+#include <list>
 #include <TTree.h>
 #include <TFile.h>
 
@@ -35,6 +36,7 @@ class SinglePhotonAfter: public SubsysReco
   TTree *_tree;
   std::string _foutname;
   int _b_particle_n;
+  int _b_nVtx;
   float _b_particle_pt[100];
   float _b_particle_eta[100];
   int _b_particle_id[100];
@@ -47,4 +49,17 @@ inline int get_embed(PHG4Particle* particle, PHG4TruthInfoContainer* truthinfo){
 inline bool withinR(PHG4VtxPoint* vtx,double r){
   return sqrt(vtx->get_x()*vtx->get_x()+vtx->get_y()*vtx->get_y())<r;
 }
+inline int numUnique(std::list<int> l){
+  l.sort();
+  int last=-1;
+  int r=0;
+  for (std::list<int>::iterator i = l.begin(); i != l.end(); ++i) {
+    if(*i!=last){
+      r++;
+      last=*i;
+    }
+  }
+  return r;
+}
 #endif // __SINGLEPHOTONAFTER_H__
+

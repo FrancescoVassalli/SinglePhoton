@@ -101,29 +101,20 @@ void makeHists(TTree* truth, TTree* recovery, const string& outname){
 
   int truthN;
   int ids[100];
+  int nVtx;
   truth->SetBranchAddress("particle_id",&ids[0]);
   truth->SetBranchAddress("particle_n",&truthN);
-
+  truth->SetBranchAddress("nVtx",&nVtx);
   int truthConversionCount=0;
 
 
   for (int i = 0; i < truth->GetEntries(); ++i)
   {
     truth->GetEntry(i);
-    cout<<"Truth N:"<<truthN<<endl;
-    if(truthN>8){
-      for (int j = 0; j < truthN; ++j)
-      {
-        if (ids[j]!=22)
-        { 
-          truthConversionCount++;
-        }
-      }
-    }
+    truthConversionCount+=nVtx;
   }
-  cout<<"Truth electron:"<<truthConversionCount<<endl;
-  //TH1F *efficency = new TH1F("efficency","",1000,0,1);
-  //efficency->Fill(recovery->GetEntries()/truthConversionCount);
+  TH1F *efficency = new TH1F("efficency","",1000,0,1);
+  efficency->Fill(recovery->GetEntries()/truthConversionCount);
 
   outfile->Write();
   outfile->Close();
@@ -141,5 +132,5 @@ void onlineHister(){
 	TTree *truthInfo, *recoveryTree;
 	truthInfo = (TTree*) f_truth->Get("ttree");
 	recoveryTree = (TTree*) f_reco->Get("convertedphotontree");
-	makeHists(truthInfo,recoveryTree,location+outname);
+	makeHists(truthInfo,recoveryTree,outname);
 }
