@@ -60,6 +60,7 @@ void makeHists(TTree* truth, TTree* recovery, const string& outname){
 
   TH1F* tRHighres = new TH1F("tRHighres","",100,0,60);
 
+  cout<<recovery->GetEntries()<<endl;
   for (int i = 0; i < recovery->GetEntries(); ++i)
   {
     recovery->GetEntry(i);
@@ -107,7 +108,7 @@ void makeHists(TTree* truth, TTree* recovery, const string& outname){
   truth->SetBranchAddress("nVtx",&nVtx);
   int truthConversionCount=0;
 
-
+  cout<<truth->GetEntries()<<endl;
   for (int i = 0; i < truth->GetEntries(); ++i)
   {
     truth->GetEntry(i);

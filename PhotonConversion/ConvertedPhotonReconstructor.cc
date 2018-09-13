@@ -180,8 +180,8 @@ ReconstructedConvertedPhoton* ConvertedPhotonReconstructor::reconstruct(PHCompos
       ftrack=track;
       track=temp;
     }
-   // _tree->Fill();
-   // cout<<"Filled"<<endl;
+    _tree->Fill();
+    cout<<"Filled"<<endl;
     delete stack;
     return new ReconstructedConvertedPhoton(event,*b_recovec,*b_recoVertex,*b_truthvec,*b_truthVertex,ftrack,track,clustermap);
 
