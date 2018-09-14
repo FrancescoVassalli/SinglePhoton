@@ -33,9 +33,9 @@ void makeHists(TTree* truth, TTree* recovery, const string& outname){
   TLorentzVector *recotlv, *truthtlv;
   TVector3 *recoVert,*truthVert;
 
-  recovery->SetBranchAddress("reco_tlv",&recotlv);
-  recovery->SetBranchAddress("truth_tlv",&truthtlv);
-  recovery->SetBranchAddress("reco_vertex",&recoVert);
+  recovery->SetBranchAddress("reco_tlv",    &recotlv  );
+  recovery->SetBranchAddress("truth_tlv",   &truthtlv );
+  recovery->SetBranchAddress("reco_vertex", &recoVert );
   recovery->SetBranchAddress("truth_vertex",&truthVert);
 
   TH1F *pTR = new TH1F("pTR","",60,0,2);
