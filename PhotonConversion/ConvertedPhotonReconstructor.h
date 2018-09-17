@@ -98,8 +98,10 @@ class ConvertedPhotonReconstructor : public SubsysReco {
     TFile *_file;
     TTree *_tree;
     std::vector<ReconstructedConvertedPhoton*> recoveredPhotonVec;
-    TLorentzVector *b_recovec;
-    TLorentzVector *b_truthvec;
+    TLorentzVector *b_recovec1;
+    TLorentzVector *b_truthvec1;
+    TLorentzVector *b_recovec2;
+    TLorentzVector *b_truthvec2;
     TVector3       *b_truthVertex;
     TVector3       *b_recoVertex;
     bool            b_failed;

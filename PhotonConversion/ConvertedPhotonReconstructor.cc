@@ -30,13 +30,17 @@ ConvertedPhotonReconstructor::ConvertedPhotonReconstructor(const std::string &na
   _file = new TFile( this->name.c_str(), "RECREATE");
   _tree = new TTree("convertedphotontree","tracks reconstructed to converted photons");
   //_tree->SetAutoSave(300);
-  b_recovec = new TLorentzVector();
-  b_truthvec = new TLorentzVector();
+  b_recovec1 = new TLorentzVector();
+  b_recovec1 = new TLorentzVector();
+  b_truthvec2 = new TLorentzVector();
+  b_truthvec2 = new TLorentzVector();
   b_truthVertex = new TVector3();
   b_recoVertex = new  TVector3();
   _tree->Branch("status",&b_failed);
-  _tree->Branch("reco_tlv",    "TLorentzVector", &b_recovec);
-  _tree->Branch("truth_tlv",   "TLorentzVector", &b_truthvec);
+  _tree->Branch("reco_tlv",    "TLorentzVector",  &b_recovec1);
+  _tree->Branch("reco_tlv",    "TLorentzVector",  &b_recovec1);
+  _tree->Branch("truth_tlv",   "TLorentzVector", &b_truthvec2);
+  _tree->Branch("truth_tlv",   "TLorentzVector", &b_truthvec2);
   _tree->Branch("truth_vertex","TVector3",       &b_truthVertex);
   _tree->Branch("reco_vertex", "TVector3",       &b_recoVertex);
 }
@@ -54,14 +58,14 @@ int ConvertedPhotonReconstructor::process_event(PHCompositeNode *topNode) {
     cout << "ConvertedPhotonReconstructor::process_event - Event = " << event << endl;
   }
   ReconstructedConvertedPhoton* recovered=reconstruct(topNode);
-  if(recovered){
+  /*if(recovered){
     cout<<"recovered"<<endl;
     //recoveredPhotonVec.push_back(recovered);
     cout<<"pushed"<<endl;
   }
   else{
     cout<<"no recovery"<<endl;
-  }
+  }*/
   event++;
   cout<<"return event::ok"<<endl;
   return Fun4AllReturnCodes::EVENT_OK;
@@ -168,23 +172,21 @@ ReconstructedConvertedPhoton* ConvertedPhotonReconstructor::reconstruct(PHCompos
     TVector3 tTrack1(truth1->get_px(),truth1->get_py(),truth1->get_pz()),
              tTrack2(truth2->get_px(),truth2->get_py(),truth2->get_pz());
 
-    b_recovec= new TLorentzVector(track1,pToE(track1,kEmass));
-    *b_recovec+=TLorentzVector(track2,pToE(track2,kEmass)); // make the tlv for the reco photon 
+    b_recovec1= new TLorentzVector(track1,pToE(track1,kEmass));
+    b_recovec2= new TLorentzVector(track2,pToE(track2,kEmass)); // make the tlv for the reco photon 
     b_recoVertex= new TVector3(vx,vy,vz);
     //do i care about the truth number of particles ?
     b_truthVertex= new TVector3(point->get_x(),point->get_y(),point->get_z());
-    b_truthvec= new TLorentzVector(tTrack1,pToE(tTrack1,kEmass));
-    *b_truthvec+=TLorentzVector( tTrack2,pToE(tTrack2,kEmass));
-   cout<<"made tree compenents"<<endl;
+    b_truthvec1= new TLorentzVector(tTrack1,pToE(tTrack1,kEmass));
+    b_truthvec2= new TLorentzVector( tTrack2,pToE(tTrack2,kEmass));
     if(!ftrack->get_positive_charge()){ // will want to match these tracks to a truth particle 
       SvtxTrack* temp=ftrack;
       ftrack=track;
       track=temp;
     }
     _tree->Fill();
-    cout<<"Filled"<<endl;
     delete stack;
-    return new ReconstructedConvertedPhoton(event,*b_recovec,*b_recoVertex,*b_truthvec,*b_truthVertex,ftrack,track,clustermap);
+    //return new ReconstructedConvertedPhoton(event,*b_recovec,*b_recoVertex,*b_truthvec,*b_truthVertex,ftrack,track,clustermap);
 
     // add the vector to the node tree 
     /* PHDataNode<std::vector<ReconstructedConvertedPhoton>>* vecNode = 
