@@ -77,18 +77,19 @@ void onlinePlotter(){
 	string name ="onlineTrackFile.root";
 	TFile *ef = new TFile((name).c_str(),"READ");
 	//track plots 
-	const int kNUM1DPLOTS= 6;
+	const int kNUM1DPLOTS= 10;
 	const int kNUM2DPLOTS= 7;
 	string plotNames1d[kNUM1DPLOTS] = {"pTR","matchAngle","trutheta",
-		"recoeta","truthRadius","recoRadius"};
+		"recoeta","truthRadius","recoRadius","VR1","VR2","VR3","tRHighres"};
 	string plotXNames1d[kNUM1DPLOTS] = {"pT #gamma #frac{reco}{truth}","angle #vec{p} truth-reco",
-		"truth #eta","reco #eta","truth R","reco R"};
+		"truth #eta","reco #eta","truth R","reco R","#Delta R R_{t}<5",
+		"#Delta R R_{t}<15","#Delta R R_{t}>15","R_{t} pT #gamma #frac{reco}{truth}>1.2"};
 	string plotNames2d[kNUM2DPLOTS] = {"ranglespace","tresR","tresZ",
 		"truthconZdepend","recoconZdepend","tpXY","rpXY"};
 	string plotNamesX2d[kNUM2DPLOTS] = {"truth-reco #Delta#eta","truth R",
 	"truth z","truth z","reco z","truth x","reco x"};
-	string plotNamesY2d[kNUM2DPLOTS] = {"truth-reco #Delta#phi","pT #gamma response",
-		"pT #gamma response","truth R", "reco R","truth y","reco y"};
+	string plotNamesY2d[kNUM2DPLOTS] = {"truth-reco #Delta#phi","pT track response",
+		"pT track response","truth R", "reco R","truth y","reco y"};
 	TH1F* h1plots[kNUM1DPLOTS];
 	TH2F* h2plots[kNUM2DPLOTS];
 	for (int i = 0; i < kNUM1DPLOTS; ++i)
