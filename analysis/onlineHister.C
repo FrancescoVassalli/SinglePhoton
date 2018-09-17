@@ -32,11 +32,13 @@ namespace {
 void makeHists(TTree* truth, TTree* recovery, const string& outname){
   TFile *outfile = new TFile(outname.c_str(),"RECREATE");
 
-  TLorentzVector *recotlv, *truthtlv;
+  TLorentzVector *recotlv1, *truthtlv1, *recotlv2, *truthtlv2,*recotlv,truthtlv;
   TVector3 *recoVert,*truthVert;
 
-  recovery->SetBranchAddress("reco_tlv",    &recotlv  );
-  recovery->SetBranchAddress("truth_tlv",   &truthtlv );
+  recovery->SetBranchAddress("reco_tlv1",    &recotlv1 );
+  recovery->SetBranchAddress("truth_tlv1",   &truthtlv1 );
+  recovery->SetBranchAddress("reco_tlv2",    &recotlv2 );
+  recovery->SetBranchAddress("truth_tlv2",   &truthtlv2 );
   recovery->SetBranchAddress("reco_vertex", &recoVert );
   recovery->SetBranchAddress("truth_vertex",&truthVert);
 
@@ -61,11 +63,14 @@ void makeHists(TTree* truth, TTree* recovery, const string& outname){
   TH1F* nullVertR = new TH1F("nullVertR","",100,0,60);
 
   TH1F* tRHighres = new TH1F("tRHighres","",100,0,60);
-
+  recotlv= new recotlv1+recotlv2;
+  truthtlv= new truthtlv1+truthtlv2;
   cout<<recovery->GetEntries()<<endl;
   for (int i = 0; i < recovery->GetEntries(); ++i)
   {
     recovery->GetEntry(i);
+    recotlv= new recotlv1+recotlv2;
+    truthtlv= new truthtlv1+truthtlv2;
     pTR->Fill(recotlv->Pt()/truthtlv->Pt());
     truthVEta->Fill(truthVert->Eta());
     recoVEta->Fill(recoVert->Eta());
@@ -80,8 +85,10 @@ void makeHists(TTree* truth, TTree* recovery, const string& outname){
     if(recoVert->X()==0&&recoVert->Y()==0){
       cout<<"Truth R:"<<truthVert->XYvector().Mod()<<", Reco z:"<<recoVert->Z()<<endl;
     }
-    responseR->Fill(truthVert->XYvector().Mod(),recotlv->Pt()/truthtlv->Pt());
-    responseZ->Fill(truthVert->Z(),recotlv->Pt()/truthtlv->Pt());
+    responseR->Fill(truthVert->XYvector().Mod(),recotlv1->Pt()/truthtlv1->Pt());
+    responseZ->Fill(truthVert->Z(),recotlv1->Pt()/truthtlv1->Pt());
+    responseR->Fill(truthVert->XYvector().Mod(),recotlv2->Pt()/truthtlv2->Pt());
+    responseZ->Fill(truthVert->Z(),recotlv2->Pt()/truthtlv2->Pt());
 
     if (truthVert->XYvector().Mod()<5)
     {
@@ -103,6 +110,8 @@ void makeHists(TTree* truth, TTree* recovery, const string& outname){
     {
       nullVertR->Fill(truthVert->XYvector().Mod());
     }
+    delete recotlv;
+    delete truthtlv;
   }
 
   int truthN;
