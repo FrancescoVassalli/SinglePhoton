@@ -1,10 +1,12 @@
 #include <TVector3.h>
 #include <TLorentzVector.h>
 #include <TFile.h>
+#include <TChain.h>
 #include <TH1.h>
 #include <TH1F.h>
 #include <TH2F.h>
 #include <cmath>
+#include <sstream>
 using namespace std;
 
 namespace {
@@ -126,15 +128,36 @@ void makeHists(TTree* truth, TTree* recovery, const string& outname){
 
 }
 
+TChain* handleFile(string name, string extension, string treename, int filecount){
+  TChain *all = new TChain(treename.c_str());
+  string temp;
+  for (int i = 0; i < filecount; ++i)
+  {
+
+    ostringstream s;
+    s<<i;
+    temp = name+string(s.str())+extension;
+    all->Add(temp.c_str());
+  }
+  return all;
+}
+
 void onlineHister(){
   const string location ="/sphenix/user/vassalli/singlesamples/Photon5/";
   string outname = "onlineTrackFile.root";
-	string intruth ="truth.root";
-	string inreco ="reco.root";
-	TFile *f_truth = new TFile((location+intruth).c_str(),"READ");
+	string in ="onlineanalysis";
+	string reco =".rootrecovered.root";
+  string truth =".root";
+  int numFiles=100;
+  TChain* truthchain=handleFile(location+in,truth,"ttree",numFiles);
+  TChain* recochain=handleFile(location+in,reco,  "convertedphotontree",numFiles);
+	/*TFile *f_truth = new TFile((location+intruth).c_str(),"READ");
 	TFile *f_reco = new TFile((location+inreco).c_str(),"READ");
 	TTree *truthInfo, *recoveryTree;
 	truthInfo = (TTree*) f_truth->Get("ttree");
-	recoveryTree = (TTree*) f_reco->Get("convertedphotontree");
-	makeHists(truthInfo,recoveryTree,outname);
+	recoveryTree = (TTree*) f_reco->Get("convertedphotontree");*/
+	makeHists(truthchain,recochain,outname);
+  //ostringsteam s;
+  //s<<numFiles;
+  //string num(s)
 }
