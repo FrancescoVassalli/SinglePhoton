@@ -37,10 +37,10 @@ ConvertedPhotonReconstructor::ConvertedPhotonReconstructor(const std::string &na
   b_truthVertex = new TVector3();
   b_recoVertex = new  TVector3();
   _tree->Branch("status",&b_failed);
-  _tree->Branch("reco_tlv",    "TLorentzVector",  &b_recovec1);
-  _tree->Branch("reco_tlv",    "TLorentzVector",  &b_recovec1);
-  _tree->Branch("truth_tlv",   "TLorentzVector", &b_truthvec2);
-  _tree->Branch("truth_tlv",   "TLorentzVector", &b_truthvec2);
+  _tree->Branch("reco_tlv1",    "TLorentzVector",  &b_recovec1);
+  _tree->Branch("reco_tlv2",    "TLorentzVector",  &b_recovec2);
+  _tree->Branch("truth_tlv1",   "TLorentzVector", &b_truthvec1);
+  _tree->Branch("truth_tlv2",   "TLorentzVector", &b_truthvec2);
   _tree->Branch("truth_vertex","TVector3",       &b_truthVertex);
   _tree->Branch("reco_vertex", "TVector3",       &b_recoVertex);
 }
