@@ -114,7 +114,7 @@ ReconstructedConvertedPhoton* ConvertedPhotonReconstructor::reconstruct(PHCompos
     vy = vertex->get_y();
     vz = vertex->get_z();
     cout<<"Vertex:"<<vx<<", "<<vy<<", "<<vz<<'\n';
-    if(vx==0&&vy==0&&vz==0){
+    if(sqrt(vx*vx+vy*vy+vz*vz)<1){
       cout<<"Quitting photon reovery due to trivial vertex\n";
       continue;
     }

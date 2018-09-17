@@ -75,6 +75,9 @@ void makeHists(TTree* truth, TTree* recovery, const string& outname){
     anglespace->Fill(TMath::Abs(truthtlv->Eta()-recotlv->Eta()),deltaPhi(truthtlv->Phi(),recotlv->Phi()));
     truthplotXY->Fill(truthVert->X(),truthVert->Y());
     recoplotXY->Fill(recoVert->X(),recoVert->Y());
+    if(recoVert->X()==0&&recoVert->Y()==0){
+      cout<<"Truth R:"<<truthVert->XYvector().Mod()<<", Reco z:"<<recoVert->Z()<<endl;
+    }
     responseR->Fill(truthVert->XYvector().Mod(),recotlv->Pt()/truthtlv->Pt());
     responseZ->Fill(truthVert->Z(),recotlv->Pt()/truthtlv->Pt());
 
@@ -115,7 +118,7 @@ void makeHists(TTree* truth, TTree* recovery, const string& outname){
     truthConversionCount+=nVtx;
   }
   TH1F *efficency = new TH1F("efficency","",1000,0,1);
-  efficency->Fill(recovery->GetEntries()/truthConversionCount);
+  efficency->Fill(recovery->GetEntries()/(float)truthConversionCount);
 
   outfile->Write();
   outfile->Close();
