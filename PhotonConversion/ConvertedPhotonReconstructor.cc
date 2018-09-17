@@ -34,6 +34,7 @@ ConvertedPhotonReconstructor::ConvertedPhotonReconstructor(const std::string &na
   b_truthvec = new TLorentzVector();
   b_truthVertex = new TVector3();
   b_recoVertex = new  TVector3();
+  _tree->Branch("status",&b_failed);
   _tree->Branch("reco_tlv",    "TLorentzVector", &b_recovec);
   _tree->Branch("truth_tlv",   "TLorentzVector", &b_truthvec);
   _tree->Branch("truth_vertex","TVector3",       &b_truthVertex);
@@ -109,14 +110,14 @@ ReconstructedConvertedPhoton* ConvertedPhotonReconstructor::reconstruct(PHCompos
       cout<<"Quiting photon recovery due to "<<ntracks<<" tracks\n";
       continue; //now i assume thet there are only 2 tracks in the event 
     }
+    b_failed=false;
     float vx,vy,vz;
     vx = vertex->get_x();
     vy = vertex->get_y();
     vz = vertex->get_z();
     cout<<"Vertex:"<<vx<<", "<<vy<<", "<<vz<<'\n';
     if(sqrt(vx*vx+vy*vy+vz*vz)<1){
-      cout<<"Quitting photon reovery due to trivial vertex\n";
-      continue;
+      b_failed=true;
     }
     float charge1;
     SvtxVertex::TrackIter titer = vertex->begin_tracks(); 

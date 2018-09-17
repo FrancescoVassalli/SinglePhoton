@@ -102,6 +102,7 @@ class ConvertedPhotonReconstructor : public SubsysReco {
     TLorentzVector *b_truthvec;
     TVector3       *b_truthVertex;
     TVector3       *b_recoVertex;
+    bool            b_failed;
 
     ReconstructedConvertedPhoton* reconstruct(PHCompositeNode *topNode);
     inline float pToE(TVector3 v, float mass){
