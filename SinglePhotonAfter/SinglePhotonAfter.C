@@ -23,11 +23,13 @@ SinglePhotonAfter::~SinglePhotonAfter(){
 
 int SinglePhotonAfter::InitRun(PHCompositeNode *topNode)
 {
+  _b_event=0;
   _f = new TFile( _foutname.c_str(), "RECREATE");
   _tree = new TTree("ttree","a succulent orange tree");
   //_tree->SetAutoSave(300);
   _tree->Branch("particle_n", &_b_particle_n);
   _tree->Branch("nVtx", &_b_nVtx);
+  _tree->Branch("event",&_b_event);
   _tree->Branch("particle_pt", _b_particle_pt,"particle_pt[particle_n]/F");
   _tree->Branch("particle_eta", _b_particle_eta,"particle_eta[particle_n]/F");
   _tree->Branch("particle_phi", _b_particle_phi,"particle_phi[particle_n]/F");
@@ -71,6 +73,7 @@ int SinglePhotonAfter::process_event(PHCompositeNode *topNode)
   _b_nVtx=numUnique(vtxList);
   _tree->Fill();
   std::cout<<"Filled "<<_b_particle_n<<" particles"<<std::endl;
+  _b_event++;
   return 0;
 }
 
