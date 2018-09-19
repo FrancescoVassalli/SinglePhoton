@@ -58,7 +58,7 @@ void makeHists(TTree* truth, TTree* recovery, const string& outname){
 
   TH1F* VR1 = new TH1F("VR1","",100,0,10);
   TH1F* VR2 = new TH1F("VR2","",100,0,10);
-  TH1F* VR3 = new TH1F("VR3","",100,0,10);
+  TH1F* VR3 = new TH1F("VR3","",30,0,40);
 
   TH1F* nullVertR = new TH1F("nullVertR","",100,0,60);
   TH1F* tRHighres = new TH1F("tRHighres","",100,0,60);
