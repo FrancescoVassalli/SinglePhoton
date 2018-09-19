@@ -32,7 +32,7 @@ namespace {
 void makeHists(TTree* truth, TTree* recovery, const string& outname){
   TFile *outfile = new TFile(outname.c_str(),"RECREATE");
 
-  TLorentzVector *recotlv1, *truthtlv1, *recotlv2, *truthtlv2,*recotlv,truthtlv;
+  TLorentzVector *recotlv1, *truthtlv1, *recotlv2, *truthtlv2,*recotlv,*truthtlv;
   TVector3 *recoVert,*truthVert;
 
   recovery->SetBranchAddress("reco_tlv1",    &recotlv1 );
@@ -62,14 +62,14 @@ void makeHists(TTree* truth, TTree* recovery, const string& outname){
 
   TH1F* nullVertR = new TH1F("nullVertR","",100,0,60);
   TH1F* tRHighres = new TH1F("tRHighres","",100,0,60);
-  recotlv= new recotlv1+recotlv2;
-  truthtlv= new truthtlv1+truthtlv2;
   cout<<recovery->GetEntries()<<endl;
+  recotlv= new TLorentzVector(*recotlv1+*recotlv2);
+  truthtlv= new TLorentzVector(*truthtlv1+*truthtlv2);
   for (int i = 0; i < recovery->GetEntries(); ++i)
   {
     recovery->GetEntry(i);
-    recotlv= new recotlv1+recotlv2;
-    truthtlv= new truthtlv1+truthtlv2;
+    recotlv= new TLorentzVector(*recotlv1+*recotlv2);
+    truthtlv= new TLorentzVector(*truthtlv1+*truthtlv2);
     pTR->Fill(recotlv->Pt()/truthtlv->Pt());
     truthVEta->Fill(truthVert->Eta());
     recoVEta->Fill(recoVert->Eta());
