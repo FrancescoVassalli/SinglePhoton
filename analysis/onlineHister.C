@@ -55,13 +55,13 @@ void makeHists(TTree* truth, TTree* recovery, const string& outname){
   TH1F *recoVEta= new TH1F("recoeta","",200,-1,1);
   TH1F *truthVRadius = new TH1F("truthRadius","",200,0,25);
   TH1F *recoVRadius = new TH1F("recoRadius","",200,0,40);
-  TH2F *truthVrz = new TH2F("truthconZdepend","",200,-20,20,200,0,20);
-  TH2F *recoVrz = new TH2F("recoconZdepend","",200,-20,20,200,0,20);
+  TH2F *truthVrz = new TH2F("truthconZdepend","",200,-20,20,200,0,40);
+  TH2F *recoVrz = new TH2F("recoconZdepend","",200,-20,20,200,0,40);
   TH2F *truthplotXY = new TH2F("tpXY","",100,-20,20,100,-20,20);
   TH2F *recoplotXY = new TH2F("rpXY","",100,-20,20,100,-20,20);
 
   TH1F* VR1 = new TH1F("VR1","",100,0,10);
-  TH1F* VR2 = new TH1F("VR2","",100,0,10);
+  TH1F* VR2 = new TH1F("VR2","",100,0,20);
   TH1F* VR3 = new TH1F("VR3","",30,0,40);
 
   TH1F* tRHighres = new TH1F("tRHighres","",100,0,60);
