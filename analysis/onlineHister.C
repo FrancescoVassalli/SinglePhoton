@@ -117,7 +117,7 @@ void makeHists(TTree* truth, TTree* recovery, const string& outname){
   }
 
   int truthN;
-  int ids[100];4
+  int ids[100];
   int nVtx;
   truth->SetBranchAddress("particle_id",&ids[0]);
   truth->SetBranchAddress("particle_n",&truthN);
