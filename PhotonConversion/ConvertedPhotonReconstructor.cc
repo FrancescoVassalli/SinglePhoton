@@ -58,7 +58,7 @@ int ConvertedPhotonReconstructor::process_event(PHCompositeNode *topNode) {
   if (((verbosity > 0)&&(event%100==0))) {  
     cout << "ConvertedPhotonReconstructor::process_event - Event = " << event << endl;
   }
-  ReconstructedConvertedPhoton* recovered=reconstruct(topNode);
+//  ReconstructedConvertedPhoton* recovered=reconstruct(topNode);
   /*if(recovered){
     cout<<"recovered"<<endl;
     //recoveredPhotonVec.push_back(recovered);
@@ -67,6 +67,7 @@ int ConvertedPhotonReconstructor::process_event(PHCompositeNode *topNode) {
   else{
     cout<<"no recovery"<<endl;
   }*/
+  reconstruct(topNode);
   event++;
   cout<<"return event::ok"<<endl;
   return Fun4AllReturnCodes::EVENT_OK;
@@ -94,7 +95,7 @@ ReconstructedConvertedPhoton* ConvertedPhotonReconstructor::reconstruct(PHCompos
   stack->set_verbosity(verbosity+1); //might be able to lower this 
   SvtxVertexMap* vertexmap = findNode::getClass<SvtxVertexMap>(topNode,"SvtxVertexMap");
   SvtxTrackMap* trackmap = findNode::getClass<SvtxTrackMap>(topNode,"SvtxTrackMap");
-  SvtxClusterMap* clustermap = findNode::getClass<SvtxClusterMap>(topNode,"SvtxClusterMap"); 
+  //SvtxClusterMap* clustermap = findNode::getClass<SvtxClusterMap>(topNode,"SvtxClusterMap"); 
   SvtxVertexEval* vertexeval = stack->get_vertex_eval();
   SvtxTrackEval* trackeval =   stack->get_track_eval();
   if(!vertexeval||!trackeval){
