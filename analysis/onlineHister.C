@@ -35,12 +35,16 @@ void makeHists(TTree* truth, TTree* recovery, const string& outname){
   TLorentzVector *recotlv1, *truthtlv1, *recotlv2, *truthtlv2,*recotlv,*truthtlv;
   TVector3 *recoVert,*truthVert;
 
+  bool failed;
+  int recocount=recovery->GetEntries();
+
   recovery->SetBranchAddress("reco_tlv1",    &recotlv1 );
   recovery->SetBranchAddress("truth_tlv1",   &truthtlv1 );
   recovery->SetBranchAddress("reco_tlv2",    &recotlv2 );
   recovery->SetBranchAddress("truth_tlv2",   &truthtlv2 );
   recovery->SetBranchAddress("reco_vertex", &recoVert );
   recovery->SetBranchAddress("truth_vertex",&truthVert);
+  recovery->SetBranchAddress("status",&failed);
 
   TH1F *pTR = new TH1F("pTR","",60,0,2);
   TH1F *matchAngle =new TH1F("matchAngle","",200,0,.1);
@@ -60,7 +64,6 @@ void makeHists(TTree* truth, TTree* recovery, const string& outname){
   TH1F* VR2 = new TH1F("VR2","",100,0,10);
   TH1F* VR3 = new TH1F("VR3","",30,0,40);
 
-  TH1F* nullVertR = new TH1F("nullVertR","",100,0,60);
   TH1F* tRHighres = new TH1F("tRHighres","",100,0,60);
   cout<<recovery->GetEntries()<<endl;
   recotlv= new TLorentzVector(*recotlv1+*recotlv2);
@@ -68,7 +71,9 @@ void makeHists(TTree* truth, TTree* recovery, const string& outname){
   for (int i = 0; i < recovery->GetEntries(); ++i)
   {
     recovery->GetEntry(i);
-    recotlv= new TLorentzVector(*recotlv1+*recotlv2);
+    if (!failed)
+    {
+     recotlv= new TLorentzVector(*recotlv1+*recotlv2);
     truthtlv= new TLorentzVector(*truthtlv1+*truthtlv2);
     pTR->Fill(recotlv->Pt()/truthtlv->Pt());
     truthVEta->Fill(truthVert->Eta());
@@ -81,9 +86,6 @@ void makeHists(TTree* truth, TTree* recovery, const string& outname){
     anglespace->Fill(TMath::Abs(truthtlv->Eta()-recotlv->Eta()),deltaPhi(truthtlv->Phi(),recotlv->Phi()));
     truthplotXY->Fill(truthVert->X(),truthVert->Y());
     recoplotXY->Fill(recoVert->X(),recoVert->Y());
-    if(recoVert->X()==0&&recoVert->Y()==0){
-      cout<<"Truth R:"<<truthVert->XYvector().Mod()<<", Reco z:"<<recoVert->Z()<<endl;
-    }
     responseR->Fill(truthVert->XYvector().Mod(),recotlv1->Pt()/truthtlv1->Pt());
     responseZ->Fill(truthVert->Z(),recotlv1->Pt()/truthtlv1->Pt());
     responseR->Fill(truthVert->XYvector().Mod(),recotlv2->Pt()/truthtlv2->Pt());
@@ -95,7 +97,7 @@ void makeHists(TTree* truth, TTree* recovery, const string& outname){
     }
     else if (truthVert->XYvector().Mod()<15)
     {
-      VR2->Fill(TMath::Abs(truthVert->XYvector().Mod()-recoVert->XYvector().Mod()));
+      VR2->Fill(TMath::Abs(recoVert->XYvector().Mod()));
     }
     else
     {
@@ -107,6 +109,11 @@ void makeHists(TTree* truth, TTree* recovery, const string& outname){
     }
     delete recotlv;
     delete truthtlv;
+    }
+    else{
+      recocount--;
+    }
+    
   }
 
   int truthN;
@@ -117,14 +124,13 @@ void makeHists(TTree* truth, TTree* recovery, const string& outname){
   truth->SetBranchAddress("nVtx",&nVtx);
   int truthConversionCount=0;
 
-  cout<<truth->GetEntries()<<endl;
   for (int i = 0; i < truth->GetEntries(); ++i)
   {
     truth->GetEntry(i);
     truthConversionCount+=nVtx;
   }
   TH1F *efficency = new TH1F("efficency","",1000,0,1);
-  efficency->Fill(recovery->GetEntries()/(float)truthConversionCount);
+  efficency->Fill(recocount/(float)truthConversionCount);
 
   outfile->Write();
   outfile->Close();
