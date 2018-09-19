@@ -73,47 +73,47 @@ void makeHists(TTree* truth, TTree* recovery, const string& outname){
     recovery->GetEntry(i);
     if (!failed)
     {
-     recotlv= new TLorentzVector(*recotlv1+*recotlv2);
-    truthtlv= new TLorentzVector(*truthtlv1+*truthtlv2);
-    pTR->Fill(recotlv->Pt()/truthtlv->Pt());
-    truthVEta->Fill(truthVert->Eta());
-    recoVEta->Fill(recoVert->Eta());
-    matchAngle->Fill(truthtlv->Angle(recotlv->Vect()));
-    truthVRadius->Fill(truthVert->XYvector().Mod());
-    recoVRadius->Fill(recoVert->XYvector().Mod());
-    truthVrz->Fill(truthVert->Z(),truthVert->XYvector().Mod());
-    recoVrz->Fill(recoVert->Z(),recoVert->XYvector().Mod());
-    anglespace->Fill(TMath::Abs(truthtlv->Eta()-recotlv->Eta()),deltaPhi(truthtlv->Phi(),recotlv->Phi()));
-    truthplotXY->Fill(truthVert->X(),truthVert->Y());
-    recoplotXY->Fill(recoVert->X(),recoVert->Y());
-    responseR->Fill(truthVert->XYvector().Mod(),recotlv1->Pt()/truthtlv1->Pt());
-    responseZ->Fill(truthVert->Z(),recotlv1->Pt()/truthtlv1->Pt());
-    responseR->Fill(truthVert->XYvector().Mod(),recotlv2->Pt()/truthtlv2->Pt());
-    responseZ->Fill(truthVert->Z(),recotlv2->Pt()/truthtlv2->Pt());
+      recotlv= new TLorentzVector(*recotlv1+*recotlv2);
+      truthtlv= new TLorentzVector(*truthtlv1+*truthtlv2);
+      pTR->Fill(recotlv->Pt()/truthtlv->Pt());
+      truthVEta->Fill(truthVert->Eta());
+      recoVEta->Fill(recoVert->Eta());
+      matchAngle->Fill(truthtlv->Angle(recotlv->Vect()));
+      truthVRadius->Fill(truthVert->XYvector().Mod());
+      recoVRadius->Fill(recoVert->XYvector().Mod());
+      truthVrz->Fill(truthVert->Z(),truthVert->XYvector().Mod());
+      recoVrz->Fill(recoVert->Z(),recoVert->XYvector().Mod());
+      anglespace->Fill(TMath::Abs(truthtlv->Eta()-recotlv->Eta()),deltaPhi(truthtlv->Phi(),recotlv->Phi()));
+      truthplotXY->Fill(truthVert->X(),truthVert->Y());
+      recoplotXY->Fill(recoVert->X(),recoVert->Y());
+      responseR->Fill(truthVert->XYvector().Mod(),recotlv1->Pt()/truthtlv1->Pt());
+      responseZ->Fill(truthVert->Z(),recotlv1->Pt()/truthtlv1->Pt());
+      responseR->Fill(truthVert->XYvector().Mod(),recotlv2->Pt()/truthtlv2->Pt());
+      responseZ->Fill(truthVert->Z(),recotlv2->Pt()/truthtlv2->Pt());
 
-    if (truthVert->XYvector().Mod()<5)
-    {
-      VR1->Fill(TMath::Abs(truthVert->XYvector().Mod()-recoVert->XYvector().Mod()));
-    }
-    else if (truthVert->XYvector().Mod()<15)
-    {
-      VR2->Fill(TMath::Abs(recoVert->XYvector().Mod()));
-    }
-    else
-    {
-      VR3->Fill(TMath::Abs(truthVert->XYvector().Mod()-recoVert->XYvector().Mod()));
-    }
-    if (recotlv->Pt()/truthtlv->Pt()>1.2)
-    {
-      tRHighres->Fill(truthVert->XYvector().Mod());
-    }
-    delete recotlv;
-    delete truthtlv;
+      if (truthVert->XYvector().Mod()<5)
+      {
+        VR1->Fill(TMath::Abs(truthVert->XYvector().Mod()-recoVert->XYvector().Mod()));
+      }
+      else if (truthVert->XYvector().Mod()<15)
+      {
+        VR2->Fill(TMath::Abs(recoVert->XYvector().Mod()));
+      }
+      else
+      {
+        VR3->Fill(TMath::Abs(truthVert->XYvector().Mod()-recoVert->XYvector().Mod()));
+      }
+      if (recotlv->Pt()/truthtlv->Pt()>1.2)
+      {
+        tRHighres->Fill(truthVert->XYvector().Mod());
+      }
+      delete recotlv;
+      delete truthtlv;
     }
     else{
       recocount--;
     }
-    
+
   }
 
   int truthN;
@@ -123,7 +123,7 @@ void makeHists(TTree* truth, TTree* recovery, const string& outname){
   truth->SetBranchAddress("particle_n",&truthN);
   truth->SetBranchAddress("nVtx",&nVtx);
   int truthConversionCount=0;
-
+  cout<<"Totals, truth:"<<truth->GetEntries()<<", reco:"<<recovery->GetEntries()<<endl;
   for (int i = 0; i < truth->GetEntries(); ++i)
   {
     truth->GetEntry(i);
@@ -155,18 +155,18 @@ TChain* handleFile(string name, string extension, string treename, int filecount
 void onlineHister(){
   const string location ="/sphenix/user/vassalli/singlesamples/Photon5/";
   string outname = "onlineTrackFile.root";
-	string in ="onlineanalysis";
-	string reco =".rootrecovered.root";
+  string in ="onlineanalysis";
+  string reco =".rootrecovered.root";
   string truth =".root";
   int numFiles=100;
   TChain* truthchain=handleFile(location+in,truth,"ttree",numFiles);
   TChain* recochain=handleFile(location+in,reco,  "convertedphotontree",numFiles);
-	/*TFile *f_truth = new TFile((location+intruth).c_str(),"READ");
-	TFile *f_reco = new TFile((location+inreco).c_str(),"READ");
-	TTree *truthInfo, *recoveryTree;
-	truthInfo = (TTree*) f_truth->Get("ttree");
-	recoveryTree = (TTree*) f_reco->Get("convertedphotontree");*/
-	makeHists(truthchain,recochain,outname);
+  /*TFile *f_truth = new TFile((location+intruth).c_str(),"READ");
+    TFile *f_reco = new TFile((location+inreco).c_str(),"READ");
+    TTree *truthInfo, *recoveryTree;
+    truthInfo = (TTree*) f_truth->Get("ttree");
+    recoveryTree = (TTree*) f_reco->Get("convertedphotontree");*/
+  makeHists(truthchain,recochain,outname);
   //ostringsteam s;
   //s<<numFiles;
   //string num(s)
