@@ -82,8 +82,8 @@ void onlinePlotter(){
 	string plotNames1d[kNUM1DPLOTS] = {"pTR","matchAngle","trutheta",
 		"recoeta","truthRadius","recoRadius","VR1","VR2","VR3","tRHighres"};
 	string plotXNames1d[kNUM1DPLOTS] = {"pT #gamma #frac{reco}{truth}","angle #vec{p} truth-reco",
-		"truth #eta","reco #eta","truth R","reco R","#Delta R R_{t}<5",
-		"#Delta R 5<R_{t}<15","reco R R_{t}>15","R_{t} pT #gamma #frac{reco}{truth}>1.2"};
+		"truth #eta","reco #eta","truth R","reco R","reco R R_{t}<5","reco R 5<R_{t}<15",
+		"reco R R_{t}>15","R_{t} pT #gamma #frac{reco}{truth}>1.2"};
 	string plotNames2d[kNUM2DPLOTS] = {"ranglespace","tresR","tresZ",
 		"truthconZdepend","recoconZdepend","tpXY","rpXY"};
 	string plotNamesX2d[kNUM2DPLOTS] = {"truth-reco #Delta#eta","truth R",

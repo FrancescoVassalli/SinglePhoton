@@ -93,7 +93,7 @@ void makeHists(TTree* truth, TTree* recovery, const string& outname){
 
       if (truthVert->XYvector().Mod()<5)
       {
-        VR1->Fill(TMath::Abs(truthVert->XYvector().Mod()-recoVert->XYvector().Mod()));
+        VR1->Fill(TMath::Abs(recoVert->XYvector().Mod()));
       }
       else if (truthVert->XYvector().Mod()<15)
       {
@@ -101,7 +101,7 @@ void makeHists(TTree* truth, TTree* recovery, const string& outname){
       }
       else
       {
-        VR3->Fill(TMath::Abs(truthVert->XYvector().Mod()-recoVert->XYvector().Mod()));
+        VR3->Fill(TMath::Abs(recoVert->XYvector().Mod()));
       }
       if (recotlv->Pt()/truthtlv->Pt()>1.2)
       {
@@ -117,7 +117,7 @@ void makeHists(TTree* truth, TTree* recovery, const string& outname){
   }
 
   int truthN;
-  int ids[100];
+  int ids[100];4
   int nVtx;
   truth->SetBranchAddress("particle_id",&ids[0]);
   truth->SetBranchAddress("particle_n",&truthN);
@@ -131,7 +131,7 @@ void makeHists(TTree* truth, TTree* recovery, const string& outname){
   }
   TH1F *efficency = new TH1F("efficency","",1000,0,1);
   efficency->Fill(recocount/(float)truthConversionCount);
-
+    
   outfile->Write();
   outfile->Close();
   delete outfile;
