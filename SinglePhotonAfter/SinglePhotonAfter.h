@@ -38,6 +38,7 @@ class SinglePhotonAfter: public SubsysReco
   int _b_particle_n;
   int _b_nVtx;
   int _b_event;
+  float _b_rVtx[100];
   float _b_particle_pt[100];
   float _b_particle_eta[100];
   int _b_particle_id[100];

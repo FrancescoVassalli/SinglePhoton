@@ -36,6 +36,7 @@ void makeHists(TTree* truth, TTree* recovery, const string& outname){
   TVector3 *recoVert,*truthVert;
 
   bool failed;
+  int event;
   int recocount=recovery->GetEntries();
 
   recovery->SetBranchAddress("reco_tlv1",    &recotlv1 );
@@ -45,6 +46,7 @@ void makeHists(TTree* truth, TTree* recovery, const string& outname){
   recovery->SetBranchAddress("reco_vertex", &recoVert );
   recovery->SetBranchAddress("truth_vertex",&truthVert);
   recovery->SetBranchAddress("status",&failed);
+  recovery->SetBranchAddress("event",&event);
 
   TH1F *pTR = new TH1F("pTR","",60,0,2);
   TH1F *matchAngle =new TH1F("matchAngle","",200,0,.1);
@@ -68,11 +70,13 @@ void makeHists(TTree* truth, TTree* recovery, const string& outname){
   cout<<recovery->GetEntries()<<endl;
   recotlv= new TLorentzVector(*recotlv1+*recotlv2);
   truthtlv= new TLorentzVector(*truthtlv1+*truthtlv2);
+  std::map<int, TVector3> recomap;
   for (int i = 0; i < recovery->GetEntries(); ++i)
   {
     recovery->GetEntry(i);
     if (!failed)
     {
+      recomap.insert(event,recoVert);
       recotlv= new TLorentzVector(*recotlv1+*recotlv2);
       truthtlv= new TLorentzVector(*truthtlv1+*truthtlv2);
       pTR->Fill(recotlv->Pt()/truthtlv->Pt());
@@ -116,21 +120,42 @@ void makeHists(TTree* truth, TTree* recovery, const string& outname){
 
   }
 
+  TH1F *noreco = new TH1F("Rnoreco","",100,0,35);
+
   int truthN;
-  int ids[100];
   int nVtx;
+  int ids[100];
+  int rVtx[100];
   truth->SetBranchAddress("particle_id",&ids[0]);
   truth->SetBranchAddress("particle_n",&truthN);
+  truth->SetBranchAddress("event",&event);
   truth->SetBranchAddress("nVtx",&nVtx);
+  truth->SetBranchAddress("rVtx",&rVtx);
   int truthConversionCount=0;
   cout<<"Totals, truth:"<<truth->GetEntries()<<", reco:"<<recovery->GetEntries()<<endl;
+  std::map<int, float> truthmap;
   for (int i = 0; i < truth->GetEntries(); ++i)
   {
     truth->GetEntry(i);
-    truthConversionCount+=nVtx;
+    if (nVtx==1)
+    {
+      truthConversionCount+=nVtx;
+      int recomapSize=recomap.size();
+      recomap[event];
+      if (recomap.size()!=recomapSize)
+      {
+        noreco->Fill(rVtx[0]));
+      }
+    }
   }
   TH1F *efficency = new TH1F("efficency","",1000,0,1);
   efficency->Fill(recocount/(float)truthConversionCount);
+
+
+  for (std::map<int,float>::iterator i = truthmap.begin(); i != truthmap.end(); ++i)
+  {
+    noreco->Fill(*i);
+  }
     
   outfile->Write();
   outfile->Close();

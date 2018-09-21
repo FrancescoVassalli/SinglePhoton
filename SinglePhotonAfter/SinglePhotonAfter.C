@@ -30,6 +30,7 @@ int SinglePhotonAfter::InitRun(PHCompositeNode *topNode)
   _tree->Branch("particle_n", &_b_particle_n);
   _tree->Branch("nVtx", &_b_nVtx);
   _tree->Branch("event",&_b_event);
+  _tree->Branch("rVtx", _b_rVtx,"rVtx[nVtx]/F");
   _tree->Branch("particle_pt", _b_particle_pt,"particle_pt[particle_n]/F");
   _tree->Branch("particle_eta", _b_particle_eta,"particle_eta[particle_n]/F");
   _tree->Branch("particle_phi", _b_particle_phi,"particle_phi[particle_n]/F");
@@ -48,13 +49,15 @@ int SinglePhotonAfter::process_event(PHCompositeNode *topNode)
   for ( PHG4TruthInfoContainer::ConstIterator iter = range.first; iter != range.second; ++iter ) {
     PHG4Particle* g4particle = iter->second; // You may ask yourself, why second?
     PHG4Particle* parent =truthinfo->GetParticle(g4particle->get_parent_id());
+    float radius;
     if(!parent){
       if(get_embed(g4particle,truthinfo)!=2) continue;
     }
     else{
       if(get_embed(parent,truthinfo)!=2) continue;
       PHG4VtxPoint* vtx=truthinfo->GetVtx(g4particle->get_vtx_id());
-      if(!withinR(vtx,21))continue;//ensures that the vtx is within the 21cm tpc range 
+      radius=vtoR(vtx);
+      if(radius<21)continue;//ensures that the vtx is within the 21cm tpc range 
       vtxList.push_back(vtx->get_id());
     }
     TLorentzVector t;
@@ -63,6 +66,7 @@ int SinglePhotonAfter::process_event(PHCompositeNode *topNode)
     float truth_eta = t.Eta();
     if (fabs(truth_eta) > 1.1) continue;
     float truth_phi = t.Phi();
+    _b_rVtx[_b_nVtx] = radius;
     _b_particle_id[ _b_particle_n ] = g4particle->get_pid();
     _b_particle_pt[ _b_particle_n ] = truth_pt;
     _b_particle_eta[ _b_particle_n ] = truth_eta;
