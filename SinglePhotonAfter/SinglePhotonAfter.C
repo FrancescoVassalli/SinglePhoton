@@ -49,7 +49,7 @@ int SinglePhotonAfter::process_event(PHCompositeNode *topNode)
   for ( PHG4TruthInfoContainer::ConstIterator iter = range.first; iter != range.second; ++iter ) {
     PHG4Particle* g4particle = iter->second; // You may ask yourself, why second?
     PHG4Particle* parent =truthinfo->GetParticle(g4particle->get_parent_id());
-    float radius;
+    float radius=0;
     if(!parent){
       if(get_embed(g4particle,truthinfo)!=2) continue;
     }

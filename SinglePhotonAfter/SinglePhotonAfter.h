@@ -48,8 +48,8 @@ class SinglePhotonAfter: public SubsysReco
 inline int get_embed(PHG4Particle* particle, PHG4TruthInfoContainer* truthinfo){
   return truthinfo->isEmbeded(particle->get_track_id());
 }
-inline bool withinR(PHG4VtxPoint* vtx,double r){
-  return sqrt(vtx->get_x()*vtx->get_x()+vtx->get_y()*vtx->get_y())<r;
+inline float vtoR(PHG4VtxPoint* vtx){
+  return (float) sqrt(vtx->get_x()*vtx->get_x()+vtx->get_y()*vtx->get_y());
 }
 inline int numUnique(std::list<int> l){
   l.sort();
