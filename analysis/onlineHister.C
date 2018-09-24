@@ -76,7 +76,7 @@ void makeHists(TTree* truth, TTree* recovery, const string& outname){
     recovery->GetEntry(i);
     if (!failed)
     {
-      recomap[event]=(float)recoVert->XYvector().Mod();
+      //recomap[event]=(float)recoVert->XYvector().Mod();
       recotlv= new TLorentzVector(*recotlv1+*recotlv2);
       truthtlv= new TLorentzVector(*truthtlv1+*truthtlv2);
       pTR->Fill(recotlv->Pt()/truthtlv->Pt());
@@ -143,6 +143,7 @@ void makeHists(TTree* truth, TTree* recovery, const string& outname){
       recomap[event];
       if (recomap.size()!=recomapSize)
       {
+        cout<<"no reco event"<<endl;
         noreco->Fill(rVtx[0]);
         recomapSize++;
       }
