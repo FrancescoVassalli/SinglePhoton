@@ -7,6 +7,7 @@
 #include <TH2F.h>
 #include <cmath>
 #include <sstream>
+#include <map>
 using namespace std;
 
 namespace {
@@ -67,16 +68,15 @@ void makeHists(TTree* truth, TTree* recovery, const string& outname){
   TH1F* VR3 = new TH1F("VR3","",30,0,40);
 
   TH1F* tRHighres = new TH1F("tRHighres","",100,0,60);
-  cout<<recovery->GetEntries()<<endl;
   recotlv= new TLorentzVector(*recotlv1+*recotlv2);
   truthtlv= new TLorentzVector(*truthtlv1+*truthtlv2);
-  std::map<int, TVector3> recomap;
+  std::map<int, float> recomap;
   for (int i = 0; i < recovery->GetEntries(); ++i)
   {
     recovery->GetEntry(i);
     if (!failed)
     {
-      recomap.insert(event,recoVert);
+      recomap[event]=(float)recoVert->XYvector().Mod();
       recotlv= new TLorentzVector(*recotlv1+*recotlv2);
       truthtlv= new TLorentzVector(*truthtlv1+*truthtlv2);
       pTR->Fill(recotlv->Pt()/truthtlv->Pt());
@@ -133,30 +133,24 @@ void makeHists(TTree* truth, TTree* recovery, const string& outname){
   truth->SetBranchAddress("rVtx",&rVtx);
   int truthConversionCount=0;
   cout<<"Totals, truth:"<<truth->GetEntries()<<", reco:"<<recovery->GetEntries()<<endl;
-  std::map<int, float> truthmap;
+  int recomapSize=recomap.size();
   for (int i = 0; i < truth->GetEntries(); ++i)
   {
     truth->GetEntry(i);
     if (nVtx==1)
     {
       truthConversionCount+=nVtx;
-      int recomapSize=recomap.size();
       recomap[event];
       if (recomap.size()!=recomapSize)
       {
-        noreco->Fill(rVtx[0]));
+        noreco->Fill(rVtx[0]);
+        recomapSize++;
       }
     }
   }
   TH1F *efficency = new TH1F("efficency","",1000,0,1);
   efficency->Fill(recocount/(float)truthConversionCount);
 
-
-  for (std::map<int,float>::iterator i = truthmap.begin(); i != truthmap.end(); ++i)
-  {
-    noreco->Fill(*i);
-  }
-    
   outfile->Write();
   outfile->Close();
   delete outfile;
