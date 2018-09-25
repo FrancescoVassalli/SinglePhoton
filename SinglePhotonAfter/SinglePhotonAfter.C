@@ -57,8 +57,8 @@ int SinglePhotonAfter::process_event(PHCompositeNode *topNode)
       if(get_embed(parent,truthinfo)!=2) continue;
       PHG4VtxPoint* vtx=truthinfo->GetVtx(g4particle->get_vtx_id());
       radius=vtoR(vtx);
+      if(radius>21)continue;//ensures that the vtx is within the 21cm tpc range 
       std::cout<<radius<<'\n';
-      if(radius<21)continue;//ensures that the vtx is within the 21cm tpc range 
       vtxList.push_back(vtx->get_id());
     }
     TLorentzVector t;
@@ -67,7 +67,7 @@ int SinglePhotonAfter::process_event(PHCompositeNode *topNode)
     float truth_eta = t.Eta();
     if (fabs(truth_eta) > 1.1) continue;
     float truth_phi = t.Phi();
-    _b_rVtx[0] = radius; //hmm
+    _b_rVtx[0] = radius; 
     _b_particle_id[ _b_particle_n ] = g4particle->get_pid();
     _b_particle_pt[ _b_particle_n ] = truth_pt;
     _b_particle_eta[ _b_particle_n ] = truth_eta;

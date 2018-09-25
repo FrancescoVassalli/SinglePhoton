@@ -76,7 +76,7 @@ void makeHists(TTree* truth, TTree* recovery, const string& outname){
     recovery->GetEntry(i);
     if (!failed)
     {
-      //recomap[event]=(float)recoVert->XYvector().Mod();
+      recomap[event]=(float)recoVert->XYvector().Mod();
       recotlv= new TLorentzVector(*recotlv1+*recotlv2);
       truthtlv= new TLorentzVector(*truthtlv1+*truthtlv2);
       pTR->Fill(recotlv->Pt()/truthtlv->Pt());
@@ -116,6 +116,7 @@ void makeHists(TTree* truth, TTree* recovery, const string& outname){
     }
     else{
       recocount--;
+      cout<<"failed event:"<<event<<endl;
     }
 
   }
@@ -151,7 +152,7 @@ void makeHists(TTree* truth, TTree* recovery, const string& outname){
   }
   TH1F *efficency = new TH1F("efficency","",1000,0,1);
   efficency->Fill(recocount/(float)truthConversionCount);
-
+  cout<<"Goods, truth:"<<truthConversionCount<<", reco:"<<recocount<<endl;
   outfile->Write();
   outfile->Close();
   delete outfile;
