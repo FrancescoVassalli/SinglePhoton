@@ -26,7 +26,6 @@ ConvertedPhotonReconstructor::ConvertedPhotonReconstructor(const std::string &na
 	SubsysReco("ConvertedPhotonReconstructor")
 {
 	this->name=name+"recovered.root";
-	hash=name;
 	verbosity = 0;
 	event=0;
 	_file = new TFile( this->name.c_str(), "RECREATE");
@@ -44,8 +43,8 @@ ConvertedPhotonReconstructor::ConvertedPhotonReconstructor(const std::string &na
 	_tree->Branch("reco_tlv2",    "TLorentzVector",  &b_recovec2);
 	_tree->Branch("truth_tlv1",   "TLorentzVector", &b_truthvec1);
 	_tree->Branch("truth_tlv2",   "TLorentzVector", &b_truthvec2);
-	_tree->Branch("truth_vertex","TVector3",       &b_truthVertex);
-	_tree->Branch("reco_vertex", "TVector3",       &b_recoVertex);
+	_tree->Branch("truth_vertex","TVector3",        &b_truthVertex);
+	_tree->Branch("reco_vertex", "TVector3",        &b_recoVertex);
 }
 
 int ConvertedPhotonReconstructor::Init(PHCompositeNode *topNode) {
@@ -70,9 +69,11 @@ int ConvertedPhotonReconstructor::process_event(PHCompositeNode *topNode) {
 	cout<<"no recovery"<<endl;
 	}*/
 	b_failed=true;
+
   std::stringstream ss;
-	ss<<event;
-	hash=name+ss.str();
+  ss<<_b_event;             //this is where the file number is 
+  _b_hash=name.c_str()[name.length()-21]+ss.str();
+	
 	reconstruct(topNode);
 	event++;
 	cout<<"return event::ok"<<endl;
