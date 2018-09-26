@@ -45,23 +45,26 @@ int SinglePhotonAfter::process_event(PHCompositeNode *topNode)
 
   PHG4TruthInfoContainer* truthinfo = findNode::getClass<PHG4TruthInfoContainer>(topNode,"G4TruthInfo");
   PHG4TruthInfoContainer::Range range = truthinfo->GetParticleRange();
-  std::cout<<"Got nodes"<<std::endl;
+  //make a list of the conversions
   std::list<int> vtxList;
+
   for ( PHG4TruthInfoContainer::ConstIterator iter = range.first; iter != range.second; ++iter ) {
     PHG4Particle* g4particle = iter->second; // You may ask yourself, why second?
     PHG4Particle* parent =truthinfo->GetParticle(g4particle->get_parent_id());
     float radius=0;
-    if(!parent){
+
+    if(!parent){ //if the parent point is null then the partilce is primary 
       if(get_embed(g4particle,truthinfo)!=2) continue;
     }
-    else{
+    else{ //if the particle is not primary find its vertex 
       if(get_embed(parent,truthinfo)!=2) continue;
       PHG4VtxPoint* vtx=truthinfo->GetVtx(g4particle->get_vtx_id());
       radius=vtoR(vtx);
-      if(radius>21)continue;//ensures that the vtx is within the 21cm tpc range 
+      //if(radius>21)continue;//ensures that the vtx is within the 21cm tpc range 
       std::cout<<radius<<'\n';
       vtxList.push_back(vtx->get_id());
     }
+    //record the particle information 
     TLorentzVector t;
     t.SetPxPyPzE( g4particle->get_px(), g4particle->get_py(), g4particle->get_pz(), g4particle->get_e() );
     float truth_pt = t.Pt();
@@ -75,11 +78,13 @@ int SinglePhotonAfter::process_event(PHCompositeNode *topNode)
     _b_particle_phi[ _b_particle_n ] = truth_phi;
     _b_particle_n++;
   }
-
+  //record event information 
   _b_nVtx=numUnique(vtxList);
+  //make a hash of the event number and file number 
   std::stringstream ss;
-  ss<<_b_event;
-  _b_hash=_foutname+ss.str();
+  ss<<_b_event;             //this is where the file number is 
+  _b_hash=_foutname.c_str()[_foutname.length()-7]+ss.str();
+
   _tree->Fill();
   std::cout<<"Filled "<<_b_particle_n<<" particles"<<std::endl;
   _b_event++;
