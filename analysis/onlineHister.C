@@ -37,7 +37,7 @@ void makeHists(TTree* truth, TTree* recovery, const string& outname){
   TVector3 *recoVert,*truthVert;
 
   bool failed;
-  int event;
+  string hash;
   int recocount=recovery->GetEntries();
 
   recovery->SetBranchAddress("reco_tlv1",    &recotlv1 );
@@ -47,7 +47,7 @@ void makeHists(TTree* truth, TTree* recovery, const string& outname){
   recovery->SetBranchAddress("reco_vertex", &recoVert );
   recovery->SetBranchAddress("truth_vertex",&truthVert);
   recovery->SetBranchAddress("status",&failed);
-  recovery->SetBranchAddress("event",&event);
+  recovery->SetBranchAddress("hash",&hash);
 
   TH1F *pTR = new TH1F("pTR","",60,0,2);
   TH1F *matchAngle =new TH1F("matchAngle","",200,0,.1);
@@ -70,10 +70,11 @@ void makeHists(TTree* truth, TTree* recovery, const string& outname){
   TH1F* tRHighres = new TH1F("tRHighres","",100,0,60);
   recotlv= new TLorentzVector(*recotlv1+*recotlv2);
   truthtlv= new TLorentzVector(*truthtlv1+*truthtlv2);
-  std::map<int, float> recomap;
+  std::map<string, float> recomap;
   for (int i = 0; i < recovery->GetEntries(); ++i)
   {
     recovery->GetEntry(i);
+    cout<<hash<<'\n';
     if (!failed)
     {
       recomap[event]=(float)recoVert->XYvector().Mod();
