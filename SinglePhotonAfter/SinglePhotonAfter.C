@@ -9,12 +9,11 @@
 
 #include "TLorentzVector.h"
 #include <iostream>
+#include <sstream>
 
 SinglePhotonAfter::SinglePhotonAfter(const std::string &name) : SubsysReco("SinglePhoton")
 {
-
   _foutname = name;
-
 }
 
 SinglePhotonAfter::~SinglePhotonAfter(){
@@ -30,6 +29,7 @@ int SinglePhotonAfter::InitRun(PHCompositeNode *topNode)
   _tree->Branch("particle_n", &_b_particle_n);
   _tree->Branch("nVtx", &_b_nVtx);
   _tree->Branch("event",&_b_event);
+  _tree->Branch("hash",&_b_hash);
   _tree->Branch("rVtx", _b_rVtx,"rVtx[nVtx]/F");
   _tree->Branch("particle_pt", _b_particle_pt,"particle_pt[particle_n]/F");
   _tree->Branch("particle_eta", _b_particle_eta,"particle_eta[particle_n]/F");
@@ -42,6 +42,7 @@ int SinglePhotonAfter::process_event(PHCompositeNode *topNode)
 {
   _b_particle_n = 0;
   _b_nVtx = 0;
+
   PHG4TruthInfoContainer* truthinfo = findNode::getClass<PHG4TruthInfoContainer>(topNode,"G4TruthInfo");
   PHG4TruthInfoContainer::Range range = truthinfo->GetParticleRange();
   std::cout<<"Got nodes"<<std::endl;
@@ -76,6 +77,9 @@ int SinglePhotonAfter::process_event(PHCompositeNode *topNode)
   }
 
   _b_nVtx=numUnique(vtxList);
+  stringstream ss;
+  ss<<_b_event;
+  _b_hash=_foutname+ss.str();
   _tree->Fill();
   std::cout<<"Filled "<<_b_particle_n<<" particles"<<std::endl;
   _b_event++;

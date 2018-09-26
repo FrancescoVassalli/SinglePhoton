@@ -35,6 +35,7 @@ class SinglePhotonAfter: public SubsysReco
   TFile *_f;
   TTree *_tree;
   std::string _foutname;
+  std::string _b_hash;
   int _b_particle_n;
   int _b_nVtx;
   int _b_event;

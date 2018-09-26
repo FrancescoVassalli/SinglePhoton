@@ -17,6 +17,7 @@
 #include <iostream>
 #include <cmath> 
 #include <algorithm>
+#include <sstream>
 
 using namespace std;
 
@@ -25,6 +26,7 @@ ConvertedPhotonReconstructor::ConvertedPhotonReconstructor(const std::string &na
 	SubsysReco("ConvertedPhotonReconstructor")
 {
 	this->name=name+"recovered.root";
+	hash=name;
 	verbosity = 0;
 	event=0;
 	_file = new TFile( this->name.c_str(), "RECREATE");
@@ -37,7 +39,7 @@ ConvertedPhotonReconstructor::ConvertedPhotonReconstructor(const std::string &na
 	b_truthVertex = new TVector3();
 	b_recoVertex = new  TVector3();
 	_tree->Branch("status",&b_failed);
-	_tree->Branch("event",&event);
+	_tree->Branch("hash",&hash);
 	_tree->Branch("reco_tlv1",    "TLorentzVector",  &b_recovec1);
 	_tree->Branch("reco_tlv2",    "TLorentzVector",  &b_recovec2);
 	_tree->Branch("truth_tlv1",   "TLorentzVector", &b_truthvec1);
@@ -68,6 +70,9 @@ int ConvertedPhotonReconstructor::process_event(PHCompositeNode *topNode) {
 	cout<<"no recovery"<<endl;
 	}*/
 	b_failed=true;
+	stringstream ss;
+	ss<<event;
+	hash=name+ss.str();
 	reconstruct(topNode);
 	event++;
 	cout<<"return event::ok"<<endl;

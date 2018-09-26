@@ -94,6 +94,7 @@ class ConvertedPhotonReconstructor : public SubsysReco {
 
   private:
     int event;
+    string hash;
     std::string name;
     TFile *_file;
     TTree *_tree;
