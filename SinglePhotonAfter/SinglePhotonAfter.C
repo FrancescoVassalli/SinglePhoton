@@ -77,7 +77,7 @@ int SinglePhotonAfter::process_event(PHCompositeNode *topNode)
   }
 
   _b_nVtx=numUnique(vtxList);
-  stringstream ss;
+  std::stringstream ss;
   ss<<_b_event;
   _b_hash=_foutname+ss.str();
   _tree->Fill();

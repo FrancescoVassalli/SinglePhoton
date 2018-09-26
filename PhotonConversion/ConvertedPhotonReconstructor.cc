@@ -70,7 +70,7 @@ int ConvertedPhotonReconstructor::process_event(PHCompositeNode *topNode) {
 	cout<<"no recovery"<<endl;
 	}*/
 	b_failed=true;
-	stringstream ss;
+  std::stringstream ss;
 	ss<<event;
 	hash=name+ss.str();
 	reconstruct(topNode);
