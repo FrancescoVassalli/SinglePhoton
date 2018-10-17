@@ -28,6 +28,8 @@ int SinglePhotonAfter::InitRun(PHCompositeNode *topNode)
   //_tree->SetAutoSave(300);
   _tree->Branch("particle_n", &_b_particle_n);
   _tree->Branch("nVtx", &_b_nVtx);
+  _tree->Branch("nconvert", &_b_nconvert);
+  _tree->Branch("npair", &_b_pair);
   _tree->Branch("event",&_b_event);
   _tree->Branch("hash",&_b_hash);
   _tree->Branch("rVtx", _b_rVtx,"rVtx[nVtx]/F");
@@ -42,30 +44,30 @@ int SinglePhotonAfter::process_event(PHCompositeNode *topNode)
 {
   _b_particle_n = 0;
   _b_nVtx = 0;
+  _b_nconvert=0;
+  _b_pair=0;
 
   PHG4TruthInfoContainer* truthinfo = findNode::getClass<PHG4TruthInfoContainer>(topNode,"G4TruthInfo");
   PHG4TruthInfoContainer::Range range = truthinfo->GetParticleRange();
   //make a list of the conversions
   std::list<int> vtxList;
-
+  std::map<int,Conversion> mapConversions;
   for ( PHG4TruthInfoContainer::ConstIterator iter = range.first; iter != range.second; ++iter ) {
     PHG4Particle* g4particle = iter->second; // You may ask yourself, why second?
     PHG4Particle* parent =truthinfo->GetParticle(g4particle->get_parent_id());
     float radius=0;
-
-    if(!parent){ //if the parent point is null then the partilce is primary 
+    TLorentzVector t;
+    if(!parent){ //if the parent point is null then the particle is primary 
       if(get_embed(g4particle,truthinfo)!=2) continue;
     }
     else{ //if the particle is not primary find its vertex 
       if(get_embed(parent,truthinfo)!=2) continue;
-      PHG4VtxPoint* vtx=truthinfo->GetVtx(g4particle->get_vtx_id());
-      radius=vtoR(vtx);
-      //if(radius>21)continue;//ensures that the vtx is within the 21cm tpc range 
+      PHG4VtxPoint* vtx=truthinfo->GetVtx(g4particle->get_vtx_id())
       std::cout<<radius<<'\n';
       vtxList.push_back(vtx->get_id());
+      mapConversions[vtx->get_id()]->setElectron(g4particle);
     }
     //record the particle information 
-    TLorentzVector t;
     t.SetPxPyPzE( g4particle->get_px(), g4particle->get_py(), g4particle->get_pz(), g4particle->get_e() );
     float truth_pt = t.Pt();
     float truth_eta = t.Eta();
@@ -79,7 +81,7 @@ int SinglePhotonAfter::process_event(PHCompositeNode *topNode)
     _b_particle_n++;
   }
   //record event information 
-  _b_nVtx=numUnique(vtxList);
+  _b_nVtx=numUnique(vtxList,mapConversions);
   //make a hash of the event number and file number 
   std::stringstream ss;
   ss<<_b_event;             //this is where the file number is 

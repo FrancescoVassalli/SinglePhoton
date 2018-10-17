@@ -38,12 +38,17 @@ class SinglePhotonAfter: public SubsysReco
   std::string _b_hash;
   int _b_particle_n;
   int _b_nVtx;
+  int _b_pair; //count acceotance e pairs 
+  int _b_nconvert;  //this is how I count how many truth conversions are in my acceptance
   int _b_event;
   float _b_rVtx[100];
   float _b_particle_pt[100];
   float _b_particle_eta[100];
   int _b_particle_id[100];
   float _b_particle_phi[100];
+
+  static const int kTPXRADIUS=21; //in cm there is a way to get this from the simulation I should implment
+  static const float kRAPIDITYACCEPT=1;
 };
 
 inline int get_embed(PHG4Particle* particle, PHG4TruthInfoContainer* truthinfo){
@@ -52,17 +57,89 @@ inline int get_embed(PHG4Particle* particle, PHG4TruthInfoContainer* truthinfo){
 inline float vtoR(PHG4VtxPoint* vtx){
   return (float) sqrt(vtx->get_x()*vtx->get_x()+vtx->get_y()*vtx->get_y());
 }
-inline int numUnique(std::list<int> l){
+//should check this is really working
+inline int numUnique(std::list<int> l,std::map<int,Converion> mymap=NULL){
   l.sort();
   int last=-1;
   int r=0;
   for (std::list<int>::iterator i = l.begin(); i != l.end(); ++i) {
     if(*i!=last){
       r++;
+      TLorentzVector t;
+      t.SetXYZM(vtx->get_x(),vtx->get_y(),vtx->get_z(),0);
+      if (t.Vect().XYvector().Mod()<kTPCRADIUS&&t.Rapidity()<kRAPIDITYACCEPT)
+      {
+        _b_nconvert++;
+        if (mymap[*i].hasPair())
+        {
+          _b_pair++;
+        }
+      }
       last=*i;
     }
   }
   return r;
 }
 #endif // __SINGLEPHOTONAFTER_H__
+
+#ifndef CONVERSION_H__
+#define CONVERSION_H__
+class Converion
+{
+public:
+  Converion(){}
+  Converion(PHG4VtxPoint* vtx);
+  ~Converion(){
+    //dont delete the points as you are not the owner and did not make your own copies
+  }
+  void setElectron(PHG4Particle* e){
+    if (e1)
+    {
+      if (e2)
+      {
+        std::cout<<"WARNING: oversetting converion electrons"<<std::endl;
+      }
+      else{
+        e2=e;
+      }
+    }
+    else{
+      e1=e;
+    }
+  }
+  void setVtx(PHG4VtxPoint* vtx){
+    this->vtx=vtx;
+  }
+  bool isComplete(){
+    if (e1&&e2&&e3&&photon)
+    {
+      return true;
+    }
+    else{
+      return false;
+    }
+  }
+  bool hasPair(){
+    if (e1&&e2)
+    {
+      return true;
+    }
+    else{
+      return false;
+    }
+  }
+  /*bool acceptancePair(){
+
+  }*/
+private:
+  PHG4Particle* e1=NULL;
+  PHG4Particle* e2=NULL;
+  PHG4Particle* photon=NULL;
+  PHG4VtxPoint* vtx=NULL;
+
+  /*inline bool inAcceptance(){
+
+  }*/
+};
+#endif //CONVERSION_H__
 
