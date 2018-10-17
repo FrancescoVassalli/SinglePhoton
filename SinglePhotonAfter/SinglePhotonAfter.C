@@ -7,7 +7,6 @@
 
 #include <calotrigger/CaloTriggerInfo.h>
 
-#include "TLorentzVector.h"
 #include <iostream>
 #include <sstream>
 
@@ -30,7 +29,7 @@ int SinglePhotonAfter::InitRun(PHCompositeNode *topNode)
   _tree->Branch("nVtx", &_b_nVtx);
   _tree->Branch("nconvert", &_b_nconvert);
   _tree->Branch("npair", &_b_pair);
-  _tree->Branch("event",&_b_event);
+  _tree->Branch("event",&_b_event); 
   _tree->Branch("hash",&_b_hash);
   _tree->Branch("rVtx", _b_rVtx,"rVtx[nVtx]/F");
   _tree->Branch("particle_pt", _b_particle_pt,"particle_pt[particle_n]/F");
@@ -66,6 +65,7 @@ int SinglePhotonAfter::process_event(PHCompositeNode *topNode)
       std::cout<<radius<<'\n';
       vtxList.push_back(vtx->get_id());
       mapConversions[vtx->get_id()]->setElectron(g4particle);
+      mapConversions[vtx->get_id()]->setVtx(vtx);
     }
     //record the particle information 
     t.SetPxPyPzE( g4particle->get_px(), g4particle->get_py(), g4particle->get_pz(), g4particle->get_e() );
@@ -81,7 +81,7 @@ int SinglePhotonAfter::process_event(PHCompositeNode *topNode)
     _b_particle_n++;
   }
   //record event information 
-  _b_nVtx=numUnique(vtxList,mapConversions);
+  _b_nVtx=numUnique(&vtxList,&mapConversions);
   //make a hash of the event number and file number 
   std::stringstream ss;
   ss<<_b_event;             //this is where the file number is 
