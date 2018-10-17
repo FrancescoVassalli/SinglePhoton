@@ -72,7 +72,7 @@ int ConvertedPhotonReconstructor::process_event(PHCompositeNode *topNode) {
 
   std::stringstream ss;
   ss<<_b_event;             //this is where the file number is 
-  _b_hash=name.c_str()[name.length()-21]+ss.str();
+  _b_hash=name.c_str()[	name.length()-21]+ss.str();
 	
 	reconstruct(topNode);
 	event++;
@@ -89,6 +89,10 @@ ConvertedPhotonReconstructor::~ConvertedPhotonReconstructor(){
 
 int ConvertedPhotonReconstructor::End(PHCompositeNode *topNode) {
 	return Fun4AllReturnCodes::EVENT_OK;
+}
+
+void ConvertedPhotonReconstructor::process_recoTracks(PHCompositeNode *topNode){
+
 }
 
 ReconstructedConvertedPhoton* ConvertedPhotonReconstructor::reconstruct(PHCompositeNode *topNode){
@@ -111,9 +115,8 @@ ReconstructedConvertedPhoton* ConvertedPhotonReconstructor::reconstruct(PHCompos
 		cout<<"Evaluator is null quiting photon recovery\n";
 		return nullptr;
 	}
-	cout<<"In reconstruct num vertex="<<vertexmap->size()<<endl;
+	cout<<"In reconstruct num vertex="<<vertexmap->size()<<'\n';
 	for (SvtxVertexMap::Iter iter = vertexmap->begin(); iter != vertexmap->end(); ++iter) {
-		//cout<<"Enter loop"<<endl;
 		SvtxVertex* vertex = iter->second;
 		if(!vertex){
 			cout<<"Vertex is null \n";
@@ -122,7 +125,7 @@ ReconstructedConvertedPhoton* ConvertedPhotonReconstructor::reconstruct(PHCompos
 		float ntracks;
 		ntracks= vertex->size_tracks();
 		if(ntracks!=2){
-			cout<<"Quiting photon recovery due to "<<ntracks<<" tracks\n";
+			//cout<<"Quiting photon recovery due to "<<ntracks<<" tracks\n";
 			doubletrack=false;
 		}
 		float vx,vy,vz;

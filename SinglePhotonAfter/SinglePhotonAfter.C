@@ -87,10 +87,38 @@ int SinglePhotonAfter::process_event(PHCompositeNode *topNode)
   ss<<_b_event;             //this is where the file number is 
   _b_hash=_foutname.c_str()[_foutname.length()-7]+ss.str();
 
+  //currently my reco can only handle single conversion events
+
   _tree->Fill();
   std::cout<<"Filled "<<_b_particle_n<<" particles"<<std::endl;
   _b_event++;
   return 0;
+}
+
+//should check this is really working
+int SinglePhotonAfter::numUnique(std::list<int> *l,std::map<int,Conversion> *mymap=NULL){
+  l->sort();
+  int last=-1;
+  int r=0;
+  for (std::list<int>::iterator i = l->begin(); i != l->end(); ++i) {
+    if(*i!=last){
+      r++;
+      TLorentzVector t;
+      PHG4VtxPoint *vtx =(mymap[*i]).getVtx();
+      t.SetXYZM(vtx->get_x(),vtx->get_y(),vtx->get_z(),0);
+      if (t.Vect().XYvector().Mod()<kTPCRADIUS&&t.Rapidity()<kRAPIDITYACCEPT)
+      {
+        _b_nconvert++;
+        if (mymap[*i].hasPair())
+        {
+          _b_pair++;
+        }
+
+      }
+      last=*i;
+    }
+  }
+  return r;
 }
 
 int SinglePhotonAfter::End(PHCompositeNode *topNode)
@@ -100,4 +128,6 @@ int SinglePhotonAfter::End(PHCompositeNode *topNode)
   _f->Close();
   return 0;
 }
+
+
 

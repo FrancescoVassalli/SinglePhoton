@@ -111,6 +111,7 @@ class ConvertedPhotonReconstructor : public SubsysReco {
     inline float pToE(TVector3 v, float mass){
       return quadrature((float) quadrature(v.x(),v.y()),(float) quadrature((float)v.z(),mass));
     }
+    void process_recoTracks(PHCompositeNode *topNode);
     template<class T>
       T quadrature(T d1, T d2){
         return TMath::Sqrt((double)d1*d1+d2*d2);
