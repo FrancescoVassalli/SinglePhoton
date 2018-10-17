@@ -37,7 +37,7 @@ void makeHists(TTree* truth, TTree* recovery, const string& outname){
   TVector3 *recoVert,*truthVert;
 
   bool failed;
-  string hash;
+  string *hash;
   int recocount=recovery->GetEntries();
 
   recovery->SetBranchAddress("reco_tlv1",    &recotlv1 );
@@ -77,7 +77,7 @@ void makeHists(TTree* truth, TTree* recovery, const string& outname){
     cout<<hash<<'\n';
     if (!failed)
     {
-      recomap[event]=(float)recoVert->XYvector().Mod();
+      //recomap[hash]=(float)recoVert->XYvector().Mod();
       recotlv= new TLorentzVector(*recotlv1+*recotlv2);
       truthtlv= new TLorentzVector(*truthtlv1+*truthtlv2);
       pTR->Fill(recotlv->Pt()/truthtlv->Pt());
@@ -117,7 +117,7 @@ void makeHists(TTree* truth, TTree* recovery, const string& outname){
     }
     else{
       recocount--;
-      cout<<"failed event:"<<event<<endl;
+      //cout<<"failed event:"<<event<<endl;
     }
 
   }
@@ -130,7 +130,7 @@ void makeHists(TTree* truth, TTree* recovery, const string& outname){
   int rVtx[100];
   truth->SetBranchAddress("particle_id",&ids[0]);
   truth->SetBranchAddress("particle_n",&truthN);
-  truth->SetBranchAddress("event",&event);
+  truth->SetBranchAddress("hash",&hash);
   truth->SetBranchAddress("nVtx",&nVtx);
   truth->SetBranchAddress("rVtx",&rVtx);
   int truthConversionCount=0;
@@ -142,13 +142,14 @@ void makeHists(TTree* truth, TTree* recovery, const string& outname){
     if (nVtx==1)
     {
       truthConversionCount+=nVtx;
-      recomap[event];
+      cout<<"truth hash:"<<hash<<'\n';
+      /*recomap[event];
       if (recomap.size()!=recomapSize)
       {
         cout<<"no reco event"<<endl;
         noreco->Fill(rVtx[0]);
         recomapSize++;
-      }
+      }*/
     }
   }
   TH1F *efficency = new TH1F("efficency","",1000,0,1);

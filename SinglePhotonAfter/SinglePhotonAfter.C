@@ -61,11 +61,11 @@ int SinglePhotonAfter::process_event(PHCompositeNode *topNode)
     }
     else{ //if the particle is not primary find its vertex 
       if(get_embed(parent,truthinfo)!=2) continue;
-      PHG4VtxPoint* vtx=truthinfo->GetVtx(g4particle->get_vtx_id())
+      PHG4VtxPoint* vtx=truthinfo->GetVtx(g4particle->get_vtx_id());
       std::cout<<radius<<'\n';
       vtxList.push_back(vtx->get_id());
-      mapConversions[vtx->get_id()]->setElectron(g4particle);
-      mapConversions[vtx->get_id()]->setVtx(vtx);
+      (mapConversions[vtx->get_id()]).setElectron(g4particle);
+      (mapConversions[vtx->get_id()]).setVtx(vtx);
     }
     //record the particle information 
     t.SetPxPyPzE( g4particle->get_px(), g4particle->get_py(), g4particle->get_pz(), g4particle->get_e() );
