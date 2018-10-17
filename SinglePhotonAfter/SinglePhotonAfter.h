@@ -1,6 +1,10 @@
 
 #ifndef CONVERSION_H__
 #define CONVERSION_H__
+
+#include <g4main/PHG4Particle.h>
+#include <g4main/PHG4VtxPoint.h>
+
 class Conversion
 {
 public:
@@ -120,8 +124,34 @@ class SinglePhotonAfter: public SubsysReco
   int _b_particle_id[100];
   float _b_particle_phi[100];
 
-  static constexpr int kTPXRADIUS=21; //in cm there is a way to get this from the simulation I should implment
-  static constexpr float kRAPIDITYACCEPT=1;
+  int kTPCRADIUS=21; //in cm there is a way to get this from the simulation I should implment
+  float kRAPIDITYACCEPT=1;
+
+
+  //should check this is really working
+  inline int numUnique(std::list<int> *l,std::map<int,Conversion> *mymap=NULL){
+    l->sort();
+    int last=-1;
+    int r=0;
+    for (std::list<int>::iterator i = l->begin(); i != l->end(); ++i) {
+      if(*i!=last){
+        r++;
+        TLorentzVector t;
+        PHG4VtxPoint *vtx =(mymap->at(*i)).getVtx();
+        t.SetXYZM(vtx->get_x(),vtx->get_y(),vtx->get_z(),0);
+        if (t.Vect().XYvector().Mod()<kTPCRADIUS&&t.Rapidity()<kRAPIDITYACCEPT)
+        {
+          _b_nconvert++;
+          if ((mymap->at(*i)).hasPair())
+          {
+            _b_pair++;
+          }
+        }
+        last=*i;
+      }
+    }
+    return r;
+  }
 };
 
 inline int get_embed(PHG4Particle* particle, PHG4TruthInfoContainer* truthinfo){
@@ -129,30 +159,6 @@ inline int get_embed(PHG4Particle* particle, PHG4TruthInfoContainer* truthinfo){
 }
 inline float vtoR(PHG4VtxPoint* vtx){
   return (float) sqrt(vtx->get_x()*vtx->get_x()+vtx->get_y()*vtx->get_y());
-}
-//should check this is really working
-inline int numUnique(std::list<int> *l,std::map<int,Conversion> *mymap=NULL){
-  l->sort();
-  int last=-1;
-  int r=0;
-  for (std::list<int>::iterator i = l->begin(); i != l->end(); ++i) {
-    if(*i!=last){
-      r++;
-      TLorentzVector t;
-      PHG4VtxPoint *vtx =mymap[*i].getVtx();
-      t.SetXYZM(vtx->get_x(),vtx->get_y(),vtx->get_z(),0);
-      if (t.Vect().XYvector().Mod()<kTPCRADIUS&&t.Rapidity()<kRAPIDITYACCEPT)
-      {
-        _b_nconvert++;
-        if (mymap[*i].hasPair())
-        {
-          _b_pair++;
-        }
-      }
-      last=*i;
-    }
-  }
-  return r;
 }
 #endif // __SINGLEPHOTONAFTER_H__
 
