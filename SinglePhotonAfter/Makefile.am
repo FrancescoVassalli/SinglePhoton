@@ -16,11 +16,14 @@ lib_LTLIBRARIES = \
 
 include_HEADERS = \
   SinglePhotonAfter.h \
-  SinglePhotonAfterLinkDef.h 
-
+  SinglePhotonAfterLinkDef.h \ 
+  Conversion.h \
+  ConversionLinkDef.h 
 libSinglePhotonAnalysis_la_SOURCES = \
   SinglePhotonAfter.C \
-  SinglePhotonAfter_Dict.C 
+  SinglePhotonAfter_Dict.C \
+  Conversion.C \
+  Conversion_Dict.C 
 
 libSinglePhotonAnalysis_la_LIBADD = \
   -lg4dst \
