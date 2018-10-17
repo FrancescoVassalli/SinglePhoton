@@ -1,7 +1,6 @@
 #include "Conversion.h"
 
-#include <g4eval/SvtxEvaluator.h>
-
+#include <g4eval/SvtxTrackEval.h>
 int Conversion::setRecoTracks(SvtxTrackEval* trackeval){	
   if (e1)
   {
@@ -9,7 +8,7 @@ int Conversion::setRecoTracks(SvtxTrackEval* trackeval){
   }
   if (e2)
   {
-  	reco2=trackeval->best_track_from(e12;
+  	reco2=trackeval->best_track_from(e1);
   }
   int r=0;
   if (reco1)

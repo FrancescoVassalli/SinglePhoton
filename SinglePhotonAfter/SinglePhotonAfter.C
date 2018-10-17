@@ -104,12 +104,12 @@ int SinglePhotonAfter::numUnique(std::list<int> *l,std::map<int,Conversion> *mym
     if(*i!=last){
       r++;
       TLorentzVector t;
-      PHG4VtxPoint *vtx =(mymap[*i]).getVtx();
+      PHG4VtxPoint *vtx =(mymap->at(*i)).getVtx();
       t.SetXYZM(vtx->get_x(),vtx->get_y(),vtx->get_z(),0);
       if (t.Vect().XYvector().Mod()<kTPCRADIUS&&t.Rapidity()<kRAPIDITYACCEPT)
       {
         _b_nconvert++;
-        if (mymap[*i].hasPair())
+        if (mymap->at(*i).hasPair())
         {
           _b_pair++;
         }

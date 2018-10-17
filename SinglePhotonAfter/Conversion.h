@@ -11,7 +11,9 @@ class Conversion
 {
 public:
   Conversion(){}
-  Conversion(PHG4VtxPoint* vtx);
+  Conversion(PHG4VtxPoint* vtx){
+    this->vtx=vtx;
+  }
   ~Conversion(){
     //dont delete the points as you are not the owner and did not make your own copies
   }

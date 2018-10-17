@@ -40,6 +40,8 @@ class SinglePhotonAfter: public SubsysReco
     return sqrt( pow( deta, 2 ) + pow( dphi, 2 ) );
   }
 
+  int numUnique(std::list<int>* l,std::map<int,Conversion>* map);
+
   TFile *_f;
   TTree *_tree;
   std::string _foutname;
