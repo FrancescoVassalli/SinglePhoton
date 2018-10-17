@@ -6,12 +6,18 @@
 #include <g4main/PHG4TruthInfoContainer.h>
 #include <g4main/PHG4Particle.h>
 #include <g4main/PHG4VtxPoint.h>
-#include <vector>
-#include <list>
+
 #include <TTree.h>
 #include <TFile.h>
 
+#include "TLorentzVector.h"
+
+#include <vector>
+#include <list>
+
+
 class PHCompositeNode;
+class Conversion;
 
 class SinglePhotonAfter: public SubsysReco
 {
@@ -47,8 +53,8 @@ class SinglePhotonAfter: public SubsysReco
   int _b_particle_id[100];
   float _b_particle_phi[100];
 
-  static const int kTPXRADIUS=21; //in cm there is a way to get this from the simulation I should implment
-  static const float kRAPIDITYACCEPT=1;
+  const static int kTPXRADIUS=21; //in cm there is a way to get this from the simulation I should implment
+  const static float kRAPIDITYACCEPT=1;
 };
 
 inline int get_embed(PHG4Particle* particle, PHG4TruthInfoContainer* truthinfo){
@@ -58,19 +64,20 @@ inline float vtoR(PHG4VtxPoint* vtx){
   return (float) sqrt(vtx->get_x()*vtx->get_x()+vtx->get_y()*vtx->get_y());
 }
 //should check this is really working
-inline int numUnique(std::list<int> l,std::map<int,Converion> mymap=NULL){
-  l.sort();
+inline int numUnique(std::list<int> *l,std::map<int,Converion> *mymap=NULL){
+  l->sort();
   int last=-1;
   int r=0;
-  for (std::list<int>::iterator i = l.begin(); i != l.end(); ++i) {
+  for (std::list<int>::iterator i = l->begin(); i != l->end(); ++i) {
     if(*i!=last){
       r++;
       TLorentzVector t;
+      PHG4VtxPoint *vtx =mymap[*i]->getVtx();
       t.SetXYZM(vtx->get_x(),vtx->get_y(),vtx->get_z(),0);
       if (t.Vect().XYvector().Mod()<kTPCRADIUS&&t.Rapidity()<kRAPIDITYACCEPT)
       {
         _b_nconvert++;
-        if (mymap[*i].hasPair())
+        if (mymap[*i]->hasPair())
         {
           _b_pair++;
         }
@@ -110,8 +117,11 @@ public:
   void setVtx(PHG4VtxPoint* vtx){
     this->vtx=vtx;
   }
+  PHG4VtxPoint* getVtx(){
+    return vtx;
+  }
   bool isComplete(){
-    if (e1&&e2&&e3&&photon)
+    if (e1&&e2&&photon)
     {
       return true;
     }
