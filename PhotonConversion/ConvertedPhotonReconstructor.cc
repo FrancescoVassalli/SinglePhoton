@@ -130,6 +130,7 @@ ReconstructedConvertedPhoton* ConvertedPhotonReconstructor::reconstruct(PHCompos
 		vy = vertex->get_y();
 		vz = vertex->get_z();
 		cout<<"Vertex:"<<vx<<", "<<vy<<", "<<vz<<'\n';
+		//how do we really want to handle low R events?
 		if(sqrt(vx*vx+vy*vy+vz*vz)<1){
 			goodR=false;
 		}
@@ -179,7 +180,7 @@ ReconstructedConvertedPhoton* ConvertedPhotonReconstructor::reconstruct(PHCompos
 			}
 			if (goodCharge)
 			{
-        b_failed=false;
+        			b_failed=false;
 				TVector3 track1(t1x,t1y,t1z),track2(t2x,t2y,t2z);
 				PHG4VtxPoint* point = vertexeval->max_truth_point_by_ntracks(vertex); //not entirely sure what this does
 				TVector3 tTrack1(truth1->get_px(),truth1->get_py(),truth1->get_pz()),
