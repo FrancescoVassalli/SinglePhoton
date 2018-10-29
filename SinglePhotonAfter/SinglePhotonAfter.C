@@ -9,6 +9,7 @@
 
 #include <iostream>
 #include <sstream>
+#include <cmath>
 
 SinglePhotonAfter::SinglePhotonAfter(const std::string &name) : SubsysReco("SinglePhoton")
 {
@@ -62,10 +63,14 @@ int SinglePhotonAfter::process_event(PHCompositeNode *topNode)
     else{ //if the particle is not primary find its vertex 
       if(get_embed(parent,truthinfo)!=2) continue;
       PHG4VtxPoint* vtx=truthinfo->GetVtx(g4particle->get_vtx_id());
-      std::cout<<radius<<'\n';
-      vtxList.push_back(vtx->get_id());
-      (mapConversions[vtx->get_id()]).setElectron(g4particle);
-      (mapConversions[vtx->get_id()]).setVtx(vtx);
+      radius=vtx->sqrt(get_x()*vtx->get_x()+vtx->get_y()*vtx->get_y());
+      if (radius<kTPCRADIUS) //limits to truth conversions within the tpc radius
+      {
+        std::cout<<radius<<'\n';
+        vtxList.push_back(vtx->get_id());
+        (mapConversions[vtx->get_id()]).setElectron(g4particle);
+        (mapConversions[vtx->get_id()]).setVtx(vtx);
+      }
     }
     //record the particle information 
     t.SetPxPyPzE( g4particle->get_px(), g4particle->get_py(), g4particle->get_pz(), g4particle->get_e() );
@@ -106,7 +111,7 @@ int SinglePhotonAfter::numUnique(std::list<int> *l,std::map<int,Conversion> *mym
       TLorentzVector t;
       PHG4VtxPoint *vtx =(mymap->at(*i)).getVtx();
       t.SetXYZM(vtx->get_x(),vtx->get_y(),vtx->get_z(),0);
-      if (t.Vect().XYvector().Mod()<kTPCRADIUS&&t.Rapidity()<kRAPIDITYACCEPT)
+      if (t.Rapidity()<kRAPIDITYACCEPT)
       {
         _b_nconvert++;
         if (mymap->at(*i).hasPair())
