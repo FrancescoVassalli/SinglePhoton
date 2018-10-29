@@ -107,7 +107,6 @@ int SinglePhotonAfter::process_event(PHCompositeNode *topNode)
   return 0;
 }
 
-//should check this is really working
 int SinglePhotonAfter::numUnique(std::list<int> *l,std::map<int,Conversion> *mymap=NULL){
   l->sort();
   int last=-1;
