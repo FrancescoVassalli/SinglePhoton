@@ -53,12 +53,15 @@ int SinglePhotonAfter::process_event(PHCompositeNode *topNode)
   std::list<int> vtxList;
   std::map<int,Conversion> mapConversions;
   for ( PHG4TruthInfoContainer::ConstIterator iter = range.first; iter != range.second; ++iter ) {
+    bool isPrimary;
     PHG4Particle* g4particle = iter->second; // You may ask yourself, why second?
     PHG4Particle* parent =truthinfo->GetParticle(g4particle->get_parent_id());
     float radius=0;
     TLorentzVector t;
     if(!parent){ //if the parent point is null then the particle is primary 
+      //checking the embed ID to make sure it is a particle I made need to change the magic literal
       if(get_embed(g4particle,truthinfo)!=2) continue;
+      isPrimary=true;
     }
     else{ //if the particle is not primary find its vertex 
       if(get_embed(parent,truthinfo)!=2) continue;
@@ -71,19 +74,23 @@ int SinglePhotonAfter::process_event(PHCompositeNode *topNode)
         (mapConversions[vtx->get_id()]).setElectron(g4particle);
         (mapConversions[vtx->get_id()]).setVtx(vtx);
       }
+      isPrimary=false;
     }
-    //record the particle information 
-    t.SetPxPyPzE( g4particle->get_px(), g4particle->get_py(), g4particle->get_pz(), g4particle->get_e() );
-    float truth_pt = t.Pt();
-    float truth_eta = t.Eta();
-    if (fabs(truth_eta) > 1.1) continue;
-    float truth_phi = t.Phi();
-    _b_rVtx[0] = radius; 
-    _b_particle_id[ _b_particle_n ] = g4particle->get_pid();
-    _b_particle_pt[ _b_particle_n ] = truth_pt;
-    _b_particle_eta[ _b_particle_n ] = truth_eta;
-    _b_particle_phi[ _b_particle_n ] = truth_phi;
-    _b_particle_n++;
+    if (radius<kTPCRADIUS)
+    {
+      //record the particle information 
+      t.SetPxPyPzE( g4particle->get_px(), g4particle->get_py(), g4particle->get_pz(), g4particle->get_e() );
+      float truth_pt = t.Pt();
+      float truth_eta = t.Eta();
+      if (fabs(truth_eta) > 1.1) continue;
+      float truth_phi = t.Phi();
+      _b_rVtx[_b_particle_n] = radius; 
+      _b_particle_id[ _b_particle_n ] = g4particle->get_pid();
+      _b_particle_pt[ _b_particle_n ] = truth_pt;
+      _b_particle_eta[ _b_particle_n ] = truth_eta;
+      _b_particle_phi[ _b_particle_n ] = truth_phi;
+      _b_particle_n++;
+    }
   }
   //record event information 
   _b_nVtx=numUnique(&vtxList,&mapConversions);
