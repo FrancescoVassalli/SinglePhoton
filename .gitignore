@@ -1,4 +1,5 @@
 *.root
+*.xml
 AutoDict*
 *.zip
 *.swp
