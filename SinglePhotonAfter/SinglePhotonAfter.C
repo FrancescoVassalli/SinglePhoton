@@ -9,7 +9,7 @@
 
 #include <iostream>
 #include <sstream>
-#include <cmath>
+#include <math.h>
 
 SinglePhotonAfter::SinglePhotonAfter(const std::string &name) : SubsysReco("SinglePhoton")
 {
@@ -63,7 +63,7 @@ int SinglePhotonAfter::process_event(PHCompositeNode *topNode)
     else{ //if the particle is not primary find its vertex 
       if(get_embed(parent,truthinfo)!=2) continue;
       PHG4VtxPoint* vtx=truthinfo->GetVtx(g4particle->get_vtx_id());
-      radius=vtx->sqrt(get_x()*vtx->get_x()+vtx->get_y()*vtx->get_y());
+      radius=sqrt(vtx->get_x()*vtx->get_x()+vtx->get_y()*vtx->get_y());
       if (radius<kTPCRADIUS) //limits to truth conversions within the tpc radius
       {
         std::cout<<radius<<'\n';
