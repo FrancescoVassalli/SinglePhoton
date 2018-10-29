@@ -32,7 +32,7 @@ int SinglePhotonAfter::InitRun(PHCompositeNode *topNode)
   _tree->Branch("npair", &_b_pair);
   _tree->Branch("event",&_b_event); 
   _tree->Branch("hash",&_b_hash);
-  _tree->Branch("rVtx", _b_rVtx,"rVtx[nVtx]/F");
+  _tree->Branch("rVtx", _b_rVtx,"rVtx[particle_n]/F");
   _tree->Branch("particle_pt", _b_particle_pt,"particle_pt[particle_n]/F");
   _tree->Branch("particle_eta", _b_particle_eta,"particle_eta[particle_n]/F");
   _tree->Branch("particle_phi", _b_particle_phi,"particle_phi[particle_n]/F");
