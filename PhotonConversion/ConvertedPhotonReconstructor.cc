@@ -157,7 +157,7 @@ ReconstructedConvertedPhoton* ConvertedPhotonReconstructor::reconstruct(PHCompos
 					continue;
 					}*/
 				++titer;
-				SvtxTrack* ftrack=track;
+				//SvtxTrack* ftrack=track;
 				track= trackmap->get(*titer);
 				if(!track){
 					doubletrack=false;
@@ -191,7 +191,8 @@ ReconstructedConvertedPhoton* ConvertedPhotonReconstructor::reconstruct(PHCompos
 						b_truthvec2= new TLorentzVector( tTrack2,pToE(tTrack2,kEmass));
 					}
 					else{
-						b_truthvec1=b_truthvec1=NULL; //the tree might not allow you to write nulls not sure this is legal
+						b_truthvec1=NULL; //the tree might not allow you to write nulls not sure this is legal
+            b_truthvec1=NULL;
 					}
 				}
 			}
