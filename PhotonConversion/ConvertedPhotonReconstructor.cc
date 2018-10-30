@@ -68,12 +68,12 @@ int ConvertedPhotonReconstructor::process_event(PHCompositeNode *topNode) {
 	else{
 	cout<<"no recovery"<<endl;
 	}*/
-	b_failed=true;
+	b_failed=true; //default to failure unless all the checks are passed
 
-  std::stringstream ss;
-  ss<<event;             //this is where the file number is 
-  hash=name.c_str()[name.length()-21]+ss.str();
-	
+	std::stringstream ss;
+	ss<<"-"<<event;             //this is where the file number is 
+	hash=name.c_str()[name.length()-21]+ss.str();
+
 	reconstruct(topNode);
 	event++;
 	cout<<"return event::ok"<<endl;
@@ -97,8 +97,7 @@ void ConvertedPhotonReconstructor::process_recoTracks(PHCompositeNode *topNode){
 
 ReconstructedConvertedPhoton* ConvertedPhotonReconstructor::reconstruct(PHCompositeNode *topNode){
 	//let the stack get the info from the node
-	bool doubletrack=true;
-	bool goodR=true;
+
 	SvtxEvalStack *stack = new SvtxEvalStack(topNode);
 	if(!stack){
 		cout<<"Evaluator is null quiting photon recovery\n";
@@ -111,6 +110,9 @@ ReconstructedConvertedPhoton* ConvertedPhotonReconstructor::reconstruct(PHCompos
 	//SvtxClusterMap* clustermap = findNode::getClass<SvtxClusterMap>(topNode,"SvtxClusterMap"); 
 	SvtxVertexEval* vertexeval = stack->get_vertex_eval();
 	SvtxTrackEval* trackeval =   stack->get_track_eval();
+	//use the bools to check the event is good
+	bool doubletrack=true;
+	bool goodR=true;
 	if(!vertexeval||!trackeval){
 		cout<<"Evaluator is null quiting photon recovery\n";
 		return nullptr;
@@ -118,92 +120,84 @@ ReconstructedConvertedPhoton* ConvertedPhotonReconstructor::reconstruct(PHCompos
 	cout<<"In reconstruct num vertex="<<vertexmap->size()<<'\n';
 	for (SvtxVertexMap::Iter iter = vertexmap->begin(); iter != vertexmap->end(); ++iter) {
 		SvtxVertex* vertex = iter->second;
-		if(!vertex){
-			cout<<"Vertex is null \n";
-			continue;
-		}
-		float ntracks;
-		ntracks= vertex->size_tracks();
-		if(ntracks!=2){
-			//cout<<"Quiting photon recovery due to "<<ntracks<<" tracks\n";
-			doubletrack=false;
-		}
-		float vx,vy,vz;
-		vx = vertex->get_x();
-		vy = vertex->get_y();
-		vz = vertex->get_z();
-		cout<<"Vertex:"<<vx<<", "<<vy<<", "<<vz<<'\n';
-		//how do we really want to handle low R events?
-		if(sqrt(vx*vx+vy*vy+vz*vz)<1){
-			goodR=false;
-		}
-		if (goodR&&doubletrack)
-		{
-			bool goodCharge=true;
-			float charge1;
-			SvtxVertex::TrackIter titer = vertex->begin_tracks(); 
-			SvtxTrack* track = trackmap->get(*titer);
-			if(!track){
-				cout<<"null track quting photon recovery\n";
-				continue;
+		if(vertex){
+			if(vertex->size_tracks()!=2){
+				doubletrack=false;
 			}
-			charge1 = track->get_charge();
-			if(abs(charge1)!=1){
-				cout<<"Quiting photon recovery due to charge="<<charge1<<'\n';
-				continue; //only considering electron positron conversion 
+			float vx,vy,vz;
+			vx = vertex->get_x();
+			vy = vertex->get_y();
+			vz = vertex->get_z();
+			cout<<"Vertex:"<<vx<<", "<<vy<<", "<<vz<<'\n';
+			//how do we really want to handle low R events?
+			if(sqrt(vx*vx+vy*vy+vz*vz)<1){
+				goodR=false;
 			}
-			float t1x,t1y,t1z,t2x,t2y,t2z,charge2;
-			t1x = track->get_px();
-			t1y = track->get_py();
-			t1z = track->get_pz();
-			PHG4Particle* truth1 = trackeval->max_truth_particle_by_nclusters(track); 
-			if(!truth1){
-				cout<<"truth1 is null quting photon recovery \n";
-				continue;
-			}
-			++titer;
-			SvtxTrack* ftrack=track;
-			track= trackmap->get(*titer);
-			if(!track){
-				cout<<"null track quting photon recovery\n";
-				continue;
-			}
-			charge2 = track->get_charge();
-			if(charge1!= -1*charge2){
-				goodCharge=false;
-			}
-			t2x = track->get_px();
-			t2y = track->get_py();
-			t2z = track->get_pz();
-
-			PHG4Particle* truth2 = trackeval->max_truth_particle_by_nclusters(track); 
-			if(!truth2){
-				cout<<"truth2 is null quting photon recovery \n";
-				continue;
-			}
-			if (goodCharge)
+			if (goodR&&doubletrack)
 			{
-        			b_failed=false;
-				TVector3 track1(t1x,t1y,t1z),track2(t2x,t2y,t2z);
-				PHG4VtxPoint* point = vertexeval->max_truth_point_by_ntracks(vertex); //not entirely sure what this does
-				TVector3 tTrack1(truth1->get_px(),truth1->get_py(),truth1->get_pz()),
-								 tTrack2(truth2->get_px(),truth2->get_py(),truth2->get_pz());
+				bool goodCharge=true;
+				float charge1;
+				SvtxVertex::TrackIter titer = vertex->begin_tracks(); 
+				SvtxTrack* track = trackmap->get(*titer);
+				if(!track){
+					cout<<"null track quting photon recovery\n";
+					continue;
+				}
+				charge1 = track->get_charge();
+				if(abs(charge1)!=1){
+					cout<<"Quiting photon recovery due to charge="<<charge1<<'\n';
+					continue; //only considering electron positron conversion 
+				}
+				float t1x,t1y,t1z,t2x,t2y,t2z,charge2;
+				t1x = track->get_px();
+				t1y = track->get_py();
+				t1z = track->get_pz();
+				PHG4Particle* truth1 = trackeval->max_truth_particle_by_nclusters(track); 
+				/*if(!truth1){
+					cout<<"truth1 is null quting photon recovery \n";
+					continue;
+					}*/
+				++titer;
+				SvtxTrack* ftrack=track;
+				track= trackmap->get(*titer);
+				if(!track){
+					doubletrack=false;
+				}
+				charge2 = track->get_charge();
+				if(charge1!= -1*charge2){
+					goodCharge=false;
+				}
+				PHG4Particle* truth2 = trackeval->max_truth_particle_by_nclusters(track); 
+				/*if(!truth2){
+					
+				}*/
 
-				b_recovec1= new TLorentzVector(track1,pToE(track1,kEmass));
-				b_recovec2= new TLorentzVector(track2,pToE(track2,kEmass)); // make the tlv for the reco photon 
-				b_recoVertex= new TVector3(vx,vy,vz);
-				//do i care about the truth number of particles ?
-				b_truthVertex= new TVector3(point->get_x(),point->get_y(),point->get_z());
-				b_truthvec1= new TLorentzVector(tTrack1,pToE(tTrack1,kEmass));
-				b_truthvec2= new TLorentzVector( tTrack2,pToE(tTrack2,kEmass));
-				if(!ftrack->get_positive_charge()){ // will want to match these tracks to a truth particle 
-					SvtxTrack* temp=ftrack;
-					ftrack=track;
-					track=temp;
+				t2x = track->get_px();
+				t2y = track->get_py();
+				t2z = track->get_pz();
+				if (goodCharge&&doubletrack)
+				{
+					b_failed=false;
+					TVector3 track1(t1x,t1y,t1z),track2(t2x,t2y,t2z);
+					PHG4VtxPoint* point = vertexeval->max_truth_point_by_ntracks(vertex); //not entirely sure what this does
+					b_recovec1= new TLorentzVector(track1,pToE(track1,kEmass));
+					b_recovec2= new TLorentzVector(track2,pToE(track2,kEmass)); 
+					b_recoVertex= new TVector3(vx,vy,vz);
+					if (truth1&&truth2)
+					{
+						TVector3 tTrack1(truth1->get_px(),truth1->get_py(),truth1->get_pz()),
+									 tTrack2(truth2->get_px(),truth2->get_py(),truth2->get_pz());
+						b_truthVertex= new TVector3(point->get_x(),point->get_y(),point->get_z());
+						b_truthvec1= new TLorentzVector(tTrack1,pToE(tTrack1,kEmass));
+						b_truthvec2= new TLorentzVector( tTrack2,pToE(tTrack2,kEmass));
+					}
+					else{
+						b_truthvec1=b_truthvec1=NULL; //the tree might not allow you to write nulls not sure this is legal
+					}
 				}
 			}
 		}
-    _tree->Fill();
+		_tree->Fill();
 		delete stack;
 		//return new ReconstructedConvertedPhoton(event,*b_recovec,*b_recoVertex,*b_truthvec,*b_truthVertex,ftrack,track,clustermap);
 

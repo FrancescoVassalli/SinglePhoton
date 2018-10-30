@@ -113,6 +113,7 @@ int SinglePhotonAfter::process_event(PHCompositeNode *topNode)
   _tree->Fill();
   std::cout<<"Filled "<<_b_particle_n<<" particles"<<std::endl;
   _b_event++;
+  delete stack;
   return 0;
 }
 
