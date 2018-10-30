@@ -105,8 +105,8 @@ int SinglePhotonAfter::process_event(PHCompositeNode *topNode)
   _b_nVtx=numUnique(&vtxList,&mapConversions,trackeval);
   //make a hash of the event number and file number 
   std::stringstream ss;
-  ss<<_b_event;             //this is where the file number is 
-  _b_hash=_foutname.c_str()[_foutname.length()-7]+ss.str();
+  ss<<"-"<<_b_event;             //this is where the file number is 
+  _b_hash=_foutname.c_str()[_foutname.length()-6]+ss.str();
 
   //currently my reco can only handle single conversion events
 
