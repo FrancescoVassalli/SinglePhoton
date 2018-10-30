@@ -26,7 +26,6 @@ ConvertedPhotonReconstructor::ConvertedPhotonReconstructor(const std::string &na
 	SubsysReco("ConvertedPhotonReconstructor")
 {
 	this->name=name+"recovered.root";
-	verbosity = 0;
 	event=0;
 	_file = new TFile( this->name.c_str(), "RECREATE");
 	_tree = new TTree("convertedphotontree","tracks reconstructed to converted photons");
@@ -56,9 +55,9 @@ int ConvertedPhotonReconstructor::InitRun(PHCompositeNode *topNode) {
 }
 
 int ConvertedPhotonReconstructor::process_event(PHCompositeNode *topNode) {
-	if (((verbosity > 0)&&(event%100==0))) {  
+	/*if (((verbosity > 0)&&(event%100==0))) {  
 		cout << "ConvertedPhotonReconstructor::process_event - Event = " << event << endl;
-	}
+	}*/
 	//  ReconstructedConvertedPhoton* recovered=reconstruct(topNode);
 	/*if(recovered){
 		cout<<"recovered"<<endl;
@@ -104,7 +103,7 @@ ReconstructedConvertedPhoton* ConvertedPhotonReconstructor::reconstruct(PHCompos
 		return nullptr;
 	}
 	stack->set_strict(false); //no idea what this does 
-	stack->set_verbosity(verbosity+1); //might be able to lower this 
+	//stack->set_verbosity(verbosity+1); //might be able to lower this 
 	SvtxVertexMap* vertexmap = findNode::getClass<SvtxVertexMap>(topNode,"SvtxVertexMap");
 	SvtxTrackMap* trackmap = findNode::getClass<SvtxTrackMap>(topNode,"SvtxTrackMap");
 	//SvtxClusterMap* clustermap = findNode::getClass<SvtxClusterMap>(topNode,"SvtxClusterMap"); 
