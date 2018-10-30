@@ -20,6 +20,7 @@
 
 class PHCompositeNode;
 class Conversion;
+class SvtxTrackEval;
 
 class SinglePhotonAfter: public SubsysReco
 {
@@ -40,7 +41,7 @@ class SinglePhotonAfter: public SubsysReco
     return sqrt( pow( deta, 2 ) + pow( dphi, 2 ) );
   }
 
-  int numUnique(std::list<int>* l,std::map<int,Conversion>* map);
+  int numUnique(std::list<int>* l,std::map<int,Conversion>* map,SvtxTrackEval* trackEval);
 
   TFile *_f;
   TTree *_tree;
@@ -48,7 +49,8 @@ class SinglePhotonAfter: public SubsysReco
   std::string _b_hash;
   int _b_particle_n;
   int _b_nVtx;
-  int _b_pair; //count acceptance e pairs 
+  int _b_Tpair; //count acceptance e pairs in truth
+  int _b_Rpair; //count acceptance e pairs in reco
   int _b_nrecotracks; //count acceptance reco tracks 
   int _b_nconvert;  //this is how I count how many truth conversions are in my acceptance
   int _b_event;

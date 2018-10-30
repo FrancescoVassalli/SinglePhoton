@@ -7,6 +7,10 @@
 
 #include <calotrigger/CaloTriggerInfo.h>
 
+#include <g4eval/SvtxEvalStack.h>
+#include <g4eval/SvtxTrackEval.h>
+
+
 #include <iostream>
 #include <sstream>
 #include <math.h>
@@ -29,7 +33,8 @@ int SinglePhotonAfter::InitRun(PHCompositeNode *topNode)
   _tree->Branch("particle_n", &_b_particle_n);
   _tree->Branch("nVtx", &_b_nVtx);
   _tree->Branch("nconvert", &_b_nconvert);
-  _tree->Branch("npair", &_b_pair);
+  _tree->Branch("nTpair", &_b_Tpair);
+  _tree->Branch("nRpair", &_b_Rpair);
   _tree->Branch("event",&_b_event); 
   _tree->Branch("hash",&_b_hash);
   _tree->Branch("rVtx", _b_rVtx,"rVtx[particle_n]/F");
@@ -45,10 +50,14 @@ int SinglePhotonAfter::process_event(PHCompositeNode *topNode)
   _b_particle_n = 0;
   _b_nVtx = 0;
   _b_nconvert=0;
-  _b_pair=0;
+  _b_Tpair=0;
+  _b_Rpair=0;
 
   PHG4TruthInfoContainer* truthinfo = findNode::getClass<PHG4TruthInfoContainer>(topNode,"G4TruthInfo");
   PHG4TruthInfoContainer::Range range = truthinfo->GetParticleRange();
+  SvtxEvalStack *stack = new SvtxEvalStack(topNode);
+  SvtxTrackEval* trackeval =   stack->get_track_eval();
+
   //make a list of the conversions
   std::list<int> vtxList;
   std::map<int,Conversion> mapConversions;
@@ -93,7 +102,7 @@ int SinglePhotonAfter::process_event(PHCompositeNode *topNode)
     }
   }
   //record event information 
-  _b_nVtx=numUnique(&vtxList,&mapConversions);
+  _b_nVtx=numUnique(&vtxList,&mapConversions,trackeval);
   //make a hash of the event number and file number 
   std::stringstream ss;
   ss<<_b_event;             //this is where the file number is 
@@ -107,7 +116,7 @@ int SinglePhotonAfter::process_event(PHCompositeNode *topNode)
   return 0;
 }
 
-int SinglePhotonAfter::numUnique(std::list<int> *l,std::map<int,Conversion> *mymap=NULL){
+int SinglePhotonAfter::numUnique(std::list<int> *l,std::map<int,Conversion> *mymap=NULL,SvtxTrackEval* trackeval=NULL){
   l->sort();
   int last=-1;
   int r=0;
@@ -120,9 +129,14 @@ int SinglePhotonAfter::numUnique(std::list<int> *l,std::map<int,Conversion> *mym
       if (t.Rapidity()<kRAPIDITYACCEPT)
       {
         _b_nconvert++;
-        if (mymap->at(*i).hasPair())
+        if (mymap&&mymap->at(*i).hasPair())
         {
-          _b_pair++;
+          _b_Tpair++;
+          mymap->at(*i).setRecoTracks(trackeval);
+          if (mymap->at(*i).recoCount()==2)
+          {
+            _b_Rpair++;
+          }
         }
 
       }

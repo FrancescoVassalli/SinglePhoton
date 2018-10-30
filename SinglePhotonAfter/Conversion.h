@@ -57,6 +57,19 @@ public:
     }
   }
   int setRecoTracks(SvtxTrackEval* trackeval);
+
+  inline int recoCount(){
+    int r=0;
+    if (reco1)
+    {
+      r++;
+    }
+    if (reco2)
+    {
+      r++;
+    }
+    return r;
+  }
   /*bool acceptancePair(){
 
   }*/
