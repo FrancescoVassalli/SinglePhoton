@@ -328,7 +328,7 @@ void onlineHister(){
     TTree *truthInfo, *recoveryTree;
     truthInfo = (TTree*) f_truth->Get("ttree");
     recoveryTree = (TTree*) f_reco->Get("convertedphotontree");*/
-  makeHists(truthchain,recochain,outname);
+  makeHists2(truthchain,recochain,outname);
   //ostringsteam s;
   //s<<numFiles;
   //string num(s)
