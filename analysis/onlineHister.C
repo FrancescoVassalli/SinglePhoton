@@ -1,5 +1,7 @@
 #include <TVector3.h>
+#include <TMap.h>
 #include <TLorentzVector.h>
+#include <TMath.h>
 #include <TFile.h>
 #include <TChain.h>
 #include <TH1.h>
@@ -7,8 +9,12 @@
 #include <TH2F.h>
 #include <cmath>
 #include <sstream>
+#include <string>
 #include <map>
 #include <iostream>
+#include "RecoData.h"
+
+  
 using namespace std;
 
 namespace {
@@ -30,7 +36,7 @@ namespace {
     return r;
   }
 }
-
+/*
 void makeHists(TTree* truth, TTree* recovery, const string& outname){
   TFile *outfile = new TFile(outname.c_str(),"RECREATE");
 
@@ -144,13 +150,13 @@ void makeHists(TTree* truth, TTree* recovery, const string& outname){
     {
       truthConversionCount+=nVtx;
       cout<<"truth hash:"<<hash<<'\n';
-      /*recomap[event];
-      if (recomap.size()!=recomapSize)
-      {
-        cout<<"no reco event"<<endl;
-        noreco->Fill(rVtx[0]);
-        recomapSize++;
-      }*/
+     // recomap[event];
+     // if (recomap.size()!=recomapSize)
+     // {
+     //   cout<<"no reco event"<<endl;
+     //   noreco->Fill(rVtx[0]);
+     //   recomapSize++;
+     // }
     }
   }
   TH1F *efficency = new TH1F("efficency","",1000,0,1);
@@ -161,92 +167,33 @@ void makeHists(TTree* truth, TTree* recovery, const string& outname){
   delete outfile;
 
 }
+*/
 
-class RecoData
-{
-public:
-  RecoData(){
-    recoPhoton = new TLorentzVector();
-    recoPhoton = new TLorentzVector();
-  }
-  RecoData(bool status,string hash, TLorentzVector* recotlv1,
-   TLorentzVector *recotlv2,TLorentzVector *truthtlv1,TLorentzVector *truthtlv2,
-   TVector3* recoVert,TVector3* truthVert): status(status), hash(hash),recotlv1(recotlv1),
-   recotlv2(recotlv2),truthtlv1(truthtlv1),truthtlv2(truthtlv2),recoVert(recoVert),truthVert(truthVert){
-    recoPhoton = new TLorentzVector();
-    truthPhoton = new TLorentzVector();
-    *recoPhoton= *recotlv2+ *recotlv2;
-    *truthPhoton = *truthtlv1+ *truthtlv2;
-  }
-  ~RecoData(){
-    delete recoPhoton;
-    delete truthPhoton;
-  }
-  inline bool get_status(){
-    return status;
-  }
-  inline string get_hash(){
-    return hash;
-  }
-  //need to handle NULL pointer
-  inline pair<TLorentzVector,TLorentzVector> getRecoTracks(){
-    pair<TLorentzVector,TLorentzVector> r;
-    r.first= *recotlv1;
-    r.second= *recotlv2;
-    return r;
-  }
-  //need to handle NULL pointer
-  inline pair<TLorentzVector,TLorentzVector> getTruthTracks(){
-    pair<TLorentzVector,TLorentzVector> r;
-    r.first= *truthtlv1;
-    r.second= *truthtlv2;
-    return r;
-  }
-  //need to handle NULL pointer
-  inline TLorentzVector getRecoPhoton(){
-    return *recoPhoton;
-  }
-  //need to handle NULL pointer
-  inline TLorentzVector getTruthPhoton(){
-    return *truthPhoton;
-  }
-  //need to handle NULL pointer
-  inline TVector3 getRecoVert(){
-    return *recoVert;
-  }
-  //need to handle NULL pointer
-  inline TVector3 getTruthVert(){
-    return *truthVert;
-  }
-
-private:
+TMap* makeRecoMap(TTree* recoveryTree){
+  TMap *recoMap= new TMap(recoveryTree->GetEntries(),0); 
   bool status;
-  string hash;
-  TLorentzVector *recotlv1, *recotlv2,*truthtlv1,*truthtlv2,*recoPhoton,*truthPhoton;
-  TVector3 *truthVert, *recoVert;
-};
-
-std::map<string, RecoData> makeRecoMap(TTree* recoveryTree){
-  std::map<string, RecoData> recoMap;
-
-  bool status;
-  string *hash;
-  TLorentzVector *recotlv1, *truthtlv1, *recotlv2, *truthtlv2;
-  TVector3 *recoVert,*truthVert;
-
+  string *hash= new string();
+  TLorentzVector *recotlv1= new TLorentzVector();
+  TLorentzVector *truthtlv1= new TLorentzVector();
+  TLorentzVector  *recotlv2= new TLorentzVector();
+  TLorentzVector  *truthtlv2= new TLorentzVector();
+  TVector3 *recoVert= new TVector3();
+  TVector3 *truthVert= new TVector3();
   recoveryTree->SetBranchAddress("status",&status);
-  recoveryTree->SetBranchAddress("hash",&hash);
+  recoveryTree->SetBranchAddress("hash", &hash);
   recoveryTree->SetBranchAddress("reco_tlv1",    &recotlv1 );
   recoveryTree->SetBranchAddress("truth_tlv1",   &truthtlv1 );
   recoveryTree->SetBranchAddress("reco_tlv2",    &recotlv2 );
   recoveryTree->SetBranchAddress("truth_tlv2",   &truthtlv2 );
   recoveryTree->SetBranchAddress("reco_vertex", &recoVert );
   recoveryTree->SetBranchAddress("truth_vertex",&truthVert);
-
+  cout<<"Starting reco map with "<<recoveryTree->GetEntries()<<" entries"<<endl;
   for (int i = 0; i < recoveryTree->GetEntries(); ++i)
   {
     recoveryTree->GetEntry(i);
-    recoMap[*hash] = RecoData(status,*hash,recotlv1,recotlv2,truthtlv1,truthtlv2,recoVert,truthVert);
+    TObjString key= TObjString(hash->c_str());
+    RecoData value=RecoData(status,*hash,recotlv1,recotlv2,truthtlv1,truthtlv2,recoVert,truthVert);
+    recoMap->Add(&key,&value);
   }
   return recoMap;
 }
@@ -254,10 +201,10 @@ std::map<string, RecoData> makeRecoMap(TTree* recoveryTree){
 void makeHists2(TTree* truthTree, TTree* recoveryTree, const string& outname){
   TFile *outfile = new TFile(outname.c_str(),"RECREATE");
 
-  std::map<string, RecoData> recoMap = makeRecoMap(recoveryTree);
+  TMap* recoMap = makeRecoMap(recoveryTree);
 
   int t_nparticle,t_nVtx,t_nconvert,t_npair,r_npair,event;
-  string *hash;
+  string *hash = new string();
   float t_rVtx[24], t_pt[24],t_eta[24],t_phi[24],t_id[24];
 
   truthTree->SetBranchAddress("particle_n",&t_nparticle);
@@ -281,7 +228,7 @@ void makeHists2(TTree* truthTree, TTree* recoveryTree, const string& outname){
   int tE_recoMatchedTracks=0;
   int rE_recoMatchedTracks=0;
   int e_events=0;
-
+  cout<<"Starting truth loop"<<endl;
   for (int i = 0; i < truthTree->GetEntries(); ++i)
   {
     truthTree->GetEntry(i);
@@ -294,7 +241,7 @@ void makeHists2(TTree* truthTree, TTree* recoveryTree, const string& outname){
       tE_totalconversions+=t_nVtx;
       tE_conversionsInRange+=t_npair;
       tE_recoMatchedTracks+=r_npair;
-      if(recoMap[*hash].get_status()){
+      if(recoMap[*hash]){
         rE_recoMatchedTracks++;
       }
     }
@@ -325,7 +272,7 @@ void onlineHister(){
   string in ="onlineanalysis";
   string reco =".rootrecovered.root";
   string truth =".root";
-  int numFiles=20;
+  int numFiles=30;
   TChain* truthchain=handleFile(location+in,truth,"ttree",numFiles);
   TChain* recochain=handleFile(location+in,reco,  "convertedphotontree",numFiles);
   /*TFile *f_truth = new TFile((location+intruth).c_str(),"READ");

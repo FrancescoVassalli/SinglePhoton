@@ -9,7 +9,6 @@ condor_log*
 */vis.mac
 */config.*
 */depcomp
-analysis/*.h
 */missing
 */Makefile
 */install-sh
