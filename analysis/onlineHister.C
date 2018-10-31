@@ -165,6 +165,10 @@ void makeHists(TTree* truth, TTree* recovery, const string& outname){
 class RecoData
 {
 public:
+  RecoData(){
+    recoPhoton = new TLorentzVector();
+    recoPhoton = new TLorentzVector();
+  }
   RecoData(bool status,string hash, TLorentzVector* recotlv1,
    TLorentzVector *recotlv2,TLorentzVector *truthtlv1,TLorentzVector *truthtlv2,
    TVector3* recoVert,TVector3* truthVert): status(status), hash(hash),recotlv1(recotlv1),
