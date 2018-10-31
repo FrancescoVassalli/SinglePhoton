@@ -161,6 +161,145 @@ void makeHists(TTree* truth, TTree* recovery, const string& outname){
 
 }
 
+class RecoData
+{
+public:
+  RecoData(const bool& status,const string& hash, TLorentzVector* recotlv1,
+   TLorentzVector *recotlv2,TLorentzVector *truthtlv1,TLorentzVector *truthtlv2,
+   TVector3* recoVert,TVector3* truthVert): status(status), hash(hash),recotlv1(recotlv1),
+   recotlv2(recotlv2),truthtlv1(truthtlv1),truthtlv2(truthtlv2),recoVert(recoVert),truthVert(truthVert){
+    recoPhoton = new TLorentzVector();
+    truthPhoton = new TLorentzVector();
+    *recoPhoton= *recotlv2+ *recotlv2;
+    *truthPhoton = *truthtlv1+ *truthtlv2;
+  }
+  ~RecoData(){
+    delete recoPhoton;
+    delete truthPhoton;
+  }
+  inline bool get_status(){
+    return status;
+  }
+  inline string hash(){
+    return &hash;
+  }
+  //need to handle NULL pointer
+  inline pair<TLorentzVector,TLorentzVector> getRecoTracks(){
+    pair<TLorentzVector,TLorentzVector> r;
+    r->first= *recotlv1;
+    r->second= *recotlv2;
+    return r;
+  }
+  //need to handle NULL pointer
+  inline pair<TLorentzVector,TLorentzVector> getRecoTracks(){
+    pair<TLorentzVector,TLorentzVector> r;
+    r->first= *truthtlv1;
+    r->second= *truthtlv2;
+    return r;
+  }
+  //need to handle NULL pointer
+  inline TLorentzVector getRecoPhoton(){
+    return *recoPhoton;
+  }
+  //need to handle NULL pointer
+  inline TLorentzVector getTruthPhoton(){
+    return *truthPhoton;
+  }
+  //need to handle NULL pointer
+  inline TVector3 getRecoVert(){
+    return *recoVert;
+  }
+  //need to handle NULL pointer
+  inline TVector3 getTruthVert(){
+    return *truthVert;
+  }
+
+private:
+  bool status;
+  string hash;
+  TLorentzVector *recotlv1, *recotlv2,*truthtlv1,*truthtlv2,*recoPhoton,*truthPhoton;
+  TVector3 *truthVert, *recoVert;
+};
+
+std::map<string, RecoData> makeRecoMap(TTree* recoveryTree){
+  std::map<string, RecoData> recoMap;
+
+  bool status;
+  string *hash;
+  TLorentzVector *recotlv1, *truthtlv1, *recotlv2, *truthtlv2;
+  TVector3 *recoVert,*truthVert;
+
+  recoveryTree->SetBranchAddress("status",&status);
+  recoveryTree->SetBranchAddress("hash",&hash);
+  recoveryTree->SetBranchAddress("reco_tlv1",    &recotlv1 );
+  recoveryTree->SetBranchAddress("truth_tlv1",   &truthtlv1 );
+  recoveryTree->SetBranchAddress("reco_tlv2",    &recotlv2 );
+  recoveryTree->SetBranchAddress("truth_tlv2",   &truthtlv2 );
+  recoveryTree->SetBranchAddress("reco_vertex", &recoVert );
+  recoveryTree->SetBranchAddress("truth_vertex",&truthVert);
+
+  for (int i = 0; i < recoveryTree->GetEntries(); ++i)
+  {
+    recoveryTree->GetEntry(i);
+    recoMap[*hash] = RecoData(status,*hash,recotlv1,recotlv2,truthtlv1,truthtlv2,recoVert,truthVert);
+  }
+  return recoMap;
+}
+
+void makeHists2(TTree* truthTree, TTree* recoveryTree, const string& outname){
+  TFile *outfile = new TFile(outname.c_str(),"RECREATE");
+
+  std::map<string, RecoData> recoMap = makeRecoMap(recoveryTree);
+
+  int t_nparticle,t_nVtx,t_nconvert,t_npair,r_npair,event;
+  string *t_hash;
+  float t_rVtx[24], t_pt[24],t_eta[24],t_phi[24],t_id[24];
+
+  truthTree->SetBranchAddress("particle_n",&t_nparticle);
+  truthTree->SetBranchAddress("nVtx",&t_nVtx);
+  truthTree->SetBranchAddress("nconvert",&t_nconvert);
+  truthTree->SetBranchAddress("nTpair",&t_npair);
+  truthTree->SetBranchAddress("nRpair",&r_npair);
+  truthTree->SetBranchAddress("event",&event);
+  truthTree->SetBranchAddress("hash",&t_hash);
+  truthTree->SetBranchAddress("rVtx",&t_rVtx);
+  truthTree->SetBranchAddress("particle_pt",&t_pt);
+  truthTree->SetBranchAddress("particle_eta",&t_eta);
+  truthTree->SetBranchAddress("particle_phi",&t_phi);
+
+  int t_totalconversions=0;
+  int t_conversionsInRange=0;
+  int t_recoMatchedTracks=0;
+
+  int tE_totalconversions=0;
+  int tE_conversionsInRange=0;
+  int tE_recoMatchedTracks=0;
+  int rE_recoMatchedTracks=0;
+  int e_events=0;
+
+  for (int i = 0; i < truthTree->GetEntries(); ++i)
+  {
+    truthTree->GetEntry(i);
+    t_totalconversions+=t_nVtx;
+    t_conversionsInRange+=nTpair;
+    t_recoMatchedTracks+=nRpair;
+    if (t_nVtx<2)
+    {
+      e_events++;
+      tE_totalconversions+=t_nVtx;
+      tE_conversionsInRange+=t_npair;
+      tE_recoMatchedTracks+=r_npair;
+      if(recoMap[*hash].get_status()){
+        rE_recoMatchedTracks++;
+      }
+    }
+  }
+  cout<<Form("For %i events of 8 photons there are %i total conversions.\n %i in the acceptance rapidity.\n %i truth matched reco tracks.\n",events,t_totalconversions,t_conversionsInRange,t_recoMatchedTracks);
+  cout<<Form("For %i events of 8 photons with max 1 truth conversion there are %i total conversions.\n %i in the acceptance rapidity.\n %i truth matched reco tracks and %i reco matched reco tracks.\n",e_events,tE_totalconversions,tE_conversionsInRange,tE_recoMatchedTracks,rE_recoMatchedTracks);
+
+
+}
+
 TChain* handleFile(string name, string extension, string treename, int filecount){
   TChain *all = new TChain(treename.c_str());
   string temp;
