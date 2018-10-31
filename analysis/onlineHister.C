@@ -8,6 +8,7 @@
 #include <cmath>
 #include <sstream>
 #include <map>
+#include <iostream>
 using namespace std;
 
 namespace {
@@ -164,7 +165,7 @@ void makeHists(TTree* truth, TTree* recovery, const string& outname){
 class RecoData
 {
 public:
-  RecoData(const bool& status,const string& hash, TLorentzVector* recotlv1,
+  RecoData(bool status,string hash, TLorentzVector* recotlv1,
    TLorentzVector *recotlv2,TLorentzVector *truthtlv1,TLorentzVector *truthtlv2,
    TVector3* recoVert,TVector3* truthVert): status(status), hash(hash),recotlv1(recotlv1),
    recotlv2(recotlv2),truthtlv1(truthtlv1),truthtlv2(truthtlv2),recoVert(recoVert),truthVert(truthVert){
@@ -180,21 +181,21 @@ public:
   inline bool get_status(){
     return status;
   }
-  inline string hash(){
-    return &hash;
+  inline string get_hash(){
+    return hash;
   }
   //need to handle NULL pointer
   inline pair<TLorentzVector,TLorentzVector> getRecoTracks(){
     pair<TLorentzVector,TLorentzVector> r;
-    r->first= *recotlv1;
-    r->second= *recotlv2;
+    r.first= *recotlv1;
+    r.second= *recotlv2;
     return r;
   }
   //need to handle NULL pointer
-  inline pair<TLorentzVector,TLorentzVector> getRecoTracks(){
+  inline pair<TLorentzVector,TLorentzVector> getTruthTracks(){
     pair<TLorentzVector,TLorentzVector> r;
-    r->first= *truthtlv1;
-    r->second= *truthtlv2;
+    r.first= *truthtlv1;
+    r.second= *truthtlv2;
     return r;
   }
   //need to handle NULL pointer
@@ -252,7 +253,7 @@ void makeHists2(TTree* truthTree, TTree* recoveryTree, const string& outname){
   std::map<string, RecoData> recoMap = makeRecoMap(recoveryTree);
 
   int t_nparticle,t_nVtx,t_nconvert,t_npair,r_npair,event;
-  string *t_hash;
+  string *hash;
   float t_rVtx[24], t_pt[24],t_eta[24],t_phi[24],t_id[24];
 
   truthTree->SetBranchAddress("particle_n",&t_nparticle);
@@ -261,7 +262,7 @@ void makeHists2(TTree* truthTree, TTree* recoveryTree, const string& outname){
   truthTree->SetBranchAddress("nTpair",&t_npair);
   truthTree->SetBranchAddress("nRpair",&r_npair);
   truthTree->SetBranchAddress("event",&event);
-  truthTree->SetBranchAddress("hash",&t_hash);
+  truthTree->SetBranchAddress("hash",&hash);
   truthTree->SetBranchAddress("rVtx",&t_rVtx);
   truthTree->SetBranchAddress("particle_pt",&t_pt);
   truthTree->SetBranchAddress("particle_eta",&t_eta);
@@ -281,8 +282,8 @@ void makeHists2(TTree* truthTree, TTree* recoveryTree, const string& outname){
   {
     truthTree->GetEntry(i);
     t_totalconversions+=t_nVtx;
-    t_conversionsInRange+=nTpair;
-    t_recoMatchedTracks+=nRpair;
+    t_conversionsInRange+=t_npair;
+    t_recoMatchedTracks+=r_npair;
     if (t_nVtx<2)
     {
       e_events++;
@@ -294,7 +295,7 @@ void makeHists2(TTree* truthTree, TTree* recoveryTree, const string& outname){
       }
     }
   }
-  cout<<Form("For %i events of 8 photons there are %i total conversions.\n %i in the acceptance rapidity.\n %i truth matched reco tracks.\n",events,t_totalconversions,t_conversionsInRange,t_recoMatchedTracks);
+  cout<<Form("For %i events of 8 photons there are %i total conversions.\n %i in the acceptance rapidity.\n %i truth matched reco tracks.\n",event,t_totalconversions,t_conversionsInRange,t_recoMatchedTracks);
   cout<<Form("For %i events of 8 photons with max 1 truth conversion there are %i total conversions.\n %i in the acceptance rapidity.\n %i truth matched reco tracks and %i reco matched reco tracks.\n",e_events,tE_totalconversions,tE_conversionsInRange,tE_recoMatchedTracks,rE_recoMatchedTracks);
 
 
