@@ -320,7 +320,7 @@ void onlineHister(){
   string in ="onlineanalysis";
   string reco =".rootrecovered.root";
   string truth =".root";
-  int numFiles=100;
+  int numFiles=20;
   TChain* truthchain=handleFile(location+in,truth,"ttree",numFiles);
   TChain* recochain=handleFile(location+in,reco,  "convertedphotontree",numFiles);
   /*TFile *f_truth = new TFile((location+intruth).c_str(),"READ");
