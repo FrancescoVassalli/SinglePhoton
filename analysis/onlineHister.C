@@ -191,10 +191,9 @@ TMap* makeRecoMap(TTree* recoveryTree){
   for (int i = 0; i < recoveryTree->GetEntries(); ++i)
   {
     recoveryTree->GetEntry(i);
-    TNamed key(hash->c_str(),hash->c_str());
-    RecoData value(status,*hash,recotlv1,recotlv2,truthtlv1,truthtlv2,recoVert,truthVert);
-    recoMap->Add(&key,&value);
-    cout<<*hash<<'\n';
+    TNamed *key=new TNamed(hash->c_str(),hash->c_str());
+    RecoData *value=new RecoData(status,*hash,recotlv1,recotlv2,truthtlv1,truthtlv2,recoVert,truthVert);
+    recoMap->Add(key,value);
   }
   return recoMap;
 }
@@ -242,14 +241,11 @@ void makeHists2(TTree* truthTree, TTree* recoveryTree, const string& outname){
       tE_totalconversions+=t_nVtx;
       tE_conversionsInRange+=t_npair;
       tE_recoMatchedTracks+=r_npair;
-      cout<<hash->c_str()<<endl;
-      if(recoMap->FindObject(hash->c_str())){
-        recoMap->FindObject(hash->c_str())->Dump();
+      if(recoMap->GetValue(hash->c_str())){
+        if(static_cast<RecoData*>(recoMap->GetValue(hash->c_str()))->get_status()){
+          rE_recoMatchedTracks++;
+        }
       }
-      //TPair* mapEntry = static_cast<TPair*>(recoMap->FindObject(&thisHash));
-      //if(mapEntry&&static_cast<RecoData*>(mapEntry->Value())->get_status()){
-      //  rE_recoMatchedTracks++;
-      //}
 
     }
   }
