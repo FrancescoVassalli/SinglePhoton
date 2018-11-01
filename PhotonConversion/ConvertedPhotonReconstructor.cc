@@ -25,7 +25,7 @@ using namespace std;
 ConvertedPhotonReconstructor::ConvertedPhotonReconstructor(const std::string &name) :
 	SubsysReco("ConvertedPhotonReconstructor")
 {
-	this->name=name+"recovered.root";
+	this->name=name+"recovered.root";;
 	event=0;
 	_file = new TFile( this->name.c_str(), "RECREATE");
 	_tree = new TTree("convertedphotontree","tracks reconstructed to converted photons");
@@ -71,7 +71,7 @@ int ConvertedPhotonReconstructor::process_event(PHCompositeNode *topNode) {
 
 	std::stringstream ss;
 	ss<<"-"<<event;             //this is where the file number is 
-  hash=name.substr(name.length()-24,name.length()-20)+ss.str();
+  hash=name.substr(name.length()-24,5)+ss.str();
 	reconstruct(topNode);
 	event++;
 	cout<<"return event::ok"<<endl;

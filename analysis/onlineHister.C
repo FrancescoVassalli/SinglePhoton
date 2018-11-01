@@ -274,12 +274,12 @@ TChain* handleFile(string name, string extension, string treename, int filecount
 }
 
 void onlineHister(){
-  const string location ="/sphenix/user/vassalli/singlesamples/Photon5/";
+  const string location ="/sphenix/user/vassalli/singlesamples/Photon5/test/";
   string outname = "onlineTrackFile.root";
   string in ="onlineanalysis";
   string reco =".rootrecovered.root";
   string truth =".root";
-  int numFiles=30;
+  int numFiles=1;
   TChain* truthchain=handleFile(location+in,truth,"ttree",numFiles);
   TChain* recochain=handleFile(location+in,reco,  "convertedphotontree",numFiles);
   /*TFile *f_truth = new TFile((location+intruth).c_str(),"READ");
