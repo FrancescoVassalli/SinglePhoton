@@ -71,8 +71,7 @@ int ConvertedPhotonReconstructor::process_event(PHCompositeNode *topNode) {
 
 	std::stringstream ss;
 	ss<<"-"<<event;             //this is where the file number is 
-	hash=name.c_str()[name.length()-20]+ss.str();
-
+  hash=name.substr(name.length()-24,name.length()-20)+ss.str();
 	reconstruct(topNode);
 	event++;
 	cout<<"return event::ok"<<endl;
