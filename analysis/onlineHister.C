@@ -171,7 +171,7 @@ delete outfile;
 
 TMap* makeRecoMap(TTree* recoveryTree){
   TMap *recoMap= new TMap(recoveryTree->GetEntries(),0); 
-  bool status;
+  bool radius,charge,tracks;
   string *hash= new string();
   TLorentzVector *recotlv1= new TLorentzVector();
   TLorentzVector *truthtlv1= new TLorentzVector();
@@ -179,7 +179,9 @@ TMap* makeRecoMap(TTree* recoveryTree){
   TLorentzVector  *truthtlv2= new TLorentzVector();
   TVector3 *recoVert= new TVector3();
   TVector3 *truthVert= new TVector3();
-  recoveryTree->SetBranchAddress("status",&status);
+  recoveryTree->SetBranchAddress("radius",&radius);
+  recoveryTree->SetBranchAddress("charge",&charge);
+  recoveryTree->SetBranchAddress("track",&tracks);
   recoveryTree->SetBranchAddress("hash", &hash);
   recoveryTree->SetBranchAddress("reco_tlv1",    &recotlv1 );
   recoveryTree->SetBranchAddress("truth_tlv1",   &truthtlv1 );
@@ -222,6 +224,7 @@ void makeHists2(TTree* truthTree, TTree* recoveryTree, const string& outname){
   int t_totalconversions=0;
   int t_conversionsInRange=0;
   int t_recoMatchedTracks=0;
+  int t_events=0;
 
   int tE_totalconversions=0;
   int tE_conversionsInRange=0;
@@ -235,6 +238,7 @@ void makeHists2(TTree* truthTree, TTree* recoveryTree, const string& outname){
     t_totalconversions+=t_nVtx;
     t_conversionsInRange+=t_npair;
     t_recoMatchedTracks+=r_npair;
+    t_events++;
     if (t_nVtx<2)
     {
       e_events++;
@@ -242,15 +246,19 @@ void makeHists2(TTree* truthTree, TTree* recoveryTree, const string& outname){
       tE_conversionsInRange+=t_npair;
       tE_recoMatchedTracks+=r_npair;
       if(recoMap->GetValue(hash->c_str())){
-        if(static_cast<RecoData*>(recoMap->GetValue(hash->c_str()))->get_status()){
+        RecoData* recodata= static_cast<RecoData*>(recoMap->GetValue(hash->c_str()));
+        if(recodata->get_status()){
           rE_recoMatchedTracks++;
+        }
+        else{
+          
         }
       }
 
     }
   }
-  cout<<Form("For %i events of 8 photons there are %i total conversions.\n %i in the acceptance rapidity.\n %i truth matched reco tracks.\n",event,t_totalconversions,t_conversionsInRange,t_recoMatchedTracks);
-  cout<<Form("For %i events of 8 photons with max 1 truth conversion there are %i total conversions.\n %i in the acceptance rapidity.\n %i truth matched reco tracks and %i reco matched reco tracks.\n",e_events,tE_totalconversions,tE_conversionsInRange,tE_recoMatchedTracks,rE_recoMatchedTracks);
+  cout<<Form("For %i events of 8 photons there are %i total conversions.\n %i in the acceptance rapidity.\n %i truth matched reco tracks.\n",t_events,t_totalconversions,t_conversionsInRange,t_recoMatchedTracks);
+  cout<<Form("For %i events of 8 photons with max 1 truth conversion there are %i total conversions.\n %i in the acceptance rapidity.\n %i truth matched reco tracks and %i reco matched reco photons.\n",e_events,tE_totalconversions,tE_conversionsInRange,tE_recoMatchedTracks,rE_recoMatchedTracks);
 
 
 }

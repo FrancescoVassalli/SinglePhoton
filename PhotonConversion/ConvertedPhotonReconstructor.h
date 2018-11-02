@@ -94,6 +94,9 @@ class ConvertedPhotonReconstructor : public SubsysReco {
 
   private:
     int event;
+	  bool b_doubletrack=true;
+		bool b_goodCharge=true;
+	  bool b_goodR=true;
     std::string hash;
     std::string name;
     TFile *_file;
@@ -105,7 +108,6 @@ class ConvertedPhotonReconstructor : public SubsysReco {
     TLorentzVector *b_truthvec2;
     TVector3       *b_truthVertex;
     TVector3       *b_recoVertex;
-    bool            b_failed;
 
     ReconstructedConvertedPhoton* reconstruct(PHCompositeNode *topNode);
     inline float pToE(TVector3 v, float mass){

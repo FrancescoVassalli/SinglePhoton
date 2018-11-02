@@ -36,7 +36,9 @@ ConvertedPhotonReconstructor::ConvertedPhotonReconstructor(const std::string &na
 	b_truthvec2 = new TLorentzVector();
 	b_truthVertex = new TVector3();
 	b_recoVertex = new  TVector3();
-	_tree->Branch("status",&b_failed);
+	_tree->Branch("charge",&b_goodCharge);
+	_tree->Branch("track",&b_doubletrack);
+	_tree->Branch("radius",&b_goodR);
 	_tree->Branch("hash",&hash);
 	_tree->Branch("reco_tlv1",    "TLorentzVector",  &b_recovec1);
 	_tree->Branch("reco_tlv2",    "TLorentzVector",  &b_recovec2);
@@ -67,7 +69,6 @@ int ConvertedPhotonReconstructor::process_event(PHCompositeNode *topNode) {
 	else{
 	cout<<"no recovery"<<endl;
 	}*/
-	b_failed=true; //default to failure unless all the checks are passed
 
 	std::stringstream ss;
 	ss<<"-"<<event;             //this is where the file number is 
@@ -95,7 +96,6 @@ void ConvertedPhotonReconstructor::process_recoTracks(PHCompositeNode *topNode){
 
 ReconstructedConvertedPhoton* ConvertedPhotonReconstructor::reconstruct(PHCompositeNode *topNode){
 	//let the stack get the info from the node
-
 	SvtxEvalStack *stack = new SvtxEvalStack(topNode);
 	if(!stack){
 		cout<<"Evaluator is null quiting photon recovery\n";
@@ -109,8 +109,6 @@ ReconstructedConvertedPhoton* ConvertedPhotonReconstructor::reconstruct(PHCompos
 	SvtxVertexEval* vertexeval = stack->get_vertex_eval();
 	SvtxTrackEval* trackeval =   stack->get_track_eval();
 	//use the bools to check the event is good
-	bool doubletrack=true;
-	bool goodR=true;
 	if(!vertexeval||!trackeval){
 		cout<<"Evaluator is null quiting photon recovery\n";
 		return nullptr;
@@ -120,7 +118,7 @@ ReconstructedConvertedPhoton* ConvertedPhotonReconstructor::reconstruct(PHCompos
 		SvtxVertex* vertex = iter->second;
 		if(vertex){
 			if(vertex->size_tracks()!=2){
-				doubletrack=false;
+				b_doubletrack=false;
 			}
 			float vx,vy,vz;
 			vx = vertex->get_x();
@@ -129,11 +127,10 @@ ReconstructedConvertedPhoton* ConvertedPhotonReconstructor::reconstruct(PHCompos
 			cout<<"Vertex:"<<vx<<", "<<vy<<", "<<vz<<'\n';
 			//how do we really want to handle low R events?
 			if(sqrt(vx*vx+vy*vy+vz*vz)<1){
-				goodR=false;
+				b_goodR=false;
 			}
-			if (goodR&&doubletrack)
+			if (b_goodR&&b_doubletrack)
 			{
-				bool goodCharge=true;
 				float charge1;
 				SvtxVertex::TrackIter titer = vertex->begin_tracks(); 
 				SvtxTrack* track = trackmap->get(*titer);
@@ -159,11 +156,11 @@ ReconstructedConvertedPhoton* ConvertedPhotonReconstructor::reconstruct(PHCompos
 				//SvtxTrack* ftrack=track;
 				track= trackmap->get(*titer);
 				if(!track){
-					doubletrack=false;
+					b_doubletrack=false;
 				}
 				charge2 = track->get_charge();
 				if(charge1!= -1*charge2){
-					goodCharge=false;
+					b_goodCharge=false;
 				}
 				PHG4Particle* truth2 = trackeval->max_truth_particle_by_nclusters(track); 
 				/*if(!truth2){
@@ -173,9 +170,8 @@ ReconstructedConvertedPhoton* ConvertedPhotonReconstructor::reconstruct(PHCompos
 				t2x = track->get_px();
 				t2y = track->get_py();
 				t2z = track->get_pz();
-				if (goodCharge&&doubletrack)
+				if (b_goodCharge&&b_doubletrack)
 				{
-					b_failed=false;
 					TVector3 track1(t1x,t1y,t1z),track2(t2x,t2y,t2z);
 					PHG4VtxPoint* point = vertexeval->max_truth_point_by_ntracks(vertex); //not entirely sure what this does
 					b_recovec1= new TLorentzVector(track1,pToE(track1,kEmass));
