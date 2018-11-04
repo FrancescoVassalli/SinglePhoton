@@ -101,10 +101,10 @@ void makeHists2(TTree* truthTree, TTree* recoveryTree, const string& outname){
   int rE_goodRadius=0;
   int e_events=0;
 
-  TH1F* h_t_dtrackMatcheddR = new TH1F("TdtrackdR","",100,0,30);
-  TH1F* h_r_dtrackMatcheddR = new TH1F("RdtrackdR","",100,0,30);
-  TH1F* h_r_dgRdR = new TH1F("RdgRdR","",100,0,30);
-  TH1F* h_t_dtrackMatcheddpT = new TH1F("TdtrackdpT","",100,0,30);
+  TH1F* h_r_dtrackMatcheddR = new TH1F("R#frac{dtrack}{dR}","",20,0,30);
+  TH1F* h_r_dgRdR = new TH1F("R#frac{dgR}{dR}","",20,0,30);
+  TH1F* h_t_dtrackMatcheddpT = new TH1F("T#frac{dtrack}{dpT}","",100,0,30);
+  TH1F* h_t_R = new TH1F("TR","",20,0,30);
 
   cout<<"Starting truth loop"<<endl;
   for (int i = 0; i < truthTree->GetEntries(); ++i)
@@ -120,8 +120,11 @@ void makeHists2(TTree* truthTree, TTree* recoveryTree, const string& outname){
       tE_totalconversions+=t_nVtx;
       tE_conversionsInRange+=t_npair;
       tE_recoMatchedTracks+=r_npair;
-      h_t_dtrackMatcheddR->Fill(t_rVtx[0]);
-      h_t_dtrackMatcheddpT->Fill(t_pt[0]+t_pt[1]);
+      if (t_nVtx==1)
+      {
+        h_t_R->Fill(t_rVtx[0]);
+        h_t_dtrackMatcheddpT->Fill(t_pt[0]+t_pt[1]);
+      }
       if(recoMap->GetValue(hash->c_str())){
         RecoData* recodata= static_cast<RecoData*>(recoMap->GetValue(hash->c_str()));
         rE_recoMatchedEvents++;
