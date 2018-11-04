@@ -91,8 +91,8 @@ void onlinePlotter(){
 	TFile *ef = new TFile((name).c_str(),"READ");
 	//track plots 
 	const int kNUM1DPLOTS= 4;
-	string plotNames1d[kNUM1DPLOTS] = {"TdtrackdR","RdtrackdR","RdgRdR",
-		"TdtrackdpT"};
+	string plotNames1d[kNUM1DPLOTS] = {"TR","R#frac{dtrack}{dR}","R#frac{dgR}{dR}",
+		"T#frac{dtrack}{dpT}"};
 	string plotXNames1d[kNUM1DPLOTS] = {"truth R","truth R","truth R","truth #Sigma track pT"};
 
 
@@ -102,9 +102,12 @@ void onlinePlotter(){
 		h1plots[i] = (TH1F*) ef->Get(plotNames1d[i].c_str());
 		string title = plotNames1d[i]+";"+plotXNames1d[i]+";";
 		h1plots[i]->SetTitle(title.c_str());
-		h1plots[i]->Scale(1/h1plots[i]->Integral());
 	} 
 
+	h1plots[1]->Divide(h1plots[0]);
+	h1plots[1]->Scale(1./2);
+	h1plots[2]->Divide(h1plots[0]);
+	cout<<Form("Track Efficency %0.1f \n Good R vertex Efficency %0.1f \n",h1plots[1]->Integral(),h1plots[2]->Integral());
 	plot(&h1plots[0],kNUM1DPLOTS);
 
 	/*
