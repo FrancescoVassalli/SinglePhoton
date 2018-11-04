@@ -36,6 +36,12 @@ public:
   inline string get_hash(){
     return hash;
   }
+  inline int getNtracks(){
+    int r=0;
+    if(recotlv1)r++;
+    if(recotlv2)r++;
+    return r;
+  }
   //need to handle NULL pointer
   inline pair<TLorentzVector,TLorentzVector> getRecoTracks(){
     pair<TLorentzVector,TLorentzVector> r;

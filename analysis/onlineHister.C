@@ -92,14 +92,20 @@ void makeHists2(TTree* truthTree, TTree* recoveryTree, const string& outname){
   int t_conversionsInRange=0;
   int t_recoMatchedTracks=0;
   int t_events=0;
-
   int tE_totalconversions=0;
   int tE_conversionsInRange=0;
   int tE_recoMatchedTracks=0;
   int rE_recoMatchedTracks=0;
+  int rE_recoMatchedEvents=0;
   int rE_chargePairs=0;
   int rE_goodRadius=0;
   int e_events=0;
+
+  TH1F* h_t_dtrackMatcheddR = new TH1F("TdtrackdR","",100,0,30);
+  TH1F* h_r_dtrackMatcheddR = new TH1F("RdtrackdR","",100,0,30);
+  TH1F* h_r_dgRdR = new TH1F("RdgRdR","",100,0,30);
+  TH1F* h_t_dtrackMatcheddpT = new TH1F("TdtrackdpT","",100,0,30);
+
   cout<<"Starting truth loop"<<endl;
   for (int i = 0; i < truthTree->GetEntries(); ++i)
   {
@@ -114,23 +120,32 @@ void makeHists2(TTree* truthTree, TTree* recoveryTree, const string& outname){
       tE_totalconversions+=t_nVtx;
       tE_conversionsInRange+=t_npair;
       tE_recoMatchedTracks+=r_npair;
+      h_t_dtrackMatcheddR->Fill(t_rVtx[0]);
+      h_t_dtrackMatcheddpT->Fill(t_pt[0]+t_pt[1]);
       if(recoMap->GetValue(hash->c_str())){
         RecoData* recodata= static_cast<RecoData*>(recoMap->GetValue(hash->c_str()));
-        if(recodata->get_goodTrack()){
-          rE_recoMatchedTracks+=2;
+        rE_recoMatchedEvents++;
+        int tempTracks=recodata->getNtracks();
+        rE_recoMatchedTracks+=recodata->getNtracks();
+        while(tempTracks>0){
+          h_r_dtrackMatcheddR->Fill(t_rVtx[0]);
+          tempTracks--;
         }
         if(recodata->get_goodCharge()){
           rE_chargePairs++;
         }
         if(recodata->get_goodRadius()){
           rE_goodRadius++;
+          h_r_dgRdR->Fill(t_rVtx[0]);
         }
       }
 
     }
   }
   cout<<Form("For %i events of 8 photons there are %i total conversions.\n %i in the acceptance rapidity.\n %i truth matched reco tracks.\n",t_events,t_totalconversions,t_conversionsInRange,t_recoMatchedTracks);
-  cout<<Form("For %i events of 8 photons with max 1 truth conversion there are %i total conversions.\n %i in the acceptance rapidity.\n %i truth matched reco tracks and %i reco matched reco tracks.\n %i reco charge paired tracks. %i reco vertecies with good R",e_events,tE_totalconversions,tE_conversionsInRange,tE_recoMatchedTracks,rE_recoMatchedTracks,rE_chargePairs,rE_goodRadius);
+  cout<<Form("For %i events of 8 photons with max 1 truth conversion there are %i total conversions.\n %i in the acceptance rapidity.\n %i truth matched reco tracks and %i reco matched events with %i tracks.\n %i reco charge paired tracks. %i reco vertecies with good R",e_events,tE_totalconversions,tE_conversionsInRange,tE_recoMatchedTracks,rE_recoMatchedEvents,rE_recoMatchedTracks,rE_chargePairs,rE_goodRadius);
+outfile->Write();
+outfile->Close();
 }
 
 TChain* handleFile(string name, string extension, string treename, int filecount){
@@ -148,12 +163,12 @@ TChain* handleFile(string name, string extension, string treename, int filecount
 }
 
 void onlineHister(){
-  const string location ="/sphenix/user/vassalli/singlesamples/Photon5/test/";
+  const string location ="/sphenix/user/vassalli/singlesamples/Photon5/";
   string outname = "onlineTrackFile.root";
   string in ="onlineanalysis";
   string reco =".rootrecovered.root";
   string truth =".root";
-  int numFiles=1;
+  int numFiles=100;
   TChain* truthchain=handleFile(location+in,truth,"ttree",numFiles);
   TChain* recochain=handleFile(location+in,reco,  "convertedphotontree",numFiles);
   /*TFile *f_truth = new TFile((location+intruth).c_str(),"READ");
