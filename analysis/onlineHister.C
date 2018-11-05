@@ -103,6 +103,7 @@ void makeHists2(TTree* truthTree, TTree* recoveryTree, const string& outname){
 
   TH1F* h_r_dtrackMatcheddR = new TH1F("R#frac{dtrack}{dR}","",20,0,30);
   TH1F* h_r_dgRdR = new TH1F("R#frac{dgR}{dR}","",20,0,30);
+  TH1F* h_r_dbRdR = new TH1F("R#frac{dbR}{dR}","",20,0,30);
   TH1F* h_t_dtrackMatcheddpT = new TH1F("T#frac{dtrack}{dpT}","",100,0,30);
   TH1F* h_t_R = new TH1F("TR","",20,0,30);
 
@@ -140,6 +141,9 @@ void makeHists2(TTree* truthTree, TTree* recoveryTree, const string& outname){
         if(recodata->get_goodRadius()){
           rE_goodRadius++;
           h_r_dgRdR->Fill(t_rVtx[0]);
+        }
+        else{
+          h_r_dbRdR->Fill(t_rVtx[0]);
         }
       }
 
