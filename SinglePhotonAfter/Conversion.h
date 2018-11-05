@@ -99,18 +99,18 @@ public:
   }
   inline PHG4Particle getElectron(){
     setElectron();
-    return *e1;
+    return PHG4Particle(*e1);
   }
   inline PHG4Particle getPositron(){
     if(setElectron()){
-      return *e2;
+      return PHG4Particle(*e2);
     }
     else{
-      return *e1;
+      return PHG4Particle(*e1);
     }
   }
   inline PHG4Particle getPhoton(){
-    return *photon;
+    return PHG4Particle(*photon);
   }
   /*bool acceptancePair(){
 

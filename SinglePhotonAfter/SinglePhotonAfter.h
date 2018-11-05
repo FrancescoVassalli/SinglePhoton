@@ -43,7 +43,7 @@ class SinglePhotonAfter: public SubsysReco
 
   void numUnique(std::list<int>* l,std::map<int,Conversion>* map,SvtxTrackEval* trackEval);
 
-  const static int kMAXPARticles=8;
+  const static int kMAXParticles=8;
 
   TFile *_f;
   TTree *_tree;
@@ -54,15 +54,15 @@ class SinglePhotonAfter: public SubsysReco
   int _b_nconvert;  //this is how I count how many truth conversions are in my acceptance
   int _b_Tpair; //count acceptance e pairs in truth
   int _b_Rpair; //count acceptance e pairs in reco
-  float _b_rVtx[kMAXPARticles];  //truth radius
-  float _b_electron_pt[kMAXPARticles];
-  float _b_positron_pt[kMAXPARticles];
-  float _b_parent_pt  [kMAXPARticles];
-  float _b_parent_eta [kMAXPARticles];
-  float _b_parent_phi [kMAXPARticles];
+  float _b_rVtx[kMAXParticles];  //truth radius
+  float _b_electron_pt[kMAXParticles];
+  float _b_positron_pt[kMAXParticles];
+  float _b_parent_pt  [kMAXParticles];
+  float _b_parent_eta [kMAXParticles];
+  float _b_parent_phi [kMAXParticles];
 
-  int kTPCRADIUS=21; //in cm there is a way to get this from the simulation I should implment
-  float kRAPIDITYACCEPT=1;
+  const static int kTPCRADIUS=21; //in cm there is a way to get this from the simulation I should implement
+  const static float kRAPIDITYACCEPT=1;
 };
 
 inline int get_embed(PHG4Particle* particle, PHG4TruthInfoContainer* truthinfo){

@@ -109,12 +109,11 @@ void SinglePhotonAfter::numUnique(std::list<int> *l,std::map<int,Conversion> *my
     //make sure the conversions are not double counted 
     if(*i!=last){
       //fill the tree
-      TLorentzVector t;
       PHG4VtxPoint *vtx =(mymap->at(*i)).getVtx();
-      t.SetPxPyPzE(vtx->get_x(),vtx->get_y(),vtx->get_z(),0);
       _b_rVtx[_b_nVtx] = sqrt(vtx->get_x()*vtx->get_x()+vtx->get_y()*vtx->get_y());
       PHG4Particle temp = (mymap->at(*i)).getPhoton();
-      t.SetPxPyPzE(temp.get_px(),temp.get_py(),temp.get_pz(),0);
+      TLorentzVector t;
+      t.SetPxPyPzE(temp.get_px(),temp.get_py(),temp.get_pz(),temp.get_e());
       _b_parent_pt[_b_nVtx]=t.Pt();
       _b_parent_phi[_b_nVtx]=t.Phi();
       _b_parent_eta[_b_nVtx]=t.Eta();
