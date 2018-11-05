@@ -118,7 +118,6 @@ void SinglePhotonAfter::numUnique(std::list<int> *l,std::map<int,Conversion> *my
       _b_parent_phi[_b_nVtx]=t.Phi();
       _b_parent_eta[_b_nVtx]=t.Eta();
       temp=(mymap->at(*i)).getElectron();
-      temp.identify();
       t.SetPxPyPzE(temp->get_px(),temp->get_py(),temp->get_pz(),temp->get_e());
       _b_electron_pt[_b_nVtx]=t.Pt();
       temp=(mymap->at(*i)).getPositron();
