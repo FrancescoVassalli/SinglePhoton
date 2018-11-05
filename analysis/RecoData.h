@@ -42,6 +42,9 @@ public:
     if(recotlv2)r++;
     return r;
   }
+  inline double getrecoR(){
+    return recoVert->XYvector()->Mod();
+  }
   //need to handle NULL pointer
   inline pair<TLorentzVector,TLorentzVector> getRecoTracks(){
     pair<TLorentzVector,TLorentzVector> r;

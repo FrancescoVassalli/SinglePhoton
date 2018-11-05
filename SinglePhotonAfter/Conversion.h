@@ -32,6 +32,30 @@ public:
       e1=e;
     }
   }
+  inline bool setElectron(){
+    if (hasPair())
+    {
+      if (e1->get_pid()<0)
+      {
+        PHG4Particle *temp = e1;
+        e1=e2;
+        e2=e1;
+      }
+      if (e1->get_pid()<0)
+      {
+        std::cout<<"WARNING: bad charges in conversion"<<std::endl;
+        return false;
+      }
+    }
+    else{
+      if (e1->get_pid()<0)
+      {
+        std::cout<<"WARNING: only 1 positron in conversion"<<std::endl;
+        return false;
+      }
+    }
+    return true;
+  }
   inline void setVtx(PHG4VtxPoint* vtx){
     this->vtx=vtx;
   }
@@ -56,6 +80,9 @@ public:
       return false;
     }
   }
+  inline void setParent(PHG4Particle* parent){
+    photon=parent;
+  }
   int setRecoTracks(SvtxTrackEval* trackeval);
 
   inline int recoCount(){
@@ -69,6 +96,21 @@ public:
       r++;
     }
     return r;
+  }
+  inline PHG4Particle getElectron(){
+    setElectron();
+    return *e1;
+  }
+  inline PHG4Particle getPositron(){
+    if(setElectron()){
+      return *e2;
+    }
+    else{
+      return *e1;
+    }
+  }
+  inline PHG4Particle getPhoton(){
+    return *photon;
   }
   /*bool acceptancePair(){
 

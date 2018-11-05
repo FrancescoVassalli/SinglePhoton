@@ -30,28 +30,24 @@ int SinglePhotonAfter::InitRun(PHCompositeNode *topNode)
   _f = new TFile( _foutname.c_str(), "RECREATE");
   _tree = new TTree("ttree","a succulent orange tree");
   //_tree->SetAutoSave(300);
-  _tree->Branch("particle_n", &_b_particle_n);
+  _tree->Branch("event",&_b_event); 
+  _tree->Branch("hash",&_b_hash);
   _tree->Branch("nVtx", &_b_nVtx);
   _tree->Branch("nconvert", &_b_nconvert);
   _tree->Branch("nTpair", &_b_Tpair);
   _tree->Branch("nRpair", &_b_Rpair);
-  _tree->Branch("event",&_b_event); 
-  _tree->Branch("hash",&_b_hash);
-  _tree->Branch("rVtx", _b_rVtx,"rVtx[particle_n]/F");
-  _tree->Branch("particle_pt", _b_particle_pt,"particle_pt[particle_n]/F");
-  _tree->Branch("particle_eta", _b_particle_eta,"particle_eta[particle_n]/F");
-  _tree->Branch("particle_phi", _b_particle_phi,"particle_phi[particle_n]/F");
-  _tree->Branch("particle_id", _b_particle_id,"particle_id[particle_n]/I");
+  _tree->Branch("rVtx", _b_rVtx,"rVtx[nVtx]/F");
+  _tree->Branch("electron_pt", _b_electron_pt,"electron_pt[nVtx]/F");
+  _tree->Branch("positron_pt", _b_positron_pt,"positron_pt[nVtx]/F");
+  _tree->Branch("photon_pt",   _b_parent_pt    ,"photon_pt[nVtx]/F");
+  _tree->Branch("photon_eta",  _b_parent_eta  ,"photon_eta[nVtx]/F");
+  _tree->Branch("photon_phi",  _b_parent_phi  ,"photon_phi[nVtx]/F");
   return 0;
 }
 
 int SinglePhotonAfter::process_event(PHCompositeNode *topNode)
 {
-  _b_particle_n = 0;
-  _b_nVtx = 0;
-  _b_nconvert=0;
-  _b_Tpair=0;
-  _b_Rpair=0;
+  
 
   PHG4TruthInfoContainer* truthinfo = findNode::getClass<PHG4TruthInfoContainer>(topNode,"G4TruthInfo");
   PHG4TruthInfoContainer::Range range = truthinfo->GetParticleRange();
@@ -82,23 +78,9 @@ int SinglePhotonAfter::process_event(PHCompositeNode *topNode)
         vtxList.push_back(vtx->get_id());
         (mapConversions[vtx->get_id()]).setElectron(g4particle);
         (mapConversions[vtx->get_id()]).setVtx(vtx);
+        (mapConversions[vtx->get_id()]).setParent(parent);
       }
       //isPrimary=false;
-    }
-    if (radius<kTPCRADIUS)
-    {
-      //record the particle information 
-      t.SetPxPyPzE( g4particle->get_px(), g4particle->get_py(), g4particle->get_pz(), g4particle->get_e() );
-      float truth_pt = t.Pt();
-      float truth_eta = t.Eta();
-      if (fabs(truth_eta) > 1.1) continue;
-      float truth_phi = t.Phi();
-      _b_rVtx[_b_particle_n] = radius; 
-      _b_particle_id[ _b_particle_n ] = g4particle->get_pid();
-      _b_particle_pt[ _b_particle_n ] = truth_pt;
-      _b_particle_eta[ _b_particle_n ] = truth_eta;
-      _b_particle_phi[ _b_particle_n ] = truth_phi;
-      _b_particle_n++;
     }
   }
   //record event information 
@@ -117,16 +99,29 @@ int SinglePhotonAfter::process_event(PHCompositeNode *topNode)
   return 0;
 }
 
-int SinglePhotonAfter::numUnique(std::list<int> *l,std::map<int,Conversion> *mymap=NULL,SvtxTrackEval* trackeval=NULL){
+void SinglePhotonAfter::numUnique(std::list<int> *l,std::map<int,Conversion> *mymap=NULL,SvtxTrackEval* trackeval=NULL){
   l->sort();
   int last=-1;
-  int r=0;
+  _b_nVtx = 0;
+  _b_nconvert=0;
+  _b_Tpair=0;
+  _b_Rpair=0;
   for (std::list<int>::iterator i = l->begin(); i != l->end(); ++i) {
+    //make sure the conversions are not double counted 
     if(*i!=last){
-      r++;
       TLorentzVector t;
       PHG4VtxPoint *vtx =(mymap->at(*i)).getVtx();
       t.SetXYZM(vtx->get_x(),vtx->get_y(),vtx->get_z(),0);
+      _b_rVtx[nVtx] = sqrt(vtx->get_x()*vtx->get_x()+vtx->get_y()*vtx->get_y());
+      PHG4Particle temp = (mymap->at(*i)).getPhoton();
+      t.SetXYZM(temp->get_px(),temp->get_py(),temp->get_pz(),0);
+      _b_parent_pt[nVtx]=t.Pt();
+      _b_parent_phi[nVtx]=t.Phi();
+      _b_parent_eta[nVtx]=t.Eta();
+      temp=(mymap->at(*i)).getElectron();
+      _b_electron_pt[nVtx]=t.Pt();
+      temp=(mymap->at(*i)).getPositron();
+      _b_positron_pt[nVtx]=t.Pt();
       if (t.Rapidity()<kRAPIDITYACCEPT)
       {
         _b_nconvert++;
@@ -139,12 +134,11 @@ int SinglePhotonAfter::numUnique(std::list<int> *l,std::map<int,Conversion> *mym
             _b_Rpair++;
           }
         }
-
       }
       last=*i;
+      nVtx++; //if conversion is unique record it 
     }
   }
-  return r;
 }
 
 int SinglePhotonAfter::End(PHCompositeNode *topNode)

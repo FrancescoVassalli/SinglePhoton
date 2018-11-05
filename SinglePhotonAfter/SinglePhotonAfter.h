@@ -43,22 +43,23 @@ class SinglePhotonAfter: public SubsysReco
 
   int numUnique(std::list<int>* l,std::map<int,Conversion>* map,SvtxTrackEval* trackEval);
 
+  int kMAXPARticles=8;
+
   TFile *_f;
   TTree *_tree;
   std::string _foutname;
   std::string _b_hash;
-  int _b_particle_n;
-  int _b_nVtx;
+  int _b_event;
+  int _b_nVtx;  //total conversions
+  int _b_nconvert;  //this is how I count how many truth conversions are in my acceptance
   int _b_Tpair; //count acceptance e pairs in truth
   int _b_Rpair; //count acceptance e pairs in reco
-  int _b_nrecotracks; //count acceptance reco tracks 
-  int _b_nconvert;  //this is how I count how many truth conversions are in my acceptance
-  int _b_event;
-  float _b_rVtx[100];
-  float _b_particle_pt[100];
-  float _b_particle_eta[100];
-  int _b_particle_id[100];
-  float _b_particle_phi[100];
+  float _b_rVtx[kMAXPARticles];  //truth radius
+  float _b_electron_pt[kMAXPARticles];
+  float _b_positron_pt[kMAXPARticles];
+  float _b_parent_pt  [kMAXPARticles];
+  float _b_parent_eta [kMAXPARticles];
+  float _b_parent_phi [kMAXPARticles];
 
   int kTPCRADIUS=21; //in cm there is a way to get this from the simulation I should implment
   float kRAPIDITYACCEPT=1;

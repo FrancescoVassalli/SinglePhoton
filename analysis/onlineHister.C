@@ -107,6 +107,8 @@ void makeHists2(TTree* truthTree, TTree* recoveryTree, const string& outname){
   TH1F* h_t_dtrackMatcheddpT = new TH1F("T#frac{dtrack}{dpT}","",100,0,30);
   TH1F* h_t_R = new TH1F("TR","",20,0,30);
 
+  TH2F* h_c_R = new TH2F("RRvTR","",20,0,30,20,0,30);
+
   cout<<"Starting truth loop"<<endl;
   for (int i = 0; i < truthTree->GetEntries(); ++i)
   {
@@ -121,7 +123,9 @@ void makeHists2(TTree* truthTree, TTree* recoveryTree, const string& outname){
       tE_totalconversions+=t_nVtx;
       tE_conversionsInRange+=t_npair;
       tE_recoMatchedTracks+=r_npair;
-      if (t_nVtx==1)
+      if (tE_conversionsInRange>0)
+      {
+        if (t_nVtx==1)
       {
         h_t_R->Fill(t_rVtx[0]);
         h_t_dtrackMatcheddpT->Fill(t_pt[0]+t_pt[1]);
@@ -138,14 +142,17 @@ void makeHists2(TTree* truthTree, TTree* recoveryTree, const string& outname){
         if(recodata->get_goodCharge()){
           rE_chargePairs++;
         }
+        h_c_R->Fill(t_rVtx[0],)
         if(recodata->get_goodRadius()){
           rE_goodRadius++;
-          h_r_dgRdR->Fill(t_rVtx[0]);
+          h_r_dgRdR->Fill(t_rVtx[0],recodata->getrecoR());
         }
         else{
           h_r_dbRdR->Fill(t_rVtx[0]);
         }
       }
+      }
+      
 
     }
   }
