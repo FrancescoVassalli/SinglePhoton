@@ -97,20 +97,20 @@ public:
     }
     return r;
   }
-  inline PHG4Particle getElectron(){
+  inline PHG4Particle* getElectron(){
     setElectron();
-    return PHG4Particle(*e1);
+    return e1;
   }
-  inline PHG4Particle getPositron(){
+  inline PHG4Particle* getPositron(){
     if(setElectron()){
-      return PHG4Particle(*e2);
+      return e2;
     }
     else{
-      return PHG4Particle(*e1);
+      return e1;
     }
   }
-  inline PHG4Particle getPhoton(){
-    return PHG4Particle(*photon);
+  inline PHG4Particle* getPhoton(){
+    return photon;
   }
   /*bool acceptancePair(){
 
