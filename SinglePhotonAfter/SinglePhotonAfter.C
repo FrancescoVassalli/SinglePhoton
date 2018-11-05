@@ -62,7 +62,6 @@ int SinglePhotonAfter::process_event(PHCompositeNode *topNode)
     PHG4Particle* g4particle = iter->second; // You may ask yourself, why second?
     PHG4Particle* parent =truthinfo->GetParticle(g4particle->get_parent_id());
     float radius=0;
-    TLorentzVector t;
     if(!parent){ //if the parent point is null then the particle is primary 
       //checking the embed ID to make sure it is a particle I made need to change the magic literal
       if(get_embed(g4particle,truthinfo)!=2) continue;
@@ -84,7 +83,7 @@ int SinglePhotonAfter::process_event(PHCompositeNode *topNode)
     }
   }
   //record event information 
-  _b_nVtx=numUnique(&vtxList,&mapConversions,trackeval);
+  numUnique(&vtxList,&mapConversions,trackeval);
   //make a hash of the event number and file number 
   std::stringstream ss;
   ss<<"-"<<_b_event;             //this is where the file number is 
@@ -93,7 +92,7 @@ int SinglePhotonAfter::process_event(PHCompositeNode *topNode)
   //currently my reco can only handle single conversion events
 
   _tree->Fill();
-  std::cout<<"Filled "<<_b_particle_n<<" particles"<<std::endl;
+  std::cout<<"Filled "<<_b_nVtx<<" vertices"<<std::endl;
   _b_event++;
   delete stack;
   return 0;
@@ -109,19 +108,22 @@ void SinglePhotonAfter::numUnique(std::list<int> *l,std::map<int,Conversion> *my
   for (std::list<int>::iterator i = l->begin(); i != l->end(); ++i) {
     //make sure the conversions are not double counted 
     if(*i!=last){
+      //fill the tree
       TLorentzVector t;
       PHG4VtxPoint *vtx =(mymap->at(*i)).getVtx();
-      t.SetXYZM(vtx->get_x(),vtx->get_y(),vtx->get_z(),0);
-      _b_rVtx[nVtx] = sqrt(vtx->get_x()*vtx->get_x()+vtx->get_y()*vtx->get_y());
+      t.SetPxPyPzE(vtx->get_x(),vtx->get_y(),vtx->get_z(),0);
+      _b_rVtx[_b_nVtx] = sqrt(vtx->get_x()*vtx->get_x()+vtx->get_y()*vtx->get_y());
       PHG4Particle temp = (mymap->at(*i)).getPhoton();
-      t.SetXYZM(temp->get_px(),temp->get_py(),temp->get_pz(),0);
-      _b_parent_pt[nVtx]=t.Pt();
-      _b_parent_phi[nVtx]=t.Phi();
-      _b_parent_eta[nVtx]=t.Eta();
+      t.SetPxPyPzE(temp.get_px(),temp.get_py(),temp.get_pz(),0);
+      _b_parent_pt[_b_nVtx]=t.Pt();
+      _b_parent_phi[_b_nVtx]=t.Phi();
+      _b_parent_eta[_b_nVtx]=t.Eta();
       temp=(mymap->at(*i)).getElectron();
-      _b_electron_pt[nVtx]=t.Pt();
+      t.SetPxPyPzE(temp.get_px(),temp.get_py(),temp.get_pz(),temp.get_e());
+      _b_electron_pt[_b_nVtx]=t.Pt();
       temp=(mymap->at(*i)).getPositron();
-      _b_positron_pt[nVtx]=t.Pt();
+      t.SetPxPyPzE(temp.get_px(),temp.get_py(),temp.get_pz(),temp.get_e());
+      _b_positron_pt[_b_nVtx]=t.Pt();
       if (t.Rapidity()<kRAPIDITYACCEPT)
       {
         _b_nconvert++;
@@ -136,7 +138,7 @@ void SinglePhotonAfter::numUnique(std::list<int> *l,std::map<int,Conversion> *my
         }
       }
       last=*i;
-      nVtx++; //if conversion is unique record it 
+      _b_nVtx++; //if conversion is unique record it 
     }
   }
 }

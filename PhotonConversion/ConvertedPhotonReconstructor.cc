@@ -174,6 +174,7 @@ ReconstructedConvertedPhoton* ConvertedPhotonReconstructor::reconstruct(PHCompos
 				{
 					TVector3 track1(t1x,t1y,t1z),track2(t2x,t2y,t2z);
 					PHG4VtxPoint* point = vertexeval->max_truth_point_by_ntracks(vertex); //not entirely sure what this does
+          //double check these give the right values 
 					b_recovec1= new TLorentzVector(track1,pToE(track1,kEmass));
 					b_recovec2= new TLorentzVector(track2,pToE(track2,kEmass)); 
 					b_recoVertex= new TVector3(vx,vy,vz);

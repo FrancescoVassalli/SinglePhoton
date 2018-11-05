@@ -41,9 +41,9 @@ class SinglePhotonAfter: public SubsysReco
     return sqrt( pow( deta, 2 ) + pow( dphi, 2 ) );
   }
 
-  int numUnique(std::list<int>* l,std::map<int,Conversion>* map,SvtxTrackEval* trackEval);
+  void numUnique(std::list<int>* l,std::map<int,Conversion>* map,SvtxTrackEval* trackEval);
 
-  int kMAXPARticles=8;
+  const static int kMAXPARticles=8;
 
   TFile *_f;
   TTree *_tree;

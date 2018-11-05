@@ -39,7 +39,7 @@ public:
       {
         PHG4Particle *temp = e1;
         e1=e2;
-        e2=e1;
+        e2=temp;
       }
       if (e1->get_pid()<0)
       {
