@@ -42,7 +42,7 @@ public:
     if(recotlv2)r++;
     return r;
   }
-  inline double getrecoR(){
+  inline double getRecoR(){
     return recoVert->XYvector().Mod();
   }
   //need to handle NULL pointer

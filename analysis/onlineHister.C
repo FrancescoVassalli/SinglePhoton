@@ -72,7 +72,7 @@ void makeHists2(TTree* truthTree, TTree* recoveryTree, const string& outname){
 
   TMap* recoMap = makeRecoMap(recoveryTree);
 
-  int t_nparticle,t_nVtx,t_nconvert,t_npair,r_npair,event;
+  int t_nVtx,t_nconvert,t_npair,r_npair,event;
   string *hash = new string();
   const int kMAXPHOTNS=8;
   float t_rVtx[kMAXPHOTNS], t_photon_pt[kMAXPHOTNS],t_photon_eta[kMAXPHOTNS],t_photon_phi[kMAXPHOTNS],
@@ -81,7 +81,6 @@ void makeHists2(TTree* truthTree, TTree* recoveryTree, const string& outname){
   truthTree->SetBranchAddress("event",&event);
   truthTree->SetBranchAddress("hash",&hash);
   truthTree->SetBranchAddress("nVtx",&t_nVtx);
-  truthTree->SetBranchAddress("particle_n",&t_nparticle);
   truthTree->SetBranchAddress("nconvert",&t_nconvert);
   truthTree->SetBranchAddress("nTpair",&t_npair);
   truthTree->SetBranchAddress("nRpair",&r_npair);
@@ -146,10 +145,10 @@ void makeHists2(TTree* truthTree, TTree* recoveryTree, const string& outname){
         if(recodata->get_goodCharge()){
           rE_chargePairs++;
         }
-        h_c_R->Fill(t_rVtx[0]);
+        h_c_R->Fill(t_rVtx[0],recodata->getRecoR());
         if(recodata->get_goodRadius()){
           rE_goodRadius++;
-          h_r_dgRdR->Fill(t_rVtx[0],recodata->getrecoR());
+          h_r_dgRdR->Fill(t_rVtx[0],recodata->getRecoR());
         }
         else{
           h_r_dbRdR->Fill(t_rVtx[0]);
