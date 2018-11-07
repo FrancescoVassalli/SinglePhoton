@@ -130,7 +130,7 @@ void makeHists2(TTree* truthTree, TTree* recoveryTree, const string& outname){
 			tE_recoMatchedTracks+=r_npair;
 			if (tE_conversionsInRange>0)
 			{
-				if (t_nVtx==1)
+				if (t_npair==1)
 				{
 					h_t_R->Fill(t_rVtx[0]);
 					h_t_dtrackMatcheddpT->Fill(t_photon_pt[0]);
