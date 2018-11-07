@@ -107,6 +107,8 @@ void makeHists2(TTree* truthTree, TTree* recoveryTree, const string& outname){
 	TH1F* h_r_dtrackMatcheddR = new TH1F("R#frac{dtrack}{dR}","",20,0,30);
 	TH1F* h_r_dgRdR = new TH1F("R#frac{dgR}{dR}","",20,0,30);
 	TH1F* h_r_dbRdR = new TH1F("R#frac{dbR}{dR}","",20,0,30);
+	TH1F* h_t_dgRdR = new TH1F("T#frac{dgR}{dR}","",20,0,30);
+	TH1F* h_t_dbRdR = new TH1F("T#frac{dbR}{dR}","",20,0,30);
 	TH1F* h_t_dtrackMatcheddpT = new TH1F("T#frac{dtrack}{dpT}","",100,0,30);
 	TH1F* h_t_R = new TH1F("TR","",20,0,30);
 
@@ -132,26 +134,28 @@ void makeHists2(TTree* truthTree, TTree* recoveryTree, const string& outname){
 				{
 					h_t_R->Fill(t_rVtx[0]);
 					h_t_dtrackMatcheddpT->Fill(t_photon_pt[0]);
-				}
-				if(recoMap->GetValue(hash->c_str())){
-					RecoData* recodata= static_cast<RecoData*>(recoMap->GetValue(hash->c_str()));
-					rE_recoMatchedEvents++;
-					int tempTracks=recodata->getNtracks();
-					rE_recoMatchedTracks+=recodata->getNtracks();
-					while(tempTracks>0){
-						h_r_dtrackMatcheddR->Fill(t_rVtx[0]);
-						tempTracks--;
-					}
-					if(recodata->get_goodCharge()){
-						rE_chargePairs++;
-					}
-					h_c_R->Fill(t_rVtx[0],recodata->getRecoR());
-					if(recodata->get_goodRadius()){
-						rE_goodRadius++;
-						h_r_dgRdR->Fill(t_rVtx[0]);
-					}
-					else{
-						h_r_dbRdR->Fill(t_rVtx[0]);
+
+					if(recoMap->GetValue(hash->c_str())){
+						RecoData* recodata= static_cast<RecoData*>(recoMap->GetValue(hash->c_str()));
+						rE_recoMatchedEvents++;
+						int tempTracks=recodata->getNtracks();
+						rE_recoMatchedTracks+=recodata->getNtracks();
+						while(tempTracks>0){
+							h_r_dtrackMatcheddR->Fill(t_rVtx[0]);
+							tempTracks--;
+						}
+						if(recodata->get_goodCharge()){
+							rE_chargePairs++;
+						}
+						h_c_R->Fill(t_rVtx[0],recodata->getRecoR());
+						if(recodata->get_goodRadius()){
+							rE_goodRadius++;
+							h_r_dgRdR->Fill(recodata->getRecoR());
+							h_t_dgRdR->Fill(t_rVtx[0]);
+						}
+						else{
+							h_r_dbRdR->Fill(recodata->getRecoR());
+						}
 					}
 				}
 			}
