@@ -1,5 +1,6 @@
 *.root
 */.DS_Store
+.DS_Store
 *.xml
 AutoDict*
 *.zip
