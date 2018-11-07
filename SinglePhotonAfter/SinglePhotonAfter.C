@@ -111,17 +111,17 @@ void SinglePhotonAfter::numUnique(std::list<int> *l,std::map<int,Conversion> *my
       //fill the tree
       PHG4VtxPoint *vtx =(mymap->at(*i)).getVtx();
       _b_rVtx[_b_nVtx] = sqrt(vtx->get_x()*vtx->get_x()+vtx->get_y()*vtx->get_y());
-      PHG4Particle temp = (mymap->at(*i)).getPhoton();
+      PHG4Particle *temp = (mymap->at(*i)).getPhoton();
       TLorentzVector t;
-      t.SetPxPyPzE(temp.get_px(),temp.get_py(),temp.get_pz(),temp.get_e());
+      t.SetPxPyPzE(temp->get_px(),temp->get_py(),temp->get_pz(),temp->get_e());
       _b_parent_pt[_b_nVtx]=t.Pt();
       _b_parent_phi[_b_nVtx]=t.Phi();
       _b_parent_eta[_b_nVtx]=t.Eta();
       temp=(mymap->at(*i)).getElectron();
-      t.SetPxPyPzE(temp.get_px(),temp.get_py(),temp.get_pz(),temp.get_e());
+      t.SetPxPyPzE(temp->get_px(),temp->get_py(),temp->get_pz(),temp->get_e());
       _b_electron_pt[_b_nVtx]=t.Pt();
       temp=(mymap->at(*i)).getPositron();
-      t.SetPxPyPzE(temp.get_px(),temp.get_py(),temp.get_pz(),temp.get_e());
+      t.SetPxPyPzE(temp->get_px(),temp->get_py(),temp->get_pz(),temp->get_e());
       _b_positron_pt[_b_nVtx]=t.Pt();
       if (t.Rapidity()<kRAPIDITYACCEPT)
       {

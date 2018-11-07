@@ -62,7 +62,7 @@ class SinglePhotonAfter: public SubsysReco
   float _b_parent_phi [kMAXParticles];
 
   const static int kTPCRADIUS=21; //in cm there is a way to get this from the simulation I should implement
-  const static float kRAPIDITYACCEPT=1;
+  float kRAPIDITYACCEPT=1;
 };
 
 inline int get_embed(PHG4Particle* particle, PHG4TruthInfoContainer* truthinfo){
