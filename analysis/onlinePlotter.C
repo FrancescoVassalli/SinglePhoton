@@ -36,7 +36,7 @@ void plot(TH1F* plot,string x){
 	axisTitles(plot,x.c_str(),"");
 	plot->Draw();
 }
-void plot(TH1F* plot){
+void plot(TH1* plot){
 	TCanvas* tc = new TCanvas(getNextPlotName(&plotcount).c_str());
 	fixOffset(plot);
 	plot->Draw();
@@ -111,18 +111,17 @@ void onlinePlotter(){
 	cout<<Form("Track Efficency %0.1f \n Good R vertex Efficency %0.1f \n",h1plots[1]->Integral(),h1plots[2]->Integral());
 	plot(&h1plots[0],kNUM1DPLOTS);
 
-	/*
-		 const int kNUM2DPLOTS= 0;
-		 TH2F* h2plots[kNUM2DPLOTS];
-		 string plotNames2d[kNUM2DPLOTS] = {"ranglespace","tresR","tresZ",
-		 "truthconZdepend","recoconZdepend","tpXY","rpXY"};
-		 string plotNamesX2d[kNUM2DPLOTS] = {"truth-reco #Delta#eta","truth R",
-		 "truth z","truth z","reco z","truth x","reco x"};
-		 string plotNamesY2d[kNUM2DPLOTS] = {"truth-reco #Delta#phi","pT track response",
-		 "pT track response","truth R", "reco R","truth y","reco y"};
-		 for (int j = 0; j < kNUM2DPLOTS; ++j)
-		 {
-		 h2plots[j] = (TH2F*) ef->Get(plotNames2d[j].c_str());
-		 }
-		 plot(&h2plots[0],kNUM2DPLOTS,plotNamesX2d,plotNamesY2d);*/
+
+	const int kNUM2DPLOTS= 1;
+	TH2F* h2plots[kNUM2DPLOTS];
+	string plotNames2d[kNUM2DPLOTS] = {"RRvTR"};
+	string plotNamesX2d[kNUM2DPLOTS] = {"truth radius"};
+	string plotNamesY2d[kNUM2DPLOTS] = {"reco radius"};
+	for (int j = 0; j < kNUM2DPLOTS; ++j)
+	{
+		h2plots[j] = (TH2F*) ef->Get(plotNames2d[j].c_str());
+		string title = plotNames2d[j]+";"+plotNamesX2d[j]+";"+plotNamesY2d[j];
+		h2plots[j]->SetTitle(title.c_str());
+		plot(h2plots[j]);
+	}
 }
