@@ -43,7 +43,7 @@ public:
     return r;
   }
   inline double getrecoR(){
-    return recoVert->XYvector()->Mod();
+    return recoVert->XYvector().Mod();
   }
   //need to handle NULL pointer
   inline pair<TLorentzVector,TLorentzVector> getRecoTracks(){

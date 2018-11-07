@@ -76,7 +76,7 @@ void makeHists2(TTree* truthTree, TTree* recoveryTree, const string& outname){
   string *hash = new string();
   const int kMAXPHOTNS=8;
   float t_rVtx[kMAXPHOTNS], t_photon_pt[kMAXPHOTNS],t_photon_eta[kMAXPHOTNS],t_photon_phi[kMAXPHOTNS],
-    t_electron_pt[kMAXPHOTNS,t_positron_pt[kMAXPHOTNS];
+    t_electron_pt[kMAXPHOTNS],t_positron_pt[kMAXPHOTNS];
 
   truthTree->SetBranchAddress("event",&event);
   truthTree->SetBranchAddress("hash",&hash);
@@ -146,7 +146,7 @@ void makeHists2(TTree* truthTree, TTree* recoveryTree, const string& outname){
         if(recodata->get_goodCharge()){
           rE_chargePairs++;
         }
-        h_c_R->Fill(t_rVtx[0],)
+        h_c_R->Fill(t_rVtx[0]);
         if(recodata->get_goodRadius()){
           rE_goodRadius++;
           h_r_dgRdR->Fill(t_rVtx[0],recodata->getrecoR());
