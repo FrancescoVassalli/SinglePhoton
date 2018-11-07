@@ -74,19 +74,23 @@ void makeHists2(TTree* truthTree, TTree* recoveryTree, const string& outname){
 
   int t_nparticle,t_nVtx,t_nconvert,t_npair,r_npair,event;
   string *hash = new string();
-  float t_rVtx[24], t_pt[24],t_eta[24],t_phi[24],t_id[24];
+  const int kMAXPHOTNS=8;
+  float t_rVtx[kMAXPHOTNS], t_photon_pt[kMAXPHOTNS],t_photon_eta[kMAXPHOTNS],t_photon_phi[kMAXPHOTNS],
+    t_electron_pt[kMAXPHOTNS,t_positron_pt[kMAXPHOTNS];
 
-  truthTree->SetBranchAddress("particle_n",&t_nparticle);
+  truthTree->SetBranchAddress("event",&event);
+  truthTree->SetBranchAddress("hash",&hash);
   truthTree->SetBranchAddress("nVtx",&t_nVtx);
+  truthTree->SetBranchAddress("particle_n",&t_nparticle);
   truthTree->SetBranchAddress("nconvert",&t_nconvert);
   truthTree->SetBranchAddress("nTpair",&t_npair);
   truthTree->SetBranchAddress("nRpair",&r_npair);
-  truthTree->SetBranchAddress("event",&event);
-  truthTree->SetBranchAddress("hash",&hash);
   truthTree->SetBranchAddress("rVtx",&t_rVtx);
-  truthTree->SetBranchAddress("particle_pt",&t_pt);
-  truthTree->SetBranchAddress("particle_eta",&t_eta);
-  truthTree->SetBranchAddress("particle_phi",&t_phi);
+  truthTree->SetBranchAddress("electron_pt",&t_electron_pt);
+  truthTree->SetBranchAddress("positron_pt",&t_positron_pt);
+  truthTree->SetBranchAddress("photon_pt",&t_photon_pt);
+  truthTree->SetBranchAddress("photon_eta",&t_photon_eta);
+  truthTree->SetBranchAddress("photon_phi",&t_photon_phi);
 
   int t_totalconversions=0;
   int t_conversionsInRange=0;
@@ -128,7 +132,7 @@ void makeHists2(TTree* truthTree, TTree* recoveryTree, const string& outname){
         if (t_nVtx==1)
       {
         h_t_R->Fill(t_rVtx[0]);
-        h_t_dtrackMatcheddpT->Fill(t_pt[0]+t_pt[1]);
+        h_t_dtrackMatcheddpT->Fill(t_photon_pt[0]);
       }
       if(recoMap->GetValue(hash->c_str())){
         RecoData* recodata= static_cast<RecoData*>(recoMap->GetValue(hash->c_str()));
