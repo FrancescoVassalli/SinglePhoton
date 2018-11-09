@@ -59,7 +59,7 @@ int ConvertedPhotonReconstructor::InitRun(PHCompositeNode *topNode) {
 int ConvertedPhotonReconstructor::process_event(PHCompositeNode *topNode) {
 	/*if (((verbosity > 0)&&(event%100==0))) {  
 		cout << "ConvertedPhotonReconstructor::process_event - Event = " << event << endl;
-	}*/
+		}*/
 	//  ReconstructedConvertedPhoton* recovered=reconstruct(topNode);
 	/*if(recovered){
 		cout<<"recovered"<<endl;
@@ -72,7 +72,7 @@ int ConvertedPhotonReconstructor::process_event(PHCompositeNode *topNode) {
 
 	std::stringstream ss;
 	ss<<"-"<<event;             //this is where the file number is 
-  hash=name.substr(name.length()-24,5)+ss.str();
+	hash=name.substr(name.length()-24,5)+ss.str();
 	reconstruct(topNode);
 	event++;
 	cout<<"return event::ok"<<endl;
@@ -116,92 +116,59 @@ ReconstructedConvertedPhoton* ConvertedPhotonReconstructor::reconstruct(PHCompos
 	cout<<"In reconstruct num vertex="<<vertexmap->size()<<'\n';
 	for (SvtxVertexMap::Iter iter = vertexmap->begin(); iter != vertexmap->end(); ++iter) {
 		SvtxVertex* vertex = iter->second;
-		if(vertex){
-			if(vertex->size_tracks()!=2){
-				b_doubletrack=false;
+		//only take 2 track events
+		if(vertex&&vertex->size_tracks()==2){
+			SvtxVertex::TrackIter titer = vertex->begin_tracks(); 
+			SvtxTrack* track1 = trackmap->get(*titer);
+			PHG4Particle* truth1 = trackeval->max_truth_particle_by_nclusters(track); 
+			++titer;
+			SvtxTrack* track2= trackmap->get(*titer);
+			PHG4Particle* truth2 = trackeval->max_truth_particle_by_nclusters(track);
+			//both the truth particles must come from the same vertex 
+			if (!truth1||!truth2||truth1->get_vtx_id()!=truth2->get_vtx_id())
+			{
+				cout<<"Skipping photon recovery tracks do not match \n";
+				continue;
 			}
+			//record the vertex position
 			float vx,vy,vz;
 			vx = vertex->get_x();
 			vy = vertex->get_y();
 			vz = vertex->get_z();
 			cout<<"Vertex:"<<vx<<", "<<vy<<", "<<vz<<'\n';
-			//how do we really want to handle low R events?
-			if(sqrt(vx*vx+vy*vy+vz*vz)<1){
-				b_goodR=false;
+			//not sure what I want to do with these charges
+			float charge1 = track->get_charge();
+			if(abs(charge1)!=1){
+				cout<<"Quiting photon recovery due to charge="<<charge1<<'\n';
+				continue; //only considering electron positron conversion 
 			}
-			if (b_goodR&&b_doubletrack)
-			{
-				float charge1;
-				SvtxVertex::TrackIter titer = vertex->begin_tracks(); 
-				SvtxTrack* track = trackmap->get(*titer);
-				if(!track){
-					cout<<"null track quting photon recovery\n";
-					continue;
-				}
-				charge1 = track->get_charge();
-				if(abs(charge1)!=1){
-					cout<<"Quiting photon recovery due to charge="<<charge1<<'\n';
-					continue; //only considering electron positron conversion 
-				}
-				float t1x,t1y,t1z,t2x,t2y,t2z,charge2;
-				t1x = track->get_px();
-				t1y = track->get_py();
-				t1z = track->get_pz();
-				PHG4Particle* truth1 = trackeval->max_truth_particle_by_nclusters(track); 
-				/*if(!truth1){
-					cout<<"truth1 is null quting photon recovery \n";
-					continue;
-					}*/
-				++titer;
-				//SvtxTrack* ftrack=track;
-				track= trackmap->get(*titer);
-				if(!track){
-					b_doubletrack=false;
-				}
-				charge2 = track->get_charge();
-				if(charge1!= -1*charge2){
-					b_goodCharge=false;
-				}
-				PHG4Particle* truth2 = trackeval->max_truth_particle_by_nclusters(track); 
-				/*if(!truth2){
-					
-				}*/
-
-				t2x = track->get_px();
-				t2y = track->get_py();
-				t2z = track->get_pz();
-				if (b_goodCharge&&b_doubletrack)
-				{
-					TVector3 track1(t1x,t1y,t1z),track2(t2x,t2y,t2z);
-					PHG4VtxPoint* point = vertexeval->max_truth_point_by_ntracks(vertex); //not entirely sure what this does
-          //double check these give the right values 
-					b_recovec1= new TLorentzVector(track1,pToE(track1,kEmass));
-					b_recovec2= new TLorentzVector(track2,pToE(track2,kEmass)); 
-					b_recoVertex= new TVector3(vx,vy,vz);
-					if (truth1&&truth2)
-					{
-						TVector3 tTrack1(truth1->get_px(),truth1->get_py(),truth1->get_pz()),
-									 tTrack2(truth2->get_px(),truth2->get_py(),truth2->get_pz());
-						b_truthVertex= new TVector3(point->get_x(),point->get_y(),point->get_z());
-						b_truthvec1= new TLorentzVector(tTrack1,pToE(tTrack1,kEmass));
-						b_truthvec2= new TLorentzVector( tTrack2,pToE(tTrack2,kEmass));
-					}
-					else{
-						b_truthvec1=NULL; //the tree might not allow you to write nulls not sure this is legal
-            b_truthvec1=NULL;
-					}
-				}
+			//record the track momentum and charge
+			float t1x,t1y,t1z,t2x,t2y,t2z,charge2;
+			t1x = track1->get_px();
+			t1y = track1->get_py();
+			t1z = track1->get_pz();
+			charge2 = track->get_charge();
+			if(charge1!= -1*charge2){
+				b_goodCharge=false;
 			}
+			t2x = track2->get_px();
+			t2y = track2->get_py();
+			t2z = track2->get_pz();
+			//convert to TObjects
+			TVector3 track1(t1x,t1y,t1z),track2(t2x,t2y,t2z);
+			PHG4VtxPoint* point = vertexeval->max_truth_point_by_ntracks(vertex); //not entirely sure what this does
+			//double check these give the right values 
+			b_recovec1= new TLorentzVector(track1,pToE(track1,kEmass));
+			b_recovec2= new TLorentzVector(track2,pToE(track2,kEmass)); 
+			b_recoVertex= new TVector3(vx,vy,vz);
+			TVector3 tTrack1(truth1->get_px(),truth1->get_py(),truth1->get_pz()),
+							 tTrack2(truth2->get_px(),truth2->get_py(),truth2->get_pz());
+			b_truthVertex= new TVector3(point->get_x(),point->get_y(),point->get_z());
+			b_truthvec1= new TLorentzVector(tTrack1,pToE(tTrack1,kEmass));
+			b_truthvec2= new TLorentzVector( tTrack2,pToE(tTrack2,kEmass));
+			_tree->Fill();
 		}
-		_tree->Fill();
-		delete stack;
-		//return new ReconstructedConvertedPhoton(event,*b_recovec,*b_recoVertex,*b_truthvec,*b_truthVertex,ftrack,track,clustermap);
-
-		// add the vector to the node tree 
-		/* PHDataNode<std::vector<ReconstructedConvertedPhoton>>* vecNode = 
-			 new PHDataNode<std::vector<ReconstructedConvertedPhoton>>(
-			 reconstructedConvertedPhotons,"ReconstructedConvertedPhotons");
-			 topNode->addNode(vecNode);*/
 	}
+	delete stack;
 	return nullptr;
 }
