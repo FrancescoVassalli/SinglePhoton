@@ -46,9 +46,7 @@ TMap* makeRecoMap(TTree* recoveryTree){
 	TLorentzVector  *truthtlv2= new TLorentzVector();
 	TVector3 *recoVert= new TVector3();
 	TVector3 *truthVert= new TVector3();
-	recoveryTree->SetBranchAddress("radius",&radius);
 	recoveryTree->SetBranchAddress("charge",&charge);
-	recoveryTree->SetBranchAddress("track",&tracks);
 	recoveryTree->SetBranchAddress("hash", &hash);
 	recoveryTree->SetBranchAddress("reco_tlv1",    &recotlv1 );
 	recoveryTree->SetBranchAddress("truth_tlv1",   &truthtlv1 );
@@ -61,7 +59,7 @@ TMap* makeRecoMap(TTree* recoveryTree){
 	{
 		recoveryTree->GetEntry(i);
 		TNamed *key=new TNamed(hash->c_str(),hash->c_str());
-		RecoData *value=new RecoData(radius,charge,tracks,*hash,recotlv1,recotlv2,truthtlv1,truthtlv2,recoVert,truthVert);
+		RecoData *value=new RecoData(charge,*hash,recotlv1,recotlv2,truthtlv1,truthtlv2,recoVert,truthVert);
 		recoMap->Add(key,value);
 	}
 	return recoMap;
@@ -122,51 +120,33 @@ void makeHists2(TTree* truthTree, TTree* recoveryTree, const string& outname){
 		t_conversionsInRange+=t_npair;
 		t_recoMatchedTracks+=r_npair;
 		t_events++;
-		if (t_nVtx<2)
+		if (tE_conversionsInRange>0&&t_npair==1)
 		{
 			e_events++;
 			tE_totalconversions+=t_nVtx;
 			tE_conversionsInRange+=t_npair;
 			tE_recoMatchedTracks+=r_npair;
-			if (tE_conversionsInRange>0)
-			{
-				if (t_npair==1)
-				{
-					h_t_R->Fill(t_rVtx[0]);
-					h_t_dtrackMatcheddpT->Fill(t_photon_pt[0]);
-
-					if(recoMap->GetValue(hash->c_str())){
-						RecoData* recodata= static_cast<RecoData*>(recoMap->GetValue(hash->c_str()));
-						rE_recoMatchedEvents++;
-						int tempTracks=recodata->getNtracks();
-						rE_recoMatchedTracks+=recodata->getNtracks();
-						while(tempTracks>0){
-							h_r_dtrackMatcheddR->Fill(t_rVtx[0]);
-							tempTracks--;
-						}
-						if(recodata->get_goodCharge()){
-							rE_chargePairs++;
-						}
-						h_c_R->Fill(t_rVtx[0],recodata->getRecoR());
-						if(recodata->get_goodRadius()){
-							rE_goodRadius++;
-							h_r_dgRdR->Fill(recodata->getRecoR());
-							h_t_dgRdR->Fill(t_rVtx[0]);
-						}
-						else{
-							h_r_dbRdR->Fill(recodata->getRecoR());
-						}
-					}
+			h_t_R->Fill(t_rVtx[0]);
+			if(recoMap->GetValue(hash->c_str())){
+				RecoData* recodata= static_cast<RecoData*>(recoMap->GetValue(hash->c_str()));
+				rE_recoMatchedEvents++;
+				//need to seperate into silicone vs no silicone here
+				h_r_dtrackMatcheddR->Fill(t_rVtx[0]);
+				if(recodata->get_goodCharge()){
+					rE_chargePairs++;
 				}
+				h_c_R->Fill(t_rVtx[0],recodata->getRecoR());
+
 			}
-
-
 		}
+
+
 	}
-	cout<<Form("For %i events of 8 photons there are %i total conversions.\n %i in the acceptance rapidity.\n %i truth matched reco tracks.\n",t_events,t_totalconversions,t_conversionsInRange,t_recoMatchedTracks);
-	cout<<Form("For %i events of 8 photons with max 1 truth conversion there are %i total conversions.\n %i in the acceptance rapidity.\n %i truth matched reco tracks and %i reco matched events with %i tracks.\n %i reco charge paired events. %i reco vertecies with good R",e_events,tE_totalconversions,tE_conversionsInRange,tE_recoMatchedTracks,rE_recoMatchedEvents,rE_recoMatchedTracks,rE_chargePairs,rE_goodRadius);
-	outfile->Write();
-	outfile->Close();
+}
+cout<<Form("For %i events of 8 photons there are %i total conversions.\n %i in the acceptance rapidity.\n %i truth matched reco tracks.\n",t_events,t_totalconversions,t_conversionsInRange,t_recoMatchedTracks);
+cout<<Form("For %i events of 8 photons with max 1 truth conversion there are %i total conversions.\n %i in the acceptance rapidity.\n %i truth matched reco tracks and %i reco matched events with %i tracks.\n %i reco charge paired events. %i reco vertecies with good R",e_events,tE_totalconversions,tE_conversionsInRange,tE_recoMatchedTracks,rE_recoMatchedEvents,rE_recoMatchedTracks,rE_chargePairs,rE_goodRadius);
+outfile->Write();
+outfile->Close();
 }
 
 TChain* handleFile(string name, string extension, string treename, int filecount){

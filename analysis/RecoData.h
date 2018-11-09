@@ -11,7 +11,7 @@ public:
     recoPhoton = new TLorentzVector();
     recoPhoton = new TLorentzVector();
   }
-  RecoData(bool radius,bool charge, bool track,string hash, TLorentzVector* recotlv1,
+  RecoData(bool charge, string hash, TLorentzVector* recotlv1,
    TLorentzVector *recotlv2,TLorentzVector *truthtlv1,TLorentzVector *truthtlv2,
    TVector3* recoVert,TVector3* truthVert):gcharge(charge),gtrack(track),gradius(radius), hash(hash),recotlv1(recotlv1),
    recotlv2(recotlv2),truthtlv1(truthtlv1),truthtlv2(truthtlv2),recoVert(recoVert),truthVert(truthVert){
@@ -23,12 +23,6 @@ public:
   ~RecoData(){
     delete recoPhoton;
     delete truthPhoton;
-  }
-  inline bool get_goodRadius(){
-    return gradius;
-  }
-  inline bool get_goodTrack(){
-    return gtrack;
   }
   inline bool get_goodCharge(){
     return gcharge;
@@ -77,9 +71,7 @@ public:
   }
 
 private:
-  bool gradius;
   bool gcharge;
-  bool gtrack;
   string hash;
   TLorentzVector *recotlv1, *recotlv2,*truthtlv1,*truthtlv2,*recoPhoton,*truthPhoton;
   TVector3 *truthVert, *recoVert;
