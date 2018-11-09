@@ -13,7 +13,7 @@ public:
   }
   RecoData(bool charge, string hash, TLorentzVector* recotlv1,
    TLorentzVector *recotlv2,TLorentzVector *truthtlv1,TLorentzVector *truthtlv2,
-   TVector3* recoVert,TVector3* truthVert):gcharge(charge),gtrack(track),gradius(radius), hash(hash),recotlv1(recotlv1),
+   TVector3* recoVert,TVector3* truthVert):gcharge(charge),hash(hash),recotlv1(recotlv1),
    recotlv2(recotlv2),truthtlv1(truthtlv1),truthtlv2(truthtlv2),recoVert(recoVert),truthVert(truthVert){
     recoPhoton = new TLorentzVector();
     truthPhoton = new TLorentzVector();
@@ -24,10 +24,10 @@ public:
     delete recoPhoton;
     delete truthPhoton;
   }
-  inline bool get_goodCharge(){
+  inline bool getGoodCharge(){
     return gcharge;
   }
-  inline string get_hash(){
+  inline string getHash(){
     return hash;
   }
   inline int getNtracks(){
