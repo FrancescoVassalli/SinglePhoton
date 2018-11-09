@@ -94,9 +94,7 @@ class ConvertedPhotonReconstructor : public SubsysReco {
 
   private:
     int event;
-	  bool b_doubletrack=true;
 		bool b_goodCharge=true;
-	  bool b_goodR=true;
     std::string hash;
     std::string name;
     TFile *_file;

@@ -90,10 +90,10 @@ void onlinePlotter(){
 	string name ="onlineTrackFile.root";
 	TFile *ef = new TFile((name).c_str(),"READ");
 	//track plots 
-	const int kNUM1DPLOTS= 5;
-	string plotNames1d[kNUM1DPLOTS] = {"TR","R#frac{dtrack}{dR}","R#frac{dgR}{dR}","R#frac{dbR}{dR}",
+	const int kNUM1DPLOTS= 7;
+	string plotNames1d[kNUM1DPLOTS] = {"T#frac{dgR}{dR}","T#frac{dbR}{dR}","TR","R#frac{dtrack}{dR}","R#frac{dgR}{dR}","R#frac{dbR}{dR}",
 		"T#frac{dtrack}{dpT}"};
-	string plotXNames1d[kNUM1DPLOTS] = {"truth R","truth R","truth R","truth R","truth #Sigma track pT"};
+	string plotXNames1d[kNUM1DPLOTS] = {"truth R","truth R","truth R","reco R","reco R","reco R","truth #Sigma track pT"};
 
 	TH1F* h1plots[kNUM1DPLOTS];
 	for (int i = 0; i < kNUM1DPLOTS; ++i)

@@ -37,8 +37,6 @@ ConvertedPhotonReconstructor::ConvertedPhotonReconstructor(const std::string &na
 	b_truthVertex = new TVector3();
 	b_recoVertex = new  TVector3();
 	_tree->Branch("charge",&b_goodCharge);
-	_tree->Branch("track",&b_doubletrack);
-	_tree->Branch("radius",&b_goodR);
 	_tree->Branch("hash",&hash);
 	_tree->Branch("reco_tlv1",    "TLorentzVector",  &b_recovec1);
 	_tree->Branch("reco_tlv2",    "TLorentzVector",  &b_recovec2);

@@ -164,7 +164,7 @@ void makeHists2(TTree* truthTree, TTree* recoveryTree, const string& outname){
 		}
 	}
 	cout<<Form("For %i events of 8 photons there are %i total conversions.\n %i in the acceptance rapidity.\n %i truth matched reco tracks.\n",t_events,t_totalconversions,t_conversionsInRange,t_recoMatchedTracks);
-	cout<<Form("For %i events of 8 photons with max 1 truth conversion there are %i total conversions.\n %i in the acceptance rapidity.\n %i truth matched reco tracks and %i reco matched events with %i tracks.\n %i reco charge paired tracks. %i reco vertecies with good R",e_events,tE_totalconversions,tE_conversionsInRange,tE_recoMatchedTracks,rE_recoMatchedEvents,rE_recoMatchedTracks,rE_chargePairs,rE_goodRadius);
+	cout<<Form("For %i events of 8 photons with max 1 truth conversion there are %i total conversions.\n %i in the acceptance rapidity.\n %i truth matched reco tracks and %i reco matched events with %i tracks.\n %i reco charge paired events. %i reco vertecies with good R",e_events,tE_totalconversions,tE_conversionsInRange,tE_recoMatchedTracks,rE_recoMatchedEvents,rE_recoMatchedTracks,rE_chargePairs,rE_goodRadius);
 	outfile->Write();
 	outfile->Close();
 }
