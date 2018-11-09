@@ -124,7 +124,7 @@ ReconstructedConvertedPhoton* ConvertedPhotonReconstructor::reconstruct(PHCompos
 			vx = vertex->get_x();
 			vy = vertex->get_y();
 			vz = vertex->get_z();
-			cout<<"Vertex:"<<vx<<", "<<vy<<", "<<vz<<'\n';
+			cout<<"Vertex:"<<vx<<", "<<vy<<", "<<vz<<" = "<<vx*vx+vy*vy+vz*vz<<"\n";
 			//how do we really want to handle low R events?
 			if(sqrt(vx*vx+vy*vy+vz*vz)<1){
 				b_goodR=false;

@@ -26,8 +26,11 @@ MASTER*
 DisplayOn.C
 Fun4All_G4_EICDetector.C
 Fun4All_G4_fsPHENIX.C
+*EIC*
+Old_*.C
 G4Setup_EICDetector.C
 G4Setup_fsPHENIX.C
+G4_CEmc_EIC.C
 G4_DSTReader_EICDetector.C
 G4_DSTReader_fsPHENIX.C
 G4_FEMC_EIC.C
