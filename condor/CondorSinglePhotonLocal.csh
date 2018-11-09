@@ -18,7 +18,7 @@ cp $BURNER $SCRATCH_AREA/
 #
 rm $OUT_FILE
 cd $SCRATCH_AREA
-#root -b Fun4All_G4_sPHENIX.C\(5,\"$IN_FILE\"\) 
+root -b Fun4All_G4_sPHENIX.C\(5,\"$IN_FILE\"\) 
 echo $LD_LIBRARY_PATH
 root -b -q after_DST.C\(\"$IN_FILE\",\"$OUT_FILE\"\)
 #
