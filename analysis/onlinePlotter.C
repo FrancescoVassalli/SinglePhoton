@@ -90,10 +90,9 @@ void onlinePlotter(){
 	string name ="onlineTrackFile.root";
 	TFile *ef = new TFile((name).c_str(),"READ");
 	//track plots 
-	const int kNUM1DPLOTS= 7;
-	string plotNames1d[kNUM1DPLOTS] = {"T#frac{dgR}{dR}","T#frac{dbR}{dR}","TR","R#frac{dtrack}{dR}","R#frac{dgR}{dR}","R#frac{dbR}{dR}",
-		"T#frac{dtrack}{dpT}"};
-	string plotXNames1d[kNUM1DPLOTS] = {"truth R","truth R","truth R","reco R","reco R","reco R","truth #Sigma track pT"};
+	const int kNUM1DPLOTS= 3;
+	string plotNames1d[kNUM1DPLOTS] = {"TR","R#frac{dtrack}{dR}","T#frac{dtrack}{dpT}"};
+	string plotXNames1d[kNUM1DPLOTS] = {"truth R","reco R","truth #gamma pT"};
 
 	TH1F* h1plots[kNUM1DPLOTS];
 	for (int i = 0; i < kNUM1DPLOTS; ++i)
@@ -101,16 +100,8 @@ void onlinePlotter(){
 		h1plots[i] = (TH1F*) ef->Get(plotNames1d[i].c_str());
 		string title = plotNames1d[i]+";"+plotXNames1d[i]+";";
 		h1plots[i]->SetTitle(title.c_str());
+		plot(h1plots[i]);
 	} 
-
-	h1plots[1]->Scale(1/h1plots[0]->Integral());
-	h1plots[1]->Scale(1./2);
-	h1plots[2]->Scale(1/h1plots[0]->Integral());
-	h1plots[3]->Scale(1/h1plots[0]->Integral());
-	h1plots[4]->Scale(1/h1plots[0]->Integral());
-	cout<<Form("Track Efficency %0.1f \n Good R vertex Efficency %0.1f \n",h1plots[1]->Integral(),h1plots[2]->Integral());
-	plot(&h1plots[0],kNUM1DPLOTS);
-
 
 	const int kNUM2DPLOTS= 1;
 	TH2F* h2plots[kNUM2DPLOTS];
