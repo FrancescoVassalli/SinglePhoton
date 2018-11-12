@@ -37,6 +37,7 @@ ConvertedPhotonReconstructor::ConvertedPhotonReconstructor(const std::string &na
 	b_truthVertex = new TVector3();
 	b_recoVertex = new  TVector3();
 	_tree->Branch("charge",&b_goodCharge);
+	_tree->Branch("silicone",&b_hasSilicone);
 	_tree->Branch("hash",&hash);
 	_tree->Branch("reco_tlv1",    "TLorentzVector",  &b_recovec1);
 	_tree->Branch("reco_tlv2",    "TLorentzVector",  &b_recovec2);
@@ -103,11 +104,11 @@ ReconstructedConvertedPhoton* ConvertedPhotonReconstructor::reconstruct(PHCompos
 	//stack->set_verbosity(verbosity+1); //might be able to lower this 
 	SvtxVertexMap* vertexmap = findNode::getClass<SvtxVertexMap>(topNode,"SvtxVertexMap");
 	SvtxTrackMap* trackmap = findNode::getClass<SvtxTrackMap>(topNode,"SvtxTrackMap");
-	//SvtxClusterMap* clustermap = findNode::getClass<SvtxClusterMap>(topNode,"SvtxClusterMap"); 
+	SvtxClusterMap* clustermap = findNode::getClass<SvtxClusterMap>(topNode,"SvtxClusterMap"); 
 	SvtxVertexEval* vertexeval = stack->get_vertex_eval();
 	SvtxTrackEval* trackeval =   stack->get_track_eval();
 	//use the bools to check the event is good
-	if(!vertexeval||!trackeval){
+	if(!vertexeval||!trackeval||!clustermap){
 		cout<<"Evaluator is null quiting photon recovery\n";
 		return nullptr;
 	}
@@ -122,6 +123,9 @@ ReconstructedConvertedPhoton* ConvertedPhotonReconstructor::reconstruct(PHCompos
 			++titer;
 			SvtxTrack* track2= trackmap->get(*titer);
 			PHG4Particle* truth2 = trackeval->max_truth_particle_by_nclusters(track2);
+			int layer1 = clustermap->get(*(track1->begin_clusters()))->get_layer();
+			int layer2 = clustermap->get(*(track2->begin_clusters()))->get_layer();
+			cout<<layer1<<','<<layer2<<'\n';
 			//both the truth particles must come from the same vertex 
 			if (!truth1||!truth2||truth1->get_vtx_id()!=truth2->get_vtx_id())
 			{
@@ -152,6 +156,8 @@ ReconstructedConvertedPhoton* ConvertedPhotonReconstructor::reconstruct(PHCompos
 			t2x = track2->get_px();
 			t2y = track2->get_py();
 			t2z = track2->get_pz();
+
+
 			//convert to TObjects
 			TVector3 Ttrack1(t1x,t1y,t1z), Ttrack2(t2x,t2y,t2z);
 			PHG4VtxPoint* point = vertexeval->max_truth_point_by_ntracks(vertex); //not entirely sure what this does
