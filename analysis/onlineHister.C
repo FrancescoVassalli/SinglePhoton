@@ -38,7 +38,7 @@ namespace {
 
 TMap* makeRecoMap(TTree* recoveryTree){
   TMap *recoMap= new TMap(recoveryTree->GetEntries(),0); 
-  bool radius,charge,tracks;
+  bool charge,silicone;
   string *hash= new string();
   TLorentzVector *recotlv1= new TLorentzVector();
   TLorentzVector *truthtlv1= new TLorentzVector();
@@ -47,6 +47,7 @@ TMap* makeRecoMap(TTree* recoveryTree){
   TVector3 *recoVert= new TVector3();
   TVector3 *truthVert= new TVector3();
   recoveryTree->SetBranchAddress("charge",&charge);
+  recoveryTree->SetBranchAddress("silicone",&silicone);
   recoveryTree->SetBranchAddress("hash", &hash);
   recoveryTree->SetBranchAddress("reco_tlv1",    &recotlv1 );
   recoveryTree->SetBranchAddress("truth_tlv1",   &truthtlv1 );
@@ -59,7 +60,7 @@ TMap* makeRecoMap(TTree* recoveryTree){
   {
     recoveryTree->GetEntry(i);
     TNamed *key=new TNamed(hash->c_str(),hash->c_str());
-    RecoData *value=new RecoData(charge,*hash,recotlv1,recotlv2,truthtlv1,truthtlv2,recoVert,truthVert);
+    RecoData *value=new RecoData(charge,silicone,*hash,recotlv1,recotlv2,truthtlv1,truthtlv2,recoVert,truthVert);
     recoMap->Add(key,value);
   }
   return recoMap;
@@ -99,10 +100,6 @@ void makeHists2(TTree* truthTree, TTree* recoveryTree, const string& outname){
   int e_events=0;
 
   TH1F* h_r_dtrackMatcheddR = new TH1F("R#frac{dtrack}{dR}","",20,0,30);
-  TH1F* h_r_dgRdR = new TH1F("R#frac{dgR}{dR}","",20,0,30);
-  TH1F* h_r_dbRdR = new TH1F("R#frac{dbR}{dR}","",20,0,30);
-  TH1F* h_t_dgRdR = new TH1F("T#frac{dgR}{dR}","",20,0,30);
-  TH1F* h_t_dbRdR = new TH1F("T#frac{dbR}{dR}","",20,0,30);
   TH1F* h_t_dtrackMatcheddpT = new TH1F("T#frac{dtrack}{dpT}","",100,0,30);
   TH1F* h_t_R = new TH1F("TR","",20,0,30);
 
@@ -127,7 +124,13 @@ void makeHists2(TTree* truthTree, TTree* recoveryTree, const string& outname){
         if(recodata->getGoodCharge()){
           rE_chargePairs++;    
         }
-        //need to seperate into silicone vs no silicone here
+        /*if (recodata->hasSilicone())
+        {
+        	
+        }
+        else{
+
+        }*/
         h_r_dtrackMatcheddR->Fill(t_rVtx[0]);
         h_c_R->Fill(t_rVtx[0],recodata->getRecoR());
       }

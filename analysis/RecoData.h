@@ -11,9 +11,9 @@ public:
     recoPhoton = new TLorentzVector();
     recoPhoton = new TLorentzVector();
   }
-  RecoData(bool charge, string hash, TLorentzVector* recotlv1,
+  RecoData(bool charge, bool silicone,string hash, TLorentzVector* recotlv1,
    TLorentzVector *recotlv2,TLorentzVector *truthtlv1,TLorentzVector *truthtlv2,
-   TVector3* recoVert,TVector3* truthVert):gcharge(charge),hash(hash),recotlv1(recotlv1),
+   TVector3* recoVert,TVector3* truthVert):gcharge(charge),silicone(silicone),hash(hash),recotlv1(recotlv1),
    recotlv2(recotlv2),truthtlv1(truthtlv1),truthtlv2(truthtlv2),recoVert(recoVert),truthVert(truthVert){
     recoPhoton = new TLorentzVector();
     truthPhoton = new TLorentzVector();
@@ -70,8 +70,13 @@ public:
     return *truthVert;
   }
 
+  inline bool hasSilicone(){
+    return silicone;
+  }
+
 private:
   bool gcharge;
+  bool silicone;
   string hash;
   TLorentzVector *recotlv1, *recotlv2,*truthtlv1,*truthtlv2,*recoPhoton,*truthPhoton;
   TVector3 *truthVert, *recoVert;

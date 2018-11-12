@@ -95,6 +95,7 @@ class ConvertedPhotonReconstructor : public SubsysReco {
   private:
     int event;
 		bool b_goodCharge=true;
+    bool b_hasSilicone=false;
     std::string hash;
     std::string name;
     TFile *_file;
