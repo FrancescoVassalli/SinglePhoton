@@ -67,7 +67,6 @@ class ReconstructedConvertedPhoton
   private:
     int event;
     bool subtracted;
-    //probably some stuff about the tracks 
     TLorentzVector recovec;
     TLorentzVector truthvec;
     TVector3 truthVertex;
@@ -95,6 +94,7 @@ class ConvertedPhotonReconstructor : public SubsysReco {
   private:
     int event;
 		bool b_goodCharge=true;
+		bool b_hasSilicone=false;
     std::string hash;
     std::string name;
     TFile *_file;

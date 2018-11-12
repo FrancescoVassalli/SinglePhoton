@@ -112,7 +112,10 @@ ReconstructedConvertedPhoton* ConvertedPhotonReconstructor::reconstruct(PHCompos
 		cout<<"Evaluator is null quiting photon recovery\n";
 		return nullptr;
 	}
-	cout<<"In reconstruct num vertex="<<vertexmap->size()<<'\n';
+  if(vertexmap->size()!=1){
+    cout<<"Vertex count != 1 not reconstructing event\n";
+    return nullptr;
+  }
 	for (SvtxVertexMap::Iter iter = vertexmap->begin(); iter != vertexmap->end(); ++iter) {
 		SvtxVertex* vertex = iter->second;
 		//only take 2 track events
@@ -125,6 +128,8 @@ ReconstructedConvertedPhoton* ConvertedPhotonReconstructor::reconstruct(PHCompos
 			PHG4Particle* truth2 = trackeval->max_truth_particle_by_nclusters(track2);
 			int layer1 = clustermap->get(*(track1->begin_clusters()))->get_layer();
 			int layer2 = clustermap->get(*(track2->begin_clusters()))->get_layer();
+      cout<<"Layers:\n";
+
 			cout<<layer1<<','<<layer2<<'\n';
 			//both the truth particles must come from the same vertex 
 			if (!truth1||!truth2||truth1->get_vtx_id()!=truth2->get_vtx_id())
