@@ -14,6 +14,8 @@
 #include <g4main/PHG4VtxPoint.h>
 #include <g4main/PHG4TruthInfoContainer.h>
 
+#include "gen/G4_Tracking.C"
+
 #include <iostream>
 #include <cmath> 
 #include <algorithm>
@@ -126,7 +128,7 @@ ReconstructedConvertedPhoton* ConvertedPhotonReconstructor::reconstruct(PHCompos
 			++titer;
 			SvtxTrack* track2= trackmap->get(*titer);
 			PHG4Particle* truth2 = trackeval->max_truth_particle_by_nclusters(track2);
-      cout<<"Layers:\n";
+      cout<<"Layers: maps:"<<n_maps_layer<<" intt:"<<n_intt_layer<<'\n';
 			for (ClusterIter i = track1->begin_clusters(); i != track1->end_clusters(); ++i)
 			{
 				cout<<clustermap->get(*i)->get_layer()<<',';
