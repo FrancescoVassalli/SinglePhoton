@@ -14,8 +14,6 @@
 #include <g4main/PHG4VtxPoint.h>
 #include <g4main/PHG4TruthInfoContainer.h>
 
-#include "../gen/G4_Tracking.C"
-
 #include <iostream>
 #include <cmath> 
 #include <algorithm>
