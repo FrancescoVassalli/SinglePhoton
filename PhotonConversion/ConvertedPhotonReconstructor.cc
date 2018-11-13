@@ -127,14 +127,14 @@ ReconstructedConvertedPhoton* ConvertedPhotonReconstructor::reconstruct(PHCompos
 			SvtxTrack* track2= trackmap->get(*titer);
 			PHG4Particle* truth2 = trackeval->max_truth_particle_by_nclusters(track2);
       cout<<"Layers:\n";
-			for (ClusterIter i = track1->begin_clusters(); i != track1->end_clusters(); ++i)
+			for (SvtxTrack::ClusterIter i = track1->begin_clusters(); i != track1->end_clusters(); ++i)
 			{
 				cout<<clustermap->get(*i)->get_layer()<<',';
 			}
 			cout<<'\n';
-			for (ClusterIter i = track2->begin_clusters(); i != track2->end_clusters(); ++i)
+			for (SvtxTrack::ClusterIter i = track2->begin_clusters(); i != track2->end_clusters(); ++i)
 			{
-				clustermap->get(*i)->get_layer()<<',';
+				cout<<clustermap->get(*i)->get_layer()<<',';
 			}
 			cout<<'\n';
 			//both the truth particles must come from the same vertex 
