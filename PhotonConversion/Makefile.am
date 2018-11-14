@@ -23,8 +23,8 @@ libConvertedPhotonReconstructor_la_SOURCES = \
   ConvertedPhotonReconstructor_Dict.C 
 
 libConvertedPhotonReconstructor_la_LIBADD = \
-  -lg4main 
-
+	-lphool\
+	-lg4eval
 BUILT_SOURCES = \
   testexternals.C
 

@@ -124,13 +124,13 @@ void makeHists2(TTree* truthTree, TTree* recoveryTree, const string& outname){
         if(recodata->getGoodCharge()){
           rE_chargePairs++;    
         }
-        /*if (recodata->hasSilicone())
+        if (recodata->hasSilicone())
         {
-        	
+          cout<<"Has silicone\n";	
         }
         else{
 
-        }*/
+        }
         h_r_dtrackMatcheddR->Fill(t_rVtx[0]);
         h_c_R->Fill(t_rVtx[0],recodata->getRecoR());
       }

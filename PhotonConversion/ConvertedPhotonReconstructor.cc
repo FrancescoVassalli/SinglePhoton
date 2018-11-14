@@ -127,7 +127,7 @@ ReconstructedConvertedPhoton* ConvertedPhotonReconstructor::reconstruct(PHCompos
 			SvtxTrack* track2= trackmap->get(*titer);
 			PHG4Particle* truth2 = trackeval->max_truth_particle_by_nclusters(track2);
       cout<<"Layers: maps:"<<n_intt_layer<<" intt:"<<n_maps_layer<<'\n';
-			if (!b_hasSilicone&&track1->begin_clusters()<n_intt_layer+n_maps_layer){
+			if (!b_hasSilicone&&clustermap->get(*track1->begin_clusters())->get_layer()<n_intt_layer+n_maps_layer){
 				b_hasSilicone=true;
 			}
 			//both the truth particles must come from the same vertex 
