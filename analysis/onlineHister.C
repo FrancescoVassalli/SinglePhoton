@@ -107,36 +107,36 @@ void makeHists2(TTree* truthTree, TTree* recoveryTree, const string& outname){
 
 	TH2F* h_cns_R = new TH2F("RRvTRnS","",20,0,30,20,0,30);
 	TH2F* h_cs_R = new TH2F("RRvTRS","",20,0,30,20,0,30);
-
-	cout<<"Starting truth loop"<<endl;
-	for (int i = 0; i < truthTree->GetEntries(); ++i)
-	{
-		truthTree->GetEntry(i);
-		t_totalconversions+=t_nVtx;
-		t_conversionsInRange+=t_npair;
-		t_recoMatchedTracks+=r_npair;
-		t_events++;
-		if (t_npair==1&&t_nVtx==1)
-		{
-			e_events++;
-			tE_totalconversions+=t_npair;
-			h_t_R->Fill(t_rVtx[0]);
-			if(recoMap->GetValue(hash->c_str())){
-				RecoData* recodata= static_cast<RecoData*>(recoMap->GetValue(hash->c_str()));
-				rE_recoMatchedEvents++;
+  cout<<"Starting truth loop"<<endl;
+  for (int i = 0; i < truthTree->GetEntries(); ++i)
+  {
+    truthTree->GetEntry(i);
+    t_totalconversions+=t_nVtx;
+    t_conversionsInRange+=t_npair;
+    t_recoMatchedTracks+=r_npair;
+    t_events++;
+    if (t_npair==1&&t_nVtx==1)
+    {
+      e_events++;
+      tE_totalconversions+=t_npair;
+      h_t_R->Fill(t_rVtx[0]);
+      if(recoMap->GetValue(hash->c_str())){
+        RecoData* recodata= static_cast<RecoData*>(recoMap->GetValue(hash->c_str()));
+        rE_recoMatchedEvents++;
         h_tr_R->Fill(t_rVtx[0]);
-				if(recodata->getGoodCharge()){
-					rE_chargePairs++;    
-				}
-				if (recodata->hasSilicone())
-				{
-					h_cs_R->Fill(t_rVtx[0],recodata->getRecoR());
-				}
-				else{
-					h_cns_R->Fill(t_rVtx[0],recodata->getRecoR());
-				}
-				h_r_dtrackMatcheddR->Fill(t_rVtx[0]);
-			}
+        if(recodata->getGoodCharge()){
+          rE_chargePairs++;    
+        }
+        if (recodata->hasSilicone())
+        {
+          h_cs_R->Fill(t_rVtx[0],recodata->getRecoR());
+        }
+        else{
+          cout<<"no silicone"<<endl;
+          h_cns_R->Fill(t_rVtx[0],recodata->getRecoR());
+        }
+        h_r_dtrackMatcheddR->Fill(t_rVtx[0]);
+      }
       else{
         h_tnr_R->Fill(t_rVtx[0]);
       }
