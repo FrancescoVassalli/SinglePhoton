@@ -103,8 +103,8 @@ void makeHists2(TTree* truthTree, TTree* recoveryTree, const string& outname){
   TH1F* h_t_dtrackMatcheddpT = new TH1F("T#frac{dtrack}{dpT}","",100,0,30);
   TH1F* h_t_R = new TH1F("TR","",20,0,30);
 
-  TH2F* h_cns_R = new TH2F("RRvTR","",20,0,30,20,0,30);
-  TH2F* h_cs_R = new TH2F("RRvTR","",20,0,30,20,0,30);
+  TH2F* h_cns_R = new TH2F("RRvTRnS","",20,0,30,20,0,30);
+  TH2F* h_cs_R = new TH2F("RRvTRS","",20,0,30,20,0,30);
 
   cout<<"Starting truth loop"<<endl;
   for (int i = 0; i < truthTree->GetEntries(); ++i)
