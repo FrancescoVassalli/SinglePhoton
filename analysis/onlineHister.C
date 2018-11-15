@@ -131,6 +131,7 @@ void makeHists2(TTree* truthTree, TTree* recoveryTree, const string& outname){
         if (recodata->hasSilicone())
         {
           h_cs_R->Fill(t_rVtx[0],recodata->getRecoR());
+          cout<<recodata->getRecoR()<<'\n';
           e_silicon++;
         }
         else{
@@ -144,12 +145,12 @@ void makeHists2(TTree* truthTree, TTree* recoveryTree, const string& outname){
       }
 		}
 	}
-  h_r_dtrackMatcheddR->Scale(1/tE_totalconversions);
+  h_r_dtrackMatcheddR->Scale(1./tE_totalconversions);
   h_t_R->Scale(1./tE_totalconversions);
   h_tr_R->Scale(1./tE_totalconversions);
   h_tnr_R->Scale(1./tE_totalconversions);
   h_cns_R->Scale(1./(tE_totalconversions-e_silicon));
-  h_cs_R->Scale(1/(e_silicon));
+  h_cs_R->Scale(1./(e_silicon));
 	cout<<Form("For %i events of 8 photons there are %i total conversions.\n %i in the acceptance rapidity.\n %i truth matched reco tracks.\n",t_events,t_totalconversions,t_conversionsInRange,t_recoMatchedTracks);
 	cout<<Form("For %i events of 8 photons with max 1 truth conversion and 2 tracks in the acceptance eta (reco and truth) there are %i total conversions.\n  %i reco matched conversions.\n %i reco charge paired events.",e_events,tE_totalconversions,rE_recoMatchedEvents,rE_chargePairs);
 	outfile->Write();
