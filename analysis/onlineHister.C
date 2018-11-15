@@ -122,7 +122,6 @@ void makeHists2(TTree* truthTree, TTree* recoveryTree, const string& outname){
       if(recoMap->GetValue(hash->c_str())){
         RecoData* recodata= static_cast<RecoData*>(recoMap->GetValue(hash->c_str()));
         rE_recoMatchedEvents++;
-        cout<<recodata->getRecoR()<<endl;
         if(recodata->getGoodCharge()){
           rE_chargePairs++;    
         }
@@ -131,6 +130,7 @@ void makeHists2(TTree* truthTree, TTree* recoveryTree, const string& outname){
           h_cs_R->Fill(t_rVtx[0],recodata->getRecoR());
         }
         else{
+          cout<<"no silicone"<<endl;
           h_cns_R->Fill(t_rVtx[0],recodata->getRecoR());
         }
         h_r_dtrackMatcheddR->Fill(t_rVtx[0]);
