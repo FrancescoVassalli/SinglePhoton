@@ -103,7 +103,8 @@ void makeHists2(TTree* truthTree, TTree* recoveryTree, const string& outname){
   TH1F* h_t_dtrackMatcheddpT = new TH1F("T#frac{dtrack}{dpT}","",100,0,30);
   TH1F* h_t_R = new TH1F("TR","",20,0,30);
 
-  TH2F* h_c_R = new TH2F("RRvTR","",20,0,30,20,0,30);
+  TH2F* h_cns_R = new TH2F("RRvTR","",20,0,30,20,0,30);
+  TH2F* h_cs_R = new TH2F("RRvTR","",20,0,30,20,0,30);
 
   cout<<"Starting truth loop"<<endl;
   for (int i = 0; i < truthTree->GetEntries(); ++i)
@@ -126,13 +127,12 @@ void makeHists2(TTree* truthTree, TTree* recoveryTree, const string& outname){
         }
         if (recodata->hasSilicone())
         {
-          cout<<"Has silicone\n";	
+          h_cs_R->Fill(t_rVtx[0],recodata->getRecoR());
         }
         else{
-
+          h_cns_R->Fill(t_rVtx[0],recodata->getRecoR());
         }
         h_r_dtrackMatcheddR->Fill(t_rVtx[0]);
-        h_c_R->Fill(t_rVtx[0],recodata->getRecoR());
       }
     }
   }
