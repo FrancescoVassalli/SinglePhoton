@@ -95,6 +95,7 @@ void makeHists2(TTree* truthTree, TTree* recoveryTree, const string& outname){
 	int t_recoMatchedTracks=0;
 	int t_events=0;
 	int tE_totalconversions=0;
+  int e_silicon=0;
 	int rE_recoMatchedEvents=0;
 	int rE_chargePairs=0;
 	int e_events=0;
@@ -102,8 +103,8 @@ void makeHists2(TTree* truthTree, TTree* recoveryTree, const string& outname){
 	TH1F* h_r_dtrackMatcheddR = new TH1F("R#frac{dtrack}{dR}","",20,0,30);
 	TH1F* h_t_dtrackMatcheddpT = new TH1F("T#frac{dtrack}{dpT}","",100,0,30);
   TH1F* h_t_R = new TH1F("TR","",20,0,30);
-  TH1F* h_tr_R = new TH1F("TRnS","",20,0,30);
-	TH1F* h_tnr_R = new TH1F("TRS","",20,0,30);
+  TH1F* h_tr_R = new TH1F("TRr","",20,0,30);
+	TH1F* h_tnr_R = new TH1F("TRnr","",20,0,30);
 
 	TH2F* h_cns_R = new TH2F("RRvTRnS","",20,0,30,20,0,30);
 	TH2F* h_cs_R = new TH2F("RRvTRS","",20,0,30,20,0,30);
@@ -130,6 +131,7 @@ void makeHists2(TTree* truthTree, TTree* recoveryTree, const string& outname){
         if (recodata->hasSilicone())
         {
           h_cs_R->Fill(t_rVtx[0],recodata->getRecoR());
+          e_silicon++;
         }
         else{
           cout<<"no silicone"<<endl;
@@ -142,6 +144,12 @@ void makeHists2(TTree* truthTree, TTree* recoveryTree, const string& outname){
       }
 		}
 	}
+  h_r_dtrackMatcheddR->Scale(1/tE_totalconversions);
+  h_t_R->Scale(1/tE_totalconversions);
+  h_tr_R->Scale(1/tE_totalconversions);
+  h_tnr_R->Scale(1/tE_totalconversions);
+  h_cns_R->Scale(1/(tE_totalconversions-e_silicon));
+  h_cs_R->Scale(1/(e_silicon));
 	cout<<Form("For %i events of 8 photons there are %i total conversions.\n %i in the acceptance rapidity.\n %i truth matched reco tracks.\n",t_events,t_totalconversions,t_conversionsInRange,t_recoMatchedTracks);
 	cout<<Form("For %i events of 8 photons with max 1 truth conversion and 2 tracks in the acceptance eta (reco and truth) there are %i total conversions.\n  %i reco matched conversions.\n %i reco charge paired events.",e_events,tE_totalconversions,rE_recoMatchedEvents,rE_chargePairs);
 	outfile->Write();
