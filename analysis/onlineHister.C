@@ -56,11 +56,11 @@ TMap* makeRecoMap(TTree* recoveryTree){
   recoveryTree->SetBranchAddress("reco_vertex", &recoVert );
   recoveryTree->SetBranchAddress("truth_vertex",&truthVert);
   cout<<"Starting reco map with "<<recoveryTree->GetEntries()<<" entries"<<endl;
-  for (int i = 0; i < recoveryTree->GetEntries(); ++i)
+  for (int i = 0; i < recoveryTree->GetEntries()-5; ++i)
   {
     recoveryTree->GetEntry(i);
     TNamed *key=new TNamed(hash->c_str(),hash->c_str());
-    RecoData *value=new RecoData(charge,silicone,*hash,recotlv1,recotlv2,truthtlv1,truthtlv2,recoVert,truthVert);
+    RecoData *value=new RecoData(charge,silicone,*hash,*recotlv1,*recotlv2,*truthtlv1,*truthtlv2,*recoVert,*truthVert);
     recoMap->Add(key,value);
   }
   return recoMap;
@@ -122,6 +122,7 @@ void makeHists2(TTree* truthTree, TTree* recoveryTree, const string& outname){
       if(recoMap->GetValue(hash->c_str())){
         RecoData* recodata= static_cast<RecoData*>(recoMap->GetValue(hash->c_str()));
         rE_recoMatchedEvents++;
+        cout<<recodata->getRecoR()<<endl;
         if(recodata->getGoodCharge()){
           rE_chargePairs++;    
         }
