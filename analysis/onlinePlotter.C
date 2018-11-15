@@ -103,9 +103,9 @@ void onlinePlotter(){
 		plot(h1plots[i]);
 	} 
 
-	const int kNUM2DPLOTS= 1;
+	const int kNUM2DPLOTS= 2;
 	TH2F* h2plots[kNUM2DPLOTS];
-	string plotNames2d[kNUM2DPLOTS] = {"RRvTR"};
+	string plotNames2d[kNUM2DPLOTS] = {"RRvTRnS","RRvTRS"};
 	string plotNamesX2d[kNUM2DPLOTS] = {"truth radius"};
 	string plotNamesY2d[kNUM2DPLOTS] = {"reco radius"};
 	for (int j = 0; j < kNUM2DPLOTS; ++j)
