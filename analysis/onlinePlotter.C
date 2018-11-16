@@ -90,10 +90,10 @@ void onlinePlotter(){
 	string name ="onlineTrackFile.root";
 	TFile *ef = new TFile((name).c_str(),"READ");
 	//track plots 
-	const int kNUM1DPLOTS= 5;
-	string plotNames1d[kNUM1DPLOTS] = {"TR","R#frac{dtrack}{dR}","T#frac{dtrack}{dpT} all","TRnr","TRr"};
+	const int kNUM1DPLOTS= 7;
+	string plotNames1d[kNUM1DPLOTS] = {"TR","R#frac{dtrack}{dR}","T#frac{dtrack}{dpT} all","TRnr","TRr","T#frac{dtrack}{dpT} matched","T#frac{dtrack}{dpT} silicone"};
 	string plotXNames1d[kNUM1DPLOTS] = {"truth R","reco R","truth #gamma pT","truth R",
-	"truth R","T#frac{dtrack}{dpT} matched","T#frac{dtrack}{dpT} silicone","truth #gamma pT","truth #gamma pT"};
+	"truth R","truth #gamma pT","truth #gamma pT"};
 
 	TH1F* h1plots[kNUM1DPLOTS];
 	for (int i = 0; i < kNUM1DPLOTS; ++i)
@@ -102,6 +102,7 @@ void onlinePlotter(){
 		string title = plotNames1d[i]+";"+plotXNames1d[i]+";";
 		h1plots[i]->SetTitle(title.c_str());
 		plot(h1plots[i]);
+		cout<<i<<endl;
 	} 
 
 	const int kNUM2DPLOTS= 2;
