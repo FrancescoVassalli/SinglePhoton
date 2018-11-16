@@ -123,11 +123,11 @@ void makeHists2(TTree* truthTree, TTree* recoveryTree, const string& outname){
       e_events++;
       tE_totalconversions+=t_npair;
       h_t_R->Fill(t_rVtx[0]);
-      h_t_totalpT->Fill(photon_pt);
+      h_t_totalpT->Fill(t_photon_pt[0]);
       if(recoMap->GetValue(hash->c_str())){
         RecoData* recodata= static_cast<RecoData*>(recoMap->GetValue(hash->c_str()));
         rE_recoMatchedEvents++;
-        h_t_matchedpT->Fill(photon_pt);
+        h_t_matchedpT->Fill(t_photon_pt[0]);
         h_tr_R->Fill(t_rVtx[0]);
         if(recodata->getGoodCharge()){
           rE_chargePairs++;    
@@ -136,7 +136,7 @@ void makeHists2(TTree* truthTree, TTree* recoveryTree, const string& outname){
         {
           h_cs_R->Fill(t_rVtx[0],recodata->getRecoR());
           //cout<<recodata->getRecoR()<<'\n';
-          h_t_siliconepT->Fill(photon_pt);
+          h_t_siliconepT->Fill(t_photon_pt[0]);
           e_silicon++;
         }
         else{
