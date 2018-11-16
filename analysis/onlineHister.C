@@ -101,7 +101,9 @@ void makeHists2(TTree* truthTree, TTree* recoveryTree, const string& outname){
 	int e_events=0;
 
 	TH1F* h_r_dtrackMatcheddR = new TH1F("R#frac{dtrack}{dR}","",20,0,30);
-	TH1F* h_t_dtrackMatcheddpT = new TH1F("T#frac{dtrack}{dpT}","",100,0,30);
+  TH1F* h_t_totalpT = new TH1F("T#frac{dtrack}{dpT} all","",100,0,30);
+  TH1F* h_t_matchedpT = new TH1F("T#frac{dtrack}{dpT} matched","",100,0,30);
+	TH1F* h_t_siliconepT = new TH1F("T#frac{dtrack}{dpT} silicone","",100,0,30);
   TH1F* h_t_R = new TH1F("TR","",20,0,30);
   TH1F* h_tr_R = new TH1F("TRr","",20,0,30);
 	TH1F* h_tnr_R = new TH1F("TRnr","",20,0,30);
@@ -121,9 +123,11 @@ void makeHists2(TTree* truthTree, TTree* recoveryTree, const string& outname){
       e_events++;
       tE_totalconversions+=t_npair;
       h_t_R->Fill(t_rVtx[0]);
+      h_t_totalpT->Fill(photon_pt);
       if(recoMap->GetValue(hash->c_str())){
         RecoData* recodata= static_cast<RecoData*>(recoMap->GetValue(hash->c_str()));
         rE_recoMatchedEvents++;
+        h_t_matchedpT->Fill(photon_pt);
         h_tr_R->Fill(t_rVtx[0]);
         if(recodata->getGoodCharge()){
           rE_chargePairs++;    
@@ -131,7 +135,8 @@ void makeHists2(TTree* truthTree, TTree* recoveryTree, const string& outname){
         if (recodata->hasSilicone())
         {
           h_cs_R->Fill(t_rVtx[0],recodata->getRecoR());
-          cout<<recodata->getRecoR()<<'\n';
+          //cout<<recodata->getRecoR()<<'\n';
+          h_t_siliconepT->Fill(photon_pt);
           e_silicon++;
         }
         else{
