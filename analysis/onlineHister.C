@@ -101,9 +101,9 @@ void makeHists2(TTree* truthTree, TTree* recoveryTree, const string& outname){
 	int e_events=0;
 
 	TH1F* h_r_dtrackMatcheddR = new TH1F("R#frac{dtrack}{dR}","",20,0,30);
-  TH1F* h_t_totalpT = new TH1F("T#frac{dtrack}{dpT} all","",100,0,30);
-  TH1F* h_t_matchedpT = new TH1F("T#frac{dtrack}{dpT} matched","",100,0,30);
-	TH1F* h_t_siliconepT = new TH1F("T#frac{dtrack}{dpT} silicone","",100,0,30);
+  TH1F* h_t_totalpT = new TH1F("T#frac{dtrack}{dpT} all","",20,0,30);
+  TH1F* h_t_matchedpT = new TH1F("T#frac{dtrack}{dpT} matched","",20,0,30);
+	TH1F* h_t_siliconepT = new TH1F("T#frac{dtrack}{dpT} silicone","",20,0,30);
   TH1F* h_t_R = new TH1F("TR","",20,0,30);
   TH1F* h_tr_R = new TH1F("TRr","",20,0,30);
 	TH1F* h_tnr_R = new TH1F("TRnr","",20,0,30);
@@ -156,6 +156,10 @@ void makeHists2(TTree* truthTree, TTree* recoveryTree, const string& outname){
   h_tnr_R->Scale(1./tE_totalconversions);
   h_cns_R->Scale(1./(tE_totalconversions-e_silicon));
   h_cs_R->Scale(1./(e_silicon));
+  TH1F* h_tr_c = (TH1F*)h_tr_R->Clone("Tr_c");
+  h_tr_c->Add(h_tnr_R,-1);
+
+
 	cout<<Form("For %i events of 8 photons there are %i total conversions.\n %i in the acceptance rapidity.\n %i truth matched reco tracks.\n",t_events,t_totalconversions,t_conversionsInRange,t_recoMatchedTracks);
 	cout<<Form("For %i events of 8 photons with max 1 truth conversion and 2 tracks in the acceptance eta (reco and truth) there are %i total conversions.\n  %i reco matched conversions.\n %i reco charge paired events.",e_events,tE_totalconversions,rE_recoMatchedEvents,rE_chargePairs);
 	cout<<Form("Overall efficency %0.2f \n",h_tr_R->Integral());
