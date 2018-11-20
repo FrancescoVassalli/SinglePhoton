@@ -87,13 +87,14 @@ void plot(TH2F** plots, const int kSIZE, string* namesX, string* namesY){
 
 void onlinePlotter(){
 	gStyle->SetOptStat(0);
-	string name ="onlineTrackFile.root";
+	string name ="onlineTrackFile8.root";
 	TFile *ef = new TFile((name).c_str(),"READ");
 	//track plots 
-	const int kNUM1DPLOTS= 7;
-	string plotNames1d[kNUM1DPLOTS] = {"TR","R#frac{dtrack}{dR}","T#frac{dtrack}{dpT} all","TRnr","TRr","T#frac{dtrack}{dpT} matched","T#frac{dtrack}{dpT} silicone"};
+	const int kNUM1DPLOTS= 8;
+	string plotNames1d[kNUM1DPLOTS] = {"TR","R#frac{dtrack}{dR}","T#frac{dtrack}{dpT} all",
+	"TRnr","TRr","T#frac{dtrack}{dpT} matched","T#frac{dtrack}{dpT} silicone","Tr_c"};
 	string plotXNames1d[kNUM1DPLOTS] = {"truth R","reco R","truth #gamma pT","truth R",
-	"truth R","truth #gamma pT","truth #gamma pT"};
+	"truth R","truth #gamma pT","truth #gamma pT","truth R"};
 
 	TH1F* h1plots[kNUM1DPLOTS];
 	for (int i = 0; i < kNUM1DPLOTS; ++i)
