@@ -27,23 +27,22 @@
 #include "G4_HIJetReco.C"
 #include "G4_DSTReader.C"
 #include "DisplayOn.C"
-R__LOAD_LIBRARY(libfun4all.so)
-R__LOAD_LIBRARY(libg4testbench.so)
-R__LOAD_LIBRARY(libphhepmc.so)
-R__LOAD_LIBRARY(libPHPythia6.so)
+  R__LOAD_LIBRARY(libfun4all.so)
+  R__LOAD_LIBRARY(libg4testbench.so)
+  R__LOAD_LIBRARY(libphhepmc.so)
+  R__LOAD_LIBRARY(libPHPythia6.so)
 R__LOAD_LIBRARY(libPHPythia8.so)
 #endif
 
-using namespace std;
+  using namespace std;
 
 
-int Fun4All_G4_sPHENIX(
-    const int nEvents = 1,
-    const char *inputFile = "/sphenix/data/data02/review_2017-08-02/single_particle/spacal2d/fieldmap/G4Hits_sPHENIX_e-_eta0_8GeV-0002.root",
-    const char *outputFile = "G4sPHENIX.root",
-    const char *embed_input_file = "/sphenix/data/data02/review_2017-08-02/sHijing/fm_0-4.list")
+  int Fun4All_G4_sPHENIX(
+      const int nEvents = 1,
+      const char *outputFile = "G4sPHENIX.root")
 {
-
+  const char *embed_input_file = "";
+  const char *inputFile = "";
   //===============
   // Input options
   //===============
@@ -77,7 +76,7 @@ int Fun4All_G4_sPHENIX(
   const bool usegun = false && !readhits;
   // Throw single Upsilons, may be embedded in Hijing by setting readhepmc flag also  (note, careful to set Z vertex equal to Hijing events)
   const bool upsilons = false && !readhits;
-  const int num_upsilons_per_event = 1;  // can set more than 1 upsilon per event, each has a unique embed flag
+  const int num_upsilons_per_event = 0;  // can set more than 1 upsilon per event, each has a unique embed flag
   // Event pile up simulation with collision rate in Hz MB collisions.
   // Note please follow up the macro to verify the settings for beam parameters
   const double pileup_collision_rate = 0;  // 100e3 for 100kHz nominal AuAu collision rate.
@@ -93,7 +92,7 @@ int Fun4All_G4_sPHENIX(
   bool do_tracking = true;
   bool do_tracking_cell = do_tracking && true;
   bool do_tracking_track = do_tracking_cell && true;
-  bool do_tracking_eval = do_tracking_track && true;
+  bool do_tracking_eval = do_tracking_track &&false;
 
   bool do_pstof = false;
 
@@ -101,13 +100,13 @@ int Fun4All_G4_sPHENIX(
   bool do_cemc_cell = do_cemc && true;
   bool do_cemc_twr = do_cemc_cell && true;
   bool do_cemc_cluster = do_cemc_twr && true;
-  bool do_cemc_eval = do_cemc_cluster && true;
+  bool do_cemc_eval = do_cemc_cluster && false;
 
   bool do_hcalin = true;
   bool do_hcalin_cell = do_hcalin && true;
   bool do_hcalin_twr = do_hcalin_cell && true;
   bool do_hcalin_cluster = do_hcalin_twr && true;
-  bool do_hcalin_eval = do_hcalin_cluster && true;
+  bool do_hcalin_eval = do_hcalin_cluster && false;
 
   bool do_magnet = true;
 
@@ -115,7 +114,7 @@ int Fun4All_G4_sPHENIX(
   bool do_hcalout_cell = do_hcalout && true;
   bool do_hcalout_twr = do_hcalout_cell && true;
   bool do_hcalout_cluster = do_hcalout_twr && true;
-  bool do_hcalout_eval = do_hcalout_cluster && true;
+  bool do_hcalout_eval = do_hcalout_cluster && false;
 
   //! forward flux return plug door. Out of acceptance and off by default.
   bool do_plugdoor = false;
@@ -125,9 +124,8 @@ int Fun4All_G4_sPHENIX(
 
   bool do_calotrigger = true && do_cemc_twr && do_hcalin_twr && do_hcalout_twr;
 
-  bool do_jet_reco = true;
-  bool do_jet_eval = do_jet_reco && true;
-
+  bool do_jet_reco = false;
+  bool do_jet_eval = do_jet_reco && false;
   // HI Jet Reco for p+Au / Au+Au collisions (default is false for
   // single particle / p+p-only simulations, or for p+Au / Au+Au
   // simulations which don't particularly care about jets)
@@ -152,7 +150,7 @@ int Fun4All_G4_sPHENIX(
   gROOT->LoadMacro("G4Setup_sPHENIX.C");
   G4Init(do_tracking, do_pstof, do_cemc, do_hcalin, do_magnet, do_hcalout, do_pipe, do_plugdoor);
 
-  int absorberactive = 1;  // set to 1 to make all absorbers active volumes
+  int absorberactive = 0;  // set to 1 to make all absorbers active volumes
   //  const string magfield = "1.5"; // alternatively to specify a constant magnetic field, give a float number, which will be translated to solenoidal field in T, if string use as fieldmap name (including path)
   const string magfield = string(getenv("CALIBRATIONROOT")) + string("/Field/Map/sPHENIX.2d.root"); // default map from the calibration database
   const float magfield_rescale = -1.4 / 1.5;                                     // scale the map to a 1.4 T field
@@ -163,9 +161,9 @@ int Fun4All_G4_sPHENIX(
 
   bool display_on = false;
   if(display_on)
-    {
-      gROOT->LoadMacro("DisplayOn.C");
-    }
+  {
+    gROOT->LoadMacro("DisplayOn.C");
+  }
 
   Fun4AllServer *se = Fun4AllServer::instance();
   se->Verbosity(0);
@@ -235,7 +233,7 @@ int Fun4All_G4_sPHENIX(
     {
       // toss low multiplicity dummy events
       PHG4SimpleEventGenerator *gen = new PHG4SimpleEventGenerator();
-      gen->add_particles("pi-", 1);  // mu+,e+,proton,pi+,Upsilon
+      gen->add_particles("gamma", 8);  // mu+,e+,proton,pi+,Upsilon
       //gen->add_particles("pi+",100); // 100 pion option
       if (readhepmc || do_embedding || runpythia8 || runpythia6)
       {
@@ -245,16 +243,16 @@ int Fun4All_G4_sPHENIX(
       else
       {
         gen->set_vertex_distribution_function(PHG4SimpleEventGenerator::Uniform,
-                                              PHG4SimpleEventGenerator::Uniform,
-                                              PHG4SimpleEventGenerator::Uniform);
+            PHG4SimpleEventGenerator::Uniform,
+            PHG4SimpleEventGenerator::Uniform);
         gen->set_vertex_distribution_mean(0.0, 0.0, 0.0);
-        gen->set_vertex_distribution_width(0.0, 0.0, 5.0);
+        gen->set_vertex_distribution_width(0.0, 0.0, 0.0);
       }
       gen->set_vertex_size_function(PHG4SimpleEventGenerator::Uniform);
       gen->set_vertex_size_parameters(0.0, 0.0);
       gen->set_eta_range(-1.0, 1.0);
       gen->set_phi_range(-1.0 * TMath::Pi(), 1.0 * TMath::Pi());
-      gen->set_pt_range(0.1, 20.0);
+      gen->set_pt_range(5.0,30.0);
       gen->Embed(2);
       gen->Verbosity(0);
 
@@ -289,44 +287,44 @@ int Fun4All_G4_sPHENIX(
 
       for(int iups = 0; iups < num_upsilons_per_event;iups++)
       {
-	PHG4ParticleGeneratorVectorMeson *vgen = new PHG4ParticleGeneratorVectorMeson();
-	vgen->add_decay_particles("e+", "e-", 0);  // i = decay id
-	// event vertex
-	if (readhepmc || do_embedding || particles || runpythia8 || runpythia6)
-	{
-	  vgen->set_reuse_existing_vertex(true);
-	}
+        PHG4ParticleGeneratorVectorMeson *vgen = new PHG4ParticleGeneratorVectorMeson();
+        vgen->add_decay_particles("e+", "e-", 0);  // i = decay id
+        // event vertex
+        if (readhepmc || do_embedding || particles || runpythia8 || runpythia6)
+        {
+          vgen->set_reuse_existing_vertex(true);
+        }
 
-	// Note: this rapidity range completely fills the acceptance of eta = +/- 1 unit
-	vgen->set_rapidity_range(-1.0, +1.0);
-	vgen->set_pt_range(0.0, 10.0);
+        // Note: this rapidity range completely fills the acceptance of eta = +/- 1 unit
+        vgen->set_rapidity_range(-1.0, +1.0);
+        vgen->set_pt_range(0.0, 10.0);
 
-	int istate = 1;
+        int istate = 1;
 
-	if (istate == 1)
-	{
-	  // Upsilon(1S)
-	  vgen->set_mass(9.46);
-	  vgen->set_width(54.02e-6);
-	}
-	else if (istate == 2)
-	{
-	  // Upsilon(2S)
-	  vgen->set_mass(10.0233);
-	  vgen->set_width(31.98e-6);
-	}
-	else
-	{
-	  // Upsilon(3S)
-	  vgen->set_mass(10.3552);
-	  vgen->set_width(20.32e-6);
-	}
+        if (istate == 1)
+        {
+          // Upsilon(1S)
+          vgen->set_mass(9.46);
+          vgen->set_width(54.02e-6);
+        }
+        else if (istate == 2)
+        {
+          // Upsilon(2S)
+          vgen->set_mass(10.0233);
+          vgen->set_width(31.98e-6);
+        }
+        else
+        {
+          // Upsilon(3S)
+          vgen->set_mass(10.3552);
+          vgen->set_width(20.32e-6);
+        }
 
-	vgen->Verbosity(0);
-	vgen->Embed(3);
-	se->registerSubsystem(vgen);
+        vgen->Verbosity(0);
+        vgen->Embed(3);
+        se->registerSubsystem(vgen);
 
-	cout << "Upsilon generator for istate = " << istate << " created and registered " << endl;
+        cout << "Upsilon generator for istate = " << istate << " created and registered " << endl;
       }
     }
   }
@@ -339,10 +337,10 @@ int Fun4All_G4_sPHENIX(
 
 #if ROOT_VERSION_CODE >= ROOT_VERSION(6,00,0)
     G4Setup(absorberactive, magfield, EDecayType::kAll,
-            do_tracking, do_pstof, do_cemc, do_hcalin, do_magnet, do_hcalout, do_pipe,do_plugdoor, magfield_rescale);
+        do_tracking, do_pstof, do_cemc, do_hcalin, do_magnet, do_hcalout, do_pipe,do_plugdoor, magfield_rescale);
 #else
     G4Setup(absorberactive, magfield, TPythia6Decayer::kAll,
-            do_tracking, do_pstof, do_cemc, do_hcalin, do_magnet, do_hcalout, do_pipe,do_plugdoor, magfield_rescale);
+        do_tracking, do_pstof, do_cemc, do_hcalin, do_magnet, do_hcalout, do_pipe,do_plugdoor, magfield_rescale);
 #endif
   }
 
@@ -536,7 +534,7 @@ int Fun4All_G4_sPHENIX(
     }
     pileup->set_time_window(time_window_minus, time_window_plus);  // override timing window in ns
     cout << "Collision pileup enabled using file " << pileupfile << " with collision rate " << pileup_collision_rate
-         << " and time window " << time_window_minus << " to " << time_window_plus << endl;
+      << " and time window " << time_window_minus << " to " << time_window_plus << endl;
   }
 
   if (do_DSTReader)
@@ -545,21 +543,21 @@ int Fun4All_G4_sPHENIX(
     gROOT->LoadMacro("G4_DSTReader.C");
 
     G4DSTreader(outputFile,  //
-                /*int*/ absorberactive,
-                /*bool*/ do_tracking,
-                /*bool*/ do_pstof,
-                /*bool*/ do_cemc,
-                /*bool*/ do_hcalin,
-                /*bool*/ do_magnet,
-                /*bool*/ do_hcalout,
-                /*bool*/ do_cemc_twr,
-                /*bool*/ do_hcalin_twr,
-                /*bool*/ do_hcalout_twr);
+        /*int*/ absorberactive,
+        /*bool*/ do_tracking,
+        /*bool*/ do_pstof,
+        /*bool*/ do_cemc,
+        /*bool*/ do_hcalin,
+        /*bool*/ do_magnet,
+        /*bool*/ do_hcalout,
+        /*bool*/ do_cemc_twr,
+        /*bool*/ do_hcalin_twr,
+        /*bool*/ do_hcalout_twr);
   }
 
-  //  Fun4AllDstOutputManager *out = new Fun4AllDstOutputManager("DSTOUT", outputFile);
-  // if (do_dst_compress) DstCompress(out);
-  //  se->registerOutputManager(out);
+  Fun4AllDstOutputManager *out = new Fun4AllDstOutputManager("DSTOUT", outputFile);
+  if (do_dst_compress) DstCompress(out);
+  se->registerOutputManager(out);
 
   //-----------------
   // Event processing
@@ -577,13 +575,13 @@ int Fun4All_G4_sPHENIX(
   }
 
   if(display_on)
-    {
-      DisplayOn();
-      // prevent macro from finishing so can see display
-      int i;
-      cout << "***** Enter any integer to proceed" << endl;
-      cin >> i;
-    }
+  {
+    DisplayOn();
+    // prevent macro from finishing so can see display
+    int i;
+    cout << "***** Enter any integer to proceed" << endl;
+    cin >> i;
+  }
 
   se->run(nEvents);
 
