@@ -90,7 +90,7 @@ class ConvertedPhotonReconstructor : public SubsysReco {
 
   protected:
     const float kEmass = 0.000511;
-    const unsigned int n_intt_layer = 8;  
+    const unsigned int n_intt_layer = 4;  
     const unsigned int n_maps_layer = 3;  // must be 0-3, setting it to zero removes MVTX completely, n < 3 gives the first n layers
   private:
     int event;
