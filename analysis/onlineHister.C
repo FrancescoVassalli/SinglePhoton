@@ -184,7 +184,7 @@ TChain* handleFile(string name, string extension, string treename, int filecount
 
 void onlineHister(){
 	const string location ="/sphenix/user/vassalli/singlesamples/Photon5/";
-	string outname = "onlineTrackFile.root";
+	string outname = "onlineTrackFile8.root";
 	string in ="onlineanalysis";
 	string reco =".rootrecovered.root";
 	string truth =".root";
