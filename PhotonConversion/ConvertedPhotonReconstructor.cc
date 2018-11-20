@@ -29,7 +29,7 @@ ConvertedPhotonReconstructor::ConvertedPhotonReconstructor(const std::string &na
 	event=0;
 	_file = new TFile( this->name.c_str(), "RECREATE");
 	_tree = new TTree("convertedphotontree","tracks reconstructed to converted photons");
-	//_tree->SetAutoSave(300);
+	_tree->SetAutoSave(300);
 	b_recovec1 = new TLorentzVector();
 	b_recovec1 = new TLorentzVector();
 	b_truthvec2 = new TLorentzVector();

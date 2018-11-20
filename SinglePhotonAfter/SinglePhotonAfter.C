@@ -29,7 +29,7 @@ int SinglePhotonAfter::InitRun(PHCompositeNode *topNode)
   _b_event=0;
   _f = new TFile( _foutname.c_str(), "RECREATE");
   _tree = new TTree("ttree","a succulent orange tree");
-  //_tree->SetAutoSave(300);
+  _tree->SetAutoSave(300);
   _tree->Branch("event",&_b_event); 
   _tree->Branch("hash",&_b_hash);
   _tree->Branch("nVtx", &_b_nVtx);
