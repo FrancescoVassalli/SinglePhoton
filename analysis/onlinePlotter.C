@@ -87,7 +87,7 @@ void plot(TH2F** plots, const int kSIZE, string* namesX, string* namesY){
 
 void onlinePlotter(){
 	gStyle->SetOptStat(0);
-	string name ="onlineTrackFile8.root";
+	string name ="onlineTrackFile4.root";
 	TFile *ef = new TFile((name).c_str(),"READ");
 	//track plots 
 	const int kNUM1DPLOTS= 8;
