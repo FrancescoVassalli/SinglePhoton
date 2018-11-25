@@ -93,6 +93,7 @@ void makeHists2(TTree* truthTree, TTree* recoveryTree, const string& outname){
 	int t_totalconversions=0;
 	int t_conversionsInRange=0;
 	int t_recoMatchedTracks=0;
+  int t_silicone_events=0;
 	int t_events=0;
 	int tE_totalconversions=0;
   int e_silicon=0;
@@ -124,6 +125,10 @@ void makeHists2(TTree* truthTree, TTree* recoveryTree, const string& outname){
       tE_totalconversions+=t_npair;
       h_t_R->Fill(t_rVtx[0]);
       h_t_totalpT->Fill(t_photon_pt[0]);
+      if (t_rVtx[0]<18)
+      {
+        t_silicone_events++;
+      }
       if(recoMap->GetValue(hash->c_str())){
         RecoData* recodata= static_cast<RecoData*>(recoMap->GetValue(hash->c_str()));
         rE_recoMatchedEvents++;
@@ -163,6 +168,8 @@ void makeHists2(TTree* truthTree, TTree* recoveryTree, const string& outname){
 	cout<<Form("For %i events of 8 photons there are %i total conversions.\n %i in the acceptance rapidity.\n %i truth matched reco tracks.\n",t_events,t_totalconversions,t_conversionsInRange,t_recoMatchedTracks);
 	cout<<Form("For %i events of 8 photons with max 1 truth conversion and 2 tracks in the acceptance eta (reco and truth) there are %i total conversions.\n  %i reco matched conversions.\n %i reco charge paired events.",e_events,tE_totalconversions,rE_recoMatchedEvents,rE_chargePairs);
 	cout<<Form("Overall efficency %0.2f \n",h_tr_R->Integral());
+  cout<<Form("Efficency of events with silicone hits %0.2f \n",(float) e_silicon/t_silicone_events);
+
 
   outfile->Write();
 	outfile->Close();
