@@ -89,12 +89,16 @@ void onlinePlotter(){
 	gStyle->SetOptStat(0);
 	string name ="onlineTrackFile4.root";
 	TFile *ef = new TFile((name).c_str(),"READ");
-	//track plots 
-	const int kNUM1DPLOTS= 8;
+
+	bool plotAll=false;
+	if (plotAll)
+	{
+		//track plots 
+	const int kNUM1DPLOTS= 9;
 	string plotNames1d[kNUM1DPLOTS] = {"TR","R#frac{dtrack}{dR}","T#frac{dtrack}{dpT} all",
-	"TRnr","TRr","T#frac{dtrack}{dpT} matched","T#frac{dtrack}{dpT} silicone","Tr_c"};
+	"TRnr","TRr","T#frac{dtrack}{dpT} matched","T#frac{dtrack}{dpT} silicone","Tr_c","recoTrackTruthR"};
 	string plotXNames1d[kNUM1DPLOTS] = {"truth R","reco R","truth #gamma pT","truth R",
-	"truth R","truth #gamma pT","truth #gamma pT","truth R"};
+	"truth R","truth #gamma pT","truth #gamma pT","truth R","truth R"};
 
 	TH1F* h1plots[kNUM1DPLOTS];
 	for (int i = 0; i < kNUM1DPLOTS; ++i)
@@ -117,5 +121,18 @@ void onlinePlotter(){
 		string title = plotNames2d[j]+";"+plotNamesX2d[j]+";"+plotNamesY2d[j];
 		h2plots[j]->SetTitle(title.c_str());
 		plot(h2plots[j]);
+	}
+	}
+	else{
+		TH1F* alltruth =(TH1F*) ef->Get("TR");
+		TH1F* recoTrack =(TH1F*) ef->Get("recoTrackTruthR");
+		TH1F* recoVert =(TH1F*) ef->Get("TRr");
+		TCanvas *tc = new TCanvas();
+		alltruth->Draw();
+		recoTrack->SetLineColor(kRed);
+		recoVert->SetLineColor(kOrange);
+		recoTrack->Draw("same");
+		recoVert->Draw("same");
+
 	}
 }
