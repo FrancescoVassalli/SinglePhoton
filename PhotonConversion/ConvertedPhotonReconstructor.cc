@@ -104,6 +104,7 @@ ReconstructedConvertedPhoton* ConvertedPhotonReconstructor::reconstruct(PHCompos
 	//stack->set_verbosity(verbosity+1); //might be able to lower this 
 	SvtxVertexMap* vertexmap = findNode::getClass<SvtxVertexMap>(topNode,"SvtxVertexMap");
 	SvtxTrackMap* trackmap = findNode::getClass<SvtxTrackMap>(topNode,"SvtxTrackMap");
+	SvtxTrackMap* unmatchedTracks = trackmap->Clone();
 	SvtxClusterMap* clustermap = findNode::getClass<SvtxClusterMap>(topNode,"SvtxClusterMap"); 
 	SvtxVertexEval* vertexeval = stack->get_vertex_eval();
 	SvtxTrackEval* trackeval =   stack->get_track_eval();
@@ -121,14 +122,18 @@ ReconstructedConvertedPhoton* ConvertedPhotonReconstructor::reconstruct(PHCompos
 		//only take 2 track events
 		if(vertex&&vertex->size_tracks()==2){
 			SvtxVertex::TrackIter titer = vertex->begin_tracks(); 
-			SvtxTrack* track1 = trackmap->get(*titer);
+			int track1id = *titer;
+			titer++;
+			int track2id = *titer;
+			SvtxTrack* track1 = trackmap->get(track1id);
 			PHG4Particle* truth1 = trackeval->max_truth_particle_by_nclusters(track1); 
-			++titer;
-			SvtxTrack* track2= trackmap->get(*titer);
+			SvtxTrack* track2= trackmap->get(track2id);
 			PHG4Particle* truth2 = trackeval->max_truth_particle_by_nclusters(track2);
       cout<<"Layers: maps:"<<n_intt_layer<<" intt:"<<n_maps_layer<<'\n';
 			if (!b_hasSilicone&&clustermap->get(*track1->begin_clusters())->get_layer()<n_intt_layer+n_maps_layer){
 				b_hasSilicone=true;
+				unmatchedTracks->erase(track1id);
+				unmatchedTracks->erase(track2id);
 			}
 			//both the truth particles must come from the same vertex 
 			if (!truth1||!truth2||truth1->get_vtx_id()!=truth2->get_vtx_id())
@@ -176,6 +181,10 @@ ReconstructedConvertedPhoton* ConvertedPhotonReconstructor::reconstruct(PHCompos
 			b_truthvec2= new TLorentzVector( tTrack2,pToE(tTrack2,kEmass));
 			_tree->Fill();
 		}
+	}
+	for (SvtxTrackMap::Iter i = unmatchedTracks->begin(); i != unmatchedTracks->end(); ++i)
+	{
+		
 	}
 	delete stack;
 	return nullptr;

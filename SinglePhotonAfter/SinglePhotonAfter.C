@@ -58,10 +58,10 @@ int SinglePhotonAfter::process_event(PHCompositeNode *topNode)
   std::list<int> vtxList;
   std::map<int,Conversion> mapConversions;
   for ( PHG4TruthInfoContainer::ConstIterator iter = range.first; iter != range.second; ++iter ) {
-    //bool isPrimary;
-    PHG4Particle* g4particle = iter->second; // You may ask yourself, why second?
-    PHG4Particle* parent =truthinfo->GetParticle(g4particle->get_parent_id());
     float radius=0;
+    //bool isPrimary;
+    PHG4Particle* g4particle = iter->second; 
+    PHG4Particle* parent =truthinfo->GetParticle(g4particle->get_parent_id());
     if(!parent){ //if the parent point is null then the particle is primary 
       //checking the embed ID to make sure it is a particle I made need to change the magic literal
       if(get_embed(g4particle,truthinfo)!=2) continue;
