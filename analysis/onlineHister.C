@@ -107,6 +107,9 @@ void makeHists2(TTree* truthTree, TTree* recoveryTree, const string& outname){
 	TH1F* h_t_siliconepT = new TH1F("T#frac{dtrack}{dpT} silicone","",20,0,30);
   TH1F* h_t_R = new TH1F("TR","",20,0,30);
   TH1F* h_recoTrackTruthR = new TH1F("recoTrackTruthR","",20,0,30);
+  TH1F* h_recoTrackTruthpT = new TH1F("recoTrackTruthpT","",20,0,30);
+  TH1F* h_allTruthR = new TH1F("allTruthR","",20,0,30);
+  TH1F* h_allTruthpT = new TH1F("allTruthpT","",20,0,30);
   TH1F* h_tr_R = new TH1F("TRr","",20,0,30);
 	TH1F* h_tnr_R = new TH1F("TRnr","",20,0,30);
 
@@ -120,14 +123,19 @@ void makeHists2(TTree* truthTree, TTree* recoveryTree, const string& outname){
     t_conversionsInRange+=t_npair;
     t_recoMatchedTracks+=r_npair;
     t_events++;
-    if (t_npair==1&&t_nVtx==1)
+    if (t_nVtx==1)
     {
-      e_events++;
+      h_allTruthR->Fill(t_rVtx[0]);
+      h_allTruthpT->Fill(t_photon_pt[0]);
+      if (t_npair==1)
+      {
+        e_events++;
       tE_totalconversions+=t_npair;
       h_t_R->Fill(t_rVtx[0]);
       h_t_totalpT->Fill(t_photon_pt[0]);
-      if(r_npair>0){
+      if(r_npair==2){
         h_recoTrackTruthR->Fill(t_rVtx[0]);
+        h_recoTrackTruthpT->Fill(t_photon_pt[0]);
       }
       if (t_rVtx[0]<18)
       {
@@ -157,6 +165,8 @@ void makeHists2(TTree* truthTree, TTree* recoveryTree, const string& outname){
       else{
         h_tnr_R->Fill(t_rVtx[0]);
       }
+      }
+      
 		}
 	}
 
