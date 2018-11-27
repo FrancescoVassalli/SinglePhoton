@@ -102,14 +102,14 @@ void makeHists2(TTree* truthTree, TTree* recoveryTree, const string& outname){
   int e_events=0;
 
   TH1F* h_r_dtrackMatcheddR = new TH1F("R#frac{dtrack}{dR}","",20,0,30);
-  TH1F* h_t_totalpT = new TH1F("TpT acceptance","",20,0,30);
-  TH1F* h_t_matchedpT = new TH1F("TpT reco vert","",20,0,30);
-  TH1F* h_t_siliconepT = new TH1F("T#frac{dtrack}{dpT} silicone","",20,0,30);
+  TH1F* h_t_totalpT = new TH1F("TpT acceptance","",20,5,30);
+  TH1F* h_t_matchedpT = new TH1F("TpT reco vert","",20,5,30);
+  TH1F* h_t_siliconepT = new TH1F("T#frac{dtrack}{dpT} silicone","",20,5,30);
   TH1F* h_t_R = new TH1F("TR","",20,0,30);
   TH1F* h_recoTrackTruthR = new TH1F("recoTrackTruthR","",20,0,30);
-  TH1F* h_recoTrackTruthpT = new TH1F("recoTrackTruthpT","",20,0,30);
+  TH1F* h_recoTrackTruthpT = new TH1F("recoTrackTruthpT","",20,5,30);
   TH1F* h_allTruthR = new TH1F("allTruthR","",20,0,30);
-  TH1F* h_allTruthpT = new TH1F("allTruthpT","",20,0,30);
+  TH1F* h_allTruthpT = new TH1F("allTruthpT","",20,5,30);
   TH1F* h_tr_R = new TH1F("TRr","",20,0,30);
   TH1F* h_tnr_R = new TH1F("TRnr","",20,0,30);
 
