@@ -124,15 +124,42 @@ void onlinePlotter(){
 	}
 	}
 	else{
-		TH1F* alltruth =(TH1F*) ef->Get("TR");
+		TH1F* accepttruth =(TH1F*) ef->Get("TR");
+		TH1F* alltruth =(TH1F*) ef->Get("allTruthR");
 		TH1F* recoTrack =(TH1F*) ef->Get("recoTrackTruthR");
 		TH1F* recoVert =(TH1F*) ef->Get("TRr");
-		TCanvas *tc = new TCanvas();
+		TCanvas *tcR = new TCanvas();
+		TLegend *tlR = new TLegend(.4,.4,.6,.6);
 		alltruth->Draw();
+		accepttruth->SetLineColor(kGreen);
 		recoTrack->SetLineColor(kRed);
 		recoVert->SetLineColor(kOrange);
+		accepttruth->Draw("same");
 		recoTrack->Draw("same");
 		recoVert->Draw("same");
+		tlR->AddEntry(alltruth,"All Truth","l");
+		tlR->AddEntry(accepttruth,"Truth in Acceptance","l");
+		tlR->AddEntry(recoTrack,"Reco Tracks","l");
+		tlR->AddEntry(recoVert,"reco Vertex","l");
+		tlR->Draw();
 
+		TCanvas *tcpT = new TCanvas();
+		TH1F* accepttruthpT =(TH1F*) ef->Get("TpT acceptance");
+		TH1F* alltruthpT =(TH1F*) ef->Get("allTruthpT");
+		TH1F* recoTrackpT =(TH1F*) ef->Get("recoTrackTruthpT");
+		TH1F* recoVertpT =(TH1F*) ef->Get("TpT reco vert");
+		alltruthpT->Draw();
+		accepttruthpT->SetLineColor(kGreen);
+		recoTrackpT->SetLineColor(kRed);
+		recoVertpT->SetLineColor(kOrange);
+		accepttruthpT->Draw("same");
+		recoTrackpT->Draw("same");
+		recoVertpT->Draw("same");
+		TLegend *tlpT = new TLegend(.4,.4,.6,.6);
+		tlpT->AddEntry(alltruthpT,"All Truth","l");
+		tlpT->AddEntry(accepttruthpT,"Truth in Acceptance","l");
+		tlpT->AddEntry(recoTrackpT,"Reco Tracks","l");
+		tlpT->AddEntry(recoVertpT,"reco Vertex","l");
+		tlpT->Draw();
 	}
 }

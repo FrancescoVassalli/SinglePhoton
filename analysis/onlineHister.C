@@ -102,8 +102,8 @@ void makeHists2(TTree* truthTree, TTree* recoveryTree, const string& outname){
 	int e_events=0;
 
 	TH1F* h_r_dtrackMatcheddR = new TH1F("R#frac{dtrack}{dR}","",20,0,30);
-  TH1F* h_t_totalpT = new TH1F("T#frac{dtrack}{dpT} all","",20,0,30);
-  TH1F* h_t_matchedpT = new TH1F("T#frac{dtrack}{dpT} matched","",20,0,30);
+  TH1F* h_t_totalpT = new TH1F("TpT acceptance","",20,0,30);
+  TH1F* h_t_matchedpT = new TH1F("TpT reco vert","",20,0,30);
 	TH1F* h_t_siliconepT = new TH1F("T#frac{dtrack}{dpT} silicone","",20,0,30);
   TH1F* h_t_R = new TH1F("TR","",20,0,30);
   TH1F* h_recoTrackTruthR = new TH1F("recoTrackTruthR","",20,0,30);
@@ -162,7 +162,7 @@ void makeHists2(TTree* truthTree, TTree* recoveryTree, const string& outname){
         }
         h_r_dtrackMatcheddR->Fill(t_rVtx[0]);
       }
-      else{
+      else{ //no reco vert 
         h_tnr_R->Fill(t_rVtx[0]);
       }
       }
