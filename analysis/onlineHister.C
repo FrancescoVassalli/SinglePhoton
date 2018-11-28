@@ -80,7 +80,6 @@ void makeHists2(TTree* truthTree, TTree* recoveryTree, const string& outname){
   truthTree->SetBranchAddress("event",&event);
   truthTree->SetBranchAddress("hash",&hash);
   truthTree->SetBranchAddress("nVtx",&t_nVtx);
-  truthTree->SetBranchAddress("nconvert",&t_nconvert);
   truthTree->SetBranchAddress("nTpair",&t_npair);
   truthTree->SetBranchAddress("nRpair",&r_npair);
   truthTree->SetBranchAddress("rVtx",&t_rVtx);
