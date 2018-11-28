@@ -51,7 +51,6 @@ class SinglePhotonAfter: public SubsysReco
   std::string _b_hash;
   int _b_event;
   int _b_nVtx;  //total conversions
-  int _b_nconvert;  //this is how I count how many truth conversions are in my acceptance
   int _b_Tpair; //count acceptance e pairs in truth
   int _b_Rpair; //count acceptance e pairs in reco
   float _b_rVtx[kMAXParticles];  //truth radius

@@ -33,7 +33,6 @@ int SinglePhotonAfter::InitRun(PHCompositeNode *topNode)
   _tree->Branch("event",&_b_event); 
   _tree->Branch("hash",&_b_hash);
   _tree->Branch("nVtx", &_b_nVtx);
-  _tree->Branch("nconvert", &_b_nconvert);
   _tree->Branch("nTpair", &_b_Tpair);
   _tree->Branch("nRpair", &_b_Rpair);
   _tree->Branch("rVtx", _b_rVtx,"rVtx[nVtx]/F");
@@ -52,7 +51,7 @@ int SinglePhotonAfter::process_event(PHCompositeNode *topNode)
   PHG4TruthInfoContainer* truthinfo = findNode::getClass<PHG4TruthInfoContainer>(topNode,"G4TruthInfo");
   PHG4TruthInfoContainer::Range range = truthinfo->GetParticleRange();
   SvtxEvalStack *stack = new SvtxEvalStack(topNode);
-  SvtxTrackEval* trackeval =   stack->get_track_eval();
+  SvtxTrackEval* trackeval = stack->get_track_eval();
 
   //make a list of the conversions
   std::list<int> vtxList;
@@ -102,7 +101,6 @@ void SinglePhotonAfter::numUnique(std::list<int> *l,std::map<int,Conversion> *my
   l->sort();
   int last=-1;
   _b_nVtx = 0;
-  _b_nconvert=0;
   _b_Tpair=0;
   _b_Rpair=0;
   for (std::list<int>::iterator i = l->begin(); i != l->end(); ++i) {
@@ -112,28 +110,23 @@ void SinglePhotonAfter::numUnique(std::list<int> *l,std::map<int,Conversion> *my
       PHG4VtxPoint *vtx =(mymap->at(*i)).getVtx();
       _b_rVtx[_b_nVtx] = sqrt(vtx->get_x()*vtx->get_x()+vtx->get_y()*vtx->get_y());
       PHG4Particle *temp = (mymap->at(*i)).getPhoton();
-      TLorentzVector t;
-      t.SetPxPyPzE(temp->get_px(),temp->get_py(),temp->get_pz(),temp->get_e());
-      _b_parent_pt[_b_nVtx]=t.Pt();
-      _b_parent_phi[_b_nVtx]=t.Phi();
-      _b_parent_eta[_b_nVtx]=t.Eta();
+      TLorentzVector photonTrack,electronTrack,positronTrack;
+      photonTrack.SetPxPyPzE(temp->get_px(),temp->get_py(),temp->get_pz(),temp->get_e());
+      _b_parent_pt[_b_nVtx]=photonTrack.Pt();
+      _b_parent_phi[_b_nVtx]=photonTrack.Phi();
+      _b_parent_eta[_b_nVtx]=photonTrack.Eta();
       temp=(mymap->at(*i)).getElectron();
-      t.SetPxPyPzE(temp->get_px(),temp->get_py(),temp->get_pz(),temp->get_e());
-      _b_electron_pt[_b_nVtx]=t.Pt();
+      electronTrack.SetPxPyPzE(temp->get_px(),temp->get_py(),temp->get_pz(),temp->get_e());
+      _b_electron_pt[_b_nVtx]=electronTrack.Pt();
       temp=(mymap->at(*i)).getPositron();
-      t.SetPxPyPzE(temp->get_px(),temp->get_py(),temp->get_pz(),temp->get_e());
-      _b_positron_pt[_b_nVtx]=t.Pt();
-      if (t.Rapidity()<kRAPIDITYACCEPT)
+      positronTrack.SetPxPyPzE(temp->get_px(),temp->get_py(),temp->get_pz(),temp->get_e());
+      _b_positron_pt[_b_nVtx]=positronTrack.Pt();
+      if (electronTrack.Rapidity()<kRAPIDITYACCEPT&&positronTrack.Rapidity()<kRAPIDITYACCEPT)
       {
-        _b_nconvert++;
-        if (mymap&&mymap->at(*i).hasPair())
+        _b_Tpair++;
+        if (mymap&&mymap->at(*i).hasPair()&&mymap->at(*i).setRecoTracks(trackeval)==2)
         {
-          _b_Tpair++;
-          mymap->at(*i).setRecoTracks(trackeval);
-          if (mymap->at(*i).recoCount()==2)
-          {
             _b_Rpair++;
-          }
         }
       }
       last=*i;
