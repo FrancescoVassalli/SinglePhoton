@@ -39,10 +39,11 @@ R__LOAD_LIBRARY(libPHPythia8.so)
 
   int Fun4All_G4_sPHENIX(
       const int nEvents = 1,
-      const char *outputFile = "G4sPHENIX.root")
+      const char *outputFile = "G4sPHENIX.root",
+      const char *inputFile = NULL)
 {
   const char *embed_input_file = "";
-  const char *inputFile = "";
+  
   //===============
   // Input options
   //===============
@@ -57,7 +58,8 @@ R__LOAD_LIBRARY(libPHPythia8.so)
   const bool readhits = false;
   // Or:
   // read files in HepMC format (typically output from event generators like hijing or pythia)
-  const bool readhepmc = false;  // read HepMC files
+
+  const bool readhepmc = (bool) inputFile;  // read HepMC files
   // Or:
   // Use pythia
   const bool runpythia8 = false;
