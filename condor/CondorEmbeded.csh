@@ -4,7 +4,7 @@
 set OUT_LOCATION="/sphenix/user/vassalli/gammasample/"
 set OUT_FILE=${OUT_LOCATION}fourembededonlineanalysis${p}.root
 set IN_FILE="/sphenix/user/vassalli/gammasample/fourembededout${p}.root"
-set PYTHIA_FILE="/sphenix/user/vassalli/gammasample/pythiahep.dat"
+set PYTHIA_FILE="/sphenix/user/vassalli/gammasample/pythiahep${p}.dat"
 #
 set SCRATCH_AREA="$_CONDOR_SCRATCH_DIR"                                                                                                              
 #
