@@ -43,7 +43,7 @@ class SinglePhotonAfter: public SubsysReco
 
   void numUnique(std::list<int>* l,std::map<int,Conversion>* map,SvtxTrackEval* trackEval);
 
-  const static int kMAXParticles=8;
+  const static int kMAXParticles=1000;
 
   TFile *_f;
   TTree *_tree;

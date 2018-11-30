@@ -126,20 +126,20 @@ void SinglePhotonAfter::numUnique(std::list<int> *l,std::map<int,Conversion> *my
       electronTrack.SetPxPyPzE(temp->get_px(),temp->get_py(),temp->get_pz(),temp->get_e());
       _b_electron_pt[_b_nVtx]=electronTrack.Pt();
       temp=(mymap->at(*i)).getPositron();
-      cout<<"got positron"<<endl;
-      positronTrack.SetPxPyPzE(temp->get_px(),temp->get_py(),temp->get_pz(),temp->get_e());
-      _b_positron_pt[_b_nVtx]=positronTrack.Pt();
-      if (electronTrack.Rapidity()<kRAPIDITYACCEPT&&positronTrack.Rapidity()<kRAPIDITYACCEPT)
-      {
-        _b_Tpair++;
-        if (mymap&&mymap->at(*i).hasPair()){
-          cout<<"has pair"<<endl;
+      if(temp){ //this will be false for 1 track events
+        positronTrack.SetPxPyPzE(temp->get_px(),temp->get_py(),temp->get_pz(),temp->get_e());
+        _b_positron_pt[_b_nVtx]=positronTrack.Pt();
+        if (electronTrack.Rapidity()<kRAPIDITYACCEPT&&positronTrack.Rapidity()<kRAPIDITYACCEPT)
+        {
+          _b_Tpair++;
           if(mymap->at(*i).setRecoTracks(trackeval)==2)
           {
-            cout<<"set reco tracks"<<endl;
             _b_Rpair++;
           }
         }
+      }
+      else{
+        _b_positron_pt[_b_nVtx]=-1;
       }
       last=*i;
       _b_nVtx++; //if conversion is unique record it 
