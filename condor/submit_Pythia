@@ -52,11 +52,11 @@ Notify_user     = frva5829@colorado.edu
 Requirements = (CPU_Experiment == "phenix")
 
 # Since this is an analysis job we set this to "cas".
-#+Job_Type       = "cas"
-+Job_Type       = "highmem"
++Job_Type       = "cas"
+#+Job_Type       = "highmem"
 
 # This should be the last command and tells condor to queue the
 # job.  If a number is placed after the command (i.e. Queue 15)
 # then the job will be submitted N times.  Use the $(Process)
 # macro to make your input/output and log files unique.
-Queue 1
+Queue 100
