@@ -4,34 +4,42 @@ using namespace Pythia8;
 using namespace std;
 
 void generator(std::string filename, long nEvents){
-	using namespace HepMC;
-	string hepName = filename+".dat";    //filenames
-	 HepMC::Pythia8ToHepMC ToHepMC;    // Interface for conversion from Pythia8::Event to HepMC event.
-    HepMC::IO_GenEvent ascii_io(hepName, std::ios::out); //file where HepMC events will be stored.
+  using namespace HepMC;
+  string hepName = filename+".dat";    //filenames
+  HepMC::Pythia8ToHepMC ToHepMC;    // Interface for conversion from Pythia8::Event to HepMC event.
+  HepMC::IO_GenEvent ascii_io(hepName, std::ios::out); //file where HepMC events will be stored.
 
-  	/*pythia set up*/
+  /*pythia set up*/
   Pythia pythiaengine;
   pythiaengine.readString("Beams:eCM = 200.");
- 	pythiaengine.readString("promptphoton:all = on");
- 	pythiaengine.readString("HardQCD:all = on");
- 	pythiaengine.readString("PhaseSpace:pTHatMin = 10.");
- 	pythiaengine.readString("Random::setSeed = on");
+  pythiaengine.readString("promptphoton:all = on");
+  pythiaengine.readString("HardQCD:all = on");
+  pythiaengine.readString("PhaseSpace:pTHatMin = 3.");
+  pythiaengine.readString("Random::setSeed = on");
   pythiaengine.readString("Random::seed =0");
   pythiaengine.init();
 
   for (int iEvent = 0; iEvent < nEvents; ++iEvent)
-  	{ 
-  		HepMC::GenEvent* hepmcevtfrag = new HepMC::GenEvent(); //create HepMC event
-      ToHepMC.fill_next_event( pythiaengine, hepmcevtfrag ); //convert event from pythia to HepMC
-      ascii_io << hepmcevtfrag;//write event to file
-      delete hepmcevtfrag; //delete event so it can be redeclared next time
-  	}
- }
+  {
+    if (!pythiaengine.next()){
+      cout<<"pythia.next() failed"<<"\n";
+      iEvent--;
+      continue;
+    } 
+    HepMC::GenEvent* hepmcevtfrag = new HepMC::GenEvent(); //create HepMC event
+    ToHepMC.fill_next_event( pythiaengine, hepmcevtfrag ); //convert event from pythia to HepMC
+    ascii_io << hepmcevtfrag;//write event to file
+    delete hepmcevtfrag; //delete event so it can be redeclared next time
+    if(iEvent%10==0){
+      cout<<iEvent<<'\n';
+    }
+  }
+}
 
 int main(int argc, char const *argv[] )
 {
-	string fileOut = string(argv[1]);
-	long nEvents =strtol(argv[2],NULL,10);  // 5000000;
-	makeData(fileOut,nEvents);
-	return 0;
+  string fileOut = string(argv[1]);
+  long nEvents =strtol(argv[2],NULL,10);  // 5000000;
+  generator(fileOut,nEvents);
+  return 0;
 }
