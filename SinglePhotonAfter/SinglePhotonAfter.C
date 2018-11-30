@@ -52,6 +52,11 @@ int SinglePhotonAfter::process_event(PHCompositeNode *topNode)
   PHG4TruthInfoContainer::Range range = truthinfo->GetParticleRange();
   SvtxEvalStack *stack = new SvtxEvalStack(topNode);
   SvtxTrackEval* trackeval = stack->get_track_eval();
+  if (!trackeval)
+  {
+    cout<<"NULL track eval fatal error"<<endl;
+    return 1;
+  }
 
   //make a list of the conversions
   std::list<int> vtxList;
@@ -82,7 +87,6 @@ int SinglePhotonAfter::process_event(PHCompositeNode *topNode)
       //isPrimary=false;
     }
   }
-  cout<<"finished event loop"<<endl;
   //record event information 
   numUnique(&vtxList,&mapConversions,trackeval);
   cout<<"finished numUnique"<<endl;
@@ -102,7 +106,6 @@ int SinglePhotonAfter::process_event(PHCompositeNode *topNode)
 
 void SinglePhotonAfter::numUnique(std::list<int> *l,std::map<int,Conversion> *mymap=NULL,SvtxTrackEval* trackeval=NULL){
   l->sort();
-  cout<<"sorted"<<endl;
   int last=-1;
   _b_nVtx = 0;
   _b_Tpair=0;
@@ -112,17 +115,14 @@ void SinglePhotonAfter::numUnique(std::list<int> *l,std::map<int,Conversion> *my
     if(*i!=last){
       //fill the tree
       PHG4VtxPoint *vtx =(mymap->at(*i)).getVtx();
-      cout<<"got vtx"<<endl;
       _b_rVtx[_b_nVtx] = sqrt(vtx->get_x()*vtx->get_x()+vtx->get_y()*vtx->get_y());
       PHG4Particle *temp = (mymap->at(*i)).getPhoton();
-      cout<<"got photon"<<endl;
       TLorentzVector photonTrack,electronTrack,positronTrack;
       photonTrack.SetPxPyPzE(temp->get_px(),temp->get_py(),temp->get_pz(),temp->get_e());
       _b_parent_pt[_b_nVtx]=photonTrack.Pt();
       _b_parent_phi[_b_nVtx]=photonTrack.Phi();
       _b_parent_eta[_b_nVtx]=photonTrack.Eta();
       temp=(mymap->at(*i)).getElectron();
-      cout<<"got electron"<<endl;
       electronTrack.SetPxPyPzE(temp->get_px(),temp->get_py(),temp->get_pz(),temp->get_e());
       _b_electron_pt[_b_nVtx]=electronTrack.Pt();
       temp=(mymap->at(*i)).getPositron();
@@ -132,10 +132,13 @@ void SinglePhotonAfter::numUnique(std::list<int> *l,std::map<int,Conversion> *my
       if (electronTrack.Rapidity()<kRAPIDITYACCEPT&&positronTrack.Rapidity()<kRAPIDITYACCEPT)
       {
         _b_Tpair++;
-        if (mymap&&mymap->at(*i).hasPair()&&mymap->at(*i).setRecoTracks(trackeval)==2)
-        {
+        if (mymap&&mymap->at(*i).hasPair()){
+          cout<<"has pair"<<endl;
+          if(mymap->at(*i).setRecoTracks(trackeval)==2)
+          {
             cout<<"set reco tracks"<<endl;
             _b_Rpair++;
+          }
         }
       }
       last=*i;
