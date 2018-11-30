@@ -497,7 +497,7 @@ R__LOAD_LIBRARY(libPHPythia8.so)
     //! positive ID is the embedded event of interest, e.g. jetty event from pythia
     //! negative IDs are backgrounds, .e.g out of time pile up collisions
     //! Usually, ID = 0 means the primary Au+Au collision background
-    //in->set_embedding_id(2);
+    in->set_embedding_id(3);
   }
   else
   {

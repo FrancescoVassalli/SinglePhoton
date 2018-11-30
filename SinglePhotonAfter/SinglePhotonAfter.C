@@ -58,7 +58,7 @@ int SinglePhotonAfter::process_event(PHCompositeNode *topNode)
   std::map<int,Conversion> mapConversions;
   for ( PHG4TruthInfoContainer::ConstIterator iter = range.first; iter != range.second; ++iter ) {
     //bool isPrimary;
-    PHG4Particle* g4particle = iter->second; // You may ask yourself, why second?
+    PHG4Particle* g4particle = iter->second; 
     PHG4Particle* parent =truthinfo->GetParticle(g4particle->get_parent_id());
     float radius=0;
     if(!parent){ //if the parent point is null then the particle is primary 
@@ -67,16 +67,17 @@ int SinglePhotonAfter::process_event(PHCompositeNode *topNode)
       //isPrimary=true;
     }
     else{ //if the particle is not primary find its vertex 
-      if(get_embed(parent,truthinfo)!=2) continue;
-      PHG4VtxPoint* vtx=truthinfo->GetVtx(g4particle->get_vtx_id());
-      radius=sqrt(vtx->get_x()*vtx->get_x()+vtx->get_y()*vtx->get_y());
-      if (radius<kTPCRADIUS) //limits to truth conversions within the tpc radius
-      {
-        std::cout<<radius<<'\n';
-        vtxList.push_back(vtx->get_id());
-        (mapConversions[vtx->get_id()]).setElectron(g4particle);
-        (mapConversions[vtx->get_id()]).setVtx(vtx);
-        (mapConversions[vtx->get_id()]).setParent(parent);
+      if(get_embed(parent,truthinfo)==2||(get_embed(parent,truthinfo)==3&&parent->get_pid()==22&&g4particle->get_pid()==11)){
+        PHG4VtxPoint* vtx=truthinfo->GetVtx(g4particle->get_vtx_id());
+        radius=sqrt(vtx->get_x()*vtx->get_x()+vtx->get_y()*vtx->get_y());
+        if (radius<kTPCRADIUS) //limits to truth conversions within the tpc radius
+        { 
+          std::cout<<radius<<'\n';
+          vtxList.push_back(vtx->get_id());
+          (mapConversions[vtx->get_id()]).setElectron(g4particle);
+          (mapConversions[vtx->get_id()]).setVtx(vtx);
+          (mapConversions[vtx->get_id()]).setParent(parent);
+        }
       }
       //isPrimary=false;
     }
