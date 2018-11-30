@@ -82,8 +82,10 @@ int SinglePhotonAfter::process_event(PHCompositeNode *topNode)
       //isPrimary=false;
     }
   }
+  cout<<"finished event loop"<<endl;
   //record event information 
   numUnique(&vtxList,&mapConversions,trackeval);
+  cout<<"finished numUnique"<<endl;
   //make a hash of the event number and file number 
   std::stringstream ss;
   ss<<"-"<<_b_event;             //this is where the file number is 
