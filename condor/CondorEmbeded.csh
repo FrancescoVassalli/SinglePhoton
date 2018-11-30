@@ -1,10 +1,10 @@
 #!/bin/csh 
 @ p = ( ${1} )
 #
-set OUT_LOCATION="/sphenix/user/vassalli/gammasamples/"
+set OUT_LOCATION="/sphenix/user/vassalli/gammasample/"
 set OUT_FILE=${OUT_LOCATION}fourembededonlineanalysis${p}.root
-set IN_FILE="/sphenix/user/vassalli/gammasamples/fourembededout${p}.root"
-set PYTHIA_FILE="/sphenix/user/vassalli/gammasamples/pythiahep.dat"
+set IN_FILE="/sphenix/user/vassalli/gammasample/fourembededout${p}.root"
+set PYTHIA_FILE="/sphenix/user/vassalli/gammasample/pythiahep.dat"
 #
 set SCRATCH_AREA="$_CONDOR_SCRATCH_DIR"                                                                                                              
 #

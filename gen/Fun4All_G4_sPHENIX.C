@@ -556,7 +556,7 @@ R__LOAD_LIBRARY(libPHPythia8.so)
         /*bool*/ do_hcalin_twr,
         /*bool*/ do_hcalout_twr);
   }
-
+  cout<<"outputting \n"<<endl;
   Fun4AllDstOutputManager *out = new Fun4AllDstOutputManager("DSTOUT", outputFile);
   if (do_dst_compress) DstCompress(out);
   se->registerOutputManager(out);
