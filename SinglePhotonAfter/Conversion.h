@@ -112,6 +112,9 @@ public:
   inline PHG4Particle* getPhoton(){
     return photon;
   }
+  inline int getEmbed() const {return embedID;}
+
+  inline void setEmbed(int embedID) {this->embedID=embedID;}
   /*bool acceptancePair(){
 
   }*/
@@ -122,6 +125,8 @@ private:
   PHG4VtxPoint* vtx=NULL;
   SvtxTrack* reco1=NULL;
   SvtxTrack* reco2=NULL;
+
+  int embedID=0;
   /*inline bool inAcceptance(){
 
   }*/

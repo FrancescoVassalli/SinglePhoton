@@ -54,6 +54,7 @@ class SinglePhotonAfter: public SubsysReco
   int _b_Tpair; //count acceptance e pairs in truth
   int _b_Rpair; //count acceptance e pairs in reco
   float _b_rVtx[kMAXParticles];  //truth radius
+  bool _b_pythia[kMAXParticles];  //tracks if the conversion is from pythia or G4 particle
   float _b_electron_pt[kMAXParticles];
   float _b_positron_pt[kMAXParticles];
   float _b_parent_pt  [kMAXParticles];

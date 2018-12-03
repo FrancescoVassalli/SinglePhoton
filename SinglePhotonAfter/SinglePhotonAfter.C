@@ -36,11 +36,13 @@ int SinglePhotonAfter::InitRun(PHCompositeNode *topNode)
   _tree->Branch("nTpair", &_b_Tpair);
   _tree->Branch("nRpair", &_b_Rpair);
   _tree->Branch("rVtx", _b_rVtx,"rVtx[nVtx]/F");
+  _tree->Branch("pythia", _b_pythia,"pythia[nVtx]/B");
   _tree->Branch("electron_pt", _b_electron_pt,"electron_pt[nVtx]/F");
   _tree->Branch("positron_pt", _b_positron_pt,"positron_pt[nVtx]/F");
   _tree->Branch("photon_pt",   _b_parent_pt    ,"photon_pt[nVtx]/F");
   _tree->Branch("photon_eta",  _b_parent_eta  ,"photon_eta[nVtx]/F");
   _tree->Branch("photon_phi",  _b_parent_phi  ,"photon_phi[nVtx]/F");
+
   return 0;
 }
 
@@ -82,6 +84,7 @@ int SinglePhotonAfter::process_event(PHCompositeNode *topNode)
           (mapConversions[vtx->get_id()]).setElectron(g4particle);
           (mapConversions[vtx->get_id()]).setVtx(vtx);
           (mapConversions[vtx->get_id()]).setParent(parent);
+          (mapConversions[vtx->get_id()]).setEmbed(get_embed(parent,truthinfo));
         }
       }
       //isPrimary=false;
@@ -142,6 +145,7 @@ void SinglePhotonAfter::numUnique(std::list<int> *l,std::map<int,Conversion> *my
         }
       }
       last=*i;
+      _b_pythia[_b_nVtx]=(mymap->at(*i)).getEmbed()==3;
       _b_nVtx++; //if conversion is unique record it 
     }
   }
