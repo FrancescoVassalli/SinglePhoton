@@ -88,9 +88,10 @@ int SinglePhotonAfter::process_event(PHCompositeNode *topNode)
     }
   }
   //record event information 
+  cout<<"in numUnique"<<endl;
   std::queue<std::pair<int,int>> missingChildren= numUnique(&vtxList,&mapConversions,trackeval);
-  findChildren(missingChildren,truthinfo);
   cout<<"finished numUnique"<<endl;
+  findChildren(missingChildren,truthinfo);
   //make a hash of the event number and file number 
   std::stringstream ss;
   ss<<"-"<<_b_event;             //this is where the file number is 
@@ -141,9 +142,11 @@ std::queue<std::pair<int,int>> SinglePhotonAfter::numUnique(std::list<int> *l,st
         }
       }
       else{
+        cout<<"in else"<<endl;
         _b_positron_pt[_b_nVtx]=-1;
         pair<int, int> tp(temp->get_parent_id(),temp->get_track_id());
         missingChildren.push(pair<int, int>(temp->get_parent_id(),temp->get_track_id()));
+        cout<<"did else"<<endl;
       }
       last=*i;
       _b_pythia[_b_nVtx]=(mymap->at(*i)).getEmbed()==3;
