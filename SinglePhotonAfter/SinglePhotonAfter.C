@@ -88,7 +88,6 @@ int SinglePhotonAfter::process_event(PHCompositeNode *topNode)
     }
   }
   //record event information 
-  cout<<"in numUnique"<<endl;
   std::queue<std::pair<int,int>> missingChildren= numUnique(&vtxList,&mapConversions,trackeval);
   cout<<"finished numUnique"<<endl;
   findChildren(missingChildren,truthinfo);
@@ -149,6 +148,9 @@ std::queue<std::pair<int,int>> SinglePhotonAfter::numUnique(std::list<int> *l,st
         (mymap->at(*i)).getElectron()->identify();
         cout<<"with parent:\n";
         (mymap->at(*i)).getPhoton()->identify();
+        _b_positron_pt[_b_nVtx]=-1;
+        pair<int, int> tp(temp->get_parent_id(),temp->get_track_id());
+        missingChildren.push(tp);
       }
       last=*i;
       _b_pythia[_b_nVtx]=(mymap->at(*i)).getEmbed()==3;
@@ -168,7 +170,7 @@ void SinglePhotonAfter::findChildren(std::queue<std::pair<int,int>> missingChild
         cout<<"With mother:\n";
       }
     }
-    missingChildren.pop()
+    missingChildren.pop();
   }
 }
 
