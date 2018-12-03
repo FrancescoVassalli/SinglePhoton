@@ -71,7 +71,7 @@ int SinglePhotonAfter::process_event(PHCompositeNode *topNode)
       //isPrimary=true;
     }
     else{ //if the particle is not primary find its vertex 
-      if(get_embed(parent,truthinfo)==2||(get_embed(parent,truthinfo)==3&&parent->get_pid()==22&&g4particle->get_pid()==11)){
+      if(get_embed(parent,truthinfo)==2||(get_embed(parent,truthinfo)==3&&parent->get_pid()==22&&TMath::Abs(g4particle->get_pid())==11)){
         PHG4VtxPoint* vtx=truthinfo->GetVtx(g4particle->get_vtx_id());
         radius=sqrt(vtx->get_x()*vtx->get_x()+vtx->get_y()*vtx->get_y());
         if (radius<kTPCRADIUS) //limits to truth conversions within the tpc radius
@@ -88,7 +88,6 @@ int SinglePhotonAfter::process_event(PHCompositeNode *topNode)
     }
   }
   //record event information 
-  cout<<"in numUnique"<<endl;
   std::queue<std::pair<int,int>> missingChildren= numUnique(&vtxList,&mapConversions,trackeval);
   cout<<"finished numUnique"<<endl;
   findChildren(missingChildren,truthinfo);
@@ -142,10 +141,11 @@ std::queue<std::pair<int,int>> SinglePhotonAfter::numUnique(std::list<int> *l,st
         }
       }
       else{
+        temp=(mymap->at(*i)).getElectron();
         cout<<"in else"<<endl;
         _b_positron_pt[_b_nVtx]=-1;
         pair<int, int> tp(temp->get_parent_id(),temp->get_track_id());
-        missingChildren.push(pair<int, int>(temp->get_parent_id(),temp->get_track_id()));
+        missingChildren.push(tp);
         cout<<"did else"<<endl;
       }
       last=*i;
