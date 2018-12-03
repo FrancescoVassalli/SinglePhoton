@@ -105,7 +105,7 @@ int SinglePhotonAfter::process_event(PHCompositeNode *topNode)
   return 0;
 }
 
-queue<int> SinglePhotonAfter::numUnique(std::list<int> *l,std::map<int,Conversion> *mymap=NULL,SvtxTrackEval* trackeval=NULL){
+queue<pair<int,int>> SinglePhotonAfter::numUnique(std::list<int> *l,std::map<int,Conversion> *mymap=NULL,SvtxTrackEval* trackeval=NULL){
   l->sort();
   int last=-1;
   _b_nVtx = 0;
@@ -142,7 +142,8 @@ queue<int> SinglePhotonAfter::numUnique(std::list<int> *l,std::map<int,Conversio
       }
       else{
         _b_positron_pt[_b_nVtx]=-1;
-        missingChildren.push(temp->get_parent_id());
+        pair<int, int> tp(temp->get_parent_id(),temp->get_track_id());
+        missingChildren.push(pair<int, int>(temp->get_parent_id(),temp->get_track_id()));
       }
       last=*i;
       _b_pythia[_b_nVtx]=(mymap->at(*i)).getEmbed()==3;
@@ -152,13 +153,14 @@ queue<int> SinglePhotonAfter::numUnique(std::list<int> *l,std::map<int,Conversio
   return missingChildren;
 }
 
-void SinglePhotonAfter::findChildren(queue<int> missingChildren,PHG4TruthInfoContainer* truthinfo){
+void SinglePhotonAfter::findChildren(queue<pair<int,int>> missingChildren,PHG4TruthInfoContainer* truthinfo){
   while(!missingChildren.empty()){
     for (PHG4TruthInfoContainer::ConstIterator iter = truthinfo->GetParticleRange().first; iter != truthinfo->GetParticleRange().second; ++iter)
     {
-      if(iter->second->get_parent_id()==missingChildren.front()){
+      if(iter->second->get_parent_id()==missingChildren.front().first&&iter->second->get_track_id()!=missingChildren.front().second){
         cout<<"Found Child:\n";
         iter->second->identify();
+        cout<<"With mother:\n";
       }
     }
     missingChildren.pop()
