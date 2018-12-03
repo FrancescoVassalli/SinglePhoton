@@ -132,7 +132,7 @@ void SinglePhotonAfter::numUnique(std::list<int> *l,std::map<int,Conversion> *my
       if(temp){ //this will be false for 1 track events
         positronTrack.SetPxPyPzE(temp->get_px(),temp->get_py(),temp->get_pz(),temp->get_e());
         _b_positron_pt[_b_nVtx]=positronTrack.Pt();
-        if (electronTrack.Rapidity()<kRAPIDITYACCEPT&&positronTrack.Rapidity()<kRAPIDITYACCEPT)
+        if (TMath::Abs(electronTrack.Eta())<kRAPIDITYACCEPT&&TMath::Abs(positronTrack.Eta())<kRAPIDITYACCEPT)
         {
           _b_Tpair++;
           if(mymap->at(*i).setRecoTracks(trackeval)==2)
