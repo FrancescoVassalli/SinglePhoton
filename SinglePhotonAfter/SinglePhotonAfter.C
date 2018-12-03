@@ -48,8 +48,6 @@ int SinglePhotonAfter::InitRun(PHCompositeNode *topNode)
 
 int SinglePhotonAfter::process_event(PHCompositeNode *topNode)
 {
-  
-
   PHG4TruthInfoContainer* truthinfo = findNode::getClass<PHG4TruthInfoContainer>(topNode,"G4TruthInfo");
   PHG4TruthInfoContainer::Range range = truthinfo->GetParticleRange();
   SvtxEvalStack *stack = new SvtxEvalStack(topNode);
@@ -59,7 +57,6 @@ int SinglePhotonAfter::process_event(PHCompositeNode *topNode)
     cout<<"NULL track eval fatal error"<<endl;
     return 1;
   }
-
   //make a list of the conversions
   std::list<int> vtxList;
   std::map<int,Conversion> mapConversions;
@@ -91,7 +88,8 @@ int SinglePhotonAfter::process_event(PHCompositeNode *topNode)
     }
   }
   //record event information 
-  numUnique(&vtxList,&mapConversions,trackeval);
+  queue<int> missingChildren= numUnique(&vtxList,&mapConversions,trackeval);
+  findChildren(missingChildren,truthinfo);
   cout<<"finished numUnique"<<endl;
   //make a hash of the event number and file number 
   std::stringstream ss;
@@ -107,12 +105,13 @@ int SinglePhotonAfter::process_event(PHCompositeNode *topNode)
   return 0;
 }
 
-void SinglePhotonAfter::numUnique(std::list<int> *l,std::map<int,Conversion> *mymap=NULL,SvtxTrackEval* trackeval=NULL){
+queue<int> SinglePhotonAfter::numUnique(std::list<int> *l,std::map<int,Conversion> *mymap=NULL,SvtxTrackEval* trackeval=NULL){
   l->sort();
   int last=-1;
   _b_nVtx = 0;
   _b_Tpair=0;
   _b_Rpair=0;
+  queue<int> missingChildren;
   for (std::list<int>::iterator i = l->begin(); i != l->end(); ++i) {
     //make sure the conversions are not double counted 
     if(*i!=last){
@@ -143,11 +142,26 @@ void SinglePhotonAfter::numUnique(std::list<int> *l,std::map<int,Conversion> *my
       }
       else{
         _b_positron_pt[_b_nVtx]=-1;
+        missingChildren.push(temp->get_parent_id());
       }
       last=*i;
       _b_pythia[_b_nVtx]=(mymap->at(*i)).getEmbed()==3;
       _b_nVtx++; //if conversion is unique record it 
     }
+  }
+  return missingChildren;
+}
+
+void SinglePhotonAfter::findChildren(queue<int> missingChildren,PHG4TruthInfoContainer* truthinfo){
+  while(!missingChildren.empty()){
+    for (PHG4TruthInfoContainer::ConstIterator iter = truthinfo->GetParticleRange().first; iter != truthinfo->GetParticleRange().second; ++iter)
+    {
+      if(iter->second->get_parent_id()==missingChildren.front()){
+        cout<<"Found Child:\n";
+        iter->second->identify();
+      }
+    }
+    missingChildren.pop()
   }
 }
 
