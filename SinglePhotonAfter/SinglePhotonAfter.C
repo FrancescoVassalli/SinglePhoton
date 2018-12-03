@@ -163,7 +163,7 @@ void SinglePhotonAfter::findChildren(std::queue<std::pair<int,int>> missingChild
         cout<<"With mother:\n";
       }
     }
-    missingChildren.pop()
+    missingChildren.pop();
   }
 }
 

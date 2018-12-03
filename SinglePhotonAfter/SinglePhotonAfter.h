@@ -16,6 +16,7 @@
 
 #include <vector>
 #include <list>
+#include <queue>
 
 
 class PHCompositeNode;
