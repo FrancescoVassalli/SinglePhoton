@@ -88,7 +88,7 @@ int SinglePhotonAfter::process_event(PHCompositeNode *topNode)
     }
   }
   //record event information 
-  queue<int> missingChildren= numUnique(&vtxList,&mapConversions,trackeval);
+  std::queue<std::pair<int,int>> missingChildren= numUnique(&vtxList,&mapConversions,trackeval);
   findChildren(missingChildren,truthinfo);
   cout<<"finished numUnique"<<endl;
   //make a hash of the event number and file number 
@@ -105,13 +105,13 @@ int SinglePhotonAfter::process_event(PHCompositeNode *topNode)
   return 0;
 }
 
-queue<pair<int,int>> SinglePhotonAfter::numUnique(std::list<int> *l,std::map<int,Conversion> *mymap=NULL,SvtxTrackEval* trackeval=NULL){
+std::queue<std::pair<int,int>> SinglePhotonAfter::numUnique(std::list<int> *l,std::map<int,Conversion> *mymap=NULL,SvtxTrackEval* trackeval=NULL){
   l->sort();
   int last=-1;
   _b_nVtx = 0;
   _b_Tpair=0;
   _b_Rpair=0;
-  queue<int> missingChildren;
+  std::queue<std::pair<int,int>> missingChildren;
   for (std::list<int>::iterator i = l->begin(); i != l->end(); ++i) {
     //make sure the conversions are not double counted 
     if(*i!=last){
@@ -153,7 +153,7 @@ queue<pair<int,int>> SinglePhotonAfter::numUnique(std::list<int> *l,std::map<int
   return missingChildren;
 }
 
-void SinglePhotonAfter::findChildren(queue<pair<int,int>> missingChildren,PHG4TruthInfoContainer* truthinfo){
+void SinglePhotonAfter::findChildren(std::queue<std::pair<int,int>> missingChildren,PHG4TruthInfoContainer* truthinfo){
   while(!missingChildren.empty()){
     for (PHG4TruthInfoContainer::ConstIterator iter = truthinfo->GetParticleRange().first; iter != truthinfo->GetParticleRange().second; ++iter)
     {

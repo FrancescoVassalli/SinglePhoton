@@ -41,8 +41,8 @@ class SinglePhotonAfter: public SubsysReco
     return sqrt( pow( deta, 2 ) + pow( dphi, 2 ) );
   }
 
-  queue<int> numUnique(std::list<int>* l,std::map<int,Conversion>* map,SvtxTrackEval* trackEval);
-  void findChildren(queue<int> missing,PHG4TruthInfoContainer* truthinfo);
+  std::queue<std::pair<int,int>> numUnique(std::list<int>* l,std::map<int,Conversion>* map,SvtxTrackEval* trackEval);
+  void findChildren(std::queue<std::pair<int,int>> missing,PHG4TruthInfoContainer* truthinfo);
 
   const static int kMAXParticles=1000;
 
