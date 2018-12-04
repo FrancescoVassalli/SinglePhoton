@@ -153,7 +153,12 @@ std::queue<std::pair<int,int>> SinglePhotonAfter::numUnique(std::list<int> *l,st
         missingChildren.push(tp);
       }
       last=*i;
-      _b_pythia[_b_nVtx]=(mymap->at(*i)).getEmbed()==3;
+      if((mymap->at(*i)).getEmbed()==3){
+        _b_pythia[_b_nVtx]=true;
+      }
+      else{
+        _b_pythia[_b_nVtx]=false;
+      }
       _b_nVtx++; //if conversion is unique record it 
     }
   }
@@ -168,6 +173,7 @@ void SinglePhotonAfter::findChildren(std::queue<std::pair<int,int>> missingChild
         cout<<"Found Child:\n";
         iter->second->identify();
         cout<<"With mother:\n";
+
       }
     }
     missingChildren.pop();
