@@ -141,15 +141,16 @@ std::queue<std::pair<int,int>> SinglePhotonAfter::numUnique(std::list<int> *l,st
         }
       }
       else{
+        cout<<"in else"<<endl;
+        temp=(mymap->at(*i)).getElectron();
         _b_positron_pt[_b_nVtx]=-1;
         pair<int, int> tp(temp->get_parent_id(),temp->get_track_id());
         missingChildren.push(pair<int, int>(temp->get_parent_id(),temp->get_track_id()));
         cout<<"No pair for:\n";
-        (mymap->at(*i)).getElectron()->identify();
+        temp->identify();
         cout<<"with parent:\n";
         (mymap->at(*i)).getPhoton()->identify();
         _b_positron_pt[_b_nVtx]=-1;
-        pair<int, int> tp(temp->get_parent_id(),temp->get_track_id());
         missingChildren.push(tp);
       }
       last=*i;
