@@ -11,6 +11,7 @@ int cluster_burner( std::string infile = "XjPhi3_pT5_98_dst.root",std::string ou
   gSystem->Load("libcalotrigger.so");
   gSystem->Load("libSinglePhotonAnalysis.so");
   gSystem->Load("libConvertedPhotonReconstructor.so");
+  gSystem->Load("libtreemaker.so");
 
   int verbosity = 0;
   Fun4AllServer *se = Fun4AllServer::instance();
@@ -23,15 +24,15 @@ int cluster_burner( std::string infile = "XjPhi3_pT5_98_dst.root",std::string ou
  
   SinglePhotonAfter *truther = new SinglePhotonAfter(outfile);
   se->registerSubsystem(truther);
-  ConvertedPhotonReconstructor *converter=new ConvertedPhotonReconstructor(outfile);
-  se->registerSubsystem(converter);
-  se->run();
+  //ConvertedPhotonReconstructor *converter=new ConvertedPhotonReconstructor(outfile);
+  //se->registerSubsystem(converter);
 
   outfile+="cTtree.root";
 
-  TreeMaker *tt = new TreeMaker( outputFile,3);
+  TreeMaker *tt = new TreeMaker( outfile,3);
   se->registerSubsystem( tt );
   
+  se->run();
   se->End();
   delete se;
   std::cout << "All done" << std::endl;

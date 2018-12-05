@@ -279,7 +279,7 @@ int TreeMaker::Init(PHCompositeNode *topNode)
   _tree->Branch("clusterTower_eta",_b_clusterTower_eta,"clusterTower_eta[clusterTower_towers]/D");
   _tree->Branch("clusterTower_phi",_b_clusterTower_phi,"clusterTower_phi[clusterTower_towers]/D");
   _tree->Branch("clusterTower_energy",_b_clusterTower_energy,"clusterTower_energy[clusterTower_towers]/D");
-  cout<<"cTTree initialized"<<endl;
+  std::cout<<"cTTree initialized"<<std::endl;
  return 0;
 }
 
@@ -307,7 +307,7 @@ int TreeMaker::process_event(PHCompositeNode *topNode)
       vz = vertex->get_z();
     }
   }
- 
+  std::cout<<"Analyzing event clusters with vtx=("<<vx<<','<<vy<<','<<vz<<')'<<std::endl; 
   //for ( PHG4TruthInfoContainer::ConstIterator iter = range.first; iter != range.second; ++iter ) {
   //  PHG4Particle* g4particle = iter->second; // You may ask yourself, why second?
   //  if ( truthinfo->isEmbeded( g4particle->get_track_id() ) != _embed_id ) continue;
@@ -356,7 +356,7 @@ int TreeMaker::process_event(PHCompositeNode *topNode)
 
   RawClusterContainer::ConstRange begin_end = clusters->getClusters();
   RawClusterContainer::ConstIterator rtiter;
-
+  std::cout<<"looping "<<clusters->size()<<" clusters"<<std::endl;
   for (rtiter = begin_end.first; rtiter !=  begin_end.second; ++rtiter) 
   {
     RawCluster *cluster = rtiter->second;
