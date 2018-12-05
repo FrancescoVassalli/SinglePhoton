@@ -279,7 +279,7 @@ int TreeMaker::Init(PHCompositeNode *topNode)
   _tree->Branch("clusterTower_eta",_b_clusterTower_eta,"clusterTower_eta[clusterTower_towers]/D");
   _tree->Branch("clusterTower_phi",_b_clusterTower_phi,"clusterTower_phi[clusterTower_towers]/D");
   _tree->Branch("clusterTower_energy",_b_clusterTower_energy,"clusterTower_energy[clusterTower_towers]/D");
-
+  cout<<"cTTree initialized"<<endl;
  return 0;
 }
 
@@ -289,8 +289,8 @@ int TreeMaker::process_event(PHCompositeNode *topNode)
   /////////////////////////////////////find truth particle information /////////////////////////////////////////////
   _b_particle_n = 0;
 
-  PHG4TruthInfoContainer* truthinfo = findNode::getClass<PHG4TruthInfoContainer>(topNode,"G4TruthInfo");
-  PHG4TruthInfoContainer::Range range = truthinfo->GetPrimaryParticleRange();
+  //PHG4TruthInfoContainer* truthinfo = findNode::getClass<PHG4TruthInfoContainer>(topNode,"G4TruthInfo");
+  //PHG4TruthInfoContainer::Range range = truthinfo->GetPrimaryParticleRange();
  
   GlobalVertexMap* vertexmap = findNode::getClass<GlobalVertexMap>(topNode, "GlobalVertexMap");
   vx = NAN;
