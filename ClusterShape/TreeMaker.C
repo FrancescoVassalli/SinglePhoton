@@ -263,7 +263,7 @@ int TreeMaker::Init(PHCompositeNode *topNode)
   //_tree->Branch("et_iso_calotower_sub_R04",_b_et_iso_calotower_sub_R04, "et_iso_calotower_sub_R04[cluster_n]/D");
   //_tree->Branch("et_iso_calotower_R04",_b_et_iso_calotower_R04, "et_iso_calotower_R04[cluster_n]/D");
 
-  //_tree->Branch("NTowers",_b_NTowers,"NTowers[cluster_n]/I");
+  _tree->Branch("NTowers",_b_NTowers,"NTowers[cluster_n]/I");
   //_tree->Branch("etot",_b_etot,"etot[cluster_n]/D");
   //_tree->Branch("e1t",_b_e1t,"e1t[cluster_n]/D");
   //_tree->Branch("e2t",_b_e2t,"e2t[cluster_n]/D");
@@ -385,8 +385,8 @@ int TreeMaker::process_event(PHCompositeNode *topNode)
     //_b_et_iso_calotower_R04[ _b_cluster_n ] = cluster->get_et_iso(4,0,1);
 
     //now we get tower information for ID purposes, find "Center of Energy", get 4 central towers
-    //std::cout<<"Towers in cluster: "<<cluster->getNTowers()<<std::endl;
-    //_b_NTowers[_b_cluster_n] = cluster->getNTowers();
+    std::cout<<"Towers in cluster: "<<cluster->getNTowers()<<std::endl;
+    _b_NTowers[_b_cluster_n] = cluster->getNTowers();
     //std::cout<<"Towers in cluster after saved: "<<_b_NTowers[_b_cluster_n]<<std::endl;
 
     std::vector <ChaseTower> clusterTowers;

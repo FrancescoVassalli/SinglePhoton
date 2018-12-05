@@ -1,5 +1,3 @@
-
-
 #include <iostream>
 using namespace std;
 
@@ -27,22 +25,18 @@ bool doesItExist(const std::string& name) //checks to see if a file exists in th
   }   
 }
 
-void addAllTheTrees(TChain *tree, string treename, int numTrees)
-/* ( exampleTreeChain, "Tree_", 50) for 50 trees called Tree_1.root, Tree_2.root, etc.)*/
-{
-  string tempname;
+TChain* handleFile(string name, string extension, string treename, int filecount){
+  TChain *all = new TChain(treename.c_str());
   string temp;
-
-  for(int i = 0; i < numTrees; i++) //read all files into TChain
+  for (int i = 0; i < filecount; ++i)
   {
-    temp = to_string(i); //convert integer to string
-    tempname = treename + temp + ".root"; //add strings together to form filename
-    //tree->Add(tempname.c_str());
-    if(doesItExist(tempname) == true)
-    {
-     tree->Add(tempname.c_str()); //convert string to const char string and read in file
-    }
+
+    ostringstream s;
+    s<<i;
+    temp = name+string(s.str())+extension;
+    all->Add(temp.c_str());
   }
+  return all;
 }
 
 
@@ -56,28 +50,30 @@ void addAllTheTrees(TChain *tree, string treename, int numTrees)
 //////////////////////////////////////function called by root////////////////////////////////////////////////
 void SPHENIX_G4_drawing_clusters_forFran()
 {
+  double clusterTower_eta[500];
+  double clusterTower_phi[500];
+  double clusterTower_energy[500];
+  int    cluster_n;
+  int    NTowers[200];
+
+  string treePath = "/sphenix/user/vassalli/gammasample/test/fourembededonlineanalysis";
+  string treeExtension = ".rootcTtree.root";
+  TChain *ttree = handleFile(treePath,treeExtension,"ttree",1);
+  ttree->SetBranchAddress("clusterTower_eta",    &clusterTower_eta    );
+  ttree->SetBranchAddress("clusterTower_phi",    &clusterTower_phi    );
+  ttree->SetBranchAddress("clusterTower_energy", &clusterTower_energy );
+  ttree->SetBranchAddress("NTowers",             &NTowers             );
+
+  string outfilename = "onlineClusterFile.root";
+  TFile *out = new TFile(outfilename.c_str(),"RECREATE");
 
   TH2F *photon_cluster = new TH2F("photon_cluster","Plot of Photon Clusters",80,-1,1,251,-1*TMath::Pi(),TMath::Pi());
   photon_cluster->SetStats(kFALSE);
   photon_cluster->GetXaxis()->SetTitle("eta");
   photon_cluster->GetYaxis()->SetTitle("phi");
 
-  double clusterTower_eta[500];
-  double clusterTower_phi[500];
-  double clusterTower_energy[500];
-  int    cluster_n;
-  int    NTowers[20];
-
-  TChain *ttree = new TChain("ttree");
-  addAllTheTrees(ttree, "./single_particles_TMVA/photon_output_", 100);
-
-  ttree->SetBranchAddress("clusterTower_eta",    &clusterTower_eta    );
-  ttree->SetBranchAddress("clusterTower_phi",    &clusterTower_phi    );
-  ttree->SetBranchAddress("clusterTower_energy", &clusterTower_energy );
-  ttree->SetBranchAddress("NTowers",             &NTowers             );
 
   int clusterNum = 1; // number of clusters you wish to draw on a single canvas
-
   ttree->GetEvent(0);
   for(int i = 0; i < clusterNum; i++)
   {
@@ -86,20 +82,9 @@ void SPHENIX_G4_drawing_clusters_forFran()
       photon_cluster->Fill(clusterTower_eta[event],clusterTower_phi[event],clusterTower_energy[event]);
     }
   }
-
-  TCanvas *canvas1 = new TCanvas("canvas1","2D Histogram Canvas",800,600);
-  canvas1->cd(1);
-  //gPad->SetGrid();
-  //photon_cluster->GetXaxis()->SetNdivisions(20);
-  //photon_cluster->GetYaxis()->SetNdivisions(62);
-  photon_cluster->Draw("colz");
+  out->Write();
+  out->Close();
+  delete ttree;
+  delete out;
 
 }
-
-
-
-
-
-
-
-
