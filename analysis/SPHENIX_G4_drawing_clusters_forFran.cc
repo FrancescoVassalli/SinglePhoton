@@ -63,6 +63,7 @@ void SPHENIX_G4_drawing_clusters_forFran()
   ttree->SetBranchAddress("clusterTower_phi",    &clusterTower_phi    );
   ttree->SetBranchAddress("clusterTower_energy", &clusterTower_energy );
   ttree->SetBranchAddress("NTowers",             &NTowers             );
+  ttree->SetBranchAddress("cluster_n",           &cluster_n           );
 
   string outfilename = "onlineClusterFile.root";
   TFile *out = new TFile(outfilename.c_str(),"RECREATE");
@@ -73,8 +74,9 @@ void SPHENIX_G4_drawing_clusters_forFran()
   photon_cluster->GetYaxis()->SetTitle("phi");
 
 
-  int clusterNum = 1; // number of clusters you wish to draw on a single canvas
+  int clusterNum = 2; // number of clusters you wish to draw on a single canvas
   ttree->GetEvent(0);
+  cout<<"Drawing "<<clusterNum<<" of "<<cluster_n<<" clusters\n";
   for(int i = 0; i < clusterNum; i++)
   {
     for(int event = 0; event < NTowers[i]; event++)
