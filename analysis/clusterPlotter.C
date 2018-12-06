@@ -90,11 +90,17 @@ void clusterPlotter(){
 	string name ="onlineClusterFile.root";
 	TFile *ef = new TFile((name).c_str(),"READ");
 
-
-	TH1F* cluster =(TH1F*) ef->Get("photon_cluster");
-	
-	TCanvas *tcR = new TCanvas();
-	cluster->Draw("colz");
-	cluster->SetTitle("Cluster;#eta;#phi");
+	int numPlots =5;
+	string plotname = "photon_cluster";
+	TH1F* cluster;
+	for (int i = 0; i < numPlots; ++i)
+	{
+		string thisplotname = plotname+to_string(i);
+		cluster=(TH1F*) ef->Get(thisplotname.c_str());
+		TCanvas *tcR = new TCanvas();
+		cluster->Draw("colz");
+		cluster->SetTitle("Cluster;#eta;#phi");
+	}
+	 
 
 }

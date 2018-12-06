@@ -339,7 +339,6 @@ int TreeMaker::process_event(PHCompositeNode *topNode)
 
   RawTowerContainer *towersEM3old = findNode::getClass<RawTowerContainer>(topNode, "TOWER_CALIB_CEMC");
   RawTowerGeomContainer *geomEM = findNode::getClass<RawTowerGeomContainer>(topNode, "TOWERGEOM_CEMC");
-
   RawClusterContainer *clusters = findNode::getClass<RawClusterContainer>(topNode,"CLUSTER_CEMC");
     
   //find correct vertex
@@ -354,12 +353,12 @@ int TreeMaker::process_event(PHCompositeNode *topNode)
      //std::cout<<"Event Vertex Calculated in ClusterIso x:"<<vx<<" y:"<<vy<<" z:"<<vz<<'\n';
   }
 
-  RawClusterContainer::ConstRange begin_end = clusters->getClusters();
-  RawClusterContainer::ConstIterator rtiter;
-  std::cout<<"looping "<<clusters->size()<<" clusters"<<std::endl;
-  for (rtiter = begin_end.first; rtiter !=  begin_end.second; ++rtiter) 
+  SinglePhotonAfter *truthConversionModule  = findNode::getClass<SinglePhotonAfter>(topNode, "TRUTH_CONVERSION_EVAL");
+
+  SinglePhotonAfter::ConstClusterIter clusiter;
+  for (clusiter = truthConversionModule->conversionClusters_begin(); clusiter !=  truthConversionModule->conversionClusters_end(); ++clusiter) 
   {
-    RawCluster *cluster = rtiter->second;
+    RawCluster *cluster = clusters->getCluster(*clusiter);
     CLHEP::Hep3Vector vertex( vx, vy, vz); //set new correct vertex for eta calculation
     CLHEP::Hep3Vector E_vec_cluster = RawClusterUtility::GetEVec(*cluster, vertex);
     double cluster_energy = E_vec_cluster.mag();

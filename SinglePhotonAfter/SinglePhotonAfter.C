@@ -15,7 +15,7 @@
 #include <sstream>
 #include <math.h>
 
-SinglePhotonAfter::SinglePhotonAfter(const std::string &name) : SubsysReco("SinglePhoton")
+SinglePhotonAfter::SinglePhotonAfter(const std::string &name) : SubsysReco("TRUTH_CONVERSION_EVAL")
 {
   _foutname = name;
 }
@@ -138,6 +138,7 @@ std::queue<std::pair<int,int>> SinglePhotonAfter::numUnique(std::list<int> *l,st
           {
             _b_Rpair++;
           }
+          conversionClusterIDs.insert(mymap->at(*i).get_cluster_id());
         }
       }
       else{
@@ -180,6 +181,7 @@ void SinglePhotonAfter::findChildren(std::queue<std::pair<int,int>> missingChild
     missingChildren.pop();
   }
 }
+
 
 int SinglePhotonAfter::End(PHCompositeNode *topNode)
 {

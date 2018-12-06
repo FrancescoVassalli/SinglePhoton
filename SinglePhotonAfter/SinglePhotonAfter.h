@@ -17,6 +17,7 @@
 #include <vector>
 #include <list>
 #include <queue>
+#include <set>
 
 
 class PHCompositeNode;
@@ -27,11 +28,20 @@ class SinglePhotonAfter: public SubsysReco
 {
 
  public:
+  typedef std::set<unsigned int> ClusterSet;
+  typedef ClusterSet::const_iterator ConstClusterIter;
+  typedef ClusterSet::iterator       ClusterIter;
+
   SinglePhotonAfter(const std::string &name="SinglePhotonAfter.root");
   ~SinglePhotonAfter();
   int InitRun(PHCompositeNode*);
   int process_event(PHCompositeNode*);
   int End(PHCompositeNode*);
+
+  ConstClusterIter conversionClusters_begin() const {return conversionClusterIDs.begin();}
+  ClusterIter conversionClusters_begin() {return conversionClusterIDs.begin();}
+  ConstClusterIter conversionClusters_end() const {return conversionClusterIDs.end();}
+  ClusterIter conversionClusters_end() {return conversionClusterIDs.end();}
 
  private:
   inline float deltaR( float eta1, float eta2, float phi1, float phi2 ) {
@@ -62,6 +72,8 @@ class SinglePhotonAfter: public SubsysReco
   float _b_parent_pt  [kMAXParticles];
   float _b_parent_eta [kMAXParticles];
   float _b_parent_phi [kMAXParticles];
+
+  ClusterSet conversionClusterIDs;
 
   const static int kTPCRADIUS=21; //in cm there is a way to get this from the simulation I should implement
   float kRAPIDITYACCEPT=1;

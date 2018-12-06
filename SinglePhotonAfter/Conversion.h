@@ -115,6 +115,8 @@ public:
   inline int getEmbed() const {return embedID;}
 
   inline void setEmbed(int embedID) {this->embedID=embedID;}
+
+  int get_cluster_id();
   /*bool acceptancePair(){
 
   }*/

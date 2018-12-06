@@ -21,3 +21,12 @@ int Conversion::setRecoTracks(SvtxTrackEval* trackeval){
   }
   return r;
 }
+
+
+int Conversion::get_cluster_id(){
+  if (!reco1)
+  {
+    reco1=trackeval->best_track_from(e1);
+  }
+  return reco1->get_cal_cluster_id(1);//id of the emcal
+}
