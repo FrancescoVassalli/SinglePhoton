@@ -74,7 +74,7 @@ void SPHENIX_G4_drawing_clusters_forFran()
   photon_cluster->GetYaxis()->SetTitle("phi");
 
 
-  int clusterNum = 2; // number of clusters you wish to draw on a single canvas
+  int clusterNum = 9; // number of clusters you wish to draw on a single canvas
   ttree->GetEvent(0);
   cout<<"Drawing "<<clusterNum<<" of "<<cluster_n<<" clusters\n";
   for(int i = 0; i < clusterNum; i++)
