@@ -69,7 +69,6 @@ void SPHENIX_G4_drawing_clusters_forFran()
   TFile *out = new TFile(outfilename.c_str(),"RECREATE");
 
   string plotname = "photon_cluster";
-  ostringstream oss;
 
   TH2F *photon_cluster; 
 
@@ -79,9 +78,9 @@ void SPHENIX_G4_drawing_clusters_forFran()
   {
     ttree->GetEvent(event);
     cout<<"Drawing "<<clusterNum<<" of "<<cluster_n<<" clusters\n";
+    ostringstream oss;
     oss<<event;
     string thisPlotname = plotname +string(oss.str());
-    oss.clear();
     photon_cluster= new TH2F(thisPlotname.c_str(),"Plot of Photon Clusters",80,-1,1,251,-1*TMath::Pi(),TMath::Pi());
     photon_cluster->SetStats(kFALSE);
     photon_cluster->GetXaxis()->SetTitle("eta");
