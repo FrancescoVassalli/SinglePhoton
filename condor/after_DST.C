@@ -11,6 +11,7 @@ int after_DST( std::string infile = "XjPhi3_pT5_98_dst.root",std::string outfile
   gSystem->Load("libcalotrigger.so");
   gSystem->Load("libSinglePhotonAnalysis.so");
   gSystem->Load("libConvertedPhotonReconstructor.so");
+  gSystem->Load("libtreemaker.so");
 
   int verbosity = 0;
   Fun4AllServer *se = Fun4AllServer::instance();
@@ -25,6 +26,9 @@ int after_DST( std::string infile = "XjPhi3_pT5_98_dst.root",std::string outfile
   se->registerSubsystem(truther);
   ConvertedPhotonReconstructor *converter=new ConvertedPhotonReconstructor(outfile);
   se->registerSubsystem(converter);
+  outfile+="cTtree.root";
+  TreeMaker *tt = new TreeMaker( outfile,3);
+  se->registerSubsystem( tt );
   se->run();
 
   se->End();

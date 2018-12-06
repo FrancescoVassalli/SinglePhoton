@@ -16,7 +16,7 @@ cp  $SOURCE_PHOTONMAKER $SCRATCH_AREA/fran_single_photons/
 cp $BURNER $SCRATCH_AREA/fran_single_photons/
 #
 cd $SCRATCH_AREA/fran_single_photons
-root -b -q Fun4All_G4_sPHENIX.C\(100,\"$IN_FILE\"\) 
+#root -b -q Fun4All_G4_sPHENIX.C\(100,\"$IN_FILE\"\) 
 root -b -q after_DST.C\(\"$IN_FILE\",\"$OUT_FILE\"\)
 #
 rm -r $SCRATCH_AREA/fran_single_photons
