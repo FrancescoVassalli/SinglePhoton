@@ -9,6 +9,7 @@ libtreemaker_la_LDFLAGS = \
   -nodefaultlibs \
   -L$(libdir) \
   -L$(OFFLINE_MAIN)/lib \
+	-L$(HOME)/install/lib \
  `root-config --libs`
 
 lib_LTLIBRARIES = \
@@ -27,7 +28,8 @@ libtreemaker_la_LIBADD = \
   -lg4eval \
   -lcalotrigger \
   -ljetbackground \
-  -lphool
+  -lphool\
+	-lSinglePhotonAnalysis
 
 BUILT_SOURCES = \
 	testexternals.C

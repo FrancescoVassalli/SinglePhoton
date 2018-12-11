@@ -6,7 +6,7 @@
 #include "TTree.h"
 #include "TFile.h"
 #include <string>
-#include <SinglePhotonAfter.h>
+#include </direct/phenix+u/vassalli/sphenix/single/SinglePhotonAfter/SinglePhotonAfter.h>
 
 class PHCompositeNode;
 
