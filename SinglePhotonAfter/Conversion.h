@@ -128,8 +128,8 @@ public:
 
   inline void setEmbed(int embedID) {this->embedID=embedID;}
 
-  int get_cluster_id() const;
-  int get_cluster_id(SvtxTrackEval *trackeval) const;
+  int get_cluster_id();
+  int get_cluster_id(SvtxTrackEval *trackeval);
   /*bool acceptancePair(){
 
   }*/
