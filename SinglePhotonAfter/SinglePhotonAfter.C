@@ -138,8 +138,11 @@ std::queue<std::pair<int,int>> SinglePhotonAfter::numUnique(std::list<int> *l,st
           {
             _b_Rpair++;
           }
+          cout<<"getting cluster"<<endl;
           int clustidtemp =mymap->at(*i).get_cluster_id(trackeval);
+          cout<<"got"<<endl;
           conversionClusterIDs.insert(clustidtemp);
+          cout<<"set"<<endl;
         }
       }
       else{
