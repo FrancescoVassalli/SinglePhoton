@@ -1,7 +1,7 @@
 #include "Conversion.h"
 
-#include <g4eval/SvtxTrackEval.h>
 int Conversion::setRecoTracks(SvtxTrackEval* trackeval){	
+  this->trackeval=trackeval;
   if (e1)
   {
   	reco1=trackeval->best_track_from(e1); // have not checked that these are in range 
@@ -22,11 +22,43 @@ int Conversion::setRecoTracks(SvtxTrackEval* trackeval){
   return r;
 }
 
+int Conversion::setRecoTracks(){  
+  assert(trackeval);
+  if (e1)
+  {
+    reco1=trackeval->best_track_from(e1); // have not checked that these are in range 
+  }
+  if (e2)
+  {
+    reco2=trackeval->best_track_from(e1);
+  }
+  int r=0;
+  if (reco1)
+  {
+    r++;
+  }
+  if (reco2)
+  {
+    r++;
+  }
+  return r;
+}
 
-int Conversion::get_cluster_id(){
+
+int Conversion::get_cluster_id() const{
+  assert(trackeval);
   if (!reco1)
   {
     reco1=trackeval->best_track_from(e1);
   }
-  return reco1->get_cal_cluster_id(1);//id of the emcal
+  return reco1->get_cal_cluster_id(CEMC);//id of the emcal
+}
+
+int Conversion::get_cluster_id(SvtxTrackEval *trackeval) const{
+  this->trackeval=trackeval;
+  if (!reco1)
+  {
+    reco1=trackeval->best_track_from(e1);
+  }
+  return reco1->get_cal_cluster_id(CEMC);//id of the emcal
 }

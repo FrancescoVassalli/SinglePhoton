@@ -4,6 +4,7 @@
 #include <g4main/PHG4Particle.h>
 #include <g4main/PHG4VtxPoint.h>
 #include <g4hough/SvtxTrack.h>
+#include <g4eval/SvtxTrackEval.h>
 
 class SvtxTrackEval;
 
@@ -11,7 +12,14 @@ class Conversion
 {
 public:
   Conversion(){}
+  Conversion(SvtxTrackEval* trackeval){
+    this->trackeval=trackeval;
+  }
   Conversion(PHG4VtxPoint* vtx){
+    this->vtx=vtx;
+  }
+  Conversion(PHG4VtxPoint* vtx,SvtxTrackEval *trackeval){
+    this->trackeval=trackeval;
     this->vtx=vtx;
   }
   ~Conversion(){
@@ -31,6 +39,9 @@ public:
     else{
       e1=e;
     }
+  }
+  inline void setTrackEval(SvtxTrackEval *trackeval){
+    this->trackeval=trackeval;
   }
   inline bool setElectron(){
     if (hasPair())
@@ -84,6 +95,7 @@ public:
     photon=parent;
   }
   int setRecoTracks(SvtxTrackEval* trackeval);
+  int setRecoTracks();
 
   inline int recoCount(){
     int r=0;
@@ -116,7 +128,8 @@ public:
 
   inline void setEmbed(int embedID) {this->embedID=embedID;}
 
-  int get_cluster_id();
+  int get_cluster_id() const;
+  int get_cluster_id(SvtxTrackEval *trackeval) const;
   /*bool acceptancePair(){
 
   }*/
@@ -127,6 +140,7 @@ private:
   PHG4VtxPoint* vtx=NULL;
   SvtxTrack* reco1=NULL;
   SvtxTrack* reco2=NULL;
+  SvtxTrackEval* trackeval=NULL;
 
   int embedID=0;
   /*inline bool inAcceptance(){

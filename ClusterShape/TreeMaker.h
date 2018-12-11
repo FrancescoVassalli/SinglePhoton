@@ -6,6 +6,7 @@
 #include "TTree.h"
 #include "TFile.h"
 #include <string>
+#include <SinglePhotonAfter.h>
 
 class PHCompositeNode;
 
