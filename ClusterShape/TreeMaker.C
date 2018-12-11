@@ -355,7 +355,7 @@ int TreeMaker::process_event(PHCompositeNode *topNode)
 
   SinglePhotonAfter *truthConversionModule  = findNode::getClass<SinglePhotonAfter>(topNode, "TRUTH_CONVERSION_EVAL");
 
-  SinglePhotonAfter::ConstClusterIter clusiter;
+  SinglePhotonAfter::ClusterIter clusiter;
   for (clusiter = truthConversionModule->conversionClusters_begin(); clusiter !=  truthConversionModule->conversionClusters_end(); ++clusiter) 
   {
     RawCluster *cluster = clusters->getCluster(*clusiter);
