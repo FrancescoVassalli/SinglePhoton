@@ -88,6 +88,8 @@ int SinglePhotonAfter::process_event(PHCompositeNode *topNode)
     }
   }
   //record event information 
+
+  cout<<"start numUnique"<<endl;
   std::queue<std::pair<int,int>> missingChildren= numUnique(&vtxList,&mapConversions,trackeval);
   cout<<"finished numUnique"<<endl;
   findChildren(missingChildren,truthinfo);
@@ -124,9 +126,11 @@ std::queue<std::pair<int,int>> SinglePhotonAfter::numUnique(std::list<int> *l,st
       _b_parent_pt[_b_nVtx]=photonTrack.Pt();
       _b_parent_phi[_b_nVtx]=photonTrack.Phi();
       _b_parent_eta[_b_nVtx]=photonTrack.Eta();
+      cout<<"got photon"<<endl;
       temp=(mymap->at(*i)).getElectron();
       electronTrack.SetPxPyPzE(temp->get_px(),temp->get_py(),temp->get_pz(),temp->get_e());
       _b_electron_pt[_b_nVtx]=electronTrack.Pt();
+      cout<<"got electron"<<endl;
       temp=(mymap->at(*i)).getPositron();
       if(temp){ //this will be false for 1 track events
         positronTrack.SetPxPyPzE(temp->get_px(),temp->get_py(),temp->get_pz(),temp->get_e());
@@ -138,7 +142,11 @@ std::queue<std::pair<int,int>> SinglePhotonAfter::numUnique(std::list<int> *l,st
           {
             _b_Rpair++;
           }
-          conversionClusterIDs.insert(mymap->at(*i).get_cluster_id());
+          cout<<"got tracks"<<endl;
+          int clustidtemp =mymap->at(*i).get_cluster_id();
+          cout<<"cluster:"<<clustidtemp<<endl;
+          conversionClusterIDs.insert(clustidtemp);
+          cout<<"inserted"<<endl;
         }
       }
       else{
