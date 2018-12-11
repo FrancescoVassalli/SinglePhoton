@@ -88,8 +88,8 @@ int SinglePhotonAfter::process_event(PHCompositeNode *topNode)
     }
   }
   //record event information 
+
   std::queue<std::pair<int,int>> missingChildren= numUnique(&vtxList,&mapConversions,trackeval);
-  cout<<"finished numUnique"<<endl;
   findChildren(missingChildren,truthinfo);
   //make a hash of the event number and file number 
   std::stringstream ss;
@@ -138,7 +138,8 @@ std::queue<std::pair<int,int>> SinglePhotonAfter::numUnique(std::list<int> *l,st
           {
             _b_Rpair++;
           }
-          conversionClusterIDs.insert(mymap->at(*i).get_cluster_id());
+          int clustidtemp =mymap->at(*i).get_cluster_id(trackeval);
+          conversionClusterIDs.insert(clustidtemp);
         }
       }
       else{

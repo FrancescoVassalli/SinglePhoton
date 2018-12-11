@@ -48,7 +48,7 @@ int Conversion::setRecoTracks(){
 
 int Conversion::get_cluster_id(){
   assert(reco1);
-  return reco1->get_cal_cluster_id(SvtxTrack::Cal_Layer(1));//id of the emcal
+  return reco1->get_cal_cluster_id(SvtxTrack::CAL_LAYER(1));//id of the emcal
 }
 
 int Conversion::get_cluster_id(SvtxTrackEval *trackeval){
@@ -57,5 +57,5 @@ int Conversion::get_cluster_id(SvtxTrackEval *trackeval){
   {
     reco1=trackeval->best_track_from(e1);
   }
-  return reco1->get_cal_cluster_id(SvtxTrack::Cal_Layer(1));//id of the emcal
+  return reco1->get_cal_cluster_id(SvtxTrack::CAL_LAYER(1));//id of the emcal
 }
