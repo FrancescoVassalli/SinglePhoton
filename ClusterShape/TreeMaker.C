@@ -358,6 +358,10 @@ int TreeMaker::process_event(PHCompositeNode *topNode)
   SinglePhotonAfter::ClusterIter clusiter;
   for (clusiter = truthConversionModule->conversionClusters_begin(); clusiter !=  truthConversionModule->conversionClusters_end(); ++clusiter) 
   {
+    if (*clusiter==-1)
+    {
+      continue;
+    }
     RawCluster *cluster = clusters->getCluster(*clusiter);
     CLHEP::Hep3Vector vertex( vx, vy, vz); //set new correct vertex for eta calculation
     CLHEP::Hep3Vector E_vec_cluster = RawClusterUtility::GetEVec(*cluster, vertex);
