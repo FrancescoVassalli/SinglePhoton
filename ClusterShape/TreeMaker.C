@@ -339,7 +339,7 @@ int TreeMaker::process_event(PHCompositeNode *topNode)
 
   RawTowerContainer *towersEM3old = findNode::getClass<RawTowerContainer>(topNode, "TOWER_CALIB_CEMC");
   RawTowerGeomContainer *geomEM = findNode::getClass<RawTowerGeomContainer>(topNode, "TOWERGEOM_CEMC");
-  RawClusterContainer *clusters = findNode::getClass<RawClusterContainer>(topNode,"CLUSTER_CEMC");
+  RawClusterContainer *clusters = conversionModule.getCluster();
     
   //find correct vertex
   vertexmap = findNode::getClass<GlobalVertexMap>(topNode, "GlobalVertexMap"); 
@@ -352,11 +352,7 @@ int TreeMaker::process_event(PHCompositeNode *topNode)
      vz = vertex->get_z();
      //std::cout<<"Event Vertex Calculated in ClusterIso x:"<<vx<<" y:"<<vy<<" z:"<<vz<<'\n';
   }
-
-  SinglePhotonAfter *truthConversionModule  = findNode::getClass<SinglePhotonAfter>(topNode, "TRUTH_CONVERSION_EVAL");
-
-  SinglePhotonAfter::ClusterIter clusiter;
-  for (clusiter = truthConversionModule->conversionClusters_begin(); clusiter !=  truthConversionModule->conversionClusters_end(); ++clusiter) 
+  for (RawClusterContainer::Iterator clusiter = clusters->getClusters().first(); clusiter !=  clusters->getClusters().second(); ++clusiter) 
   {
     if (*clusiter==-1)
     {

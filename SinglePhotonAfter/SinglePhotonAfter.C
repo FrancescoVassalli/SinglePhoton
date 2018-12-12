@@ -48,6 +48,7 @@ int SinglePhotonAfter::InitRun(PHCompositeNode *topNode)
 
 int SinglePhotonAfter::process_event(PHCompositeNode *topNode)
 {
+  RawClusterContainer *mainClusterContainer = findNode::getClass<RawClusterContainer>(topNode,"CLUSTER_CEMC");
   PHG4TruthInfoContainer* truthinfo = findNode::getClass<PHG4TruthInfoContainer>(topNode,"G4TruthInfo");
   PHG4TruthInfoContainer::Range range = truthinfo->GetParticleRange();
   SvtxEvalStack *stack = new SvtxEvalStack(topNode);
@@ -105,7 +106,7 @@ int SinglePhotonAfter::process_event(PHCompositeNode *topNode)
   return 0;
 }
 
-std::queue<std::pair<int,int>> SinglePhotonAfter::numUnique(std::list<int> *l,std::map<int,Conversion> *mymap=NULL,SvtxTrackEval* trackeval=NULL){
+std::queue<std::pair<int,int>> SinglePhotonAfter::numUnique(std::list<int> *l,std::map<int,Conversion> *mymap=NULL,SvtxTrackEval* trackeval=NULL,RawClusterContainer *mainClusterContainer){
   l->sort();
   int last=-1;
   _b_nVtx = 0;
@@ -141,7 +142,7 @@ std::queue<std::pair<int,int>> SinglePhotonAfter::numUnique(std::list<int> *l,st
           cout<<"getting cluster"<<endl;
           int clustidtemp =mymap->at(*i).get_cluster_id(trackeval);
           cout<<"got"<<endl;
-          conversionClusterIDs.insert(clustidtemp);
+          conversionClusters.AddCluster(mainClusterContainer.getCluster(clustidtemp));
           cout<<"set"<<endl;
         }
       }

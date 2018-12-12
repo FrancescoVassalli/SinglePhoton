@@ -28,7 +28,7 @@ int after_embeded( std::string infile = "XjPhi3_pT5_98_dst.root",std::string out
   //se->registerSubsystem(converter);
   outfile+="cTtree.root";
 
-  TreeMaker *tt = new TreeMaker( outfile,3);
+  TreeMaker *tt = new TreeMaker( outfile,3,truther);
   se->registerSubsystem( tt );
   
   se->run();

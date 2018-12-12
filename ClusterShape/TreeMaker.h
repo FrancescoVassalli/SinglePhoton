@@ -80,6 +80,14 @@ class TreeMaker: public SubsysReco
  public:
 
   TreeMaker(const std::string &name="TreeMaker.root", int embed_id = 0);
+  TreeMaker(const std::string &name="TreeMaker.root", int embed_id = 0,SinglePhotonAfter* conversionModule);
+
+  ~TreeMaker(){
+    if (conversionModule)
+    {
+      delete conversionModule;
+    }
+  }
 
   int Init(PHCompositeNode*);
   int process_event(PHCompositeNode*);
@@ -97,10 +105,11 @@ class TreeMaker: public SubsysReco
   }
 
   TFile *_f;
-
   TTree *_tree;
 
   std::string _foutname;
+
+  SinglePhotonAfter * conversionModule=NULL;
 
   float vx;
   float vy;
