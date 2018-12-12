@@ -27,7 +27,6 @@ libtreemaker_la_LIBADD = \
   -lg4dst \
   -lg4eval \
   -lcalotrigger \
-  -ljetbackground \
   -lphool\
 	-lSinglePhotonAnalysis
 
