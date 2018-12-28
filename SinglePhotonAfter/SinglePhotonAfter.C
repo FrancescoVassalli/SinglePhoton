@@ -143,7 +143,10 @@ std::queue<std::pair<int,int>> SinglePhotonAfter::numUnique(std::list<int> *l,st
           cout<<"getting cluster"<<endl;
           int clustidtemp =mymap->at(*i).get_cluster_id(trackeval);
           cout<<"got"<<endl;
-          conversionClusters.AddCluster(mainClusterContainer->getCluster(clustidtemp));
+          if (clustidtemp>0)
+          {
+            conversionClusters.AddCluster(mainClusterContainer->getCluster(clustidtemp));
+          }
           cout<<"set"<<endl;
         }
       }
