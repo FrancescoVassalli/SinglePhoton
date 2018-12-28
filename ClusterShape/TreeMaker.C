@@ -339,7 +339,7 @@ int TreeMaker::process_event(PHCompositeNode *topNode)
 
   RawTowerContainer *towersEM3old = findNode::getClass<RawTowerContainer>(topNode, "TOWER_CALIB_CEMC");
   RawTowerGeomContainer *geomEM = findNode::getClass<RawTowerGeomContainer>(topNode, "TOWERGEOM_CEMC");
-  RawClusterContainer *clusters = conversionModule->getClusters();
+  const RawClusterContainer *clusters = conversionModule->getClusters();
     
   //find correct vertex
   vertexmap = findNode::getClass<GlobalVertexMap>(topNode, "GlobalVertexMap"); 
