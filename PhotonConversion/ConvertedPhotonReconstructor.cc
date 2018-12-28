@@ -4,10 +4,10 @@
 #include <phool/getClass.h>
 #include <phool/PHDataNode.h>
 
-#include <g4hough/SvtxClusterMap.h>
-#include <g4hough/SvtxVertexMap.h>
-#include <g4hough/SvtxVertex.h>
-#include <g4hough/SvtxTrackMap.h>
+#include <trackbase_historic/SvtxClusterMap.h>
+#include <trackbase_historic/SvtxVertexMap.h>
+#include <trackbase_historic/SvtxVertex.h>
+#include <trackbase_historic/SvtxTrackMap.h>
 #include <g4eval/SvtxEvalStack.h>
 
 #include <g4main/PHG4Particle.h>

@@ -8,6 +8,8 @@
 #include <g4main/PHG4Particle.h>
 #include <g4main/PHG4VtxPoint.h>
 
+#include <calobase/RawClusterContainer.h>
+
 #include <TTree.h>
 #include <TFile.h>
 

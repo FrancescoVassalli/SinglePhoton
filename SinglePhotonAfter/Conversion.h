@@ -3,7 +3,7 @@
 
 #include <g4main/PHG4Particle.h>
 #include <g4main/PHG4VtxPoint.h>
-#include <g4hough/SvtxTrack.h>
+#include <trackbase_historic/SvtxTrack.h>
 #include <g4eval/SvtxTrackEval.h>
 
 class SvtxTrackEval;
