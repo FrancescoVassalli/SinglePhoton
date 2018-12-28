@@ -339,7 +339,7 @@ int TreeMaker::process_event(PHCompositeNode *topNode)
 
   RawTowerContainer *towersEM3old = findNode::getClass<RawTowerContainer>(topNode, "TOWER_CALIB_CEMC");
   RawTowerGeomContainer *geomEM = findNode::getClass<RawTowerGeomContainer>(topNode, "TOWERGEOM_CEMC");
-  RawClusterContainer *clusters = conversionModule.getCluster();
+  RawClusterContainer *clusters = conversionModule->getCluster();
     
   //find correct vertex
   vertexmap = findNode::getClass<GlobalVertexMap>(topNode, "GlobalVertexMap"); 
@@ -352,12 +352,10 @@ int TreeMaker::process_event(PHCompositeNode *topNode)
      vz = vertex->get_z();
      //std::cout<<"Event Vertex Calculated in ClusterIso x:"<<vx<<" y:"<<vy<<" z:"<<vz<<'\n';
   }
-  for (RawClusterContainer::Iterator clusiter = clusters->getClusters().first(); clusiter !=  clusters->getClusters().second(); ++clusiter) 
+  for (RawClusterContainer::Iterator clusiter = clusters->getClusters().first; clusiter !=  clusters->getClusters().second; ++clusiter) 
   {
-    if (*clusiter==-1)
-    {
-      continue;
-    }
+
+    //no check that clusteriter is valid
     RawCluster *cluster = clusters->getCluster(*clusiter);
     CLHEP::Hep3Vector vertex( vx, vy, vz); //set new correct vertex for eta calculation
     CLHEP::Hep3Vector E_vec_cluster = RawClusterUtility::GetEVec(*cluster, vertex);

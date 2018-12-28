@@ -39,7 +39,7 @@ class SinglePhotonAfter: public SubsysReco
   int InitRun(PHCompositeNode*);
   int process_event(PHCompositeNode*);
   int End(PHCompositeNode*);
-  inline RawClusterContainer* getClusters()const{return &conversionClusters;}
+  inline const RawClusterContainer* getClusters()const{return &conversionClusters;}
 
   /*ConstClusterIter conversionClusters_begin() const {return conversionClusterIDs.begin();}
   ClusterIter conversionClusters_begin() {return conversionClusterIDs.begin();}
