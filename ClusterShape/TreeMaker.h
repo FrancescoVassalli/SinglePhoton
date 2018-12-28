@@ -78,9 +78,9 @@ class TreeMaker: public SubsysReco
 {
 
  public:
-
-  TreeMaker(const std::string &name="TreeMaker.root", int embed_id = 0);
-  TreeMaker(const std::string &name="TreeMaker.root", int embed_id = 0,SinglePhotonAfter* conversionModule=NULL);
+  TreeMaker(): SubsysReco("IsoTree"){}
+  TreeMaker(const std::string &name, int embed_id);
+  TreeMaker(const std::string &name, int embed_id,SinglePhotonAfter* conversionModule);
 
   ~TreeMaker(){
     if (conversionModule)
