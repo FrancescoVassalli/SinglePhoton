@@ -48,6 +48,7 @@ int SinglePhotonAfter::InitRun(PHCompositeNode *topNode)
 
 int SinglePhotonAfter::process_event(PHCompositeNode *topNode)
 {
+  RawClusterContainer* mainClusterContainer = findNode::getClass<RawClusterContainer>(topNode,"CLUSTER_CEMC");
   PHG4TruthInfoContainer* truthinfo = findNode::getClass<PHG4TruthInfoContainer>(topNode,"G4TruthInfo");
   PHG4TruthInfoContainer::Range range = truthinfo->GetParticleRange();
   SvtxEvalStack *stack = new SvtxEvalStack(topNode);
@@ -89,7 +90,7 @@ int SinglePhotonAfter::process_event(PHCompositeNode *topNode)
   }
   //record event information 
 
-  std::queue<std::pair<int,int>> missingChildren= numUnique(&vtxList,&mapConversions,trackeval);
+  std::queue<std::pair<int,int>> missingChildren= numUnique(&vtxList,&mapConversions,trackeval,mainClusterContainer);
   findChildren(missingChildren,truthinfo);
   //make a hash of the event number and file number 
   std::stringstream ss;
@@ -106,10 +107,6 @@ int SinglePhotonAfter::process_event(PHCompositeNode *topNode)
 }
 
 std::queue<std::pair<int,int>> SinglePhotonAfter::numUnique(std::list<int> *l,std::map<int,Conversion> *mymap=NULL,SvtxTrackEval* trackeval=NULL,RawClusterContainer *mainClusterContainer=NULL){
-  if (!mainClusterContainer)
-  {
-   mainClusterContainer = findNode::getClass<RawClusterContainer>(topNode,"CLUSTER_CEMC");
-  }
   
   l->sort();
   int last=-1;
