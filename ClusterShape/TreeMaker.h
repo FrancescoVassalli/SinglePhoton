@@ -82,12 +82,7 @@ class TreeMaker: public SubsysReco
   TreeMaker(const std::string &name, int embed_id);
   TreeMaker(const std::string &name, int embed_id,SinglePhotonAfter* conversionModule);
 
-  ~TreeMaker(){
-    if (conversionModule)
-    {
-      delete conversionModule;
-    }
-  }
+  ~TreeMaker(){}//don't delete the Single* b/c the serve will 
 
   int Init(PHCompositeNode*);
   int process_event(PHCompositeNode*);
