@@ -235,6 +235,11 @@ TreeMaker::TreeMaker(const std::string &name, int embed_id) : SubsysReco("IsoTre
 
 }
 
+TreeMaker::TreeMaker(const std::string &name, int embed_id,SinglePhotonAfter* conversionModule) : SubsysReco("IsoTree"),conversionModule(conversionModule)
+{
+  _foutname = name;
+  _embed_id = embed_id;
+}
 int TreeMaker::Init(PHCompositeNode *topNode)
 {
   _f = new TFile( _foutname.c_str(), "RECREATE");
@@ -339,7 +344,7 @@ int TreeMaker::process_event(PHCompositeNode *topNode)
 
   RawTowerContainer *towersEM3old = findNode::getClass<RawTowerContainer>(topNode, "TOWER_CALIB_CEMC");
   RawTowerGeomContainer *geomEM = findNode::getClass<RawTowerGeomContainer>(topNode, "TOWERGEOM_CEMC");
-  const RawClusterContainer *clusters = conversionModule->getClusters();
+  RawClusterContainer *clusters = conversionModule->getClusters();
     
   //find correct vertex
   vertexmap = findNode::getClass<GlobalVertexMap>(topNode, "GlobalVertexMap"); 
