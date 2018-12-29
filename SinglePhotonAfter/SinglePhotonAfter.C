@@ -118,51 +118,52 @@ std::queue<std::pair<int,int>> SinglePhotonAfter::numUnique(std::list<int> *l,st
     //make sure the conversions are not double counted 
     if(*i!=last){
       //fill the tree
-      PHG4VtxPoint *vtx =(mymap->at(*i)).getVtx();
-      _b_rVtx[_b_nVtx] = sqrt(vtx->get_x()*vtx->get_x()+vtx->get_y()*vtx->get_y());
-      PHG4Particle *temp = (mymap->at(*i)).getPhoton();
-      TLorentzVector photonTrack,electronTrack,positronTrack;
-      photonTrack.SetPxPyPzE(temp->get_px(),temp->get_py(),temp->get_pz(),temp->get_e());
-      _b_parent_pt[_b_nVtx]=photonTrack.Pt();
+      PHG4VtxPoint *vtx =(mymap->at(*i)).getVtx(); //get the vtx
+      _b_rVtx[_b_nVtx] = sqrt(vtx->get_x()*vtx->get_x()+vtx->get_y()*vtx->get_y()); //find the radius
+      PHG4Particle *temp = (mymap->at(*i)).getPhoton(); //set the photon
+      TLorentzVector photonTrack,electronTrack,positronTrack; //make tlv for each particle 
+      photonTrack.SetPxPyPzE(temp->get_px(),temp->get_py(),temp->get_pz(),temp->get_e()); //intialize
+      //fill tree values
+      _b_parent_pt[_b_nVtx] =photonTrack.Pt();
       _b_parent_phi[_b_nVtx]=photonTrack.Phi();
       _b_parent_eta[_b_nVtx]=photonTrack.Eta();
-      temp=(mymap->at(*i)).getElectron();
+      temp=(mymap->at(*i)).getElectron(); //set the first child 
       electronTrack.SetPxPyPzE(temp->get_px(),temp->get_py(),temp->get_pz(),temp->get_e());
-      _b_electron_pt[_b_nVtx]=electronTrack.Pt();
+      _b_electron_pt[_b_nVtx]=electronTrack.Pt(); //fill tree
       temp=(mymap->at(*i)).getPositron();
       if(temp){ //this will be false for 1 track events
-        positronTrack.SetPxPyPzE(temp->get_px(),temp->get_py(),temp->get_pz(),temp->get_e());
-        _b_positron_pt[_b_nVtx]=positronTrack.Pt();
+        positronTrack.SetPxPyPzE(temp->get_px(),temp->get_py(),temp->get_pz(),temp->get_e()); //init the tlv
+        _b_positron_pt[_b_nVtx]=positronTrack.Pt(); //fill tree
         if (TMath::Abs(electronTrack.Eta())<kRAPIDITYACCEPT&&TMath::Abs(positronTrack.Eta())<kRAPIDITYACCEPT)
         {
           _b_Tpair++;
-          if(mymap->at(*i).setRecoTracks(trackeval)==2)
+          if(mymap->at(*i).setRecoTracks(trackeval)==2) //see if the conversion has 2 reco tracks
           {
             _b_Rpair++;
+            cout<<"reco pair \n";
           }
-          cout<<"getting cluster"<<endl;
-          int clustidtemp =mymap->at(*i).get_cluster_id(trackeval);
+          else{
+            cout<<"no reco pair \n"
+          }
+          int clustidtemp =mymap->at(*i).get_cluster_id(trackeval); //get the cluster id of the current conversion
           if (clustidtemp>0)
           {
-            conversionClusters.AddCluster(mainClusterContainer->getCluster(clustidtemp));
+            conversionClusters.AddCluster(mainClusterContainer->getCluster(clustidtemp)); //add the calo cluster to the container
           }
         }
       }
-      else{
-        cout<<"in else"<<endl;
-        temp=(mymap->at(*i)).getElectron();
-        _b_positron_pt[_b_nVtx]=-1;
-        pair<int, int> tp(temp->get_parent_id(),temp->get_track_id());
-        missingChildren.push(pair<int, int>(temp->get_parent_id(),temp->get_track_id()));
+      else{ //fails the truth 2 track check
+        cout<<"1 track event"<<endl;
+        temp=(mymap->at(*i)).getElectron(); //go back to the first track 
+        _b_positron_pt[_b_nVtx]=-1; //set the second track to null
+        missingChildren.push(pair<int, int>(temp->get_parent_id(),temp->get_track_id())); //add the known ids to the list missing a child
         cout<<"No pair for:\n";
         temp->identify();
         cout<<"with parent:\n";
         (mymap->at(*i)).getPhoton()->identify();
-        _b_positron_pt[_b_nVtx]=-1;
-        missingChildren.push(tp);
       }
-      last=*i;
-      if((mymap->at(*i)).getEmbed()==3){
+      last=*i; //update the loops position in the conversion list
+      if((mymap->at(*i)).getEmbed()==3){ //decide if the conversion is from pythia
         _b_pythia[_b_nVtx]=true;
       }
       else{
