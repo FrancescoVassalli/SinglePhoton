@@ -27,14 +27,14 @@
 #include "G4_HIJetReco.C"
 #include "G4_DSTReader.C"
 #include "DisplayOn.C"
-  R__LOAD_LIBRARY(libfun4all.so)
-  R__LOAD_LIBRARY(libg4testbench.so)
-  R__LOAD_LIBRARY(libphhepmc.so)
-  R__LOAD_LIBRARY(libPHPythia6.so)
+R__LOAD_LIBRARY(libfun4all.so)
+R__LOAD_LIBRARY(libg4testbench.so)
+R__LOAD_LIBRARY(libphhepmc.so)
+R__LOAD_LIBRARY(libPHPythia6.so)
 R__LOAD_LIBRARY(libPHPythia8.so)
 #endif
 
-  using namespace std;
+using namespace std;
 
 
   int Fun4All_G4_sPHENIX(
@@ -163,9 +163,9 @@ R__LOAD_LIBRARY(libPHPythia8.so)
 
   bool display_on = false;
   if(display_on)
-  {
-    gROOT->LoadMacro("DisplayOn.C");
-  }
+    {
+      gROOT->LoadMacro("DisplayOn.C");
+    }
 
   Fun4AllServer *se = Fun4AllServer::instance();
   se->Verbosity(0);
@@ -211,7 +211,7 @@ R__LOAD_LIBRARY(libPHPythia8.so)
 
       PHPythia8 *pythia8 = new PHPythia8();
       // see coresoftware/generators/PHPythia8 for example config
-      pythia8->set_config_file("phpythia8.cfg");
+      pythia8->set_config_file("phpythia8.cfg"); // example configure files : https://github.com/sPHENIX-Collaboration/coresoftware/tree/master/generators/PHPythia8
       if (readhepmc)
         pythia8->set_reuse_vertex(0);  // reuse vertex of subevent with embedding ID of 0
       // pythia8->set_vertex_distribution_width(0,0,10,0); // additional vertex smearing if needed, more vertex options available
@@ -223,7 +223,7 @@ R__LOAD_LIBRARY(libPHPythia8.so)
       gSystem->Load("libPHPythia6.so");
 
       PHPythia6 *pythia6 = new PHPythia6();
-      pythia6->set_config_file("phpythia6.cfg");
+      pythia6->set_config_file("phpythia6.cfg"); // example configure files : https://github.com/sPHENIX-Collaboration/coresoftware/tree/master/generators/PHPythia6
       if (readhepmc)
         pythia6->set_reuse_vertex(0);  // reuse vertex of subevent with embedding ID of 0
       // pythia6->set_vertex_distribution_width(0,0,10,0); // additional vertex smearing if needed, more vertex options available
@@ -245,8 +245,8 @@ R__LOAD_LIBRARY(libPHPythia8.so)
       else
       {
         gen->set_vertex_distribution_function(PHG4SimpleEventGenerator::Uniform,
-            PHG4SimpleEventGenerator::Uniform,
-            PHG4SimpleEventGenerator::Uniform);
+                                              PHG4SimpleEventGenerator::Uniform,
+                                              PHG4SimpleEventGenerator::Uniform);
         gen->set_vertex_distribution_mean(0.0, 0.0, 0.0);
         gen->set_vertex_distribution_width(0.0, 0.0, 0.0);
       }
@@ -289,44 +289,44 @@ R__LOAD_LIBRARY(libPHPythia8.so)
 
       for(int iups = 0; iups < num_upsilons_per_event;iups++)
       {
-        PHG4ParticleGeneratorVectorMeson *vgen = new PHG4ParticleGeneratorVectorMeson();
-        vgen->add_decay_particles("e+", "e-", 0);  // i = decay id
-        // event vertex
-        if (readhepmc || do_embedding || particles || runpythia8 || runpythia6)
-        {
-          vgen->set_reuse_existing_vertex(true);
-        }
+	PHG4ParticleGeneratorVectorMeson *vgen = new PHG4ParticleGeneratorVectorMeson();
+	vgen->add_decay_particles("e+", "e-", 0);  // i = decay id
+	// event vertex
+	if (readhepmc || do_embedding || particles || runpythia8 || runpythia6)
+	{
+	  vgen->set_reuse_existing_vertex(true);
+	}
 
-        // Note: this rapidity range completely fills the acceptance of eta = +/- 1 unit
-        vgen->set_rapidity_range(-1.0, +1.0);
-        vgen->set_pt_range(0.0, 10.0);
+	// Note: this rapidity range completely fills the acceptance of eta = +/- 1 unit
+	vgen->set_rapidity_range(-1.0, +1.0);
+	vgen->set_pt_range(0.0, 10.0);
 
-        int istate = 1;
+	int istate = 1;
 
-        if (istate == 1)
-        {
-          // Upsilon(1S)
-          vgen->set_mass(9.46);
-          vgen->set_width(54.02e-6);
-        }
-        else if (istate == 2)
-        {
-          // Upsilon(2S)
-          vgen->set_mass(10.0233);
-          vgen->set_width(31.98e-6);
-        }
-        else
-        {
-          // Upsilon(3S)
-          vgen->set_mass(10.3552);
-          vgen->set_width(20.32e-6);
-        }
+	if (istate == 1)
+	{
+	  // Upsilon(1S)
+	  vgen->set_mass(9.46);
+	  vgen->set_width(54.02e-6);
+	}
+	else if (istate == 2)
+	{
+	  // Upsilon(2S)
+	  vgen->set_mass(10.0233);
+	  vgen->set_width(31.98e-6);
+	}
+	else
+	{
+	  // Upsilon(3S)
+	  vgen->set_mass(10.3552);
+	  vgen->set_width(20.32e-6);
+	}
 
-        vgen->Verbosity(0);
-        vgen->Embed(3);
-        se->registerSubsystem(vgen);
+	vgen->Verbosity(0);
+	vgen->Embed(3);
+	se->registerSubsystem(vgen);
 
-        cout << "Upsilon generator for istate = " << istate << " created and registered " << endl;
+	cout << "Upsilon generator for istate = " << istate << " created and registered " << endl;
       }
     }
   }
@@ -339,10 +339,10 @@ R__LOAD_LIBRARY(libPHPythia8.so)
 
 #if ROOT_VERSION_CODE >= ROOT_VERSION(6,00,0)
     G4Setup(absorberactive, magfield, EDecayType::kAll,
-        do_tracking, do_pstof, do_cemc, do_hcalin, do_magnet, do_hcalout, do_pipe,do_plugdoor, magfield_rescale);
+            do_tracking, do_pstof, do_cemc, do_hcalin, do_magnet, do_hcalout, do_pipe,do_plugdoor, magfield_rescale);
 #else
     G4Setup(absorberactive, magfield, TPythia6Decayer::kAll,
-        do_tracking, do_pstof, do_cemc, do_hcalin, do_magnet, do_hcalout, do_pipe,do_plugdoor, magfield_rescale);
+            do_tracking, do_pstof, do_cemc, do_hcalin, do_magnet, do_hcalout, do_pipe,do_plugdoor, magfield_rescale);
 #endif
   }
 
@@ -497,7 +497,7 @@ R__LOAD_LIBRARY(libPHPythia8.so)
     //! positive ID is the embedded event of interest, e.g. jetty event from pythia
     //! negative IDs are backgrounds, .e.g out of time pile up collisions
     //! Usually, ID = 0 means the primary Au+Au collision background
-    in->set_embedding_id(3);
+    //in->set_embedding_id(2);
   }
   else
   {
@@ -536,7 +536,7 @@ R__LOAD_LIBRARY(libPHPythia8.so)
     }
     pileup->set_time_window(time_window_minus, time_window_plus);  // override timing window in ns
     cout << "Collision pileup enabled using file " << pileupfile << " with collision rate " << pileup_collision_rate
-      << " and time window " << time_window_minus << " to " << time_window_plus << endl;
+         << " and time window " << time_window_minus << " to " << time_window_plus << endl;
   }
 
   if (do_DSTReader)
@@ -545,16 +545,16 @@ R__LOAD_LIBRARY(libPHPythia8.so)
     gROOT->LoadMacro("G4_DSTReader.C");
 
     G4DSTreader(outputFile,  //
-        /*int*/ absorberactive,
-        /*bool*/ do_tracking,
-        /*bool*/ do_pstof,
-        /*bool*/ do_cemc,
-        /*bool*/ do_hcalin,
-        /*bool*/ do_magnet,
-        /*bool*/ do_hcalout,
-        /*bool*/ do_cemc_twr,
-        /*bool*/ do_hcalin_twr,
-        /*bool*/ do_hcalout_twr);
+                /*int*/ absorberactive,
+                /*bool*/ do_tracking,
+                /*bool*/ do_pstof,
+                /*bool*/ do_cemc,
+                /*bool*/ do_hcalin,
+                /*bool*/ do_magnet,
+                /*bool*/ do_hcalout,
+                /*bool*/ do_cemc_twr,
+                /*bool*/ do_hcalin_twr,
+                /*bool*/ do_hcalout_twr);
   }
   cout<<"outputting \n"<<endl;
   Fun4AllDstOutputManager *out = new Fun4AllDstOutputManager("DSTOUT", outputFile);
@@ -577,13 +577,13 @@ R__LOAD_LIBRARY(libPHPythia8.so)
   }
 
   if(display_on)
-  {
-    DisplayOn();
-    // prevent macro from finishing so can see display
-    int i;
-    cout << "***** Enter any integer to proceed" << endl;
-    cin >> i;
-  }
+    {
+      DisplayOn();
+      // prevent macro from finishing so can see display
+      int i;
+      cout << "***** Enter any integer to proceed" << endl;
+      cin >> i;
+    }
 
   se->run(nEvents);
 
