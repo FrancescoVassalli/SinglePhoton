@@ -91,7 +91,9 @@ int SinglePhotonAfter::process_event(PHCompositeNode *topNode)
   //record event information 
 
   std::queue<std::pair<int,int>> missingChildren= numUnique(&vtxList,&mapConversions,trackeval,mainClusterContainer);
-  findChildren(missingChildren,truthinfo);
+  cout<<"In truth system main RawClusterContainer::size="<<mainClusterContainer->size();
+  cout<<"In truth system this RawClusterContainer::size="<<_conversionClusters->size();
+  //findChildren(missingChildren,truthinfo);
   //make a hash of the event number and file number 
   std::stringstream ss;
   ss<<"-"<<_b_event;             //this is where the file number is 
@@ -117,6 +119,7 @@ std::queue<std::pair<int,int>> SinglePhotonAfter::numUnique(std::list<int> *l,st
   for (std::list<int>::iterator i = l->begin(); i != l->end(); ++i) {
     //make sure the conversions are not double counted 
     if(*i!=last){
+      cout<<"unique"<<endl;
       //fill the tree
       PHG4VtxPoint *vtx =(mymap->at(*i)).getVtx(); //get the vtx
       _b_rVtx[_b_nVtx] = sqrt(vtx->get_x()*vtx->get_x()+vtx->get_y()*vtx->get_y()); //find the radius
@@ -148,7 +151,7 @@ std::queue<std::pair<int,int>> SinglePhotonAfter::numUnique(std::list<int> *l,st
           int clustidtemp =mymap->at(*i).get_cluster_id(trackeval); //get the cluster id of the current conversion
           if (clustidtemp>0)
           {
-            conversionClusters.AddCluster(mainClusterContainer->getCluster(clustidtemp)); //add the calo cluster to the container
+            _conversionClusters.AddCluster(mainClusterContainer->getCluster(clustidtemp)); //add the calo cluster to the container
           }
         }
       }

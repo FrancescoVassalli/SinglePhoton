@@ -55,7 +55,7 @@ class SinglePhotonAfter: public SubsysReco
     return sqrt( pow( deta, 2 ) + pow( dphi, 2 ) );
   }
 
-  std::queue<std::pair<int,int>> numUnique(std::list<int>* l,std::map<int,Conversion>* map,SvtxTrackEval* trackEval,RawClusterContainer *mainClusterContainer);
+  std::queue<std::pair<int,int>> numUnique(std::list<int>* l,std::map<int,Conversion>* map,SvtxTrackEval* trackEval);
   void findChildren(std::queue<std::pair<int,int>> missing,PHG4TruthInfoContainer* truthinfo);
 
   const static int kMAXParticles=1000;
@@ -76,7 +76,7 @@ class SinglePhotonAfter: public SubsysReco
   float _b_parent_eta [kMAXParticles];
   float _b_parent_phi [kMAXParticles];
 
-  RawClusterContainer conversionClusters;
+  RawClusterContainer _conversionClusters;
 
   const static int kTPCRADIUS=21; //in cm there is a way to get this from the simulation I should implement
   float kRAPIDITYACCEPT=1;
