@@ -137,7 +137,7 @@ std::queue<std::pair<int,int>> SinglePhotonAfter::numUnique(std::list<int> *l,st
         if (TMath::Abs(electronTrack.Eta())<kRAPIDITYACCEPT&&TMath::Abs(positronTrack.Eta())<kRAPIDITYACCEPT)
         {
           _b_Tpair++;
-          if(mymap->at(*i).setRecoTracks(trackeval)==2) //see if the conversion has 2 reco tracks
+          if(mymap->at(*i).setRecoTracks()==2) //see if the conversion has 2 reco tracks
           {
             _b_Rpair++;
             cout<<"reco pair \n";

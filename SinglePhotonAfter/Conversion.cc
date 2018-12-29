@@ -47,7 +47,15 @@ int Conversion::setRecoTracks(){
 
 
 int Conversion::get_cluster_id(){
-  assert(reco1);
+  if(!reco1){
+    assert(trackeval);
+    reco1=trackeval->best_track_from(e1);
+    if(!reco1){
+      cout<<"bad reco"<<endl;
+      e1->identify();
+      return -1;
+    }
+  }
   return reco1->get_cal_cluster_id(SvtxTrack::CAL_LAYER(1));//id of the emcal
 }
 
@@ -61,6 +69,5 @@ int Conversion::get_cluster_id(SvtxTrackEval *trackeval){
       return -1;
     }
   }
-  cout<<"checking layer"<<endl;
   return reco1->get_cal_cluster_id(SvtxTrack::CAL_LAYER(1));//id of the emcal
 }
