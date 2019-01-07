@@ -357,11 +357,16 @@ int TreeMaker::process_event(PHCompositeNode *topNode)
      vz = vertex->get_z();
      //std::cout<<"Event Vertex Calculated in ClusterIso x:"<<vx<<" y:"<<vy<<" z:"<<vz<<'\n';
   }
+  cout<<"set vertex"<<endl;
   for (RawClusterContainer::Iterator clusiter = clusters->getClusters().first; clusiter !=  clusters->getClusters().second; ++clusiter) 
   {
 
     //no check that clusteriter is valid
     RawCluster *cluster = clusters->getCluster(clusiter->first);
+    if (!cluster)
+    {
+      cout<<"cluster is NULL"<<endl;
+    }
     CLHEP::Hep3Vector vertex( vx, vy, vz); //set new correct vertex for eta calculation
     CLHEP::Hep3Vector E_vec_cluster = RawClusterUtility::GetEVec(*cluster, vertex);
     double cluster_energy = E_vec_cluster.mag();
