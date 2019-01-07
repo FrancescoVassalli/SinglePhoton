@@ -76,86 +76,86 @@ ChaseTower findMaxTower(std::vector<ChaseTower> towers)
 }
 
 /*
-EtaPhiPoint CenterOfEnergy_BazilevskyStyle(std::vector<ChaseTower> towers)
-{
-  double avgeta = 0;
-  double avgphi = 0;
-  double etot = 0;
-  for(unsigned int i = 0; i < towers.size(); i++)
-  {
-    etot += towers.at(i).getEnergy();
-  }
-  for(unsigned int i = 0; i < towers.size(); i++)
-  {
-    avgeta += towers.at(i).getEta() * (towers.at(i).getEnergy() / etot);
-    avgphi += towers.at(i).getPhi() * (towers.at(i).getEnergy() / etot);
-  }
-  return EtaPhiPoint(avgeta , avgphi);
+   EtaPhiPoint CenterOfEnergy_BazilevskyStyle(std::vector<ChaseTower> towers)
+   {
+   double avgeta = 0;
+   double avgphi = 0;
+   double etot = 0;
+   for(unsigned int i = 0; i < towers.size(); i++)
+   {
+   etot += towers.at(i).getEnergy();
+   }
+   for(unsigned int i = 0; i < towers.size(); i++)
+   {
+   avgeta += towers.at(i).getEta() * (towers.at(i).getEnergy() / etot);
+   avgphi += towers.at(i).getPhi() * (towers.at(i).getEnergy() / etot);
+   }
+   return EtaPhiPoint(avgeta , avgphi);
+   }
+
+
+   bool my_compare(ChaseTower a, ChaseTower b, EtaPhiPoint CoE)
+   {
+   return deltaR(CoE.eta, a.getEta(), CoE.phi, a.getPhi()) < deltaR(CoE.eta, b.getEta(), CoE.phi, b.getPhi());
+   }
+
+   cutValues CutValues_BazilevskyStyle(std::vector<ChaseTower> towers, EtaPhiPoint CoE)
+   {
+   std::list<int> central4;
+   central4.push_front(0);
+   for(unsigned int i = 1; i < towers.size(); i++) //loops through the vector of chaseTowers, sorted towers by distance
+   {
+   for (std::list<int>::iterator it = central4.begin(); it != central4.end(); ++it) //iterate through list
+   {
+   if(my_compare(towers.at(i), towers.at(*it), CoE)) //if tower is shorter distance to CoE than current tower, insert
+   {
+   central4.insert(it,i); //yay insert sort, break when spot is found
+   break;
+   }
+   }
+   }
+
+   double etot = 0;
+   for(unsigned int i = 0; i < towers.size(); i++) //loops through the vector of chaseTowers
+   {
+   etot += towers.at(i).getEnergy();
+   }
+
+   double e1 = 0;
+   double e2 = 0;
+   double e3 = 0;
+   double e4 = 0;
+
+   std::list<int>::iterator it = central4.begin();
+   e1 = towers.at(*it).getEnergy(); //closest tower
+   if(central4.size() >= 3)
+   {
+   ++it;
+   std::list<int>::iterator it2 = it;
+   ++it2;
+   if(fabs(towers.at(*it).getEta() - CoE.eta) < fabs(towers.at(*it2).getEta() - CoE.eta)) //if tower is closer in eta, it is e2
+   {
+   e2 = towers.at(*it).getEnergy(); 
+   e4 = towers.at(*it2).getEnergy(); 
+   }
+   else
+   {
+   e2 = towers.at(*it2).getEnergy(); 
+   e4 = towers.at(*it).getEnergy(); 
+   }
+   }
+   if(central4.size() >= 4)
+   {
+++it;
+++it;
+e3 = towers.at(*it).getEnergy(); //off diagonal tower
 }
 
-
-bool my_compare(ChaseTower a, ChaseTower b, EtaPhiPoint CoE)
-{
-  return deltaR(CoE.eta, a.getEta(), CoE.phi, a.getPhi()) < deltaR(CoE.eta, b.getEta(), CoE.phi, b.getPhi());
-}
-
-cutValues CutValues_BazilevskyStyle(std::vector<ChaseTower> towers, EtaPhiPoint CoE)
-{
-  std::list<int> central4;
-  central4.push_front(0);
-  for(unsigned int i = 1; i < towers.size(); i++) //loops through the vector of chaseTowers, sorted towers by distance
-  {
-    for (std::list<int>::iterator it = central4.begin(); it != central4.end(); ++it) //iterate through list
-    {
-      if(my_compare(towers.at(i), towers.at(*it), CoE)) //if tower is shorter distance to CoE than current tower, insert
-      {
-        central4.insert(it,i); //yay insert sort, break when spot is found
-        break;
-      }
-    }
-  }
-
-  double etot = 0;
-  for(unsigned int i = 0; i < towers.size(); i++) //loops through the vector of chaseTowers
-  {
-    etot += towers.at(i).getEnergy();
-  }
-
-  double e1 = 0;
-  double e2 = 0;
-  double e3 = 0;
-  double e4 = 0;
-
-  std::list<int>::iterator it = central4.begin();
-  e1 = towers.at(*it).getEnergy(); //closest tower
-  if(central4.size() >= 3)
-  {
-    ++it;
-    std::list<int>::iterator it2 = it;
-    ++it2;
-    if(fabs(towers.at(*it).getEta() - CoE.eta) < fabs(towers.at(*it2).getEta() - CoE.eta)) //if tower is closer in eta, it is e2
-    {
-      e2 = towers.at(*it).getEnergy(); 
-      e4 = towers.at(*it2).getEnergy(); 
-    }
-    else
-    {
-      e2 = towers.at(*it2).getEnergy(); 
-      e4 = towers.at(*it).getEnergy(); 
-    }
-  }
-  if(central4.size() >= 4)
-  {
-    ++it;
-    ++it;
-    e3 = towers.at(*it).getEnergy(); //off diagonal tower
-  }
-
-  double e1t = (e1 + e2 + e3 + e4)/etot; //energy in central 4
-  double e2t = (e1 - e2 - e3 + e4)/etot; //vertical symmetry
-  double e3t = (e1 + e2 - e3 - e4)/etot; //horizontal symetry
-  double e4t = (e3)/etot; //off diagonal
-  return cutValues(e1t, e2t, e3t, e4t);
+double e1t = (e1 + e2 + e3 + e4)/etot; //energy in central 4
+double e2t = (e1 - e2 - e3 + e4)/etot; //vertical symmetry
+double e3t = (e1 + e2 - e3 - e4)/etot; //horizontal symetry
+double e4t = (e3)/etot; //off diagonal
+return cutValues(e1t, e2t, e3t, e4t);
 }
 
 cutValues CutValues_ChaseStyle(std::vector<ChaseTower> towers, EtaPhiPoint CoE)
@@ -274,7 +274,7 @@ int TreeMaker::Init(PHCompositeNode *topNode)
   //_tree->Branch("e2t",_b_e2t,"e2t[cluster_n]/D");
   //_tree->Branch("e3t",_b_e3t,"e3t[cluster_n]/D");
   //_tree->Branch("e4t",_b_e4t,"e4t[cluster_n]/D");
-//
+  //
   //_tree->Branch("chase_e1t",_b_chase_e1t,"chase_e1t[cluster_n]/D");
   //_tree->Branch("chase_e2t",_b_chase_e2t,"chase_e2t[cluster_n]/D");
   //_tree->Branch("chase_e3t",_b_chase_e3t,"chase_e3t[cluster_n]/D");
@@ -285,7 +285,7 @@ int TreeMaker::Init(PHCompositeNode *topNode)
   _tree->Branch("clusterTower_phi",_b_clusterTower_phi,"clusterTower_phi[clusterTower_towers]/D");
   _tree->Branch("clusterTower_energy",_b_clusterTower_energy,"clusterTower_energy[clusterTower_towers]/D");
   std::cout<<"cTTree initialized"<<std::endl;
- return 0;
+  return 0;
 }
 
 
@@ -296,7 +296,7 @@ int TreeMaker::process_event(PHCompositeNode *topNode)
 
   //PHG4TruthInfoContainer* truthinfo = findNode::getClass<PHG4TruthInfoContainer>(topNode,"G4TruthInfo");
   //PHG4TruthInfoContainer::Range range = truthinfo->GetPrimaryParticleRange();
- 
+
   GlobalVertexMap* vertexmap = findNode::getClass<GlobalVertexMap>(topNode, "GlobalVertexMap");
   vx = NAN;
   vy = NAN;
@@ -336,7 +336,7 @@ int TreeMaker::process_event(PHCompositeNode *topNode)
   //  
   //}
 
-  
+
 
   //////////////////////////////////////Find cluster information/////////////////////////////////////////////////////
   _b_cluster_n = 0;
@@ -351,113 +351,113 @@ int TreeMaker::process_event(PHCompositeNode *topNode)
   vx=vy=vz=0;
   if (vertexmap&&!vertexmap->empty())
   {
-     GlobalVertex* vertex = (vertexmap->begin()->second);
-     vx = vertex->get_x();
-     vy = vertex->get_y();
-     vz = vertex->get_z();
-     //std::cout<<"Event Vertex Calculated in ClusterIso x:"<<vx<<" y:"<<vy<<" z:"<<vz<<'\n';
+    GlobalVertex* vertex = (vertexmap->begin()->second);
+    vx = vertex->get_x();
+    vy = vertex->get_y();
+    vz = vertex->get_z();
+    //std::cout<<"Event Vertex Calculated in ClusterIso x:"<<vx<<" y:"<<vy<<" z:"<<vz<<'\n';
   }
   for (RawClusterContainer::Iterator clusiter = clusters->getClusters().first; clusiter !=  clusters->getClusters().second; ++clusiter) 
   {
-    /*const unsigned int clusid= clusiter->first;
-    cout<<"got clusid:"<<clusid<<endl;
-    RawCluster *cluster = clusters->getCluster(clusid); //what about just using clusiter->second??*/
     RawCluster *cluster = clusiter->second;
-    cout<<"got cluster"<<endl;
-    CLHEP::Hep3Vector vertex( vx, vy, vz); //set new correct vertex for eta calculation
-    cout<<"making vector"<<endl;
-    CLHEP::Hep3Vector E_vec_cluster = RawClusterUtility::GetEVec(*cluster, vertex);
-    cout<<"madevector"<<endl;
-    double cluster_energy = E_vec_cluster.mag();
-    double cluster_eta = E_vec_cluster.pseudoRapidity(); 
-    double cluster_phi = E_vec_cluster.phi();
-    double et = cluster_energy / cosh( cluster_eta );
-    double prob = cluster->get_prob();
+    if(cluster){ //only process valid clusters
+      cout<<"got cluster:"<<cluster<<endl;
+      CLHEP::Hep3Vector vertex( vx, vy, vz); //set new correct vertex for eta calculation
+      cluster->identify();
+      cout<<"making vector"<<endl;
+      CLHEP::Hep3Vector E_vec_cluster = RawClusterUtility::GetEVec(*cluster, vertex);
+      cout<<"madevector"<<endl;
+      double cluster_energy = E_vec_cluster.mag();
+      double cluster_eta = E_vec_cluster.pseudoRapidity(); 
+      double cluster_phi = E_vec_cluster.phi();
+      double et = cluster_energy / cosh( cluster_eta );
+      double prob = cluster->get_prob();
 
-    if (et < 1) continue;
-    _b_cluster_eta[ _b_cluster_n ] = cluster_eta;
-    _b_cluster_phi[ _b_cluster_n ] = cluster_phi;
-    _b_cluster_et[ _b_cluster_n ] = et;
-    _b_cluster_prob[ _b_cluster_n ] = prob;    
+      if (et < 1) continue;
+      _b_cluster_eta[ _b_cluster_n ] = cluster_eta;
+      _b_cluster_phi[ _b_cluster_n ] = cluster_phi;
+      _b_cluster_et[ _b_cluster_n ] = et;
+      _b_cluster_prob[ _b_cluster_n ] = prob;    
 
-    //arguments are (cone radiusx10, subtract event = true, use calotowers for isolation = true)
-    //_b_et_iso_calotower_sub_R01[ _b_cluster_n ] = cluster->get_et_iso(1,1,1);
-    //_b_et_iso_calotower_R01[ _b_cluster_n ] = cluster->get_et_iso(1,0,1);
-    //_b_et_iso_calotower_sub_R02[ _b_cluster_n ] = cluster->get_et_iso(2,1,1);
-    //_b_et_iso_calotower_R02[ _b_cluster_n ] = cluster->get_et_iso(2,0,1);
-    //_b_et_iso_calotower_sub_R03[ _b_cluster_n ] = cluster->get_et_iso(3,1,1);
-    //_b_et_iso_calotower_R03[ _b_cluster_n ] = cluster->get_et_iso(3,0,1);
-    //_b_et_iso_calotower_sub_R04[ _b_cluster_n ] = cluster->get_et_iso(4,1,1);
-    //_b_et_iso_calotower_R04[ _b_cluster_n ] = cluster->get_et_iso(4,0,1);
+      //arguments are (cone radiusx10, subtract event = true, use calotowers for isolation = true)
+      //_b_et_iso_calotower_sub_R01[ _b_cluster_n ] = cluster->get_et_iso(1,1,1);
+      //_b_et_iso_calotower_R01[ _b_cluster_n ] = cluster->get_et_iso(1,0,1);
+      //_b_et_iso_calotower_sub_R02[ _b_cluster_n ] = cluster->get_et_iso(2,1,1);
+      //_b_et_iso_calotower_R02[ _b_cluster_n ] = cluster->get_et_iso(2,0,1);
+      //_b_et_iso_calotower_sub_R03[ _b_cluster_n ] = cluster->get_et_iso(3,1,1);
+      //_b_et_iso_calotower_R03[ _b_cluster_n ] = cluster->get_et_iso(3,0,1);
+      //_b_et_iso_calotower_sub_R04[ _b_cluster_n ] = cluster->get_et_iso(4,1,1);
+      //_b_et_iso_calotower_R04[ _b_cluster_n ] = cluster->get_et_iso(4,0,1);
 
-    //now we get tower information for ID purposes, find "Center of Energy", get 4 central towers
-    std::cout<<"Towers in cluster: "<<cluster->getNTowers()<<std::endl;
-    _b_NTowers[_b_cluster_n] = cluster->getNTowers();
-    //std::cout<<"Towers in cluster after saved: "<<_b_NTowers[_b_cluster_n]<<std::endl;
+      //now we get tower information for ID purposes, find "Center of Energy", get 4 central towers
+      std::cout<<"Towers in cluster: "<<cluster->getNTowers()<<std::endl;
+      _b_NTowers[_b_cluster_n] = cluster->getNTowers();
+      //std::cout<<"Towers in cluster after saved: "<<_b_NTowers[_b_cluster_n]<<std::endl;
 
-    std::vector <ChaseTower> clusterTowers;
+      std::vector <ChaseTower> clusterTowers;
 
-    RawCluster::TowerConstRange clusterrange = cluster->get_towers();
-    for (RawCluster::TowerConstIterator rtiter = clusterrange.first; rtiter != clusterrange.second; ++rtiter) 
-    {
-      RawTower *tower = towersEM3old->getTower(rtiter->first);
-      RawTowerGeom *tower_geom = geomEM->get_tower_geometry(tower->get_key());
-      ChaseTower temp;
-      temp.setEta(tower_geom->get_eta());
-      _b_clusterTower_eta[_b_clusterTower_towers] = tower_geom->get_eta();
-      temp.setPhi(tower_geom->get_phi());
-      _b_clusterTower_phi[_b_clusterTower_towers] = tower_geom->get_phi();
-      temp.setEnergy(tower->get_energy());
-      _b_clusterTower_energy[_b_clusterTower_towers] = tower->get_energy();
-      temp.setKey(tower->get_key());
-      clusterTowers.push_back(temp);
-      _b_clusterTower_towers++;
+      RawCluster::TowerConstRange clusterrange = cluster->get_towers();
+      for (RawCluster::TowerConstIterator rtiter = clusterrange.first; rtiter != clusterrange.second; ++rtiter) 
+      {
+        RawTower *tower = towersEM3old->getTower(rtiter->first);
+        RawTowerGeom *tower_geom = geomEM->get_tower_geometry(tower->get_key());
+        ChaseTower temp;
+        temp.setEta(tower_geom->get_eta());
+        _b_clusterTower_eta[_b_clusterTower_towers] = tower_geom->get_eta();
+        temp.setPhi(tower_geom->get_phi());
+        _b_clusterTower_phi[_b_clusterTower_towers] = tower_geom->get_phi();
+        temp.setEnergy(tower->get_energy());
+        _b_clusterTower_energy[_b_clusterTower_towers] = tower->get_energy();
+        temp.setKey(tower->get_key());
+        clusterTowers.push_back(temp);
+        _b_clusterTower_towers++;
+      }
+
+      ////////////////////now that we have all towers from cluster, find max tower//////////////////////////
+      // ChaseTower MaxTower = findMaxTower(clusterTowers);
+      //
+      //
+      // ////////////////////Find 49 towers around max tower, Sasha style/////////////////////////////////////
+      // std::vector<ChaseTower> Sasha49Towers;
+      //
+      // RawTowerContainer::ConstRange towerrange = towersEM3old->getTowers();
+      // for (RawTowerContainer::ConstIterator rtiter = towerrange.first; rtiter != towerrange.second; ++rtiter) 
+      // {
+      //   RawTower *tower = rtiter->second;
+      //   RawTowerGeom *tower_geom = geomEM->get_tower_geometry(tower->get_key());
+      //   double this_phi = tower_geom->get_phi();
+      //   double this_eta = tower_geom->get_eta();
+      //   double this_energy = tower->get_energy();
+      //   double dif_eta = this_eta - MaxTower.getEta();
+      //   double dif_phi = this_phi - MaxTower.getPhi();
+      //
+      //   if(dif_phi > TMath::Pi()){dif_phi -= 2*TMath::Pi();} //make sure dif_phi is between -pi and pi
+      //   else if(dif_phi < -1*TMath::Pi()){dif_phi += 2*TMath::Pi();}
+      //
+      //   if(fabs(dif_eta) < 0.08 and fabs(dif_phi) < 0.08 )
+      //   {
+      //     Sasha49Towers.push_back(ChaseTower(this_eta, this_phi, this_energy, tower->get_key()));
+      //   }
+      // }
+      //
+      // /////////////Find Center of energy for cluster, get tower info of 4 towers around CoE////////////////
+      // EtaPhiPoint CoE = CenterOfEnergy_BazilevskyStyle(Sasha49Towers);
+      // 
+      // cutValues clusterCuts = CutValues_BazilevskyStyle(Sasha49Towers, CoE);
+      // cutValues chase_clusterCuts = CutValues_ChaseStyle(Sasha49Towers, CoE);
+      //
+      // _b_e1t[_b_cluster_n] = clusterCuts.e1t;
+      // _b_e2t[_b_cluster_n] = clusterCuts.e2t;
+      // _b_e3t[_b_cluster_n] = clusterCuts.e3t;
+      // _b_e4t[_b_cluster_n] = clusterCuts.e4t;
+      //
+      // _b_chase_e1t[_b_cluster_n] = chase_clusterCuts.e1t;
+      // _b_chase_e2t[_b_cluster_n] = chase_clusterCuts.e2t;
+      // _b_chase_e3t[_b_cluster_n] = chase_clusterCuts.e3t;
+      // _b_chase_e4t[_b_cluster_n] = chase_clusterCuts.e4t;
+
+      _b_cluster_n++;
     }
-
-    ////////////////////now that we have all towers from cluster, find max tower//////////////////////////
-   // ChaseTower MaxTower = findMaxTower(clusterTowers);
-//
-//
-   // ////////////////////Find 49 towers around max tower, Sasha style/////////////////////////////////////
-   // std::vector<ChaseTower> Sasha49Towers;
-//
-   // RawTowerContainer::ConstRange towerrange = towersEM3old->getTowers();
-   // for (RawTowerContainer::ConstIterator rtiter = towerrange.first; rtiter != towerrange.second; ++rtiter) 
-   // {
-   //   RawTower *tower = rtiter->second;
-   //   RawTowerGeom *tower_geom = geomEM->get_tower_geometry(tower->get_key());
-   //   double this_phi = tower_geom->get_phi();
-   //   double this_eta = tower_geom->get_eta();
-   //   double this_energy = tower->get_energy();
-   //   double dif_eta = this_eta - MaxTower.getEta();
-   //   double dif_phi = this_phi - MaxTower.getPhi();
-//
-   //   if(dif_phi > TMath::Pi()){dif_phi -= 2*TMath::Pi();} //make sure dif_phi is between -pi and pi
-   //   else if(dif_phi < -1*TMath::Pi()){dif_phi += 2*TMath::Pi();}
-//
-   //   if(fabs(dif_eta) < 0.08 and fabs(dif_phi) < 0.08 )
-   //   {
-   //     Sasha49Towers.push_back(ChaseTower(this_eta, this_phi, this_energy, tower->get_key()));
-   //   }
-   // }
-//
-   // /////////////Find Center of energy for cluster, get tower info of 4 towers around CoE////////////////
-   // EtaPhiPoint CoE = CenterOfEnergy_BazilevskyStyle(Sasha49Towers);
-   // 
-   // cutValues clusterCuts = CutValues_BazilevskyStyle(Sasha49Towers, CoE);
-   // cutValues chase_clusterCuts = CutValues_ChaseStyle(Sasha49Towers, CoE);
-//
-   // _b_e1t[_b_cluster_n] = clusterCuts.e1t;
-   // _b_e2t[_b_cluster_n] = clusterCuts.e2t;
-   // _b_e3t[_b_cluster_n] = clusterCuts.e3t;
-   // _b_e4t[_b_cluster_n] = clusterCuts.e4t;
-//
-   // _b_chase_e1t[_b_cluster_n] = chase_clusterCuts.e1t;
-   // _b_chase_e2t[_b_cluster_n] = chase_clusterCuts.e2t;
-   // _b_chase_e3t[_b_cluster_n] = chase_clusterCuts.e3t;
-   // _b_chase_e4t[_b_cluster_n] = chase_clusterCuts.e4t;
-
-    _b_cluster_n++;
   }
 
 

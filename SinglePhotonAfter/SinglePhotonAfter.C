@@ -109,7 +109,7 @@ int SinglePhotonAfter::process_event(PHCompositeNode *topNode)
 }
 
 std::queue<std::pair<int,int>> SinglePhotonAfter::numUnique(std::list<int> *l,std::map<int,Conversion> *mymap=NULL,SvtxTrackEval* trackeval=NULL,RawClusterContainer *mainClusterContainer=NULL){
-  
+
   l->sort();
   int last=-1;
   _b_nVtx = 0;
@@ -160,9 +160,9 @@ std::queue<std::pair<int,int>> SinglePhotonAfter::numUnique(std::list<int> *l,st
             default:
               cout<<"Error setting reco tracks"<<endl;
           }
-          if (clustidtemp>=0)
-          {
-            _conversionClusters.AddCluster(mainClusterContainer->getCluster(clustidtemp)); //add the calo cluster to the container
+          RawCluster *clustemp =   mainClusterContainer->getCluster(clustidtemp);
+          if(clustemp){
+            _conversionClusters.AddCluster(clustemp); //add the calo cluster to the container
           }
         }
         else{
