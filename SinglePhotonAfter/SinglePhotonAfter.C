@@ -92,7 +92,7 @@ int SinglePhotonAfter::process_event(PHCompositeNode *topNode)
 
   std::queue<std::pair<int,int>> missingChildren= numUnique(&vtxList,&mapConversions,trackeval,mainClusterContainer);
   cout<<"In truth system main RawClusterContainer::size="<<mainClusterContainer->size();
-  cout<<"In truth system this RawClusterContainer::size="<<_conversionClusters->size();
+  cout<<"In truth system this RawClusterContainer::size="<<_conversionClusters.size();
   //findChildren(missingChildren,truthinfo);
   //make a hash of the event number and file number 
   std::stringstream ss;
@@ -140,16 +140,25 @@ std::queue<std::pair<int,int>> SinglePhotonAfter::numUnique(std::list<int> *l,st
         if (TMath::Abs(electronTrack.Eta())<kRAPIDITYACCEPT&&TMath::Abs(positronTrack.Eta())<kRAPIDITYACCEPT)
         {
           _b_Tpair++;
-          if(mymap->at(*i).setRecoTracks(trackeval)==2) //see if the conversion has 2 reco tracks
-          {
-            _b_Rpair++;
-            cout<<"reco pair \n";
+          unsigned int nRecoTracks = mymap->at(*i).setRecoTracks(trackeval); //find the reco tracks for this conversion
+          int clustidtemp=-1;
+          switch(nRecoTracks){
+            case 2:
+              _b_Rpair++;
+              cout<<"reco pair \n";
+              clustidtemp=mymap->at(*i).get_cluster_id(); //get the cluster id of the current conversion
+              break;
+            case 1:
+              cout<<"one reco track\n"
+              clustidtemp=mymap->at(*i).get_cluster_id(); //get the cluster id of the current conversion
+              break;
+            case 0:
+              cout<<"no reco tracks\n";
+              break;
+            default:
+              cout<<"Error setting reco tracks"<<endl;
           }
-          else{
-            cout<<"no reco pair \n";
-          }
-          int clustidtemp =mymap->at(*i).get_cluster_id(); //get the cluster id of the current conversion
-          if (clustidtemp>0)
+          if (clustidtemp>=0)
           {
             _conversionClusters.AddCluster(mainClusterContainer->getCluster(clustidtemp)); //add the calo cluster to the container
           }
