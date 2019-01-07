@@ -7,6 +7,8 @@
 
 #include <calotrigger/CaloTriggerInfo.h>
 
+#include <calobase/RawCluster.h>
+
 #include <g4eval/SvtxEvalStack.h>
 #include <g4eval/SvtxTrackEval.h>
 
@@ -91,8 +93,7 @@ int SinglePhotonAfter::process_event(PHCompositeNode *topNode)
   //record event information 
 
   std::queue<std::pair<int,int>> missingChildren= numUnique(&vtxList,&mapConversions,trackeval,mainClusterContainer);
-  cout<<"In truth system main RawClusterContainer::size="<<mainClusterContainer->size();
-  cout<<"In truth system this RawClusterContainer::size="<<_conversionClusters.size();
+  cout<<"In truth system this RawClusterContainer::size="<<_conversionClusters.size()<<'\n';
   //findChildren(missingChildren,truthinfo);
   //make a hash of the event number and file number 
   std::stringstream ss;
@@ -162,6 +163,7 @@ std::queue<std::pair<int,int>> SinglePhotonAfter::numUnique(std::list<int> *l,st
           }
           RawCluster *clustemp =   mainClusterContainer->getCluster(clustidtemp);
           if(clustemp){
+            clustemp->identify();
             _conversionClusters.AddCluster(clustemp); //add the calo cluster to the container
           }
         }
