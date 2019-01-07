@@ -82,7 +82,7 @@ class TreeMaker: public SubsysReco
  public:
   TreeMaker(): SubsysReco("ConversionClusterTree"){}
   TreeMaker(const std::string &name, int embed_id);
-  TreeMaker(const std::string &name, int embed_id,SinglePhotonAfter* conversionModule);
+  TreeMaker(const std::string &name, int embed_id,TruthConversionEval* conversionModule);
 
   ~TreeMaker(){}//don't delete the Single* b/c the serve will 
 
