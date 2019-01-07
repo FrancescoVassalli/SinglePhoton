@@ -1,4 +1,4 @@
-int after_embeded( std::string infile = "XjPhi3_pT5_98_dst.root",std::string outfile)
+int cluster_burner( std::string infile = "XjPhi3_pT5_98_dst.root",std::string outfile)
 {
   
   gSystem->Load("libfun4all.so");
