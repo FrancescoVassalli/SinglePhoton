@@ -50,6 +50,8 @@ int SinglePhotonAfter::InitRun(PHCompositeNode *topNode)
 
 int SinglePhotonAfter::process_event(PHCompositeNode *topNode)
 {
+  _conversionClusters.Reset();
+
   RawClusterContainer* mainClusterContainer = findNode::getClass<RawClusterContainer>(topNode,"CLUSTER_CEMC");
   PHG4TruthInfoContainer* truthinfo = findNode::getClass<PHG4TruthInfoContainer>(topNode,"G4TruthInfo");
   PHG4TruthInfoContainer::Range range = truthinfo->GetParticleRange();
