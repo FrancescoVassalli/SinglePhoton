@@ -362,11 +362,12 @@ int TreeMaker::process_event(PHCompositeNode *topNode)
   {
 
     //no check that clusteriter is valid
-    RawCluster *cluster = clusters->getCluster(clusiter->first);
-    if (!cluster)
+    if (!clusteriter)
     {
-      cout<<"cluster is NULL"<<endl;
+      cout<<"clusteriter is NULL"<<endl;
     }
+    RawCluster *cluster = clusters->getCluster(clusiter->first);
+    
     CLHEP::Hep3Vector vertex( vx, vy, vz); //set new correct vertex for eta calculation
     CLHEP::Hep3Vector E_vec_cluster = RawClusterUtility::GetEVec(*cluster, vertex);
     double cluster_energy = E_vec_cluster.mag();
