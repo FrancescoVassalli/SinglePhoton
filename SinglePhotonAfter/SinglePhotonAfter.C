@@ -166,7 +166,7 @@ std::queue<std::pair<int,int>> SinglePhotonAfter::numUnique(std::list<int> *l,st
           RawCluster *clustemp =   mainClusterContainer->getCluster(clustidtemp);
           if(clustemp){
             clustemp->identify();
-            _conversionClusters.AddCluster(clustemp); //add the calo cluster to the container
+            _conversionClusters.AddCluster(new RawCluster(*clustemp)); //add the calo cluster to the container
           }
         }
         else{
