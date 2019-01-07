@@ -102,7 +102,7 @@ int SinglePhotonAfter::process_event(PHCompositeNode *topNode)
   //currently my reco can only handle single conversion events
 
   _tree->Fill();
-  std::cout<<"Filled "<<_b_nVtx<<" vertices"<<std::endl;
+  std::cout<<"Filled "<<_b_nVtx<<" vertices \n";
   _b_event++;
   delete stack;
   return 0;
@@ -119,7 +119,7 @@ std::queue<std::pair<int,int>> SinglePhotonAfter::numUnique(std::list<int> *l,st
   for (std::list<int>::iterator i = l->begin(); i != l->end(); ++i) {
     //make sure the conversions are not double counted 
     if(*i!=last){
-      cout<<"unique"<<endl;
+      cout<<"unique \n";
       //fill the tree
       PHG4VtxPoint *vtx =(mymap->at(*i)).getVtx(); //get the vtx
       _b_rVtx[_b_nVtx] = sqrt(vtx->get_x()*vtx->get_x()+vtx->get_y()*vtx->get_y()); //find the radius
@@ -135,6 +135,7 @@ std::queue<std::pair<int,int>> SinglePhotonAfter::numUnique(std::list<int> *l,st
       _b_electron_pt[_b_nVtx]=electronTrack.Pt(); //fill tree
       temp=(mymap->at(*i)).getPositron();
       if(temp){ //this will be false for 1 track events
+        cout<<"2 track event \n";
         positronTrack.SetPxPyPzE(temp->get_px(),temp->get_py(),temp->get_pz(),temp->get_e()); //init the tlv
         _b_positron_pt[_b_nVtx]=positronTrack.Pt(); //fill tree
         if (TMath::Abs(electronTrack.Eta())<kRAPIDITYACCEPT&&TMath::Abs(positronTrack.Eta())<kRAPIDITYACCEPT)
@@ -165,7 +166,7 @@ std::queue<std::pair<int,int>> SinglePhotonAfter::numUnique(std::list<int> *l,st
         }
       }
       else{ //fails the truth 2 track check
-        cout<<"1 track event"<<endl;
+        cout<<"1 track event \n";
         temp=(mymap->at(*i)).getElectron(); //go back to the first track 
         _b_positron_pt[_b_nVtx]=-1; //set the second track to null
         missingChildren.push(pair<int, int>(temp->get_parent_id(),temp->get_track_id())); //add the known ids to the list missing a child
