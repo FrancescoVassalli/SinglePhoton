@@ -56,7 +56,7 @@ void SPHENIX_G4_drawing_clusters_forFran()
   int    cluster_n;
   int    NTowers[200];
 
-  string treePath = "/sphenix/user/vassalli/singlesamples/Photon5/test/onlineanalysis";
+  string treePath = "/sphenix/user/vassalli/gammasample/test/fourembededonlineanalysis";
   string treeExtension = ".rootcTtree.root";
   TChain *ttree = handleFile(treePath,treeExtension,"ttree",1);
   ttree->SetBranchAddress("clusterTower_eta",    &clusterTower_eta    );
@@ -73,7 +73,7 @@ void SPHENIX_G4_drawing_clusters_forFran()
   TH2F *photon_cluster; 
 
 
-  int clusterNum = 2; // number of clusters you wish to draw on a single canvas
+  int clusterNum = 1; // number of clusters you wish to draw on a single canvas
   for (int event = 0; event < ttree->GetEntries(); ++event)
   {
     ttree->GetEvent(event);

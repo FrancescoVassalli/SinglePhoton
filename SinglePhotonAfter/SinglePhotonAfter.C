@@ -8,6 +8,7 @@
 #include <calotrigger/CaloTriggerInfo.h>
 
 #include <calobase/RawCluster.h>
+#include <calobase/RawClusterv1.h>
 
 #include <g4eval/SvtxEvalStack.h>
 #include <g4eval/SvtxTrackEval.h>
@@ -163,10 +164,10 @@ std::queue<std::pair<int,int>> SinglePhotonAfter::numUnique(std::list<int> *l,st
             default:
               cout<<"Error setting reco tracks"<<endl;
           }
-          RawCluster *clustemp =   mainClusterContainer->getCluster(clustidtemp);
+          RawClusterv1 *clustemp =   static_cast<RawClusterv1*> (mainClusterContainer->getCluster(clustidtemp));
           if(clustemp){
             clustemp->identify();
-            _conversionClusters.AddCluster(new RawCluster(*clustemp)); //add the calo cluster to the container
+            _conversionClusters.AddCluster(new RawClusterv1(*clustemp)); //add the calo cluster to the container
           }
         }
         else{
