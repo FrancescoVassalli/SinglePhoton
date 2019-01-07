@@ -140,6 +140,7 @@ std::queue<std::pair<int,int>> SinglePhotonAfter::numUnique(std::list<int> *l,st
         _b_positron_pt[_b_nVtx]=positronTrack.Pt(); //fill tree
         if (TMath::Abs(electronTrack.Eta())<kRAPIDITYACCEPT&&TMath::Abs(positronTrack.Eta())<kRAPIDITYACCEPT)
         {
+          cout<<"In rapidity\n";
           _b_Tpair++;
           unsigned int nRecoTracks = mymap->at(*i).setRecoTracks(trackeval); //find the reco tracks for this conversion
           int clustidtemp=-1;
@@ -163,6 +164,9 @@ std::queue<std::pair<int,int>> SinglePhotonAfter::numUnique(std::list<int> *l,st
           {
             _conversionClusters.AddCluster(mainClusterContainer->getCluster(clustidtemp)); //add the calo cluster to the container
           }
+        }
+        else{
+          cout<<"outside acceptance with electron eta:"<<electronTrack.Eta()<<" and positron:"<<positronTrack.Eta()<<'\n';
         }
       }
       else{ //fails the truth 2 track check
