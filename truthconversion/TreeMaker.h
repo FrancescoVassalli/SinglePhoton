@@ -2,11 +2,13 @@
 #define TreeMaker_h
 
 #include <fun4all/SubsysReco.h>
-#include <vector>
+
 #include "TTree.h"
 #include "TFile.h"
+#include "TruthConversionEval.h"
+
 #include <string>
-#include </direct/phenix+u/vassalli/sphenix/single/SinglePhotonAfter/SinglePhotonAfter.h>
+#include <vector>
 
 class PHCompositeNode;
 
@@ -78,7 +80,7 @@ class TreeMaker: public SubsysReco
 {
 
  public:
-  TreeMaker(): SubsysReco("IsoTree"){}
+  TreeMaker(): SubsysReco("ConversionClusterTree"){}
   TreeMaker(const std::string &name, int embed_id);
   TreeMaker(const std::string &name, int embed_id,SinglePhotonAfter* conversionModule);
 
@@ -104,7 +106,7 @@ class TreeMaker: public SubsysReco
 
   std::string _foutname;
 
-  SinglePhotonAfter * conversionModule=NULL;
+  TruthConversionEval * conversionModule=NULL;
 
   float vx;
   float vy;

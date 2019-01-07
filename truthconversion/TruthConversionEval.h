@@ -1,6 +1,6 @@
 
-#ifndef SINGLEPHOTONAFTER_H__
-#define SINGLEPHOTONAFTER_H__
+#ifndef TRUTHCONVERSIONEVAL_H__
+#define TRUTHCONVERSIONEVAL_H__
 
 // --- need to check all these includes...
 #include <fun4all/SubsysReco.h>
@@ -26,26 +26,18 @@ class PHCompositeNode;
 class Conversion;
 class SvtxTrackEval;
 
-class SinglePhotonAfter: public SubsysReco
+class TruthConversionEval: public SubsysReco
 {
 
  public:
-  /*typedef std::set<unsigned int> ClusterSet;
-  typedef ClusterSet::const_iterator ConstClusterIter;
-  typedef ClusterSet::iterator       ClusterIter;*/
 
-  SinglePhotonAfter(const std::string &name="SinglePhotonAfter.root");
-  ~SinglePhotonAfter();
+  TruthConversionEval(const std::string &name="TruthConversionEval.root");
+  ~TruthConversionEval();
   int InitRun(PHCompositeNode*);
   int process_event(PHCompositeNode*);
   int End(PHCompositeNode*);
   //should make this const
   inline RawClusterContainer* getClusters(){return &_conversionClusters;}
-
-  /*ConstClusterIter conversionClusters_begin() const {return conversionClusterIDs.begin();}
-  ClusterIter conversionClusters_begin() {return conversionClusterIDs.begin();}
-  ConstClusterIter conversionClusters_end() const {return conversionClusterIDs.end();}
-  ClusterIter conversionClusters_end() {return conversionClusterIDs.end();}*/
 
  private:
   inline float deltaR( float eta1, float eta2, float phi1, float phi2 ) {
@@ -90,7 +82,7 @@ inline float vtoR(PHG4VtxPoint* vtx){
   return (float) sqrt(vtx->get_x()*vtx->get_x()+vtx->get_y()*vtx->get_y());
 }
 
-#endif // __SINGLEPHOTONAFTER_H__
+#endif // __TRUTHCONVERSIONEVAL_H__
 
 
 
