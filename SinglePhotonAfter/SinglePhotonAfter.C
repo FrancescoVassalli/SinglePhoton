@@ -63,6 +63,7 @@ int SinglePhotonAfter::process_event(PHCompositeNode *topNode)
     cout<<"NULL track eval fatal error"<<endl;
     return 1;
   }
+  cout<<"Truth particle:"<<truthinfo->size()<<'\n';
   //make a list of the conversions
   std::list<int> vtxList;
   std::map<int,Conversion> mapConversions;
