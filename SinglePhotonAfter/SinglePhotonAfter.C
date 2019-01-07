@@ -149,7 +149,7 @@ std::queue<std::pair<int,int>> SinglePhotonAfter::numUnique(std::list<int> *l,st
               clustidtemp=mymap->at(*i).get_cluster_id(); //get the cluster id of the current conversion
               break;
             case 1:
-              cout<<"one reco track\n"
+              cout<<"one reco track\n";
               clustidtemp=mymap->at(*i).get_cluster_id(); //get the cluster id of the current conversion
               break;
             case 0:
