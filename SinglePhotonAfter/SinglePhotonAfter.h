@@ -30,9 +30,6 @@ class SinglePhotonAfter: public SubsysReco
 {
 
  public:
-  /*typedef std::set<unsigned int> ClusterSet;
-  typedef ClusterSet::const_iterator ConstClusterIter;
-  typedef ClusterSet::iterator       ClusterIter;*/
 
   SinglePhotonAfter(const std::string &name="SinglePhotonAfter.root");
   ~SinglePhotonAfter();
@@ -41,11 +38,6 @@ class SinglePhotonAfter: public SubsysReco
   int End(PHCompositeNode*);
   //should make this const
   inline RawClusterContainer* getClusters(){return &_conversionClusters;}
-
-  /*ConstClusterIter conversionClusters_begin() const {return conversionClusterIDs.begin();}
-  ClusterIter conversionClusters_begin() {return conversionClusterIDs.begin();}
-  ConstClusterIter conversionClusters_end() const {return conversionClusterIDs.end();}
-  ClusterIter conversionClusters_end() {return conversionClusterIDs.end();}*/
 
  private:
   inline float deltaR( float eta1, float eta2, float phi1, float phi2 ) {
@@ -59,7 +51,7 @@ class SinglePhotonAfter: public SubsysReco
   std::queue<std::pair<int,int>> numUnique(std::list<int>* l,std::map<int,Conversion>* map,SvtxTrackEval* trackEval,RawClusterContainer* mainClusterContainer);
   void findChildren(std::queue<std::pair<int,int>> missing,PHG4TruthInfoContainer* truthinfo);
 
-  const static int kMAXParticles=1000;
+  const static int ks_MAXParticles=1000;
 
   TFile *_f;
   TTree *_tree;
@@ -69,13 +61,13 @@ class SinglePhotonAfter: public SubsysReco
   int _b_nVtx;  //total conversions
   int _b_Tpair; //count acceptance e pairs in truth
   int _b_Rpair; //count acceptance e pairs in reco
-  float _b_rVtx[kMAXParticles];  //truth radius
-  bool _b_pythia[kMAXParticles];  //tracks if the conversion is from pythia or G4 particle
-  float _b_electron_pt[kMAXParticles];
-  float _b_positron_pt[kMAXParticles];
-  float _b_parent_pt  [kMAXParticles];
-  float _b_parent_eta [kMAXParticles];
-  float _b_parent_phi [kMAXParticles];
+  float _b_rVtx[ks_MAXParticles];  //truth radius
+  bool _b_pythia[ks_MAXParticles];  //tracks if the conversion is from pythia or G4 particle
+  float _b_electron_pt[ks_MAXParticles];
+  float _b_positron_pt[ks_MAXParticles];
+  float _b_parent_pt  [ks_MAXParticles];
+  float _b_parent_eta [ks_MAXParticles];
+  float _b_parent_phi [ks_MAXParticles];
 
   RawClusterContainer _conversionClusters;
 

@@ -5,7 +5,7 @@ INCLUDES = \
   -I$(OFFLINE_MAIN)/include \
   -I`root-config --incdir`
 
-libtreemaker_la_LDFLAGS = \
+libtruthconversion_la_LDFLAGS = \
   -nodefaultlibs \
   -L$(libdir) \
   -L$(OFFLINE_MAIN)/lib \
@@ -13,22 +13,29 @@ libtreemaker_la_LDFLAGS = \
  `root-config --libs`
 
 lib_LTLIBRARIES = \
-	libtreemaker.la
+	libtruthconversion.la
   
 include_HEADERS = \
 	TreeMaker.h \
-	TreeMakerLinkDef.h 
+	TreeMakerLinkDef.h \
+	Conversion.h \
+	ConversionLinkDef.h \
+	TruthConverionEval.h \
+	TruthConversionEvalLinkDef.h
 
-libtreemaker_la_SOURCES = \
+libtruthconversion_la_SOURCES = \
 	TreeMaker.cc \
-	TreeMaker_Dict.C 
+	TreeMaker_Dict.C \
+	TruthConverionEval.C \
+	TruthConverionEval_Dict.C \
+	Conversion.C \
+	Conversion_Dict.C
 
-libtreemaker_la_LIBADD = \
+libtruthconversion_la_LIBADD = \
   -lg4dst \
   -lg4eval \
   -lcalotrigger \
-  -lphool\
-	-lSinglePhotonAnalysis
+  -lphool
 
 BUILT_SOURCES = \
 	testexternals.C
@@ -37,7 +44,7 @@ noinst_PROGRAMS = \
 	testexternals
 
 testexternals_LDADD = \
-	libtreemaker.la
+	libtruthconversion.la
 
 testexternals.C:
 	echo "//*** this is a generated file. Do not commit, do not edit" > $@

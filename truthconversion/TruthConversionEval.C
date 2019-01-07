@@ -1,4 +1,4 @@
-#include "SinglePhotonAfter.h"
+#include "TruthConversionEval.h"
 
 #include <fun4all/Fun4AllServer.h>
 
@@ -18,16 +18,16 @@
 #include <sstream>
 #include <math.h>
 
-SinglePhotonAfter::SinglePhotonAfter(const std::string &name) : SubsysReco("TRUTH_CONVERSION_EVAL")
+TruthConversionEval::TruthConversionEval(const std::string &name) : SubsysReco("TruthConversionEval")
 {
   _foutname = name;
 }
 
-SinglePhotonAfter::~SinglePhotonAfter(){
+TruthConversionEval::~TruthConversionEval(){
   delete _f;
 }
 
-int SinglePhotonAfter::InitRun(PHCompositeNode *topNode)
+int TruthConversionEval::InitRun(PHCompositeNode *topNode)
 {
   _b_event=0;
   _f = new TFile( _foutname.c_str(), "RECREATE");
@@ -49,7 +49,7 @@ int SinglePhotonAfter::InitRun(PHCompositeNode *topNode)
   return 0;
 }
 
-int SinglePhotonAfter::process_event(PHCompositeNode *topNode)
+int TruthConversionEval::process_event(PHCompositeNode *topNode)
 {
   _conversionClusters.Reset();
 
@@ -112,7 +112,7 @@ int SinglePhotonAfter::process_event(PHCompositeNode *topNode)
   return 0;
 }
 
-std::queue<std::pair<int,int>> SinglePhotonAfter::numUnique(std::list<int> *l,std::map<int,Conversion> *mymap=NULL,SvtxTrackEval* trackeval=NULL,RawClusterContainer *mainClusterContainer=NULL){
+std::queue<std::pair<int,int>> TruthConversionEval::numUnique(std::list<int> *l,std::map<int,Conversion> *mymap=NULL,SvtxTrackEval* trackeval=NULL,RawClusterContainer *mainClusterContainer=NULL){
 
   l->sort();
   int last=-1;
@@ -197,7 +197,7 @@ std::queue<std::pair<int,int>> SinglePhotonAfter::numUnique(std::list<int> *l,st
   return missingChildren;
 }
 
-void SinglePhotonAfter::findChildren(std::queue<std::pair<int,int>> missingChildren,PHG4TruthInfoContainer* truthinfo){
+void TruthConversionEval::findChildren(std::queue<std::pair<int,int>> missingChildren,PHG4TruthInfoContainer* truthinfo){
   while(!missingChildren.empty()){
     for (PHG4TruthInfoContainer::ConstIterator iter = truthinfo->GetParticleRange().first; iter != truthinfo->GetParticleRange().second; ++iter)
     {
@@ -213,7 +213,7 @@ void SinglePhotonAfter::findChildren(std::queue<std::pair<int,int>> missingChild
 }
 
 
-int SinglePhotonAfter::End(PHCompositeNode *topNode)
+int TruthConversionEval::End(PHCompositeNode *topNode)
 {
   std::cout<<"Writing truth tree"<<std::endl;
   _f->Write();

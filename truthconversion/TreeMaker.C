@@ -1,10 +1,10 @@
-#include "TreeMaker.h"
-
 #include <phool/getClass.h>
-#include <fun4all/Fun4AllServer.h>
-
 #include <phool/PHCompositeNode.h>
 
+#include <fun4all/Fun4AllServer.h>
+
+
+#include "TreeMaker.h"
 #include "TLorentzVector.h"
 #include <iostream>
 #include <vector>
@@ -40,7 +40,7 @@
 ////////////////////////////////////////////////////////////////////////////////////
 //
 //
-//  These functions are for finding Sasha Bazilevsky's chi values for myself
+//  These functions are for finding Sasha Bazilevsky's chi values for ChaseSmith
 //
 //
 ///////////////////////////////////////////////////////////////////////////////////
@@ -228,14 +228,14 @@ cutValues CutValues_ChaseStyle(std::vector<ChaseTower> towers, EtaPhiPoint CoE)
 
 
 
-TreeMaker::TreeMaker(const std::string &name, int embed_id) : SubsysReco("IsoTree")
+TreeMaker::TreeMaker(const std::string &name, int embed_id) : SubsysReco("ConversionClusterTree")
 {
   _foutname = name;
   _embed_id = embed_id;
 
 }
 
-TreeMaker::TreeMaker(const std::string &name, int embed_id,SinglePhotonAfter* conversionModule) : SubsysReco("IsoTree"),conversionModule(conversionModule)
+TreeMaker::TreeMaker(const std::string &name, int embed_id,TruthConversionEval* conversionModule) : SubsysReco("ConversionClusterTree"),conversionModule(conversionModule)
 {
   _foutname = name;
   _embed_id = embed_id;

@@ -1,6 +1,6 @@
 AC_INIT(configure.ac)
 
-AM_INIT_AUTOMAKE(TreeMaker, 1.00)
+AM_INIT_AUTOMAKE(truthconversion, 1.00)
 AC_PROG_CXX(CC g++)
 AC_ENABLE_STATIC(no)
 LT_INIT
