@@ -14,7 +14,7 @@ Arguments       = $(Process)
 # The requirement line specifies which machines we want to
 # run this job on.  Any arbitrary classad expression can
 # be used.
-#Requirements = (CPU_Experiment == "phenix") 
+Requirements = (CPU_Speed >= 1)
 
 # Rank is an expression that states how to rank machines which 
 # have already met the requirements expression.  Essentially, 
@@ -45,15 +45,7 @@ Log          = /direct/phenix+u/vassalli/sphenix/single/condor_logs/log.pythia.$
 # Email address to send notification to.
 Notify_user     = frva5829@colorado.edu
 
-# These are job flags which are non-Condor specific.
-# The "Experiment" flag should be set to the user's experiment:
-# star, phobos, phenix, brahms, atlas, etc.
-#+Experiment     = "phenix"
-Requirements = (CPU_Experiment == "phenix")
-
-# Since this is an analysis job we set this to "cas".
-+Job_Type       = "cas"
-#+Job_Type       = "highmem"
+request_memory = 0M
 
 # This should be the last command and tells condor to queue the
 # job.  If a number is placed after the command (i.e. Queue 15)
