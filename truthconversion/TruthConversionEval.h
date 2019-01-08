@@ -30,7 +30,8 @@ class TruthConversionEval: public SubsysReco
 
  public:
 
-  TruthConversionEval(const std::string &name="TruthConversionEval.root");
+  TruthConversionEval(const std::string &name="TruthConversionEval.root",const unsigned int runnumber, 
+    const int particleEmbed, const int pythiaEmbed);
   ~TruthConversionEval();
   int InitRun(PHCompositeNode*);
   int process_event(PHCompositeNode*);
@@ -51,6 +52,9 @@ class TruthConversionEval: public SubsysReco
   void findChildren(std::queue<std::pair<int,int>> missing,PHG4TruthInfoContainer* truthinfo);
 
   const static int kMAXParticles=1000;
+  const int kParticleEmbed;
+  const int kPythiaEmbed;
+  const unsigned int kRunNumber;
 
   TFile *_f;
   TTree *_tree;

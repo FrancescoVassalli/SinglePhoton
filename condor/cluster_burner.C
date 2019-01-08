@@ -1,4 +1,4 @@
-int cluster_burner( std::string infile = "XjPhi3_pT5_98_dst.root",std::string outfile)
+int cluster_burner( std::string infile = "XjPhi3_pT5_98_dst.root",std::string outfile, int runNumber)
 {
   
   gSystem->Load("libfun4all.so");
@@ -20,7 +20,7 @@ int cluster_burner( std::string infile = "XjPhi3_pT5_98_dst.root",std::string ou
   hitsin->fileopen( infile );
   se->registerInputManager(hitsin);
  
-  TruthConversionEval *truther = new TruthConversionEval(outfile);
+  TruthConversionEval *truther = new TruthConversionEval(outfile,runNumber,2,3);
   se->registerSubsystem(truther);
 //  ConvertedPhotonReconstructor *converter=new ConvertedPhotonReconstructor(outfile);
   //se->registerSubsystem(converter);

@@ -15,10 +15,11 @@
 
 
 #include <iostream>
-#include <sstream>
 #include <math.h>
 
-TruthConversionEval::TruthConversionEval(const std::string &name) : SubsysReco("TruthConversionEval")
+TruthConversionEval::TruthConversionEval(const std::string &name,const unsigned int runnumber, 
+    const int particleEmbed, const int pythiaEmbed) : SubsysReco("TruthConversionEval"),
+kRunNumber(runnumber),kParticleEmbed(particleEmbed), kPythiaEmbed(pythiaEmbed)
 {
   _foutname = name;
 }
@@ -33,8 +34,8 @@ int TruthConversionEval::InitRun(PHCompositeNode *topNode)
   _f = new TFile( _foutname.c_str(), "RECREATE");
   _tree = new TTree("ttree","a succulent orange tree");
   _tree->SetAutoSave(300);
+  _tree->Branch("runNumber",&kRunNumber);
   _tree->Branch("event",&_b_event); 
-  _tree->Branch("hash",&_b_hash);
   _tree->Branch("nVtx", &_b_nVtx);
   _tree->Branch("nTpair", &_b_Tpair);
   _tree->Branch("nRpair", &_b_Rpair);
@@ -70,12 +71,16 @@ int TruthConversionEval::process_event(PHCompositeNode *topNode)
     PHG4Particle* parent =truthinfo->GetParticle(g4particle->get_parent_id());
     float radius=0;
     if(!parent){ //if the parent point is null then the particle is primary 
-      //checking the embed ID to make sure I made the primary particle. May need to change the magic literal
-      if(get_embed(g4particle,truthinfo)!=2) continue;
+      if(get_embed(g4particle,truthinfo)!=kParticleEmbed) continue;
     }
     else{ //if the particle is not primary find its vertex 
+      if (get_embed(parent,truthinfo)==kPythiaEmbed)
+      {
+        cout<<"pythia hit\n";
+      }
       //check that the parent is an embeded(2) photon or a pythia(3) photon that converts
-      if(get_embed(parent,truthinfo)==2||(get_embed(parent,truthinfo)==3&&parent->get_pid()==22&&TMath::Abs(g4particle->get_pid())==11)){
+      if(get_embed(parent,truthinfo)==kParticleEmbed
+        ||(get_embed(parent,truthinfo)==kPythiaEmbed&&parent->get_pid()==22&&TMath::Abs(g4particle->get_pid())==11)){
         PHG4VtxPoint* vtx=truthinfo->GetVtx(g4particle->get_vtx_id()); //get the conversion vertex
         radius=sqrt(vtx->get_x()*vtx->get_x()+vtx->get_y()*vtx->get_y());
         if (radius<kTPCRADIUS) //limits to truth conversions within the tpc radius
@@ -95,13 +100,7 @@ int TruthConversionEval::process_event(PHCompositeNode *topNode)
   //std::queue<std::pair<int,int>> missingChildren= numUnique(&vtxList,&mapConversions,trackeval,mainClusterContainer);
   cout<<Name()<<"# conversion clusters="<<_conversionClusters.size()<<'\n';
   //findChildren(missingChildren,truthinfo);
-  //make a hash of the event number and file number 
-  std::stringstream ss;
-  ss<<"-"<<_b_event;             //this is where the file number is 
-  _b_hash=_foutname.substr(_foutname.length()-10,5)+ss.str();
-
-  //currently my reco can only handle single conversion events
-
+  
   _tree->Fill();
   std::cout<<"Filled "<<_b_nVtx<<" vertices \n";
   _b_event++;
