@@ -26,7 +26,7 @@ include_HEADERS = \
 libtruthconversion_la_SOURCES = \
 	TreeMaker.cc \
 	TreeMaker_Dict.C \
-	TruthConverionEval.C \
+	TruthConverionEval.cc \
 	TruthConverionEval_Dict.C \
 	Conversion.C \
 	Conversion_Dict.C
