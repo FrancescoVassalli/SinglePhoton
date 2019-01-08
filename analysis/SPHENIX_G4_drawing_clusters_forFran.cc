@@ -56,9 +56,10 @@ void SPHENIX_G4_drawing_clusters_forFran()
   int    cluster_n;
   int    NTowers[200];
 
-  string treePath = "/sphenix/user/vassalli/gammasample/test/fourembededonlineanalysis";
+  string treePath = "/sphenix/user/vassalli/gammasample/fourembededonlineanalysis";
   string treeExtension = ".rootcTtree.root";
-  TChain *ttree = handleFile(treePath,treeExtension,"ttree",1);
+  unsigned int nFiles=50;
+  TChain *ttree = handleFile(treePath,treeExtension,"ttree",nFiles);
   ttree->SetBranchAddress("clusterTower_eta",    &clusterTower_eta    );
   ttree->SetBranchAddress("clusterTower_phi",    &clusterTower_phi    );
   ttree->SetBranchAddress("clusterTower_energy", &clusterTower_energy );
