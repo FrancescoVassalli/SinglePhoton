@@ -130,9 +130,6 @@ public:
 
   int get_cluster_id();
   int get_cluster_id(SvtxTrackEval *trackeval);
-  /*bool acceptancePair(){
-
-  }*/
 private:
   PHG4Particle* e1=NULL;
   PHG4Particle* e2=NULL;
