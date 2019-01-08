@@ -17,8 +17,8 @@
 #include <iostream>
 #include <math.h>
 
-TruthConversionEval::TruthConversionEval(const std::string &name,const unsigned int runnumber, 
-    const int particleEmbed, const int pythiaEmbed) : SubsysReco("TruthConversionEval"),
+TruthConversionEval::TruthConversionEval(const std::string &name, unsigned int runnumber, 
+     int particleEmbed,  int pythiaEmbed) : SubsysReco("TruthConversionEval"),
 kRunNumber(runnumber),kParticleEmbed(particleEmbed), kPythiaEmbed(pythiaEmbed)
 {
   _foutname = name;

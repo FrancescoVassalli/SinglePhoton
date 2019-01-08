@@ -30,8 +30,8 @@ class TruthConversionEval: public SubsysReco
 
  public:
 
-  TruthConversionEval(const std::string &name="TruthConversionEval.root",const unsigned int runnumber, 
-    const int particleEmbed, const int pythiaEmbed);
+  TruthConversionEval(const std::string &name,unsigned int runnumber, 
+    int particleEmbed, int pythiaEmbed);
   ~TruthConversionEval();
   int InitRun(PHCompositeNode*);
   int process_event(PHCompositeNode*);
@@ -51,11 +51,11 @@ class TruthConversionEval: public SubsysReco
   std::queue<std::pair<int,int>> numUnique(std::map<int,Conversion>* map,SvtxTrackEval* trackEval,RawClusterContainer* mainClusterContainer);
   void findChildren(std::queue<std::pair<int,int>> missing,PHG4TruthInfoContainer* truthinfo);
 
-  const static int kMAXParticles=1000;
-  const int kParticleEmbed;
-  const int kPythiaEmbed;
-  const unsigned int kRunNumber;
-
+  const static int s_kMAXParticles=1000;
+  const unsigned int _kRunNumber;
+  const int _kParticleEmbed;
+  const int _kPythiaEmbed;
+  int _runNumber=kRunNumber;
   TFile *_f;
   TTree *_tree;
   std::string _foutname;
@@ -74,8 +74,8 @@ class TruthConversionEval: public SubsysReco
 
   RawClusterContainer _conversionClusters;
 
-  const static int kTPCRADIUS=21; //in cm there is a way to get this from the simulation I should implement
-  float kRAPIDITYACCEPT=1;
+  const static int s_kTPCRADIUS=21; //in cm there is a way to get this from the simulation I should implement
+  float _kRAPIDITYACCEPT=1;
 };
 
 inline int get_embed(PHG4Particle* particle, PHG4TruthInfoContainer* truthinfo){
