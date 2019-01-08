@@ -41,7 +41,7 @@ int TruthConversionEval::InitRun(PHCompositeNode *topNode)
   _tree->Branch("nTpair", &_b_Tpair);
   _tree->Branch("nRpair", &_b_Rpair);
   _tree->Branch("rVtx", _b_rVtx,"rVtx[nVtx]/F");
-  _tree->Branch("pythia", _b_pythia,"pythia[nVtx]/I");
+  _tree->Branch("pythia", _b_pythia,"pythia[nVtx]/B");
   _tree->Branch("electron_pt", _b_electron_pt,"electron_pt[nVtx]/F");
   _tree->Branch("positron_pt", _b_positron_pt,"positron_pt[nVtx]/F");
   _tree->Branch("photon_pt",   _b_parent_pt    ,"photon_pt[nVtx]/F");
@@ -170,7 +170,7 @@ std::queue<std::pair<int,int>> TruthConversionEval::numUnique(std::map<int,Conve
       cout<<"with parent:\n";
       i->second.getPhoton()->identify();
     }
-    _b_pythia[_b_nVtx]=i->second.getEmbed();
+    _b_pythia[_b_nVtx]=i->second.getEmbed()==3;
     cout<<"Embed ID:"<<i->second.getEmbed()<<'\n';
   }
   return missingChildren;

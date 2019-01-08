@@ -65,7 +65,7 @@ class TruthConversionEval: public SubsysReco
   int _b_Tpair; //count acceptance e pairs in truth
   int _b_Rpair; //count acceptance e pairs in reco
   float _b_rVtx[s_kMAXParticles];  //truth radius
-  int _b_pythia[s_kMAXParticles];  //tracks if the conversion is from pythia or G4 particle
+  bool _b_pythia[s_kMAXParticles];  //tracks if the conversion is from pythia or G4 particle
   float _b_electron_pt[s_kMAXParticles];
   float _b_positron_pt[s_kMAXParticles];
   float _b_parent_pt  [s_kMAXParticles];
