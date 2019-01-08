@@ -51,11 +51,11 @@ class TruthConversionEval: public SubsysReco
   std::queue<std::pair<int,int>> numUnique(std::map<int,Conversion>* map,SvtxTrackEval* trackEval,RawClusterContainer* mainClusterContainer);
   void findChildren(std::queue<std::pair<int,int>> missing,PHG4TruthInfoContainer* truthinfo);
 
-  const static int s_s_kMAXParticles=1000;
+  const static int s_kMAXParticles=1000;
   const unsigned int _kRunNumber;
   const int _kParticleEmbed;
   const int _kPythiaEmbed;
-  int _runNumber=_kRunNumber;
+  int _runNumber;
   TFile *_f;
   TTree *_tree;
   std::string _foutname;

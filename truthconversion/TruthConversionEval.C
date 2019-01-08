@@ -19,7 +19,7 @@
 
 TruthConversionEval::TruthConversionEval(const std::string &name, unsigned int runnumber, 
      int particleEmbed,  int pythiaEmbed) : SubsysReco("TruthConversionEval"),
-kRunNumber(runnumber),kParticleEmbed(particleEmbed), kPythiaEmbed(pythiaEmbed)
+_kRunNumber(runnumber),_kParticleEmbed(particleEmbed), _kPythiaEmbed(pythiaEmbed)
 {
   _foutname = name;
 }
@@ -31,6 +31,7 @@ TruthConversionEval::~TruthConversionEval(){
 int TruthConversionEval::InitRun(PHCompositeNode *topNode)
 {
   _b_event=0;
+  _runNumber=_kRunNumber;
   _f = new TFile( _foutname.c_str(), "RECREATE");
   _tree = new TTree("ttree","a succulent orange tree");
   _tree->SetAutoSave(300);
@@ -83,7 +84,7 @@ int TruthConversionEval::process_event(PHCompositeNode *topNode)
         ||(get_embed(parent,truthinfo)==_kPythiaEmbed&&parent->get_pid()==22&&TMath::Abs(g4particle->get_pid())==11)){
         PHG4VtxPoint* vtx=truthinfo->GetVtx(g4particle->get_vtx_id()); //get the conversion vertex
         radius=sqrt(vtx->get_x()*vtx->get_x()+vtx->get_y()*vtx->get_y());
-        if (radius<kTPCRADIUS) //limits to truth conversions within the tpc radius
+        if (radius<s_kTPCRADIUS) //limits to truth conversions within the tpc radius
         { 
           //initialize the conversion object -don't use constructor b/c setters have error handling
           std::cout<<"Conversion with radius [cm]:"<<radius<<'\n';
