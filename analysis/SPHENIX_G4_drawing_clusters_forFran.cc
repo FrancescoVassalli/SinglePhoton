@@ -79,6 +79,7 @@ void SPHENIX_G4_drawing_clusters_forFran()
   {
     ttree->GetEvent(event);
     cout<<"Drawing "<<clusterNum<<" of "<<cluster_n<<" clusters\n";
+    if(cluster_n==0) continue;
     ostringstream oss;
     oss<<event;
     string thisPlotname = plotname +string(oss.str());
@@ -103,7 +104,7 @@ void SPHENIX_G4_drawing_clusters_forFran()
       }
       if (maxTowerEnergy!=-1.)
        {
-         photon_cluster->GetXaxis()->SetRangeUser(TMath::Max(maxTowerEta-.2,-1.),,TMath::Min(maxTowerEta+.2,1));
+         photon_cluster->GetXaxis()->SetRangeUser(TMath::Max(maxTowerEta-.2,-1.),TMath::Min(maxTowerEta+.2,1.));
          photon_cluster->GetYaxis()->SetRangeUser(TMath::Max(maxTowerPhi-.2,-1*TMath::Pi()),TMath::Min(maxTowerPhi+.2,TMath::Pi()));
        } 
       
