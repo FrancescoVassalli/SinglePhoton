@@ -18,17 +18,17 @@ lib_LTLIBRARIES = \
 include_HEADERS = \
 	TreeMaker.h \
 	TreeMakerLinkDef.h \
+	TruthConversionEval.h \
+	TruthConversionEvalLinkDef.h \
 	Conversion.h \
-	ConversionLinkDef.h \
-	TruthConverionEval.h \
-	TruthConversionEvalLinkDef.h
+	ConversionLinkDef.h 
 
 libtruthconversion_la_SOURCES = \
 	TreeMaker.cc \
 	TreeMaker_Dict.C \
 	TruthConverionEval.cc \
 	TruthConverionEval_Dict.C \
-	Conversion.C \
+	Conversion.cc \
 	Conversion_Dict.C
 
 libtruthconversion_la_LIBADD = \
