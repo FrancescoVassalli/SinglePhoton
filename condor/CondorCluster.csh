@@ -17,7 +17,7 @@ cp  $SOURCE_PHOTONMAKER $SCRATCH_AREA
 cp $BURNER $SCRATCH_AREA
 #
 cd $SCRATCH_AREA
-root -b -q Fun4All_G4_sPHENIX.C\(10,\"$IN_FILE\"\) 
+root -b -q Fun4All_G4_sPHENIX.C\(1,\"$IN_FILE\",\"$PYTHIA_FILE\"\) 
 root -b -q cluster_burner.C\(\"$IN_FILE\",\"$OUT_FILE\"\)
 #
 rm -rf $SCRATCH_AREA

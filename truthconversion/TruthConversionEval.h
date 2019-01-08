@@ -1,6 +1,6 @@
 
-#ifndef SINGLEPHOTONAFTER_H__
-#define SINGLEPHOTONAFTER_H__
+#ifndef TRUTHCONVERSIONEVAL_H__
+#define TRUTHCONVERSIONEVAL_H__
 
 // --- need to check all these includes...
 #include <fun4all/SubsysReco.h>
@@ -26,18 +26,18 @@ class PHCompositeNode;
 class Conversion;
 class SvtxTrackEval;
 
-class SinglePhotonAfter: public SubsysReco
+class TruthConversionEval: public SubsysReco
 {
 
  public:
 
-  SinglePhotonAfter(const std::string &name="SinglePhotonAfter.root");
-  ~SinglePhotonAfter();
+  TruthConversionEval(const std::string &name="TruthConversionEval.root");
+  ~TruthConversionEval();
   int InitRun(PHCompositeNode*);
   int process_event(PHCompositeNode*);
   int End(PHCompositeNode*);
   //should make this const
-  inline RawClusterContainer* getClusters(){return &_conversionClusters;}
+  inline const RawClusterContainer* getClusters()const {return &_conversionClusters;}
 
  private:
   inline float deltaR( float eta1, float eta2, float phi1, float phi2 ) {
@@ -51,7 +51,7 @@ class SinglePhotonAfter: public SubsysReco
   std::queue<std::pair<int,int>> numUnique(std::list<int>* l,std::map<int,Conversion>* map,SvtxTrackEval* trackEval,RawClusterContainer* mainClusterContainer);
   void findChildren(std::queue<std::pair<int,int>> missing,PHG4TruthInfoContainer* truthinfo);
 
-  const static int ks_MAXParticles=1000;
+  const static int kMAXParticles=1000;
 
   TFile *_f;
   TTree *_tree;
@@ -61,13 +61,13 @@ class SinglePhotonAfter: public SubsysReco
   int _b_nVtx;  //total conversions
   int _b_Tpair; //count acceptance e pairs in truth
   int _b_Rpair; //count acceptance e pairs in reco
-  float _b_rVtx[ks_MAXParticles];  //truth radius
-  bool _b_pythia[ks_MAXParticles];  //tracks if the conversion is from pythia or G4 particle
-  float _b_electron_pt[ks_MAXParticles];
-  float _b_positron_pt[ks_MAXParticles];
-  float _b_parent_pt  [ks_MAXParticles];
-  float _b_parent_eta [ks_MAXParticles];
-  float _b_parent_phi [ks_MAXParticles];
+  float _b_rVtx[kMAXParticles];  //truth radius
+  bool _b_pythia[kMAXParticles];  //tracks if the conversion is from pythia or G4 particle
+  float _b_electron_pt[kMAXParticles];
+  float _b_positron_pt[kMAXParticles];
+  float _b_parent_pt  [kMAXParticles];
+  float _b_parent_eta [kMAXParticles];
+  float _b_parent_phi [kMAXParticles];
 
   RawClusterContainer _conversionClusters;
 
@@ -82,7 +82,7 @@ inline float vtoR(PHG4VtxPoint* vtx){
   return (float) sqrt(vtx->get_x()*vtx->get_x()+vtx->get_y()*vtx->get_y());
 }
 
-#endif // __SINGLEPHOTONAFTER_H__
+#endif // __TRUTHCONVERSIONEVAL_H__
 
 
 
