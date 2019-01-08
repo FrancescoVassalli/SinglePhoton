@@ -62,7 +62,7 @@ int TruthConversionEval::process_event(PHCompositeNode *topNode)
   SvtxTrackEval* trackeval = stack->get_track_eval();
   if (!trackeval)
   {
-    cout<<"NULL track eval fatal error"<<endl;
+    cout<<"NULL track eval in " <<Name()<<" fatal error"<<endl;
     return 1;
   }
   //make a map of the conversions
@@ -71,14 +71,7 @@ int TruthConversionEval::process_event(PHCompositeNode *topNode)
     PHG4Particle* g4particle = iter->second; 
     PHG4Particle* parent =truthinfo->GetParticle(g4particle->get_parent_id());
     float radius=0;
-    if(!parent){ //if the parent point is null then the particle is primary 
-      if(get_embed(g4particle,truthinfo)!=_kParticleEmbed) continue;
-    }
-    else{ //if the particle is not primary find its vertex 
-      if (get_embed(parent,truthinfo)==_kPythiaEmbed)
-      {
-        cout<<"pythia hit\n";
-      }
+    if(parent){ //if the particle is not primary find its vertex 
       //check that the parent is an embeded(2) photon or a pythia(3) photon that converts
       if(get_embed(parent,truthinfo)==_kParticleEmbed
         ||(get_embed(parent,truthinfo)==_kPythiaEmbed&&parent->get_pid()==22&&TMath::Abs(g4particle->get_pid())==11)){
@@ -131,7 +124,7 @@ std::queue<std::pair<int,int>> TruthConversionEval::numUnique(std::map<int,Conve
     _b_electron_pt[_b_nVtx]=electronTrack.Pt(); //fill tree
     temp=i->second.getPositron();
     if(temp){ //this will be false for 1 track events
-      cout<<"2 track event \n";
+      cout<<"2 track conversion \n";
       positronTrack.SetPxPyPzE(temp->get_px(),temp->get_py(),temp->get_pz(),temp->get_e()); //init the tlv
       _b_positron_pt[_b_nVtx]=positronTrack.Pt(); //fill tree
       if (TMath::Abs(electronTrack.Eta())<_kRAPIDITYACCEPT&&TMath::Abs(positronTrack.Eta())<_kRAPIDITYACCEPT)
@@ -156,9 +149,9 @@ std::queue<std::pair<int,int>> TruthConversionEval::numUnique(std::map<int,Conve
           default:
             cout<<"Error setting reco tracks"<<endl;
         }
-        RawCluster *clustemp =   dynamic_cast<RawCluster*>(mainClusterContainer->getCluster(clustidtemp)->clone());
-        if(clustemp){
-          clustemp->identify();
+        if(mainClusterContainer->getCluster(clustidtemp)){//if thre is matching cluster 
+          mainClusterContainer->getCluster(clustidtemp)->identify();
+          RawCluster *clustemp =   dynamic_cast<RawCluster*>(mainClusterContainer->getCluster(clustidtemp)->Clone());
           _conversionClusters.AddCluster(clustemp); //add the calo cluster to the container
         }
       }
@@ -177,6 +170,7 @@ std::queue<std::pair<int,int>> TruthConversionEval::numUnique(std::map<int,Conve
       i->second.getPhoton()->identify();
     }
     if(i->second.getEmbed()==3){ //decide if the conversion is from pythia
+      cout<<"pythia conversion\n";
       _b_pythia[_b_nVtx]=true;
     }
     else{
