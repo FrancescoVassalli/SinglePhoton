@@ -41,7 +41,7 @@ int TruthConversionEval::InitRun(PHCompositeNode *topNode)
   _tree->Branch("nTpair", &_b_Tpair);
   _tree->Branch("nRpair", &_b_Rpair);
   _tree->Branch("rVtx", _b_rVtx,"rVtx[nVtx]/F");
-  _tree->Branch("pythia", _b_pythia,"pythia[nVtx]/B");
+  _tree->Branch("pythia", _b_pythia,"pythia[nVtx]/I");
   _tree->Branch("electron_pt", _b_electron_pt,"electron_pt[nVtx]/F");
   _tree->Branch("positron_pt", _b_positron_pt,"positron_pt[nVtx]/F");
   _tree->Branch("photon_pt",   _b_parent_pt    ,"photon_pt[nVtx]/F");
@@ -110,6 +110,7 @@ std::queue<std::pair<int,int>> TruthConversionEval::numUnique(std::map<int,Conve
   std::queue<std::pair<int,int>> missingChildren;
   for (std::map<int,Conversion>::iterator i = mymap->begin(); i != mymap->end(); ++i) {
     //fill the tree
+    _b_nVtx++; 
     PHG4VtxPoint *vtx =i->second.getVtx(); //get the vtx
     _b_rVtx[_b_nVtx] = sqrt(vtx->get_x()*vtx->get_x()+vtx->get_y()*vtx->get_y()); //find the radius
     PHG4Particle *temp = i->second.getPhoton(); //set the photon
@@ -156,7 +157,7 @@ std::queue<std::pair<int,int>> TruthConversionEval::numUnique(std::map<int,Conve
         }
       }
       else{
-        cout<<"outside acceptance with electron eta:"<<electronTrack.Eta()<<" and positron:"<<positronTrack.Eta()<<'\n';
+        cout<<"outside acceptance\n";
       }
     }
     else{ //fails the truth 2 track check
@@ -169,14 +170,8 @@ std::queue<std::pair<int,int>> TruthConversionEval::numUnique(std::map<int,Conve
       cout<<"with parent:\n";
       i->second.getPhoton()->identify();
     }
-    if(i->second.getEmbed()==3){ //decide if the conversion is from pythia
-      cout<<"pythia conversion\n";
-      _b_pythia[_b_nVtx]=true;
-    }
-    else{
-      _b_pythia[_b_nVtx]=false;
-    }
-    _b_nVtx++; 
+    _b_pythia[_b_nVtx]=i->second.getEmbed();
+    cout<<"Embed ID:"<<i->second.getEmbed()<<'\n';
   }
   return missingChildren;
 }
