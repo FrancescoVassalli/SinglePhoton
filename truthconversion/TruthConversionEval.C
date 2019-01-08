@@ -164,7 +164,7 @@ std::queue<std::pair<int,int>> TruthConversionEval::numUnique(std::list<int> *l,
             default:
               cout<<"Error setting reco tracks"<<endl;
           }
-          RawCluster *clustemp =   mainClusterContainer->getCluster(clustidtemp)->clone();
+          RawCluster *clustemp =   dynamic_cast<RawCluster*>(mainClusterContainer->getCluster(clustidtemp)->clone());
           if(clustemp){
             clustemp->identify();
             _conversionClusters.AddCluster(clustemp); //add the calo cluster to the container

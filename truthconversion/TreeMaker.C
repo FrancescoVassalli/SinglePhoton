@@ -344,7 +344,7 @@ int TreeMaker::process_event(PHCompositeNode *topNode)
 
   RawTowerContainer *towersEM3old = findNode::getClass<RawTowerContainer>(topNode, "TOWER_CALIB_CEMC");
   RawTowerGeomContainer *geomEM = findNode::getClass<RawTowerGeomContainer>(topNode, "TOWERGEOM_CEMC");
-  RawClusterContainer *clusters = conversionModule->getClusters();
+  const RawClusterContainer *clusters = conversionModule->getClusters();
   cout<<Name()<<" cluster size:"<<clusters->size()<<endl;  
   //find correct vertex
   vertexmap = findNode::getClass<GlobalVertexMap>(topNode, "GlobalVertexMap"); 
@@ -357,7 +357,7 @@ int TreeMaker::process_event(PHCompositeNode *topNode)
     vz = vertex->get_z();
     //std::cout<<"Event Vertex Calculated in ClusterIso x:"<<vx<<" y:"<<vy<<" z:"<<vz<<'\n';
   }
-  for (RawClusterContainer::Iterator clusiter = clusters->getClusters().first; clusiter !=  clusters->getClusters().second; ++clusiter) 
+  for (RawClusterContainer::ConstIterator clusiter = clusters->getClusters().first; clusiter !=  clusters->getClusters().second; ++clusiter) 
   {
     RawCluster *cluster = clusiter->second;
     if(cluster){ //only process valid clusters

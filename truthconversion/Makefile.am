@@ -24,10 +24,10 @@ include_HEADERS = \
 	ConversionLinkDef.h 
 
 libtruthconversion_la_SOURCES = \
-	TreeMaker.cc \
+	TreeMaker.C \
 	TreeMaker_Dict.C \
-	TruthConverionEval.cc \
-	TruthConverionEval_Dict.C \
+	TruthConversionEval.C \
+	TruthConversionEval_Dict.C \
 	Conversion.cc \
 	Conversion_Dict.C
 

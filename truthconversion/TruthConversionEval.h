@@ -37,7 +37,7 @@ class TruthConversionEval: public SubsysReco
   int process_event(PHCompositeNode*);
   int End(PHCompositeNode*);
   //should make this const
-  inline RawClusterContainer* getClusters(){return &_conversionClusters;}
+  inline const RawClusterContainer* getClusters()const {return &_conversionClusters;}
 
  private:
   inline float deltaR( float eta1, float eta2, float phi1, float phi2 ) {
