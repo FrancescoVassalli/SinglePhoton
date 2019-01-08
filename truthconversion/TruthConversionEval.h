@@ -51,11 +51,11 @@ class TruthConversionEval: public SubsysReco
   std::queue<std::pair<int,int>> numUnique(std::map<int,Conversion>* map,SvtxTrackEval* trackEval,RawClusterContainer* mainClusterContainer);
   void findChildren(std::queue<std::pair<int,int>> missing,PHG4TruthInfoContainer* truthinfo);
 
-  const static int s_kMAXParticles=1000;
+  const static int s_s_kMAXParticles=1000;
   const unsigned int _kRunNumber;
   const int _kParticleEmbed;
   const int _kPythiaEmbed;
-  int _runNumber=kRunNumber;
+  int _runNumber=_kRunNumber;
   TFile *_f;
   TTree *_tree;
   std::string _foutname;
@@ -64,13 +64,13 @@ class TruthConversionEval: public SubsysReco
   int _b_nVtx;  //total conversions
   int _b_Tpair; //count acceptance e pairs in truth
   int _b_Rpair; //count acceptance e pairs in reco
-  float _b_rVtx[kMAXParticles];  //truth radius
-  bool _b_pythia[kMAXParticles];  //tracks if the conversion is from pythia or G4 particle
-  float _b_electron_pt[kMAXParticles];
-  float _b_positron_pt[kMAXParticles];
-  float _b_parent_pt  [kMAXParticles];
-  float _b_parent_eta [kMAXParticles];
-  float _b_parent_phi [kMAXParticles];
+  float _b_rVtx[s_kMAXParticles];  //truth radius
+  bool _b_pythia[s_kMAXParticles];  //tracks if the conversion is from pythia or G4 particle
+  float _b_electron_pt[s_kMAXParticles];
+  float _b_positron_pt[s_kMAXParticles];
+  float _b_parent_pt  [s_kMAXParticles];
+  float _b_parent_eta [s_kMAXParticles];
+  float _b_parent_phi [s_kMAXParticles];
 
   RawClusterContainer _conversionClusters;
 

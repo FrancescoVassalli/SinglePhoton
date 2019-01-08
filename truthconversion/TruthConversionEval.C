@@ -34,7 +34,7 @@ int TruthConversionEval::InitRun(PHCompositeNode *topNode)
   _f = new TFile( _foutname.c_str(), "RECREATE");
   _tree = new TTree("ttree","a succulent orange tree");
   _tree->SetAutoSave(300);
-  _tree->Branch("runNumber",&kRunNumber);
+  _tree->Branch("runNumber",&_runNumber);
   _tree->Branch("event",&_b_event); 
   _tree->Branch("nVtx", &_b_nVtx);
   _tree->Branch("nTpair", &_b_Tpair);
@@ -71,16 +71,16 @@ int TruthConversionEval::process_event(PHCompositeNode *topNode)
     PHG4Particle* parent =truthinfo->GetParticle(g4particle->get_parent_id());
     float radius=0;
     if(!parent){ //if the parent point is null then the particle is primary 
-      if(get_embed(g4particle,truthinfo)!=kParticleEmbed) continue;
+      if(get_embed(g4particle,truthinfo)!=_kParticleEmbed) continue;
     }
     else{ //if the particle is not primary find its vertex 
-      if (get_embed(parent,truthinfo)==kPythiaEmbed)
+      if (get_embed(parent,truthinfo)==_kPythiaEmbed)
       {
         cout<<"pythia hit\n";
       }
       //check that the parent is an embeded(2) photon or a pythia(3) photon that converts
-      if(get_embed(parent,truthinfo)==kParticleEmbed
-        ||(get_embed(parent,truthinfo)==kPythiaEmbed&&parent->get_pid()==22&&TMath::Abs(g4particle->get_pid())==11)){
+      if(get_embed(parent,truthinfo)==_kParticleEmbed
+        ||(get_embed(parent,truthinfo)==_kPythiaEmbed&&parent->get_pid()==22&&TMath::Abs(g4particle->get_pid())==11)){
         PHG4VtxPoint* vtx=truthinfo->GetVtx(g4particle->get_vtx_id()); //get the conversion vertex
         radius=sqrt(vtx->get_x()*vtx->get_x()+vtx->get_y()*vtx->get_y());
         if (radius<kTPCRADIUS) //limits to truth conversions within the tpc radius
@@ -133,7 +133,7 @@ std::queue<std::pair<int,int>> TruthConversionEval::numUnique(std::map<int,Conve
       cout<<"2 track event \n";
       positronTrack.SetPxPyPzE(temp->get_px(),temp->get_py(),temp->get_pz(),temp->get_e()); //init the tlv
       _b_positron_pt[_b_nVtx]=positronTrack.Pt(); //fill tree
-      if (TMath::Abs(electronTrack.Eta())<kRAPIDITYACCEPT&&TMath::Abs(positronTrack.Eta())<kRAPIDITYACCEPT)
+      if (TMath::Abs(electronTrack.Eta())<_kRAPIDITYACCEPT&&TMath::Abs(positronTrack.Eta())<_kRAPIDITYACCEPT)
       {
         cout<<"In rapidity\n";
         _b_Tpair++;
