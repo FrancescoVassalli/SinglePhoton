@@ -75,10 +75,6 @@ int TruthConversionEval::process_event(PHCompositeNode *topNode)
       if(get_embed(g4particle,truthinfo)!=_kParticleEmbed) continue;
     }
     else{ //if the particle is not primary find its vertex 
-      if (get_embed(parent,truthinfo)==_kPythiaEmbed)
-      {
-        cout<<"pythia hit\n";
-      }
       //check that the parent is an embeded(2) photon or a pythia(3) photon that converts
       if(get_embed(parent,truthinfo)==_kParticleEmbed
         ||(get_embed(parent,truthinfo)==_kPythiaEmbed&&parent->get_pid()==22&&TMath::Abs(g4particle->get_pid())==11)){
