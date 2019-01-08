@@ -9,9 +9,7 @@ int cluster_burner( std::string infile = "XjPhi3_pT5_98_dst.root",std::string ou
 
   gSystem->Load("libg4eval.so");
   gSystem->Load("libcalotrigger.so");
-  gSystem->Load("libSinglePhotonAnalysis.so");
-  gSystem->Load("libConvertedPhotonReconstructor.so");
-  gSystem->Load("libtreemaker.so");
+  gSystem->Load("libtruthconversion.so");
 
   int verbosity = 0;
   Fun4AllServer *se = Fun4AllServer::instance();
@@ -22,7 +20,7 @@ int cluster_burner( std::string infile = "XjPhi3_pT5_98_dst.root",std::string ou
   hitsin->fileopen( infile );
   se->registerInputManager(hitsin);
  
-  SinglePhotonAfter *truther = new SinglePhotonAfter(outfile);
+  TruthConversionEval *truther = new TruthConversionEval(outfile);
   se->registerSubsystem(truther);
 //  ConvertedPhotonReconstructor *converter=new ConvertedPhotonReconstructor(outfile);
   //se->registerSubsystem(converter);
