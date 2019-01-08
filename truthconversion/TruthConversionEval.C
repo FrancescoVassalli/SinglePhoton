@@ -138,17 +138,17 @@ std::queue<std::pair<int,int>> TruthConversionEval::numUnique(std::map<int,Conve
         {
           cout<<"In rapidity\n";
           _b_Tpair++;
-          unsigned int nRecoTracks = mymap->at(*i).setRecoTracks(trackeval); //find the reco tracks for this conversion
+          unsigned int nRecoTracks = i->second.setRecoTracks(trackeval); //find the reco tracks for this conversion
           int clustidtemp=-1;
           switch(nRecoTracks){
             case 2:
               _b_Rpair++;
               cout<<"reco pair \n";
-              clustidtemp=mymap->at(*i).get_cluster_id(); //get the cluster id of the current conversion
+              clustidtemp=i->second.get_cluster_id(); //get the cluster id of the current conversion
               break;
             case 1:
               cout<<"one reco track\n";
-              clustidtemp=mymap->at(*i).get_cluster_id(); //get the cluster id of the current conversion
+              clustidtemp=i->second.get_cluster_id(); //get the cluster id of the current conversion
               break;
             case 0:
               cout<<"no reco tracks\n";
@@ -176,7 +176,6 @@ std::queue<std::pair<int,int>> TruthConversionEval::numUnique(std::map<int,Conve
         cout<<"with parent:\n";
         i->second.getPhoton()->identify();
       }
-      last=*i; //update the loops position in the conversion list
       if(i->second.getEmbed()==3){ //decide if the conversion is from pythia
         _b_pythia[_b_nVtx]=true;
       }
