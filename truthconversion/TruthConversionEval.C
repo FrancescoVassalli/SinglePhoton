@@ -152,9 +152,9 @@ std::queue<std::pair<int,int>> TruthConversionEval::numUnique(std::map<int,Conve
           default:
             cout<<"Error setting reco tracks"<<endl;
         }
-        RawCluster *clustemp =   dynamic_cast<RawCluster*>(mainClusterContainer->getCluster(clustidtemp)->clone());
-        if(clustemp){
-          clustemp->identify();
+        if(mainClusterContainer->getCluster(clustidtemp)){//if thre is matching cluster 
+          mainClusterContainer->getCluster(clustidtemp)->identify();
+          RawCluster *clustemp =   dynamic_cast<RawCluster*>(mainClusterContainer->getCluster(clustidtemp)->Clone());
           _conversionClusters.AddCluster(clustemp); //add the calo cluster to the container
         }
       }
