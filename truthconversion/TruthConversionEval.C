@@ -51,7 +51,7 @@ int TruthConversionEval::InitRun(PHCompositeNode *topNode)
 
 int TruthConversionEval::process_event(PHCompositeNode *topNode)
 {
-  _conversionClusters.Reset();
+  _conversionClusters.Reset(); //clear the list of conversion clusters
 
   RawClusterContainer* mainClusterContainer = findNode::getClass<RawClusterContainer>(topNode,"CLUSTER_CEMC");
   PHG4TruthInfoContainer* truthinfo = findNode::getClass<PHG4TruthInfoContainer>(topNode,"G4TruthInfo");
@@ -63,40 +63,37 @@ int TruthConversionEval::process_event(PHCompositeNode *topNode)
     cout<<"NULL track eval fatal error"<<endl;
     return 1;
   }
-  //make a list of the conversions
-  std::list<int> vtxList;
+  //make a map of the conversions
   std::map<int,Conversion> mapConversions;
   for ( PHG4TruthInfoContainer::ConstIterator iter = range.first; iter != range.second; ++iter ) {
-    //bool isPrimary;
     PHG4Particle* g4particle = iter->second; 
     PHG4Particle* parent =truthinfo->GetParticle(g4particle->get_parent_id());
     float radius=0;
     if(!parent){ //if the parent point is null then the particle is primary 
-      //checking the embed ID to make sure it is a particle I made need to change the magic literal
+      //checking the embed ID to make sure I made the primary particle. May need to change the magic literal
       if(get_embed(g4particle,truthinfo)!=2) continue;
-      //isPrimary=true;
     }
     else{ //if the particle is not primary find its vertex 
+      //check that the parent is an embeded(2) photon or a pythia(3) photon that converts
       if(get_embed(parent,truthinfo)==2||(get_embed(parent,truthinfo)==3&&parent->get_pid()==22&&TMath::Abs(g4particle->get_pid())==11)){
-        PHG4VtxPoint* vtx=truthinfo->GetVtx(g4particle->get_vtx_id());
+        PHG4VtxPoint* vtx=truthinfo->GetVtx(g4particle->get_vtx_id()); //get the conversion vertex
         radius=sqrt(vtx->get_x()*vtx->get_x()+vtx->get_y()*vtx->get_y());
         if (radius<kTPCRADIUS) //limits to truth conversions within the tpc radius
         { 
-          std::cout<<radius<<'\n';
-          vtxList.push_back(vtx->get_id());
+          //initialize the conversion object -don't use constructor b/c setters have error handling
+          std::cout<<"Conversion with radius [cm]:"<<radius<<'\n';
           (mapConversions[vtx->get_id()]).setElectron(g4particle);
           (mapConversions[vtx->get_id()]).setVtx(vtx);
           (mapConversions[vtx->get_id()]).setParent(parent);
           (mapConversions[vtx->get_id()]).setEmbed(get_embed(parent,truthinfo));
         }
       }
-      //isPrimary=false;
     }
   }
   //record event information 
-
-  std::queue<std::pair<int,int>> missingChildren= numUnique(&vtxList,&mapConversions,trackeval,mainClusterContainer);
-  cout<<"In truth system this RawClusterContainer::size="<<_conversionClusters.size()<<'\n';
+  numUnique(&mapConversions,trackeval,mainClusterContainer);
+  //std::queue<std::pair<int,int>> missingChildren= numUnique(&vtxList,&mapConversions,trackeval,mainClusterContainer);
+  cout<<Name()<<"# conversion clusters="<<_conversionClusters.size()<<'\n';
   //findChildren(missingChildren,truthinfo);
   //make a hash of the event number and file number 
   std::stringstream ss;
@@ -112,32 +109,27 @@ int TruthConversionEval::process_event(PHCompositeNode *topNode)
   return 0;
 }
 
-std::queue<std::pair<int,int>> TruthConversionEval::numUnique(std::list<int> *l,std::map<int,Conversion> *mymap=NULL,SvtxTrackEval* trackeval=NULL,RawClusterContainer *mainClusterContainer=NULL){
+std::queue<std::pair<int,int>> TruthConversionEval::numUnique(std::map<int,Conversion> *mymap=NULL,SvtxTrackEval* trackeval=NULL,RawClusterContainer *mainClusterContainer=NULL){
 
-  l->sort();
-  int last=-1;
   _b_nVtx = 0;
   _b_Tpair=0;
   _b_Rpair=0;
   std::queue<std::pair<int,int>> missingChildren;
-  for (std::list<int>::iterator i = l->begin(); i != l->end(); ++i) {
-    //make sure the conversions are not double counted 
-    if(*i!=last){
-      cout<<"unique \n";
+  for (std::map<int,Conversion>::iterator i = mymap->begin(); i != mymap->end(); ++i) {
       //fill the tree
-      PHG4VtxPoint *vtx =(mymap->at(*i)).getVtx(); //get the vtx
+      PHG4VtxPoint *vtx =i->second.getVtx(); //get the vtx
       _b_rVtx[_b_nVtx] = sqrt(vtx->get_x()*vtx->get_x()+vtx->get_y()*vtx->get_y()); //find the radius
-      PHG4Particle *temp = (mymap->at(*i)).getPhoton(); //set the photon
+      PHG4Particle *temp = i->second.getPhoton(); //set the photon
       TLorentzVector photonTrack,electronTrack,positronTrack; //make tlv for each particle 
       photonTrack.SetPxPyPzE(temp->get_px(),temp->get_py(),temp->get_pz(),temp->get_e()); //intialize
       //fill tree values
       _b_parent_pt[_b_nVtx] =photonTrack.Pt();
       _b_parent_phi[_b_nVtx]=photonTrack.Phi();
       _b_parent_eta[_b_nVtx]=photonTrack.Eta();
-      temp=(mymap->at(*i)).getElectron(); //set the first child 
+      temp=i->second.getElectron(); //set the first child 
       electronTrack.SetPxPyPzE(temp->get_px(),temp->get_py(),temp->get_pz(),temp->get_e());
       _b_electron_pt[_b_nVtx]=electronTrack.Pt(); //fill tree
-      temp=(mymap->at(*i)).getPositron();
+      temp=i->second.getPositron();
       if(temp){ //this will be false for 1 track events
         cout<<"2 track event \n";
         positronTrack.SetPxPyPzE(temp->get_px(),temp->get_py(),temp->get_pz(),temp->get_e()); //init the tlv
@@ -176,24 +168,23 @@ std::queue<std::pair<int,int>> TruthConversionEval::numUnique(std::list<int> *l,
       }
       else{ //fails the truth 2 track check
         cout<<"1 track event \n";
-        temp=(mymap->at(*i)).getElectron(); //go back to the first track 
+        temp=i->second.getElectron(); //go back to the first track 
         _b_positron_pt[_b_nVtx]=-1; //set the second track to null
         missingChildren.push(pair<int, int>(temp->get_parent_id(),temp->get_track_id())); //add the known ids to the list missing a child
         cout<<"No pair for:\n";
         temp->identify();
         cout<<"with parent:\n";
-        (mymap->at(*i)).getPhoton()->identify();
+        i->second.getPhoton()->identify();
       }
       last=*i; //update the loops position in the conversion list
-      if((mymap->at(*i)).getEmbed()==3){ //decide if the conversion is from pythia
+      if(i->second.getEmbed()==3){ //decide if the conversion is from pythia
         _b_pythia[_b_nVtx]=true;
       }
       else{
         _b_pythia[_b_nVtx]=false;
       }
-      _b_nVtx++; //if conversion is unique record it 
     }
-  }
+      _b_nVtx++; 
   return missingChildren;
 }
 
