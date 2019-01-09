@@ -19,4 +19,4 @@
 ![radius](https://github.com/FrancescoVassalli/SinglePhoton/files/2742038/4layerRecoR.pdf)
 
 **Truth Conversion**
-- My work on using truth information to match conversions to EM clusters as been collected into a single package which is the truthconversion folder in this repository. It produces clusters 
+- My work on using truth information to match conversions to EM clusters as been collected into a single package which is the truthconversion folder in this repository. I believe these clusters will be useful in determining how to implement the outside-in method in SPHENIX. 
