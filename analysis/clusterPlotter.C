@@ -91,7 +91,7 @@ void clusterPlotter(){
 	TFile *ef = new TFile((name).c_str(),"READ");
 	string outname="";
 	unsigned int totalPlots =500;
-	unsigned int numToDraw=1;
+	unsigned int numToDraw=100;
 	unsigned int numDrew=0;
 	string plotname = "photon_cluster";
 	TH1F* cluster;
