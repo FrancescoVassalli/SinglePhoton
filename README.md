@@ -18,6 +18,7 @@
 ![pT](https://github.com/FrancescoVassalli/SinglePhoton/files/2742038/4layerRecopT.pdf)
 ![radius](https://github.com/FrancescoVassalli/SinglePhoton/files/2742038/4layerRecoR.pdf)
 It may be useful to compare this to the ![ATLAS effiency](https://user-images.githubusercontent.com/31448119/50920392-7f50c280-1402-11e9-9750-d93955f9af22.png)
+Note that my photons were 5-30 GeV uniform distribution while the ATLAS study was fixed 20GeV.
 
 
 **Truth Conversion**
