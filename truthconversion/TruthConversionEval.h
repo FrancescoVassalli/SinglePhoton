@@ -31,7 +31,7 @@ class TruthConversionEval: public SubsysReco
  public:
 
   TruthConversionEval(const std::string &name,unsigned int runnumber, 
-    int particleEmbed, int pythiaEmbed);
+    int particleEmbed, int pythiaEmbed,bool makeTTree);
   ~TruthConversionEval();
   int InitRun(PHCompositeNode*);
   int process_event(PHCompositeNode*);
@@ -55,9 +55,10 @@ class TruthConversionEval: public SubsysReco
   const unsigned int _kRunNumber;
   const int _kParticleEmbed;
   const int _kPythiaEmbed;
+  const bool _kMakeTTree;
   int _runNumber;
-  TFile *_f;
-  TTree *_tree;
+  TFile *_f=NULL;
+  TTree *_tree=NULL;
   std::string _foutname;
   std::string _b_hash;
   int _b_event;
