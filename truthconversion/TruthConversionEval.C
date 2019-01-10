@@ -37,7 +37,8 @@ int TruthConversionEval::InitRun(PHCompositeNode *topNode)
 	_runNumber=_kRunNumber;
   if(_kMakeTTree){
 	_f = new TFile( _foutname.c_str(), "RECREATE");
-	_tree = new TTree("ttree","a succulent orange tree");
+	_tree = new TTree("ttree","conversion data");
+	_signalCutTree = new TTree("cutTree","signal data for making track pair cuts");
 	_tree->SetAutoSave(300);
 	_tree->Branch("runNumber",&_runNumber);
 	_tree->Branch("event",&_b_event); 
@@ -51,6 +52,9 @@ int TruthConversionEval::InitRun(PHCompositeNode *topNode)
 	_tree->Branch("photon_pt",   _b_parent_pt    ,"photon_pt[nVtx]/F");
 	_tree->Branch("photon_eta",  _b_parent_eta  ,"photon_eta[nVtx]/F");
 	_tree->Branch("photon_phi",  _b_parent_phi  ,"photon_phi[nVtx]/F");
+	_signalCutTree->Branch("track_deta", _b_track_deta,"track_deta[nRpair]/F");
+	_signalCutTree->Branch("track_dlayer", _b_track_dlayer,"track_dlayer[nRpair]/I");
+	_signalCutTree->Branch("track_silicon", _b_track_silicon,"track_silicon[nRpair]/B");
 }
 	return 0;
 }
@@ -59,9 +63,7 @@ int TruthConversionEval::process_event(PHCompositeNode *topNode)
 {
 	_conversionClusters.Reset(); //clear the list of conversion clusters
 
-	RawClusterContainer* mainClusterContainer = findNode::getClass<RawClusterContainer>(topNode,"CLUSTER_CEMC");
-	PHG4TruthInfoContainer* truthinfo = findNode::getClass<PHG4TruthInfoContainer>(topNode,"G4TruthInfo");
-	PHG4TruthInfoContainer::Range range = truthinfo->GetParticleRange();
+	PHG4TruthInfoContainer::Range range = _truthinfo->GetParticleRange();
 	SvtxEvalStack *stack = new SvtxEvalStack(topNode);
 	SvtxTrackEval* trackeval = stack->get_track_eval();
 	if (!trackeval)
@@ -73,13 +75,13 @@ int TruthConversionEval::process_event(PHCompositeNode *topNode)
 	std::map<int,Conversion> mapConversions;
 	for ( PHG4TruthInfoContainer::ConstIterator iter = range.first; iter != range.second; ++iter ) {
 		PHG4Particle* g4particle = iter->second; 
-		PHG4Particle* parent =truthinfo->GetParticle(g4particle->get_parent_id());
+		PHG4Particle* parent =_truthinfo->GetParticle(g4particle->get_parent_id());
 		float radius=0;
 		if(parent){ //if the particle is not primary find its vertex 
 			//check that the parent is an embeded(2) photon or a pythia(3) photon that converts
-			if(get_embed(parent,truthinfo)==_kParticleEmbed
-					||(get_embed(parent,truthinfo)==_kPythiaEmbed&&parent->get_pid()==22&&TMath::Abs(g4particle->get_pid())==11)){
-				PHG4VtxPoint* vtx=truthinfo->GetVtx(g4particle->get_vtx_id()); //get the conversion vertex
+			if(get_embed(parent,_truthinfo)==_kParticleEmbed||(get_embed(parent,_truthinfo)==_kPythiaEmbed
+				&&parent->get_pid()==22&&TMath::Abs(g4particle->get_pid())==11)){
+				PHG4VtxPoint* vtx=_truthinfo->GetVtx(g4particle->get_vtx_id()); //get the conversion vertex
 				radius=sqrt(vtx->get_x()*vtx->get_x()+vtx->get_y()*vtx->get_y());
 				if (radius<s_kTPCRADIUS) //limits to truth conversions within the tpc radius
 				{ 
@@ -91,13 +93,13 @@ int TruthConversionEval::process_event(PHCompositeNode *topNode)
 					(mapConversions[vtx->get_id()]).setElectron(g4particle);
 					(mapConversions[vtx->get_id()]).setVtx(vtx);
 					(mapConversions[vtx->get_id()]).setParent(parent);
-					(mapConversions[vtx->get_id()]).setEmbed(get_embed(parent,truthinfo));
+					(mapConversions[vtx->get_id()]).setEmbed(get_embed(parent,_truthinfo));
 				}
 			}
 		}
 	}
 	//record event information 
-	numUnique(&mapConversions,trackeval,mainClusterContainer);
+	numUnique(&mapConversions,trackeval,_mainClusterContainer);
 	//std::queue<std::pair<int,int>> missingChildren= numUnique(&vtxList,&mapConversions,trackeval,mainClusterContainer);
 	if (Verbosity()==10)
 	{
@@ -107,6 +109,10 @@ int TruthConversionEval::process_event(PHCompositeNode *topNode)
   if (_tree)
   {
     _tree->Fill();
+  }
+  if (_signalCutTree)
+  {
+  	_signalCutTree->Fill();
   }
 	if (Verbosity()>=8)
 	{
@@ -149,6 +155,10 @@ std::queue<std::pair<int,int>> TruthConversionEval::numUnique(std::map<int,Conve
 				int clustidtemp=-1;
 				switch(nRecoTracks){
 					case 2: //there are 2 reco tracks
+            i->second.setRecoMaps(_svtxClusterMap,_hitMap);
+						_b_track_deta[_b_Rpair] = i->second.trackDEta();
+						_b_track_dlayer[_b_Rpair] = i->second.trackDLayer();
+						_b_track_silicon[_b_Rpair] = i->second.hasSilicon();
 						_b_Rpair++;
 						clustidtemp=i->second.get_cluster_id(); //get the cluster id of the current conversion
 						break;
@@ -187,11 +197,11 @@ std::queue<std::pair<int,int>> TruthConversionEval::numUnique(std::map<int,Conve
 	return missingChildren;
 }
 
-void TruthConversionEval::findChildren(std::queue<std::pair<int,int>> missingChildren,PHG4TruthInfoContainer* truthinfo){
+void TruthConversionEval::findChildren(std::queue<std::pair<int,int>> missingChildren,PHG4TruthInfoContainer* _truthinfo){
 	if (Verbosity()>=6)
 	{
 		while(!missingChildren.empty()){
-			for (PHG4TruthInfoContainer::ConstIterator iter = truthinfo->GetParticleRange().first; iter != truthinfo->GetParticleRange().second; ++iter)
+			for (PHG4TruthInfoContainer::ConstIterator iter = _truthinfo->GetParticleRange().first; iter != _truthinfo->GetParticleRange().second; ++iter)
 			{
 				if(iter->second->get_parent_id()==missingChildren.front().first&&iter->second->get_track_id()!=missingChildren.front().second){
 					cout<<"Found Child:\n";

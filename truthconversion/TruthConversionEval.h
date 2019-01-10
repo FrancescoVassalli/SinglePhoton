@@ -65,13 +65,19 @@ class TruthConversionEval: public SubsysReco
 			if ( dphi > 3.14159 ) dphi -= 2 * 3.14159;
 			if ( dphi < -3.14159 ) dphi += 2 * 3.14159;
 			return sqrt( pow( deta, 2 ) + pow( dphi, 2 ) );
-		}
-		/** helper function for process_event
-		* fills the member fields with information from the conversions 
-		* finds the clusters associated with the conversions
-		* @return currently will return nothing 
-		* but can easily be changed to return a structure for the converions with only 1 truth associated track*/
-		std::queue<std::pair<int,int>> numUnique(std::map<int,Conversion>* map,SvtxTrackEval* trackEval,RawClusterContainer* mainClusterContainer);
+    }
+    inline float doNodePointers(PHCompositeNode*){
+      _mainClusterContainer = findNode::getClass<RawClusterContainer>(topNode,"CLUSTER_CEMC");
+      _truthinfo = findNode::getClass<PHG4TruthInfoContainer>(topNode,"G4TruthInfo");
+      _svtxClusterMap = findNode::getClass<SvtxClusterMap>(topNode,"SvtxClusterMap");
+      _hitMap = findNode::getClass<SvtxHitMap>(topNode,"SvtxHitMap");
+    }
+    /** helper function for process_event
+     * fills the member fields with information from the conversions 
+     * finds the clusters associated with the conversions
+     * @return currently will return nothing 
+     * but can easily be changed to return a structure for the converions with only 1 truth associated track*/
+    std::queue<std::pair<int,int>> numUnique(std::map<int,Conversion>* map,SvtxTrackEval* trackEval,RawClusterContainer* mainClusterContainer);
 		/** attempts to find other truth associated tracks for conversions with only 1 truth associated track*/
 		void findChildren(std::queue<std::pair<int,int>> missing,PHG4TruthInfoContainer* truthinfo);
 
@@ -82,9 +88,14 @@ class TruthConversionEval: public SubsysReco
 		const bool _kMakeTTree;
 		int _runNumber; ///<for the TTree do not change
 		TFile *_f=NULL;
-		TTree *_tree=NULL;
-		std::string _foutname;
-		int _b_event;
+		TTree *_tree=NULL; ///< stores most of the data about the conversions
+		TTree *_signalCutTree=NULL; //<signal data for making track pair cuts
+    RawClusterContainer = *_mainClusterContainer;
+    PHG4TruthInforContainer = *_truthinfo;
+    SvtxClusterMap* _svtxClusterMap;
+    SvtxHitMap *_hitMap;
+    std::string _foutname;
+    int _b_event;
 		int _b_nVtx;  ///<total conversions
 		int _b_Tpair; ///<count acceptance e pairs in truth
 		int _b_Rpair; ///<count acceptance e pairs in reco
@@ -95,6 +106,9 @@ class TruthConversionEval: public SubsysReco
 		float _b_parent_pt  [s_kMAXParticles];
 		float _b_parent_eta [s_kMAXParticles];
 		float _b_parent_phi [s_kMAXParticles];
+    float _b_track_deta [s_kMAXParticles];
+    bool _b_track_silicon [s_kMAXParticles];
+    int _b_track_dlayer [s_kMAXParticles];
 		/** RawClusters associated with truth conversions
 		* processed by other modules*/
 		RawClusterContainer _conversionClusters;
