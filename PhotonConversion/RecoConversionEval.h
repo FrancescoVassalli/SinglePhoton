@@ -9,7 +9,16 @@
 
 
 #include <fun4all/SubsysReco.h>
+#include <phool/getClass.h>
+#include <phool/PHDataNode.h>
 #include <trackbase_historic/SvtxTrack_v1.h>
+#include <trackbase_historic/SvtxTrackMap.h>
+#include <trackbase_historic/SvtxHitMap.h>
+#include <trackbase_historic/SvtxHit.h>
+#include <trackbase_historic/SvtxClusterMap.h>
+#include <trackbase_historic/SvtxCluster.h>
+#include <calobase/RawClusterContainer.h>
+#include <calobase/RawCluster.h>
 #include <TVector3.h>
 #include <TLorentzVector.h>
 #include <TTree.h>
@@ -17,7 +26,7 @@
 #include <iostream>
 #include <string>
 #include <vector>
-#include <math>
+#include <cmath>
 class PHCompositeNode;
 class SvtxEvalStack;
 class SvtxClusterMap;
@@ -37,16 +46,16 @@ class RecoConversionEval : public SubsysReco {
     SvtxTrackMap* _allTracks;
     RawClusterContainer* _mainClusterContainer;
     SvtxClusterMap* _svtxClusterMap;
-
+    SvtxHitMap *_hitMap;
 		std::string _fname;
 		TFile *_file;
 		TTree *_tree;
 
     inline void doNodePointers(PHCompositeNode *topNode){
-      SvtxTrackMap* _allTracks = findNode::getClass<SvtxTrackMap>(topNode,"SvtxTrackMap");
-      RawClusterContainer* _mainClusterContainer = findNode::getClass<RawClusterContainer>(topNode,"CLUSTER_CEMC");
-      SvtxClusterMap *_svtxClusterMap = findNode::getClass<SvtxClusterMap>(topNode,"SvtxClusterMap");
-      SvtxHitMap *_hitMap = findNode::getClass<SvtxClusterMap>(topNode,"SvtxHitMap");
+      _allTracks = findNode::getClass<SvtxTrackMap>(topNode,"SvtxTrackMap");
+      _mainClusterContainer = findNode::getClass<RawClusterContainer>(topNode,"CLUSTER_CEMC");
+      _svtxClusterMap = findNode::getClass<SvtxClusterMap>(topNode,"SvtxClusterMap");
+      _hitMap = findNode::getClass<SvtxHitMap>(topNode,"SvtxHitMap");
     }
 
     inline bool hasNodePointers(){
@@ -76,33 +85,34 @@ class RecoConversionEval : public SubsysReco {
       * also need to check the approach distance
       */
       inline bool hitCuts(SvtxTrack* t1, SvtxTrack* t2){
-        SvtxCluster *c1 = _svtxClusterMap->get(*(t1->begin_cluster()));
-        SvtxCluster *c2 = _svtxClusterMap->get(*(t2->begin_cluster()));
+        SvtxCluster *c1 = _svtxClusterMap->get(*(t1->begin_clusters()));
+        SvtxCluster *c2 = _svtxClusterMap->get(*(t2->begin_clusters()));
         SvtxHit *h1 = _hitMap->get(*(c1->begin_hits()));
         SvtxHit *h2 = _hitMap->get(*(c2->begin_hits()));
         //check that the first hits are close enough
         if (c1->get_layer()>_kNSiliconLayer&&c2->get_layer()>_kNSiliconLayer)
         {
-          cout<<"No silicon hits layers diff="<<abs(h1->get_layer()-h2->get_layer())<<'\n';
+          std::cout<<"No silicon hits layers diff="<<abs(h1->get_layer()-h2->get_layer())<<'\n';
           if (abs(h1->get_layer()-h2->get_layer())>_kFirstHitStrict)
           {
             return false;
           }
         }
         else{
-          cout<<"Hits! layers diff="<<abs(h1->get_layer()-h2->get_layer())<<'\n';
+          std::cout<<"Hits! layers diff="<<abs(h1->get_layer()-h2->get_layer())<<'\n';
           if (abs(h1->get_layer()-h2->get_layer())>_kFirstHit)
           {
             return false;
           }
         }
         //check the approach distance
+        return true;
       }
-    static const int _kNSiliconLayer=7;
-    static const float _kEMProbCut=.5
-    static const float _kPolarCut=.1;
-    static const float _kFirstHit=3;
-    static const float _kFirstHitStrict=1;
+    static constexpr int _kNSiliconLayer=7;
+    static constexpr float _kEMProbCut=.5;
+    static constexpr float _kPolarCut=.1;
+    static constexpr float _kFirstHit=3;
+    static constexpr float _kFirstHitStrict=1;
 
 
 };
