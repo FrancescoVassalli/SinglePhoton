@@ -38,6 +38,7 @@ int RecoConversionEval::InitRun(PHCompositeNode *topNode) {
 
 int RecoConversionEval::process_event(PHCompositeNode *topNode) {
 	doNodePointers(topNode);
+	cout<<"Did pointers: \n \n"
   int bigLoopCount=0;
   for ( SvtxTrackMap::Iter iter = _allTracks->begin(); iter != _allTracks->end(); ++iter) {
     SvtxTrack* thisTrack = iter->second;
