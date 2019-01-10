@@ -40,17 +40,17 @@ int RecoConversionEval::process_event(PHCompositeNode *topNode) {
   		cout<<bigLoopCount<<" tracks processed"<<endl;
   	}
     //I want to now only check e tracks so check the clusters of the |charge|=1 tracks
-    if (abs(iter->second->get_charge())==1)
+    if (abs(iter->second->get_charge())==1&&iter->second->get_pt()>_kTrackPtCut)
     {
     	SvtxTrack* thisTrack = iter->second;
       RawCluster* bestCluster= _mainClusterContainer->getCluster(thisTrack->get_cal_cluster_id(SvtxTrack::CAL_LAYER(1)));
       //what if not cluster is found?
       if(bestCluster&&bestCluster->get_prob()>_kEMProbCut){
       	//loop over the following tracks
-      	for (SvtxTrackMap::Iter jter = ++iter; jter != _allTracks->end(); ++jter)
+      	for (SvtxTrackMap::Iter jter = iter; jter != _allTracks->end(); ++jter)
       	{
       		//check that the next track is an opposite charge electron
-      		if (thisTrack->get_charge()*-1==jter->second->get_charge())
+      		if (thisTrack->get_charge()*-1==jter->second->get_charge()&&jter->second->get_pt()>_kTrackPtCut)
       		{
       			RawCluster* nextCluster= _mainClusterContainer->getCluster(jter->second->get_cal_cluster_id(SvtxTrack::CAL_LAYER(1)));
       			//what if not cluster is found?
@@ -61,6 +61,7 @@ int RecoConversionEval::process_event(PHCompositeNode *topNode) {
       	}
       }
     }
+    ++iter;
   }
   return Fun4AllReturnCodes::EVENT_OK;
 }

@@ -114,6 +114,7 @@ class RecoConversionEval : public SubsysReco {
      float _kPolarCut=.1;
      float _kFirstHit=3;
      float _kFirstHitStrict=1;
+     float _kTrackPtCut=.4; //MeV
 
 
 };
