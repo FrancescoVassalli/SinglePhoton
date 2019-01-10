@@ -22,29 +22,8 @@
 using namespace std;
 
 ConvertedPhotonReconstructor::ConvertedPhotonReconstructor(const std::string &name) :
-	SubsysReco("ConvertedPhotonReconstructor")
-{
-	this->name=name+"recovered.root";;
-	event=0;
-	_file = new TFile( this->name.c_str(), "RECREATE");
-	_tree = new TTree("convertedphotontree","tracks reconstructed to converted photons");
-	_tree->SetAutoSave(300);
-	b_recovec1 = new TLorentzVector();
-	b_recovec1 = new TLorentzVector();
-	b_truthvec2 = new TLorentzVector();
-	b_truthvec2 = new TLorentzVector();
-	b_truthVertex = new TVector3();
-	b_recoVertex = new  TVector3();
-	_tree->Branch("charge",&b_goodCharge);
-	_tree->Branch("silicone",&b_hasSilicone);
-	_tree->Branch("hash",&hash);
-	_tree->Branch("reco_tlv1",    "TLorentzVector",  &b_recovec1);
-	_tree->Branch("reco_tlv2",    "TLorentzVector",  &b_recovec2);
-	_tree->Branch("truth_tlv1",   "TLorentzVector", &b_truthvec1);
-	_tree->Branch("truth_tlv2",   "TLorentzVector", &b_truthvec2);
-	_tree->Branch("truth_vertex","TVector3",        &b_truthVertex);
-	_tree->Branch("reco_vertex", "TVector3",        &b_recoVertex);
-}
+	SubsysReco("ConvertedPhotonReconstructor"), _fname(name) 
+	{}
 
 int ConvertedPhotonReconstructor::Init(PHCompositeNode *topNode) {
 	return Fun4AllReturnCodes::EVENT_OK;
@@ -55,25 +34,20 @@ int ConvertedPhotonReconstructor::InitRun(PHCompositeNode *topNode) {
 }
 
 int ConvertedPhotonReconstructor::process_event(PHCompositeNode *topNode) {
-	/*if (((verbosity > 0)&&(event%100==0))) {  
-		cout << "ConvertedPhotonReconstructor::process_event - Event = " << event << endl;
-		}*/
-	//  ReconstructedConvertedPhoton* recovered=reconstruct(topNode);
-	/*if(recovered){
-		cout<<"recovered"<<endl;
-	//recoveredPhotonVec.push_back(recovered);
-	cout<<"pushed"<<endl;
+	SvtxTrackMap* allTracks = findNode::getClass<SvtxTrackMap>(topNode,"SvtxTrackMap");
+	for ( SvtxTrackMap::Iter iter = allTracks->begin(); iter != allTracks->end(); ++iter ) {
+		/*there's a lot of track functions that I don't really know what they do
+		chisq()
+		error()
+		id()
+		p()
+		pos()
+		*/ 
+		if (abs(iter->get_charge())==1)//I want to now only check e tracks
+		{
+			cout<<"Charged Track:\n \tchi:"<<iter->chisq()<<"\n \tp:"<<iter->p()<<"\n \tpos:"<<iter->pos()<<"\n \tid:"<<iter->id()<<"\n \terror:"<<iter->error()<<'\n';
+		}
 	}
-	else{
-	cout<<"no recovery"<<endl;
-	}*/
-
-	std::stringstream ss;
-	ss<<"-"<<event;             //this is where the file number is 
-	hash=name.substr(name.length()-24,5)+ss.str();
-	reconstruct(topNode);
-	event++;
-	cout<<"return event::ok"<<endl;
 	return Fun4AllReturnCodes::EVENT_OK;
 }
 

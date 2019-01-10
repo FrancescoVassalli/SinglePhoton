@@ -16,11 +16,15 @@ lib_LTLIBRARIES = \
 
 include_HEADERS = \
   ConvertedPhotonReconstructor.h \
-  ConvertedPhotonReconstructorLinkDef.h 
+  ConvertedPhotonReconstructorLinkDef.h \
+  RecoConversionEval.h \
+  RecoConversionEvalLinkDef.h
 
 libConvertedPhotonReconstructor_la_SOURCES = \
-  ConvertedPhotonReconstructor.cc\
-  ConvertedPhotonReconstructor_Dict.C 
+  ConvertedPhotonReconstructor.cc \
+  ConvertedPhotonReconstructor_Dict.C \ 
+  RecoConversionEval.cc \
+  RecoConversionEval_Dict.C 
 
 libConvertedPhotonReconstructor_la_LIBADD = \
 	-lphool\
