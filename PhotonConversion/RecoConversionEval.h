@@ -76,8 +76,8 @@ class RecoConversionEval : public SubsysReco {
 			}
 
       inline bool pairCuts(SvtxTrack* t1, SvtxTrack* t2){
-        std::cout<<"polar:"<<abs(t1->get_eta()-t2->get_eta())<<'\n';
-        return abs(t1->get_eta()-t2->get_eta())<_kPolarCut && hitCuts(t1,t2);
+        std::cout<<"polar:"<<fabs(t1->get_eta()-t2->get_eta())<<'\n';
+        return fabs(t1->get_eta()-t2->get_eta())<_kPolarCut && hitCuts(t1,t2);
 
       }
       /* Check that the radial distance between the first hit of both tracks is less the cut 
