@@ -36,7 +36,7 @@ int RecoConversionEval::InitRun(PHCompositeNode *topNode) {
 int RecoConversionEval::process_event(PHCompositeNode *topNode) {
 	SvtxTrackMap* allTracks = findNode::getClass<SvtxTrackMap>(topNode,"SvtxTrackMap");
 	for ( SvtxTrackMap::Iter iter = allTracks->begin(); iter != allTracks->end(); ++iter ) {
-		SvtxTrack* thisTrack = iter.second;
+		SvtxTrack* thisTrack = iter->second;
 		/*there's a lot of track functions that I don't really know what they do
 		chisq()
 		error()
@@ -46,7 +46,7 @@ int RecoConversionEval::process_event(PHCompositeNode *topNode) {
 		*/ 
 		if (abs(thisTrack->get_charge())==1)//I want to now only check e tracks
 		{
-			cout<<"Charged Track:\n \tchi:"<<thisTrack->chisq()<<"\n \tp:"<<thisTrack->p()<<"\n \tpos:"<<thisTrack->pos()<<"\n \tid:"<<thisTrack->id()<<"\n \terror:"<<thisTrack->error()<<'\n';
+			cout<<"Charged Track:\n \tchi:"<<thisTrack->get_chisq()<<"\n \tp:"<<thisTrack->get_p()<<"\n \tpos:"<<thisTrack->get_pos()<<"\n \tid:"<<thisTrack->get_id()<<"\n \terror:"<<thisTrack->get_error()<<'\n';
 		}
 	}
 	return Fun4AllReturnCodes::EVENT_OK;
