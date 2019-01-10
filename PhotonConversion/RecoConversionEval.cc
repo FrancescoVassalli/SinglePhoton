@@ -1,4 +1,4 @@
-#include "ConvertedPhotonReconstructor.h"
+#include "RecoConversionEval.h"
 
 #include <fun4all/Fun4AllReturnCodes.h>
 #include <phool/getClass.h>
@@ -21,21 +21,22 @@
 
 using namespace std;
 
-ConvertedPhotonReconstructor::ConvertedPhotonReconstructor(const std::string &name) :
-	SubsysReco("ConvertedPhotonReconstructor"), _fname(name) 
+RecoConversionEval::RecoConversionEval(const std::string &name) :
+	SubsysReco("RecoConversionEval"), _fname(name) 
 	{}
 
-int ConvertedPhotonReconstructor::Init(PHCompositeNode *topNode) {
+int RecoConversionEval::Init(PHCompositeNode *topNode) {
 	return Fun4AllReturnCodes::EVENT_OK;
 }
 
-int ConvertedPhotonReconstructor::InitRun(PHCompositeNode *topNode) {
+int RecoConversionEval::InitRun(PHCompositeNode *topNode) {
 	return Fun4AllReturnCodes::EVENT_OK;
 }
 
-int ConvertedPhotonReconstructor::process_event(PHCompositeNode *topNode) {
+int RecoConversionEval::process_event(PHCompositeNode *topNode) {
 	SvtxTrackMap* allTracks = findNode::getClass<SvtxTrackMap>(topNode,"SvtxTrackMap");
 	for ( SvtxTrackMap::Iter iter = allTracks->begin(); iter != allTracks->end(); ++iter ) {
+		SvtxTrack* thisTrack = iter.second;
 		/*there's a lot of track functions that I don't really know what they do
 		chisq()
 		error()
@@ -43,30 +44,30 @@ int ConvertedPhotonReconstructor::process_event(PHCompositeNode *topNode) {
 		p()
 		pos()
 		*/ 
-		if (abs(iter->get_charge())==1)//I want to now only check e tracks
+		if (abs(thisTrack->get_charge())==1)//I want to now only check e tracks
 		{
-			cout<<"Charged Track:\n \tchi:"<<iter->chisq()<<"\n \tp:"<<iter->p()<<"\n \tpos:"<<iter->pos()<<"\n \tid:"<<iter->id()<<"\n \terror:"<<iter->error()<<'\n';
+			cout<<"Charged Track:\n \tchi:"<<thisTrack->chisq()<<"\n \tp:"<<thisTrack->p()<<"\n \tpos:"<<thisTrack->pos()<<"\n \tid:"<<thisTrack->id()<<"\n \terror:"<<thisTrack->error()<<'\n';
 		}
 	}
 	return Fun4AllReturnCodes::EVENT_OK;
 }
 
-ConvertedPhotonReconstructor::~ConvertedPhotonReconstructor(){
+RecoConversionEval::~RecoConversionEval(){
 
 	_file->Write();
 	_file->Close();
 	delete _file;
 }
 
-int ConvertedPhotonReconstructor::End(PHCompositeNode *topNode) {
+int RecoConversionEval::End(PHCompositeNode *topNode) {
 	return Fun4AllReturnCodes::EVENT_OK;
 }
 
-void ConvertedPhotonReconstructor::process_recoTracks(PHCompositeNode *topNode){
+void RecoConversionEval::process_recoTracks(PHCompositeNode *topNode){
 
 }
 
-ReconstructedConvertedPhoton* ConvertedPhotonReconstructor::reconstruct(PHCompositeNode *topNode){
+ReconstructedConvertedPhoton* RecoConversionEval::reconstruct(PHCompositeNode *topNode){
 	//let the stack get the info from the node
 	SvtxEvalStack *stack = new SvtxEvalStack(topNode);
 	if(!stack){
