@@ -46,7 +46,7 @@ int RecoConversionEval::process_event(PHCompositeNode *topNode) {
 		*/ 
 		if (abs(thisTrack->get_charge())==1)//I want to now only check e tracks
 		{
-			cout<<"Charged Track:\n \tchi:"<<thisTrack->get_chisq()<<"\n \tp:"<<thisTrack->get_p()<<"\n \tid:"<<thisTrack->get_id()<<'\n';
+			cout<<"Charged Track:\n \tchi:"<<thisTrack->get_chisq()<<"\n \tp:"<<thisTrack->get_p()<<"\n \tid:"<<thisTrack->get_id()<<"\n \tpos:"<<thisTrack->get_pos(11)<<'\n';
 		}
 	}
 	return Fun4AllReturnCodes::EVENT_OK;
@@ -54,9 +54,6 @@ int RecoConversionEval::process_event(PHCompositeNode *topNode) {
 
 RecoConversionEval::~RecoConversionEval(){
 
-	_file->Write();
-	_file->Close();
-	delete _file;
 }
 
 int RecoConversionEval::End(PHCompositeNode *topNode) {

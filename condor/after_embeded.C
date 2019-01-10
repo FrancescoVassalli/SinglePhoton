@@ -21,16 +21,10 @@ int after_embeded( std::string infile = "XjPhi3_pT5_98_dst.root",std::string out
   Fun4AllInputManager *hitsin = new Fun4AllDstInputManager("DSTin");
   hitsin->fileopen( infile );
   se->registerInputManager(hitsin);
- 
-  SinglePhotonAfter *truther = new SinglePhotonAfter(outfile);
-  se->registerSubsystem(truther);
-//  ConvertedPhotonReconstructor *converter=new ConvertedPhotonReconstructor(outfile);
-  //se->registerSubsystem(converter);
-  outfile+="cTtree.root";
-
-  TreeMaker *tt = new TreeMaker( outfile,3,truther);
-  se->registerSubsystem( tt );
   
+  RecoConversionEval *rCE = new RecoConversionEval(outfile);
+  se->registerSubsystem( rCE );
+
   se->run();
   se->End();
   delete se;
