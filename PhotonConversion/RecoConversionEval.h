@@ -108,11 +108,12 @@ class RecoConversionEval : public SubsysReco {
         //check the approach distance
         return true;
       }
-    static constexpr int _kNSiliconLayer=7;
-    static constexpr float _kEMProbCut=.5;
-    static constexpr float _kPolarCut=.1;
-    static constexpr float _kFirstHit=3;
-    static constexpr float _kFirstHitStrict=1;
+      // I want these to be static constexpr
+     unsigned int _kNSiliconLayer=7;
+     float _kEMProbCut=.5;
+     float _kPolarCut=.1;
+     float _kFirstHit=3;
+     float _kFirstHitStrict=1;
 
 
 };
