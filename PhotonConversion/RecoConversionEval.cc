@@ -37,18 +37,33 @@ int RecoConversionEval::InitRun(PHCompositeNode *topNode) {
 }
 
 int RecoConversionEval::process_event(PHCompositeNode *topNode) {
-  SvtxTrackMap* allTracks = findNode::getClass<SvtxTrackMap>(topNode,"SvtxTrackMap");
-  RawClusterContainer* mainClusterContainer = findNode::getClass<RawClusterContainer>(topNode,"CLUSTER_CEMC");
-  for ( SvtxTrackMap::Iter iter = allTracks->begin(); iter != allTracks->end(); ++iter ) {
+	doNodePointers(topNode);
+  int bigLoopCount=0;
+  for ( SvtxTrackMap::Iter iter = _allTracks->begin(); iter != _allTracks->end(); ++iter) {
     SvtxTrack* thisTrack = iter->second;
     //I want to now only check e tracks so check the clusters of the |charge|=1 tracks
     if (abs(thisTrack->get_charge())==1)
     {
-      RawCluster* bestcluster= mainClusterContainer->getCluster(thisTrack->get_cal_cluster_id(SvtxTrack::CAL_LAYER(1)));
-      if(bestcluster){
-        cout<<"cluster prob="<<bestcluster->get_prob()<<'\n';
+      RawCluster* bestCluster= _mainClusterContainer->getCluster(thisTrack->get_cal_cluster_id(SvtxTrack::CAL_LAYER(1)));
+      //what if not cluster is found?
+      if(bestCluster&&bestCluster->get_prob()>_kEMProbCut){
+      	//loop over the following tracks
+      	for (SvtxTrackMap::Iter jter = allTracks->begin()+bigLoopCount; jter != allTracks->end(); ++jter)
+      	{
+      		SvtxTrack* nextTrack = jter->second;
+      		//check that the next track is an opposite charge electron
+      		if (thisTrack->get_charge()*-1==nextTrack->get_charge())
+      		{
+      			RawCluster* nextCluster= mainClusterContainer->getCluster(thisTrack->get_cal_cluster_id(SvtxTrack::CAL_LAYER(1)));
+      			//what if not cluster is found?
+      			if(nextCluster&&nextCluster->get_prob()>_kEMProbCut){
+      				pairCuts(thisTrack,nextTrack);
+      			}
+      		}
+      	}
       }
     }
+	bigLoopCount++;    
   }
   return Fun4AllReturnCodes::EVENT_OK;
 }
