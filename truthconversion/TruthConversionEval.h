@@ -124,16 +124,15 @@ class TruthConversionEval: public SubsysReco
     /**@}*/
     /** \defgroup signalTreeVars Variables for {@link _signalCutTree}
       @{*/
-    float _b_track_deta [s_kMAXParticles];
-    bool _b_track_silicon [s_kMAXParticles];
-    int _b_track_dlayer [s_kMAXParticles];
+    float _b_track_deta ;
+    bool _b_track_silicon ;
+    int _b_track_dlayer ;
     /**@}*/
     /** \defgroup backTreeVars Variables for {@link _signalCutTree}
       @{*/
-    int _b_nBack;
-    float _bb_track_deta [s_kMAXParticles];
-    bool _bb_track_silicon [s_kMAXParticles];
-    int _bb_track_dlayer [s_kMAXParticles];
+    float _bb_track_deta ;
+    bool _bb_track_silicon ;
+    int _bb_track_dlayer ;
     /**@}*/
     /** RawClusters associated with truth conversions
      * processed by other modules*/

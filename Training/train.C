@@ -38,14 +38,18 @@ void makeFactory(TTree* signalTree, TTree* backTree,std::string outfile)
   factory->AddVariable("track_deta",'F');
   factory->AddVariable("track_dlayer",'I');
   factory->AddVariable("track_silicon",'I');
+  factory->BookMethod( TMVA::Types::kLikelihood, "LikelihoodD",
+      "!H:!V:!TransformOutput:PDFInterpol=Spline2:NSmoothSig[0]=20:NSmoothBkg[0]=20:NSmooth=5:NAvEvtPerBin=50:VarTransform=Decorrelate" );
+  factory->TrainAllMethods();
+  factory->EvaluateAllMethods();
 }
 
 
 int train(){
   using namespace std;
   string treePath = "/sphenix/user/vassalli/gammasample/fourembededonlineanalysis";
-  string treeExtension = ".rootcTtree.root";
-  string outname = "";
+  string treeExtension = ".root";
+  string outname = "cutTrain.root";
   unsigned int nFiles=100;
 
   TChain *signalTree = handleFile(treePath,treeExtension,"cutTreeSignal",nFiles);

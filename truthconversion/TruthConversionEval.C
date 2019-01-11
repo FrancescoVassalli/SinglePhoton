@@ -49,16 +49,14 @@ int TruthConversionEval::InitRun(PHCompositeNode *topNode)
     _tree->Branch("photon_phi",  _b_parent_phi  ,"photon_phi[nVtx]/F");
     _signalCutTree = new TTree("cutTreeSignal","signal data for making track pair cuts");
     _signalCutTree->SetAutoSave(300);
-    _signalCutTree->Branch("nRpair", &_b_Rpair);
-    _signalCutTree->Branch("track_deta", _b_track_deta,"track_deta[nRpair]/F");
-    _signalCutTree->Branch("track_dlayer", _b_track_dlayer,"track_dlayer[nRpair]/I");
-    _signalCutTree->Branch("track_silicon", _b_track_silicon,"track_silicon[nRpair]/B");
+    _signalCutTree->Branch("track_deta", &_b_track_deta);
+    _signalCutTree->Branch("track_dlayer",&_b_track_dlayer);
+    _signalCutTree->Branch("track_silicon", &_b_track_silicon);
     _backgroundCutTree = new TTree("cutTreeBack","background data for making track pair cuts");
     _backgroundCutTree->SetAutoSave(300);
-    _backgroundCutTree->Branch("nBack", &_b_nBack);
-    _backgroundCutTree->Branch("track_deta", _bb_track_deta,"track_deta[nBack]/F");
-    _backgroundCutTree->Branch("track_dlayer", _bb_track_dlayer,"track_dlayer[nBack]/I");
-    _backgroundCutTree->Branch("track_silicon", _bb_track_silicon,"track_silicon[nBack]/B");
+    _backgroundCutTree->Branch("track_deta", &_bb_track_deta);
+    _backgroundCutTree->Branch("track_dlayer", &_bb_track_dlayer);
+    _backgroundCutTree->Branch("track_silicon", &_bb_track_silicon);
   }
   return 0;
 }
@@ -117,7 +115,6 @@ int TruthConversionEval::process_event(PHCompositeNode *topNode)
   }
   //pass the map to this helper method which fills the fields for the TTree 
   numUnique(&mapConversions,trackeval,_mainClusterContainer);
-  processBackground(&backgroundMap,trackeval);
   //std::queue<std::pair<int,int>> missingChildren= numUnique(&vtxList,&mapConversions,trackeval,mainClusterContainer);
   if (Verbosity()==10)
   {
@@ -127,8 +124,7 @@ int TruthConversionEval::process_event(PHCompositeNode *topNode)
   if (_kMakeTTree)
   {
     _tree->Fill();
-    _signalCutTree->Fill();
-    _backgroundCutTree->Fill();
+    processBackground(&backgroundMap,trackeval);
   }
   if (Verbosity()>=8)
   {
@@ -170,9 +166,12 @@ std::queue<std::pair<int,int>> TruthConversionEval::numUnique(std::map<int,Conve
         int clustidtemp=-1;
         switch(nRecoTracks){
           case 2: //there are 2 reco tracks
-            _b_track_deta[_b_Rpair] = i->second.trackDEta();
-            _b_track_dlayer[_b_Rpair] = i->second.trackDLayer(_svtxClusterMap,_hitMap);
-            _b_track_silicon[_b_Rpair] = i->second.hasSilicon(_svtxClusterMap);
+            if(_kMakeTTree){
+              _b_track_deta = i->second.trackDEta();
+              _b_track_dlayer = i->second.trackDLayer(_svtxClusterMap,_hitMap);
+              _b_track_silicon = i->second.hasSilicon(_svtxClusterMap);
+              _signalCutTree->Fill(); 
+            }
             _b_Rpair++;
             clustidtemp=i->second.get_cluster_id(); //get the cluster id of the current conversion
             break;
@@ -213,15 +212,14 @@ std::queue<std::pair<int,int>> TruthConversionEval::numUnique(std::map<int,Conve
 }
 
 void TruthConversionEval::processBackground(std::map<int,Conversion> *mymap,SvtxTrackEval* trackeval){
-  _b_nBack=0;
   for (std::map<int,Conversion>::iterator i = mymap->begin(); i != mymap->end(); ++i) {
     int nReco=i->second.setRecoTracks(trackeval);
     if (nReco==2)
     {
-      _bb_track_deta[_b_nBack] = i->second.trackDEta();
-      _bb_track_dlayer[_b_nBack] = i->second.trackDLayer(_svtxClusterMap,_hitMap);
-      _bb_track_silicon[_b_nBack] = i->second.hasSilicon(_svtxClusterMap);
-      _b_nBack++;
+      _bb_track_deta = i->second.trackDEta();
+      _bb_track_dlayer = i->second.trackDLayer(_svtxClusterMap,_hitMap);
+      _bb_track_silicon = i->second.hasSilicon(_svtxClusterMap);
+      _backgroundCutTree->Fill();
     }
   }
 }
