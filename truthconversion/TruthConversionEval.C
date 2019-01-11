@@ -36,6 +36,7 @@ int TruthConversionEval::InitRun(PHCompositeNode *topNode)
 		_tree = new TTree("ttree","conversion data");
 		_signalCutTree = new TTree("cutTree","signal data for making track pair cuts");
 		_tree->SetAutoSave(300);
+		_signalCutTree->SetAutoSave(300);
 		_tree->Branch("runNumber",&_runNumber);
 		_tree->Branch("event",&_b_event); 
 		_tree->Branch("nVtx", &_b_nVtx);
@@ -109,7 +110,6 @@ int TruthConversionEval::process_event(PHCompositeNode *topNode)
 	if (_signalCutTree)
 	{
 		_signalCutTree->Fill();
-    cout<<"filling tree"<<endl;
 	}
 	if (Verbosity()>=8)
 	{
@@ -154,6 +154,7 @@ std::queue<std::pair<int,int>> TruthConversionEval::numUnique(std::map<int,Conve
 						_b_track_deta[_b_Rpair] = i->second.trackDEta();
 						_b_track_dlayer[_b_Rpair] = i->second.trackDLayer(_svtxClusterMap,_hitMap);
 						_b_track_silicon[_b_Rpair] = i->second.hasSilicon(_svtxClusterMap);
+            cout<<"deta:"<<i->second.trackDEta()<<'\n';
 						_b_Rpair++;
 						clustidtemp=i->second.get_cluster_id(); //get the cluster id of the current conversion
 						break;
