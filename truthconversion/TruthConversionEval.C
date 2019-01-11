@@ -78,6 +78,8 @@ int TruthConversionEval::process_event(PHCompositeNode *topNode)
   //make a map of the conversions
   std::map<int,Conversion> mapConversions;
   std::map<int,Conversion> backgroundMap;
+  unsigned int backi=0;
+  unsigned int backmod=0;
   for ( PHG4TruthInfoContainer::ConstIterator iter = range.first; iter != range.second; ++iter ) {
     PHG4Particle* g4particle = iter->second; 
     PHG4Particle* parent =_truthinfo->GetParticle(g4particle->get_parent_id());
@@ -102,11 +104,14 @@ int TruthConversionEval::process_event(PHCompositeNode *topNode)
           (mapConversions[vtx->get_id()]).setEmbed(parentEmbedID);
         }
       }
-      else{ //not a conversion
-        (backgroundMap[vtx->get_id()]).setElectron(g4particle);
-        (backgroundMap[vtx->get_id()]).setVtx(vtx);
-        (backgroundMap[vtx->get_id()]).setParent(parent);
-        (backgroundMap[vtx->get_id()]).setEmbed(parentEmbedID);
+      else if(trackeval->best_track_from(g4particle)){ //not a conversion but has a track
+        (backgroundMap[backi]).setElectron(g4particle);
+        (backgroundMap[backi]).setVtx(vtx);
+        (backgroundMap[backi]).setParent(parent);
+        (backgroundMap[backi]).setEmbed(parentEmbedID);
+        if(++backmod%2==0){
+          backi++;
+        }
       }
     }
   }
@@ -209,11 +214,10 @@ std::queue<std::pair<int,int>> TruthConversionEval::numUnique(std::map<int,Conve
 
 void TruthConversionEval::processBackground(std::map<int,Conversion> *mymap,SvtxTrackEval* trackeval){
   _b_nBack=0;
-  cout<<"looping over "<<mymap->size()<<'\n';
   for (std::map<int,Conversion>::iterator i = mymap->begin(); i != mymap->end(); ++i) {
-    if (i->second.setRecoTracks(trackeval)==2)
+    int nReco=i->second.setRecoTracks(trackeval);
+    if (nReco==2)
     {
-      cout<<"good background\n";
       _bb_track_deta[_b_nBack] = i->second.trackDEta();
       _bb_track_dlayer[_b_nBack] = i->second.trackDLayer(_svtxClusterMap,_hitMap);
       _bb_track_silicon[_b_nBack] = i->second.hasSilicon(_svtxClusterMap);

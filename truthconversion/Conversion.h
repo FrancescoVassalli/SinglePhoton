@@ -179,14 +179,6 @@ public:
   inline float trackDEta(){
       if (recoCount()==2)
       {
-        if(reco1->get_charge()==reco2->get_charge()){
-          cout<<"same charge \n";
-          reco1->identify();
-          reco2->identify();
-        }
-        cout<<"eta 1:"<<reco1->get_eta()<<" eta 2:"<<reco2->get_eta()<< 
-          "diff:"<<reco1->get_eta()-reco2->get_eta()<< "fabs:"<<
-          fabs(reco1->get_eta()-reco2->get_eta())<<'\n';
         return fabs(reco1->get_eta()-reco2->get_eta());
       }
       else return -1.;
