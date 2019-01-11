@@ -11,6 +11,7 @@
 #ifndef TRUTHCONVERSIONEVAL_H__
 #define TRUTHCONVERSIONEVAL_H__
 
+#include <fun4all/Fun4AllServer.h>
 #include <phool/PHCompositeNode.h>
 #include <phool/getClass.h>
 

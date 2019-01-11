@@ -1,6 +1,5 @@
 #include "TruthConversionEval.h"
 
-#include <fun4all/Fun4AllServer.h>
 
 #include <calotrigger/CaloTriggerInfo.h>
 
@@ -19,7 +18,6 @@ TruthConversionEval::TruthConversionEval(const std::string &name, unsigned int r
 	_kRunNumber(runnumber),_kParticleEmbed(particleEmbed), _kPythiaEmbed(pythiaEmbed), _kMakeTTree(makeTTree)
 {
 	_foutname = name;
-	cout<<"constructed"<<endl;
 }
 
 TruthConversionEval::~TruthConversionEval(){
@@ -38,6 +36,7 @@ int TruthConversionEval::InitRun(PHCompositeNode *topNode)
 		_tree = new TTree("ttree","conversion data");
 		_signalCutTree = new TTree("cutTree","signal data for making track pair cuts");
 		_tree->SetAutoSave(300);
+		_signalCutTree->SetAutoSave(300);
 		_tree->Branch("runNumber",&_runNumber);
 		_tree->Branch("event",&_b_event); 
 		_tree->Branch("nVtx", &_b_nVtx);
@@ -54,15 +53,13 @@ int TruthConversionEval::InitRun(PHCompositeNode *topNode)
 		_signalCutTree->Branch("track_dlayer", _b_track_dlayer,"track_dlayer[nRpair]/I");
 		_signalCutTree->Branch("track_silicon", _b_track_silicon,"track_silicon[nRpair]/B");
 	}
-	cout<<"made trees"<<endl;
 	return 0;
 }
 
 int TruthConversionEval::process_event(PHCompositeNode *topNode)
 {
-	cout<<"processing"<<endl;
+  doNodePointers(topNode);
 	_conversionClusters.Reset(); //clear the list of conversion clusters
-	cout<<"clusters reset"<<endl;
 	PHG4TruthInfoContainer::Range range = _truthinfo->GetParticleRange();
 	SvtxEvalStack *stack = new SvtxEvalStack(topNode);
 	SvtxTrackEval* trackeval = stack->get_track_eval();
@@ -131,7 +128,6 @@ std::queue<std::pair<int,int>> TruthConversionEval::numUnique(std::map<int,Conve
 	std::queue<std::pair<int,int>> missingChildren;
 	for (std::map<int,Conversion>::iterator i = mymap->begin(); i != mymap->end(); ++i) {
 		//fill the tree
-		_b_nVtx++; 
 		PHG4VtxPoint *vtx =i->second.getVtx(); //get the vtx
 		_b_rVtx[_b_nVtx] = sqrt(vtx->get_x()*vtx->get_x()+vtx->get_y()*vtx->get_y()); //find the radius
 		PHG4Particle *temp = i->second.getPhoton(); //set the photon
@@ -158,6 +154,7 @@ std::queue<std::pair<int,int>> TruthConversionEval::numUnique(std::map<int,Conve
 						_b_track_deta[_b_Rpair] = i->second.trackDEta();
 						_b_track_dlayer[_b_Rpair] = i->second.trackDLayer(_svtxClusterMap,_hitMap);
 						_b_track_silicon[_b_Rpair] = i->second.hasSilicon(_svtxClusterMap);
+            cout<<"deta:"<<i->second.trackDEta()<<'\n';
 						_b_Rpair++;
 						clustidtemp=i->second.get_cluster_id(); //get the cluster id of the current conversion
 						break;
@@ -192,6 +189,7 @@ std::queue<std::pair<int,int>> TruthConversionEval::numUnique(std::map<int,Conve
 			i->second.getPhoton()->identify();
 			}*/
 		_b_pythia[_b_nVtx]=i->second.getEmbed()==3;
+		_b_nVtx++; 
 	}
 	return missingChildren;
 }
