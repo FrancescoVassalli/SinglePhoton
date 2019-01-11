@@ -47,13 +47,13 @@ int TruthConversionEval::InitRun(PHCompositeNode *topNode)
 		_tree->Branch("photon_pt",   _b_parent_pt    ,"photon_pt[nVtx]/F");
 		_tree->Branch("photon_eta",  _b_parent_eta  ,"photon_eta[nVtx]/F");
 		_tree->Branch("photon_phi",  _b_parent_phi  ,"photon_phi[nVtx]/F");
-		_signalCutTree = new TTree("cutTree","signal data for making track pair cuts");
+		_signalCutTree = new TTree("cutTreeSignal","signal data for making track pair cuts");
 		_signalCutTree->SetAutoSave(300);
 		_signalCutTree->Branch("nRpair", &_b_Rpair);
 		_signalCutTree->Branch("track_deta", _b_track_deta,"track_deta[nRpair]/F");
 		_signalCutTree->Branch("track_dlayer", _b_track_dlayer,"track_dlayer[nRpair]/I");
 		_signalCutTree->Branch("track_silicon", _b_track_silicon,"track_silicon[nRpair]/B");
-		_backgroundCutTree = new TTree("cutTree","signal data for making track pair cuts");
+		_backgroundCutTree = new TTree("cutTreeBack","background data for making track pair cuts");
 		_backgroundCutTree->SetAutoSave(300);
 		_backgroundCutTree->Branch("nBack", &_b_nBack);
 		_backgroundCutTree->Branch("track_deta", _bb_track_deta,"track_deta[nRpair]/F");
