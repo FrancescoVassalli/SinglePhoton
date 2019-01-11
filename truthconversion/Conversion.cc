@@ -11,6 +11,9 @@ int Conversion::setRecoTracks(SvtxTrackEval* trackeval){
   {
     reco2=trackeval->best_track_from(e2);
   }
+  if(reco2==reco1){
+    reco2=NULL;
+  }
   int r=0;
   if (reco1)
   {
@@ -32,6 +35,9 @@ int Conversion::setRecoTracks(){
   if (e2)
   {
     reco2=trackeval->best_track_from(e2);
+  }
+  if(reco2==reco1){
+    reco2=NULL;
   }
   int r=0;
   if (reco1)
