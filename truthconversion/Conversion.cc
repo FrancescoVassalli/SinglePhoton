@@ -75,20 +75,24 @@ int Conversion::get_cluster_id(SvtxTrackEval *trackeval){
 bool Conversion::hasSilicon(SvtxClusterMap* svtxClusterMap){
   switch(recoCount()){
     case 2:
-      SvtxCluster *c1 = svtxClusterMap->get(*(reco1->begin_clusters()));
-      SvtxCluster *c2 = svtxClusterMap->get(*(reco2->begin_clusters()));
-      return c1->get_layer()<=_kNSiliconLayer||c2->get_layer()<=_kNSiliconLayer;
+      {
+        SvtxCluster *c1 = svtxClusterMap->get(*(reco1->begin_clusters()));
+        SvtxCluster *c2 = svtxClusterMap->get(*(reco2->begin_clusters()));
+        return c1->get_layer()<=_kNSiliconLayer||c2->get_layer()<=_kNSiliconLayer;
+      }
       break;
     case 1:
-      SvtxCluster *c1;
-      if (reco1)
       {
-        c1 = svtxClusterMap->get(*(reco1->begin_clusters()));
+        SvtxCluster *c1;
+        if (reco1)
+        {
+          c1 = svtxClusterMap->get(*(reco1->begin_clusters()));
+        }
+        else{
+          c1 = svtxClusterMap->get(*(reco2->begin_clusters()));
+        }
+        return c1->get_layer()<=_kNSiliconLayer;
       }
-      else{
-        c1 = svtxClusterMap->get(*(reco2->begin_clusters()));
-      }
-      return c1->get_layer()<=_kNSiliconLayer;
       break;
     default:
       return false;

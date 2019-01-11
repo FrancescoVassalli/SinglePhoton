@@ -1,4 +1,4 @@
-int cluster_burner( std::string infile = "XjPhi3_pT5_98_dst.root",std::string outfile, int runNumber)
+int cluster_burner( std::string infile = "XjPhi3_pT5_98_dst.root",std::string outfile, int runNumber=0)
 {
   
   gSystem->Load("libfun4all.so");
@@ -20,15 +20,15 @@ int cluster_burner( std::string infile = "XjPhi3_pT5_98_dst.root",std::string ou
   hitsin->fileopen( infile );
   se->registerInputManager(hitsin);
  
-  TruthConversionEval *truther = new TruthConversionEval(outfile,runNumber,2,3);
+  TruthConversionEval *truther = new TruthConversionEval(outfile,runNumber,2,3,true);
   se->registerSubsystem(truther);
 //  ConvertedPhotonReconstructor *converter=new ConvertedPhotonReconstructor(outfile);
   //se->registerSubsystem(converter);
-  outfile+="cTtree.root";
+/*  outfile+="cTtree.root";
 
   TreeMaker *tt = new TreeMaker( outfile,3,truther);
   se->registerSubsystem( tt );
-  
+  */
   se->run();
   se->End();
   delete se;

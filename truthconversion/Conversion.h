@@ -11,6 +11,10 @@
 #include <g4main/PHG4Particle.h>
 #include <g4main/PHG4VtxPoint.h>
 #include <trackbase_historic/SvtxTrack.h>
+#include <trackbase_historic/SvtxHitMap.h>
+#include <trackbase_historic/SvtxHit.h>
+#include <trackbase_historic/SvtxClusterMap.h>
+#include <trackbase_historic/SvtxCluster.h>
 #include <g4eval/SvtxTrackEval.h>
 
 class SvtxTrackEval;
@@ -43,7 +47,7 @@ public:
     {
       if (e2&&verbosity>0)
       {
-        std::cout<<"WARNING: oversetting conversion electrons"<<std::endl;
+        std::cout<<"WARNING in Conversion oversetting conversion electrons"<<std::endl;
       }
       else{
         e2=e;
@@ -186,7 +190,7 @@ public:
   }
       /** Return the difference in layers of the first hits of the reco track 
       * @return -1 if reco tracks are not set*/
-      int trackDLayer(SvtxClusterMap* cmap);
+      int trackDLayer(SvtxClusterMap* cmap,SvtxHitMap* hitMap);
       ///@return true if there are any silicon hits for the conversion
       bool hasSilicon(SvtxClusterMap* cmap);
 private:

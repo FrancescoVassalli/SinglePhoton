@@ -11,10 +11,18 @@
 #ifndef TRUTHCONVERSIONEVAL_H__
 #define TRUTHCONVERSIONEVAL_H__
 
+#include <phool/PHCompositeNode.h>
+#include <phool/getClass.h>
+
 #include <fun4all/SubsysReco.h>
 #include <g4main/PHG4TruthInfoContainer.h>
 #include <g4main/PHG4Particle.h>
 #include <g4main/PHG4VtxPoint.h>
+
+#include <trackbase_historic/SvtxHitMap.h>
+#include <trackbase_historic/SvtxHit.h>
+#include <trackbase_historic/SvtxClusterMap.h>
+#include <trackbase_historic/SvtxCluster.h>
 
 #include <calobase/RawClusterContainer.h>
 
@@ -66,7 +74,7 @@ class TruthConversionEval: public SubsysReco
 			if ( dphi < -3.14159 ) dphi += 2 * 3.14159;
 			return sqrt( pow( deta, 2 ) + pow( dphi, 2 ) );
     }
-    inline float doNodePointers(PHCompositeNode*){
+    inline void doNodePointers(PHCompositeNode* topNode){
       _mainClusterContainer = findNode::getClass<RawClusterContainer>(topNode,"CLUSTER_CEMC");
       _truthinfo = findNode::getClass<PHG4TruthInfoContainer>(topNode,"G4TruthInfo");
       _svtxClusterMap = findNode::getClass<SvtxClusterMap>(topNode,"SvtxClusterMap");
@@ -90,8 +98,8 @@ class TruthConversionEval: public SubsysReco
 		TFile *_f=NULL;
 		TTree *_tree=NULL; ///< stores most of the data about the conversions
 		TTree *_signalCutTree=NULL; //<signal data for making track pair cuts
-    RawClusterContainer = *_mainClusterContainer;
-    PHG4TruthInforContainer = *_truthinfo;
+    RawClusterContainer *_mainClusterContainer;
+    PHG4TruthInfoContainer *_truthinfo;
     SvtxClusterMap* _svtxClusterMap;
     SvtxHitMap *_hitMap;
     std::string _foutname;

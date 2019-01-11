@@ -2,9 +2,6 @@
 
 #include <fun4all/Fun4AllServer.h>
 
-#include <phool/PHCompositeNode.h>
-#include <phool/getClass.h>
-
 #include <calotrigger/CaloTriggerInfo.h>
 
 #include <calobase/RawCluster.h>
@@ -155,10 +152,9 @@ std::queue<std::pair<int,int>> TruthConversionEval::numUnique(std::map<int,Conve
 				int clustidtemp=-1;
 				switch(nRecoTracks){
 					case 2: //there are 2 reco tracks
-            i->second.setRecoMaps(_svtxClusterMap,_hitMap);
 						_b_track_deta[_b_Rpair] = i->second.trackDEta();
-						_b_track_dlayer[_b_Rpair] = i->second.trackDLayer();
-						_b_track_silicon[_b_Rpair] = i->second.hasSilicon();
+						_b_track_dlayer[_b_Rpair] = i->second.trackDLayer(_svtxClusterMap,_hitMap);
+						_b_track_silicon[_b_Rpair] = i->second.hasSilicon(_svtxClusterMap);
 						_b_Rpair++;
 						clustidtemp=i->second.get_cluster_id(); //get the cluster id of the current conversion
 						break;
