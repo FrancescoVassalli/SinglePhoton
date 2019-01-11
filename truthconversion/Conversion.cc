@@ -118,3 +118,14 @@ int Conversion::trackDLayer(SvtxClusterMap* svtxClusterMap,SvtxHitMap* hitMap){
   }
   else return -1;
 }
+int Conversion::firstLayer(SvtxClusterMap* svtxClusterMap){
+  if (recoCount()==2){
+    SvtxCluster *c1 = svtxClusterMap->get(*(reco1->begin_clusters()));
+    SvtxCluster *c2 = svtxClusterMap->get(*(reco2->begin_clusters()));
+    if(c1->get_layer()>c2->get_layer()){
+      return c2->get_layer();
+    }
+    else return c1->get_layer();
+  }
+  else return -1;
+}

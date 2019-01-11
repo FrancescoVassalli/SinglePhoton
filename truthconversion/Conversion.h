@@ -191,6 +191,8 @@ public:
       /** Return the difference in layers of the first hits of the reco track 
       * @return -1 if reco tracks are not set*/
       int trackDLayer(SvtxClusterMap* cmap,SvtxHitMap* hitMap);
+      ///@return the first layer the associated reco clusters hit
+      int firstLayer(SvtxClusterMap* cmap);
       ///@return true if there are any silicon hits for the conversion
       bool hasSilicon(SvtxClusterMap* cmap);
 private:
