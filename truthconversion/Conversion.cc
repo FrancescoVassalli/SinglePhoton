@@ -106,7 +106,9 @@ int Conversion::trackDLayer(SvtxClusterMap* svtxClusterMap,SvtxHitMap* hitMap){
     SvtxCluster *c2 = svtxClusterMap->get(*(reco2->begin_clusters()));
     SvtxHit *h1 = hitMap->get(*(c1->begin_hits()));
     SvtxHit *h2 = hitMap->get(*(c2->begin_hits()));
-    return fabs(h1->get_layer()-h2->get_layer());
+    int l1 = h1->get_layer();
+    int l2 = h2->get_layer();
+    return abs(l1-l2);
   }
   else return -1;
 }
