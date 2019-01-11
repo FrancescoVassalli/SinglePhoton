@@ -31,7 +31,7 @@ int Conversion::setRecoTracks(){
   }
   if (e2)
   {
-    reco2=trackeval->best_track_from(e1);
+    reco2=trackeval->best_track_from(e2);
   }
   int r=0;
   if (reco1)

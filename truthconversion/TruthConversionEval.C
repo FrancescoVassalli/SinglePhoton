@@ -168,7 +168,6 @@ std::queue<std::pair<int,int>> TruthConversionEval::numUnique(std::map<int,Conve
 						_b_track_deta[_b_Rpair] = i->second.trackDEta();
 						_b_track_dlayer[_b_Rpair] = i->second.trackDLayer(_svtxClusterMap,_hitMap);
 						_b_track_silicon[_b_Rpair] = i->second.hasSilicon(_svtxClusterMap);
-            cout<<"deta:"<<i->second.trackDEta()<<'\n';
 						_b_Rpair++;
 						clustidtemp=i->second.get_cluster_id(); //get the cluster id of the current conversion
 						break;

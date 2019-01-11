@@ -93,7 +93,7 @@ class TruthConversionEval: public SubsysReco
 	* fills the fields for {@link _backgroundCutTree*/
 	void processBackground(std::map<int,Conversion>* map,SvtxTrackEval* trackEval);
 
-		const static int s_kMAXParticles=1000; //< increase this number if arrays go out of bounds
+		const static int s_kMAXParticles=200; //< increase this number if arrays go out of bounds
 		const unsigned int _kRunNumber;
 		const int _kParticleEmbed;
 		const int _kPythiaEmbed;
