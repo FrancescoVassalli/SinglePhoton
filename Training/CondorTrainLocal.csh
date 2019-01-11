@@ -2,7 +2,7 @@
 @ p = ( ${1} )
 #
 #/sphenix/user/vassalli/gammasample/test/fourembededout0.root
-set OUT_LOCATION="/sphenix/user/vassalli/gammasample/test/"
+set OUT_LOCATION="/sphenix/user/vassalli/gammasample/"
 set IN_FILE=${OUT_LOCATION}fourembededonlineanalysis${p}.root
 set OUT_FILE=${OUT_LOCATION}cutTraining${p}.root
 #
