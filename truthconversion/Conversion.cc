@@ -9,7 +9,7 @@ int Conversion::setRecoTracks(SvtxTrackEval* trackeval){
   }
   if (e2)
   {
-    reco2=trackeval->best_track_from(e1);
+    reco2=trackeval->best_track_from(e2);
   }
   int r=0;
   if (reco1)
@@ -106,7 +106,7 @@ int Conversion::trackDLayer(SvtxClusterMap* svtxClusterMap,SvtxHitMap* hitMap){
     SvtxCluster *c2 = svtxClusterMap->get(*(reco2->begin_clusters()));
     SvtxHit *h1 = hitMap->get(*(c1->begin_hits()));
     SvtxHit *h2 = hitMap->get(*(c2->begin_hits()));
-    return abs(h1->get_layer()-h2->get_layer());
+    return fabs(h1->get_layer()-h2->get_layer());
   }
   else return -1;
 }
