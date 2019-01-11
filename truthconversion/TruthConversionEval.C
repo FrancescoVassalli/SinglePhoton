@@ -107,7 +107,6 @@ int TruthConversionEval::process_event(PHCompositeNode *topNode)
         (backgroundMap[vtx->get_id()]).setVtx(vtx);
         (backgroundMap[vtx->get_id()]).setParent(parent);
         (backgroundMap[vtx->get_id()]).setEmbed(parentEmbedID);
-        cout<<"adding background \n";
       }
     }
   }
