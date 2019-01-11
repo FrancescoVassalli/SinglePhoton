@@ -19,47 +19,50 @@ TruthConversionEval::TruthConversionEval(const std::string &name, unsigned int r
 	_kRunNumber(runnumber),_kParticleEmbed(particleEmbed), _kPythiaEmbed(pythiaEmbed), _kMakeTTree(makeTTree)
 {
 	_foutname = name;
+	cout<<"constructed"<<endl;
 }
 
 TruthConversionEval::~TruthConversionEval(){
-  if (_f)
-  {
-    delete _f;
-  }
+	if (_f)
+	{
+		delete _f;
+	}
 }
 
 int TruthConversionEval::InitRun(PHCompositeNode *topNode)
 {
 	_b_event=0;
 	_runNumber=_kRunNumber;
-  if(_kMakeTTree){
-	_f = new TFile( _foutname.c_str(), "RECREATE");
-	_tree = new TTree("ttree","conversion data");
-	_signalCutTree = new TTree("cutTree","signal data for making track pair cuts");
-	_tree->SetAutoSave(300);
-	_tree->Branch("runNumber",&_runNumber);
-	_tree->Branch("event",&_b_event); 
-	_tree->Branch("nVtx", &_b_nVtx);
-	_tree->Branch("nTpair", &_b_Tpair);
-	_tree->Branch("nRpair", &_b_Rpair);
-	_tree->Branch("rVtx", _b_rVtx,"rVtx[nVtx]/F");
-	_tree->Branch("pythia", _b_pythia,"pythia[nVtx]/B");
-	_tree->Branch("electron_pt", _b_electron_pt,"electron_pt[nVtx]/F");
-	_tree->Branch("positron_pt", _b_positron_pt,"positron_pt[nVtx]/F");
-	_tree->Branch("photon_pt",   _b_parent_pt    ,"photon_pt[nVtx]/F");
-	_tree->Branch("photon_eta",  _b_parent_eta  ,"photon_eta[nVtx]/F");
-	_tree->Branch("photon_phi",  _b_parent_phi  ,"photon_phi[nVtx]/F");
-	_signalCutTree->Branch("track_deta", _b_track_deta,"track_deta[nRpair]/F");
-	_signalCutTree->Branch("track_dlayer", _b_track_dlayer,"track_dlayer[nRpair]/I");
-	_signalCutTree->Branch("track_silicon", _b_track_silicon,"track_silicon[nRpair]/B");
-}
+	if(_kMakeTTree){
+		_f = new TFile( _foutname.c_str(), "RECREATE");
+		_tree = new TTree("ttree","conversion data");
+		_signalCutTree = new TTree("cutTree","signal data for making track pair cuts");
+		_tree->SetAutoSave(300);
+		_tree->Branch("runNumber",&_runNumber);
+		_tree->Branch("event",&_b_event); 
+		_tree->Branch("nVtx", &_b_nVtx);
+		_tree->Branch("nTpair", &_b_Tpair);
+		_tree->Branch("nRpair", &_b_Rpair);
+		_tree->Branch("rVtx", _b_rVtx,"rVtx[nVtx]/F");
+		_tree->Branch("pythia", _b_pythia,"pythia[nVtx]/B");
+		_tree->Branch("electron_pt", _b_electron_pt,"electron_pt[nVtx]/F");
+		_tree->Branch("positron_pt", _b_positron_pt,"positron_pt[nVtx]/F");
+		_tree->Branch("photon_pt",   _b_parent_pt    ,"photon_pt[nVtx]/F");
+		_tree->Branch("photon_eta",  _b_parent_eta  ,"photon_eta[nVtx]/F");
+		_tree->Branch("photon_phi",  _b_parent_phi  ,"photon_phi[nVtx]/F");
+		_signalCutTree->Branch("track_deta", _b_track_deta,"track_deta[nRpair]/F");
+		_signalCutTree->Branch("track_dlayer", _b_track_dlayer,"track_dlayer[nRpair]/I");
+		_signalCutTree->Branch("track_silicon", _b_track_silicon,"track_silicon[nRpair]/B");
+	}
+	cout<<"made trees"<<endl;
 	return 0;
 }
 
 int TruthConversionEval::process_event(PHCompositeNode *topNode)
 {
+	cout<<"processing"<<endl;
 	_conversionClusters.Reset(); //clear the list of conversion clusters
-
+	cout<<"clusters reset"<<endl;
 	PHG4TruthInfoContainer::Range range = _truthinfo->GetParticleRange();
 	SvtxEvalStack *stack = new SvtxEvalStack(topNode);
 	SvtxTrackEval* trackeval = stack->get_track_eval();
@@ -77,7 +80,7 @@ int TruthConversionEval::process_event(PHCompositeNode *topNode)
 		if(parent){ //if the particle is not primary find its vertex 
 			//check that the parent is an embeded(2) photon or a pythia(3) photon that converts
 			if(get_embed(parent,_truthinfo)==_kParticleEmbed||(get_embed(parent,_truthinfo)==_kPythiaEmbed
-				&&parent->get_pid()==22&&TMath::Abs(g4particle->get_pid())==11)){
+						&&parent->get_pid()==22&&TMath::Abs(g4particle->get_pid())==11)){
 				PHG4VtxPoint* vtx=_truthinfo->GetVtx(g4particle->get_vtx_id()); //get the conversion vertex
 				radius=sqrt(vtx->get_x()*vtx->get_x()+vtx->get_y()*vtx->get_y());
 				if (radius<s_kTPCRADIUS) //limits to truth conversions within the tpc radius
@@ -103,14 +106,14 @@ int TruthConversionEval::process_event(PHCompositeNode *topNode)
 		cout<<Name()<<"# conversion clusters="<<_conversionClusters.size()<<'\n';
 	}
 	//findChildren(missingChildren,truthinfo);
-  if (_tree)
-  {
-    _tree->Fill();
-  }
-  if (_signalCutTree)
-  {
-  	_signalCutTree->Fill();
-  }
+	if (_tree)
+	{
+		_tree->Fill();
+	}
+	if (_signalCutTree)
+	{
+		_signalCutTree->Fill();
+	}
 	if (Verbosity()>=8)
 	{
 		std::cout<<Name()<<" found "<<_b_nVtx<<" truth conversions \n";
