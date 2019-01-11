@@ -89,6 +89,9 @@ class TruthConversionEval: public SubsysReco
     std::queue<std::pair<int,int>> numUnique(std::map<int,Conversion>* map,SvtxTrackEval* trackEval,RawClusterContainer* mainClusterContainer);
 		/** attempts to find other truth associated tracks for conversions with only 1 truth associated track*/
 		void findChildren(std::queue<std::pair<int,int>> missing,PHG4TruthInfoContainer* truthinfo);
+	/** @param map should contain Conversion objects which hold background events i.e. not conversions
+	* fills the fields for {@link _backgroundCutTree*/
+	void processBackground(std::map<int,Conversion>* map,SvtxTrackEval* trackEval);
 
 		const static int s_kMAXParticles=1000; //< increase this number if arrays go out of bounds
 		const unsigned int _kRunNumber;
@@ -99,25 +102,39 @@ class TruthConversionEval: public SubsysReco
 		TFile *_f=NULL;
 		TTree *_tree=NULL; ///< stores most of the data about the conversions
 		TTree *_signalCutTree=NULL; //<signal data for making track pair cuts
+		TTree *_backgroundCutTree=NULL; //<background data for making track pair cuts
     RawClusterContainer *_mainClusterContainer;
     PHG4TruthInfoContainer *_truthinfo;
     SvtxClusterMap* _svtxClusterMap;
     SvtxHitMap *_hitMap;
     std::string _foutname;
+    /** \defgroup mainTreeVars Variables for {@link _tree}
+    @{*/
     int _b_event;
 		int _b_nVtx;  ///<total conversions
 		int _b_Tpair; ///<count acceptance e pairs in truth
 		int _b_Rpair; ///<count acceptance e pairs in reco
-		float _b_rVtx[s_kMAXParticles];  ///<truth conversion radius
+		float _b_rVtx[s_kMAXParticles];  ///<truth conversion radius used for the signal tree
 		bool _b_pythia[s_kMAXParticles];  ///<record if the conversion is from pythia or G4 particle
 		float _b_electron_pt[s_kMAXParticles];
 		float _b_positron_pt[s_kMAXParticles];
 		float _b_parent_pt  [s_kMAXParticles];
 		float _b_parent_eta [s_kMAXParticles];
 		float _b_parent_phi [s_kMAXParticles];
+		/**@}*/
+	/** \defgroup signalTreeVars Variables for {@link _signalCutTree}
+    @{*/
     float _b_track_deta [s_kMAXParticles];
     bool _b_track_silicon [s_kMAXParticles];
     int _b_track_dlayer [s_kMAXParticles];
+		/**@}*/
+    /** \defgroup backTreeVars Variables for {@link _signalCutTree}
+    @{*/
+    int _b_nBack;
+    float _bb_track_deta [s_kMAXParticles];
+    bool _bb_track_silicon [s_kMAXParticles];
+    int _bb_track_dlayer [s_kMAXParticles];
+		/**@}*/
 		/** RawClusters associated with truth conversions
 		* processed by other modules*/
 		RawClusterContainer _conversionClusters;
