@@ -5,7 +5,7 @@ int Conversion::setRecoTracks(SvtxTrackEval* trackeval){
   this->trackeval=trackeval;
   if (e1)
   {
-    reco1=trackeval->best_track_from(e1); // have not checked that these are in range 
+    reco1=trackeval->best_track_from(e1);  
   }
   if (e2)
   {

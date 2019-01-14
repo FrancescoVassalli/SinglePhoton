@@ -195,6 +195,42 @@ public:
       int firstLayer(SvtxClusterMap* cmap);
       ///@return true if there are any silicon hits for the conversion
       bool hasSilicon(SvtxClusterMap* cmap);
+      /** distance between two closest points on the reco tracks 
+      * @return -1 if tracks are not set*/
+  inline double approachDistance()const{
+    if (recoCount()==2)
+    {
+     static const double eps = 0.000001;
+      const TVector3 u(reco1->get_px(),reco1->get_py(),reco1->get_pz());
+      const TVector3 v(reco2->get_px(),reco2->get_py(),reco2->get_pz());
+      const TVector3 w(reco1->get_x()-reco2->get_x(),reco1->get_x()-reco2->get_y(),reco1->get_x()-reco2->get_z());
+      
+      double a = u.Dot(u);
+      double b = u.Dot(v);
+      double c = v.Dot(v);
+      double d = u.Dot(w);
+      double e = v.Dot(w);
+
+      double D = a*c - b*b;
+      double sc, tc;
+      // compute the line parameters of the two closest points
+      if (D < eps) {         // the lines are almost parallel
+        sc = 0.0;
+        tc = (b>c ? d/b : e/c);   // use the largest denominator
+      }
+      else {
+        sc = (b*e - c*d) / D;
+        tc = (a*e - b*d) / D;
+      }
+      // get the difference of the two closest points
+      u*=sc;
+      v*=tc;
+      w+=u;
+      w-=v;
+      return w.Mag();   // return the closest distance 
+    }
+     else return -1; 
+  }
 private:
   PHG4Particle* e1=NULL;
   PHG4Particle* e2=NULL;
