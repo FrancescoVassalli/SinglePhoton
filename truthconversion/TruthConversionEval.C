@@ -52,11 +52,13 @@ int TruthConversionEval::InitRun(PHCompositeNode *topNode)
     _signalCutTree->Branch("track_deta", &_b_track_deta);
     _signalCutTree->Branch("track_dlayer",&_b_track_dlayer);
     _signalCutTree->Branch("track_layer", &_b_track_layer);
+    _signalCutTree->Branch("approach_dist", &_b_approach);
     _backgroundCutTree = new TTree("cutTreeBack","background data for making track pair cuts");
     _backgroundCutTree->SetAutoSave(300);
     _backgroundCutTree->Branch("track_deta", &_bb_track_deta);
     _backgroundCutTree->Branch("track_dlayer", &_bb_track_dlayer);
     _backgroundCutTree->Branch("track_layer", &_bb_track_layer);
+    _backgroundCutTree->Branch("approach_dist", &_bb_approach);
   }
   return 0;
 }
@@ -170,6 +172,7 @@ std::queue<std::pair<int,int>> TruthConversionEval::numUnique(std::map<int,Conve
               _b_track_deta = i->second.trackDEta();
               _b_track_dlayer = i->second.trackDLayer(_svtxClusterMap,_hitMap);
               _b_track_layer = i->second.firstLayer(_svtxClusterMap);
+              _b_approach = i->second.approachDistance();
               _signalCutTree->Fill(); 
             }
             _b_Rpair++;
@@ -219,6 +222,7 @@ void TruthConversionEval::processBackground(std::map<int,Conversion> *mymap,Svtx
       _bb_track_deta = i->second.trackDEta();
       _bb_track_dlayer = i->second.trackDLayer(_svtxClusterMap,_hitMap);
       _bb_track_layer = i->second.firstLayer(_svtxClusterMap);
+      _bb_approach = i->second.approachDistance();
       _backgroundCutTree->Fill();
     }
   }
