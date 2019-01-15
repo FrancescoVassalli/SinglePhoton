@@ -72,7 +72,7 @@ int TruthConversionEval::process_event(PHCompositeNode *topNode)
   SvtxTrackEval* trackeval = stack->get_track_eval();
   if (!trackeval)
   {
-    cout<<"NULL track eval in " <<Name()<<" fatal error"<<endl;
+    cerr<<"NULL track eval in " <<Name()<<" fatal error"<<endl;
     return 1;
   }
   //make a map of the conversions
@@ -186,7 +186,7 @@ std::queue<std::pair<int,int>> TruthConversionEval::numUnique(std::map<int,Conve
           default:
             if (Verbosity()>1)
             {
-              cout<<Name()<<" error setting reco tracks"<<endl;
+              cerr<<Name()<<" error setting reco tracks"<<endl;
             }
             break;
         }

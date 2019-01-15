@@ -18,13 +18,16 @@ include_HEADERS = \
   ConvertedPhotonReconstructor.h \
   ConvertedPhotonReconstructorLinkDef.h \
   RecoConversionEval.h \
-  RecoConversionEvalLinkDef.h
+  RecoConversionEvalLinkDef.h \
+	RaveVertexingAux.h \
+	RaveVertexingAuxLinkDef.h
 
 libConvertedPhotonReconstructor_la_SOURCES = \
   ConvertedPhotonReconstructor.cc \
-  ConvertedPhotonReconstructor_Dict.C \ 
+  ConvertedPhotonReconstructor_Dict.C \
   RecoConversionEval.cc \
-  RecoConversionEval_Dict.C 
+  RecoConversionEval_Dict.C \
+	RaveVertexingAux.C
 
 libConvertedPhotonReconstructor_la_LIBADD = \
 	-lphool\
