@@ -5,6 +5,8 @@ INCLUDES = \
   -I$(OFFLINE_MAIN)/include \
   -I`root-config --incdir`
 
+AM_CXXFLAGS = -DRAVE -DRaveDLLExport=
+
 libConvertedPhotonReconstructor_la_LDFLAGS = \
   -nodefaultlibs \
   -L$(libdir) \
@@ -31,6 +33,9 @@ libConvertedPhotonReconstructor_la_SOURCES = \
 
 libConvertedPhotonReconstructor_la_LIBADD = \
 	-lphool\
+	-lgenfit2 \
+	-lgenfit2exp \
+	-lPHGenFit \
 	-lg4eval
 BUILT_SOURCES = \
   testexternals.C

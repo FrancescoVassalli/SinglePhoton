@@ -8,6 +8,7 @@
 #define __RaveVertexingAux_H__
 
 #include <GenFit/GFRaveVertex.h>
+#include <GenFit/GFRaveVertexFactory.h>
 #include <GenFit/Track.h>
 #include <fun4all/SubsysReco.h>
 #include <string>
@@ -17,12 +18,17 @@ namespace PHGenFit
 {
 class Track;
 } /* namespace PHGenFit */
+
+namespace genfit
+{
+class GFRaveVertexFactory;
+} /* namespace genfit */
+class SvtxTrack;
 namespace PHGenFit
 {
 class Fitter;
 } /* namespace PHGenFit */
 
-class SvtxTrack;
 
 class PHTimer;
 class SvtxTrackMap;
@@ -40,7 +46,7 @@ public:
   //!dtor
   ~RaveVertexingAux();
   
-  makeVtx(SvtxTrack *t1, SvtxTrack *t2);
+  SvtxVertex* makeVtx(SvtxTrack *t1, SvtxTrack *t2);
 
   inline int get_primary_pid_guess() const
   {
@@ -60,6 +66,13 @@ public:
   {
     _vertex_min_ndf = vertexMinPT;
   }
+  inline int Verbosity(int v){
+    _verbosity=v;
+    return v;
+  }
+  inline int Verbosity(){
+    return _verbosity;
+  }
 private:
   genfit::Track* TranslateSvtxToGenFitTrack(SvtxTrack* svtx);
   PHGenFit::Fitter* _fitter;
@@ -67,5 +80,6 @@ private:
   double _vertex_min_ndf;
   genfit::GFRaveVertexFactory* _vertex_finder;
   std::string _vertexing_method;
+  int _verbosity=0;
 };
 #endif //__RaveVertexingAux_H__

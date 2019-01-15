@@ -106,9 +106,9 @@ class RecoConversionEval : public SubsysReco {
     /* cut on the distance between the closest point between the two tracks*/
 		inline bool approachDistance(SvtxTrack *t1,SvtxTrack* t2)const{
 			static const double eps = 0.000001;
-      const TVector3 u(t1->get_px(),t1->get_py(),t1->get_pz());
-      const TVector3 v(t2->get_px(),t2->get_py(),t2->get_pz());
-      const TVector3 w(t1->get_x()-t2->get_x(),t1->get_x()-t2->get_y(),t1->get_x()-t2->get_z());
+      TVector3 u(t1->get_px(),t1->get_py(),t1->get_pz());
+      TVector3 v(t2->get_px(),t2->get_py(),t2->get_pz());
+      TVector3 w(t1->get_x()-t2->get_x(),t1->get_x()-t2->get_y(),t1->get_x()-t2->get_z());
 			
 			double a = u.Dot(u);
 			double b = u.Dot(v);
