@@ -82,6 +82,7 @@ class TruthConversionEval: public SubsysReco
       _svtxClusterMap = findNode::getClass<SvtxClusterMap>(topNode,"SvtxClusterMap");
       _hitMap = findNode::getClass<SvtxHitMap>(topNode,"SvtxHitMap");
       _vertexer= new RaveVertexingAux(topNode);
+      _vertexer->Verbosity(10);
       _topNode=topNode;
     }
     /** helper function for process_event
