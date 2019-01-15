@@ -57,9 +57,7 @@ class TruthConversionEval: public SubsysReco
      */
     TruthConversionEval(const std::string &name,unsigned int runnumber, 
         int particleEmbed, int pythiaEmbed,bool makeTTree);
-    ~TruthConversionEval(){
-      if(_vertexer) delete _vertexer;
-    }
+    ~TruthConversionEval();
     int InitRun(PHCompositeNode*);
     /**
      * Find the conversions pass them to numUnique.
