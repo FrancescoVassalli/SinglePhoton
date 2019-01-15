@@ -8,7 +8,6 @@
 #ifndef CONVERSION_H__
 #define CONVERSION_H__
 
-#include "../PhotonConversion/RaveVertexingAux.h"
 #include <g4main/PHG4Particle.h>
 #include <g4main/PHG4VtxPoint.h>
 #include <trackbase_historic/SvtxTrack.h>

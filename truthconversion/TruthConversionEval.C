@@ -176,7 +176,8 @@ std::queue<std::pair<int,int>> TruthConversionEval::numUnique(std::map<int,Conve
               _b_track_layer = i->second.firstLayer(_svtxClusterMap);
               _b_approach = i->second.approachDistance();
               SvtxVertex* vtx = i->second.getRecoVtx(_topNode);
-              _b_vtx_radius =sqrt(vtx->get_x()*vtx->get_x()+vtx->get_y()*vtx->get_y());
+              if(vtx) _b_vtx_radius =sqrt(vtx->get_x()*vtx->get_x()+vtx->get_y()*vtx->get_y());
+              else _b_vtx_radius=-1;
               _signalCutTree->Fill(); 
             }
             _b_Rpair++;
@@ -228,7 +229,8 @@ void TruthConversionEval::processBackground(std::map<int,Conversion> *mymap,Svtx
       _bb_track_layer = i->second.firstLayer(_svtxClusterMap);
       _bb_approach = i->second.approachDistance();
       SvtxVertex* vtx = i->second.getRecoVtx(_topNode);
-      _bb_vtx_radius =sqrt(vtx->get_x()*vtx->get_x()+vtx->get_y()*vtx->get_y());
+      if(vtx) _bb_vtx_radius =sqrt(vtx->get_x()*vtx->get_x()+vtx->get_y()*vtx->get_y());
+      else _bb_vtx_radius=-1;
       _backgroundCutTree->Fill();
     }
   }
