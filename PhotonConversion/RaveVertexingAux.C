@@ -96,11 +96,19 @@ SvtxVertex* RaveVertexingAux::makeVtx(SvtxTrack *t1, SvtxTrack *t2)
 {
   SvtxVertex_v1* svtx_vtx=new SvtxVertex_v1();
   vector<genfit::Track*> gf_tracks;
-  if (t1->get_ndf() < _vertex_min_ndf||t2->get_ndf() < _vertex_min_ndf) return NULL; //ndf cut
+  if (t1->get_ndf() < _vertex_min_ndf||t2->get_ndf() < _vertex_min_ndf){//ndf cut
+    cout<<"ndf cut \n";
+    delete svtx_vtx;
+    return NULL; 
+  } 
 
   auto genfit_track1 = TranslateSvtxToGenFitTrack(t1);
   auto genfit_track2 = TranslateSvtxToGenFitTrack(t2);
-  if (!genfit_track1 || !genfit_track2) return NULL; //geomentry cut
+  if (!genfit_track1 || !genfit_track2){//geomentry cut
+    cout<<"geo cut \n";
+    delete svtx_vtx;
+    return NULL; 
+  } 
   gf_tracks.push_back(const_cast<genfit::Track*>(genfit_track1));
   gf_tracks.push_back(const_cast<genfit::Track*>(genfit_track2));
 
@@ -115,6 +123,7 @@ SvtxVertex* RaveVertexingAux::makeVtx(SvtxTrack *t1, SvtxTrack *t2)
     {
       if (Verbosity() > 1)
         std::cout << "RaveVertexingAux: GFRaveVertexFactory::findVertices failed!";
+      delete svtx_vtx;
       return NULL;
     }
   }
@@ -124,6 +133,7 @@ SvtxVertex* RaveVertexingAux::makeVtx(SvtxTrack *t1, SvtxTrack *t2)
     if (!rave_vtx)
     {
       std::cout << "RaveVertexingAux: GFRaveVertexFactory::findVertices failed!";
+      delete svtx_vtx;
       return NULL;
     }
 
