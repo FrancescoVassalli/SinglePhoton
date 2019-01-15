@@ -18,6 +18,7 @@
 #include <trackbase_historic/SvtxVertex.h>
 #include <g4eval/SvtxTrackEval.h>
 #include <TVector3.h>
+#include <TLorentzVector.h>
 #include <utility>
 
 class SvtxTrackEval;
@@ -243,17 +244,21 @@ public:
      else return -1; 
   }
 
+  float setRecoVtx(SvtxVertex* recovtx);
+
 private:
   PHG4Particle* e1=NULL;
   PHG4Particle* e2=NULL;
   PHG4Particle* photon=NULL;
   PHG4VtxPoint* vtx=NULL;
+  SvtxVertex* recoVtx=NULL:
   SvtxTrack* reco1=NULL;
   SvtxTrack* reco2=NULL;
   SvtxTrackEval* trackeval=NULL;
   SvtxClusterMap* _svtxClusterMap=NULL;                                                                              
   SvtxHitMap *_hitMap=NULL;
   SvtxVertex *recoVertex=NULL;
+  TLorentzVector *recoPhoton=NULL;
   static const int _kNSiliconLayer =7; ///<hardcoded 
   int embedID=0;
   int verbosity;

@@ -56,13 +56,17 @@ int TruthConversionEval::InitRun(PHCompositeNode *topNode)
     _signalCutTree->Branch("track_layer", &_b_track_layer);
     _signalCutTree->Branch("approach_dist", &_b_approach);
     _signalCutTree->Branch("vtx_radius", &_b_vtx_radius);
+    _signalCutTree->Branch("vtx_chi2", &_b_vtx_chi2);
+    _signalCutTree->Branch("vtxTrack_dist", &_b_vtxTrack_dist);
     _backgroundCutTree = new TTree("cutTreeBack","background data for making track pair cuts");
     _backgroundCutTree->SetAutoSave(300);
     _backgroundCutTree->Branch("track_deta", &_bb_track_deta);
     _backgroundCutTree->Branch("track_dlayer", &_bb_track_dlayer);
     _backgroundCutTree->Branch("track_layer", &_bb_track_layer);
     _backgroundCutTree->Branch("vtx_radius", &_bb_vtx_radius);
+    _backgroundCutTree->Branch("vtx_chi2", &_bb_vtx_chi2);
     _backgroundCutTree->Branch("approach_dist", &_bb_approach);
+    _backgroundCutTree->Branch("vtxTrack_dist", &_bb_vtxTrack_dist);
   }
   return 0;
 }
@@ -181,11 +185,16 @@ std::queue<std::pair<int,int>> TruthConversionEval::numUnique(std::map<int,Conve
               _b_track_dlayer = i->second.trackDLayer(_svtxClusterMap,_hitMap);
               _b_track_layer = i->second.firstLayer(_svtxClusterMap);
               _b_approach = i->second.approachDistance();
+              /*RaveVertexAux does not work currently
               pair<SvtxVertex*,SvtxVertex*> recoTracks = i->second.getRecoTracks();
               SvtxVertex* vtx = _vertexer->makeVtx(recoTracks.first,recoTracks.second);
               if(vtx) _b_vtx_radius =sqrt(vtx->get_x()*vtx->get_x()+vtx->get_y()*vtx->get_y());
-              else _b_vtx_radius=-1;
-              _signalCutTree->Fill(); 
+              else _b_vtx_radius=-1;*/
+              SvtxVertex *truthvVtx = i->second.getVtx();
+              _b_vtx_radius = sqrt(vtx->get_x()*vtx->get_x()+vtx->get_y()*vtx->get_y());
+              _b_vtx_chi2 = vtx->get_chisq();
+              _b_vtxTrack_dist = i->second.setRecoVtx(truthvVtx);
+              _signalCutTree->Fill();   
             }
             _b_Rpair++;
             clustidtemp=i->second.get_cluster_id(); //get the cluster id of the current conversion
@@ -236,9 +245,14 @@ void TruthConversionEval::processBackground(std::map<int,Conversion> *mymap,Svtx
       _bb_track_layer = i->second.firstLayer(_svtxClusterMap);
       _bb_approach = i->second.approachDistance();
       pair<SvtxVertex*,SvtxVertex*> recoTracks = i->second.getRecoTracks();
+      /* RaveVetexingAux is not currently working
       SvtxVertex* vtx = _vertexer->makeVtx(recoTracks.first,recoTracks.second);
       if(vtx) _bb_vtx_radius =sqrt(vtx->get_x()*vtx->get_x()+vtx->get_y()*vtx->get_y());
-      else _bb_vtx_radius=-1;
+      else _bb_vtx_radius=-1;*/
+      SvtxVertex *truthvVtx = i->second.getVtx();
+      _bb_vtx_radius = sqrt(vtx->get_x()*vtx->get_x()+vtx->get_y()*vtx->get_y());
+      _bb_vtx_chi2 = vtx->get_chisq();
+      _bb_vtxTrack_dist = i->second.setRecoVtx(truthvVtx);
       _backgroundCutTree->Fill();
     }
   }
