@@ -133,7 +133,7 @@ int Conversion::firstLayer(SvtxClusterMap* svtxClusterMap){
   else return -1;
 }
 
-SvtxVertex* findRecoVertex(PHCompositeNode *topNode){
+SvtxVertex* Conversion::findRecoVertex(PHCompositeNode *topNode){
   RaveVertexingAux vertexer(topNode);
   if (recoCount()==2)
   {

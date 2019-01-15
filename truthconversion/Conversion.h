@@ -16,6 +16,7 @@
 #include <trackbase_historic/SvtxHit.h>
 #include <trackbase_historic/SvtxClusterMap.h>
 #include <trackbase_historic/SvtxCluster.h>
+#include <trackbase_historic/SvtxVertex.h>
 #include <g4eval/SvtxTrackEval.h>
 #include <TVector3.h>
 

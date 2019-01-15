@@ -66,7 +66,7 @@ public:
   {
     _vertex_min_ndf = vertexMinPT;
   }
-  inline bool hasErorrs(){
+  inline bool hasErrors(){
     return !_noErrors;
   }
   inline int Verbosity(int v){

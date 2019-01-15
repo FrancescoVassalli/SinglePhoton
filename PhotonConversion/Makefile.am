@@ -29,13 +29,15 @@ libConvertedPhotonReconstructor_la_SOURCES = \
   ConvertedPhotonReconstructor_Dict.C \
   RecoConversionEval.cc \
   RecoConversionEval_Dict.C \
-	RaveVertexingAux.C
+	RaveVertexingAux.C \
+	RaveVertexingAux_Dict.C
 
 libConvertedPhotonReconstructor_la_LIBADD = \
 	-lphool\
 	-lgenfit2 \
 	-lgenfit2exp \
 	-lPHGenFit \
+	-lphgeom \
 	-lg4eval
 BUILT_SOURCES = \
   testexternals.C

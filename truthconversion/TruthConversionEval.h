@@ -80,6 +80,7 @@ class TruthConversionEval: public SubsysReco
       _truthinfo = findNode::getClass<PHG4TruthInfoContainer>(topNode,"G4TruthInfo");
       _svtxClusterMap = findNode::getClass<SvtxClusterMap>(topNode,"SvtxClusterMap");
       _hitMap = findNode::getClass<SvtxHitMap>(topNode,"SvtxHitMap");
+      _topNode=topNode;
     }
     /** helper function for process_event
      * fills the member fields with information from the conversions 
@@ -108,6 +109,7 @@ class TruthConversionEval: public SubsysReco
     SvtxClusterMap* _svtxClusterMap;
     SvtxHitMap *_hitMap;
     std::string _foutname;
+    PHCompositeNode *_topNode=NULL;
     /** \defgroup mainTreeVars Variables for {@link _tree}
       @{*/
     int _b_event;

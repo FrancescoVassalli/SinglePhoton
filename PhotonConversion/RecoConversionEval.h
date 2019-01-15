@@ -30,6 +30,7 @@
 class PHCompositeNode;
 class SvtxEvalStack;
 class SvtxClusterMap;
+class SvtxVertex;
 
 class RecoConversionEval : public SubsysReco {
 
@@ -59,7 +60,7 @@ class RecoConversionEval : public SubsysReco {
 			_mainClusterContainer = findNode::getClass<RawClusterContainer>(topNode,"CLUSTER_CEMC");
 			_svtxClusterMap = findNode::getClass<SvtxClusterMap>(topNode,"SvtxClusterMap");
 			_hitMap = findNode::getClass<SvtxHitMap>(topNode,"SvtxHitMap");
-      _auxVertexer = new _auxVertexer(topNode);
+      _auxVertexer = new RaveVertexingAux(topNode);
 		}
 
 		inline bool hasNodePointers()const{
@@ -108,6 +109,7 @@ class RecoConversionEval : public SubsysReco {
 			}
 			return true;
 		}
+    bool vtxCuts(SvtxVertex* vtx);
     /* cut on the distance between the closest point between the two tracks*/
 		inline bool approachDistance(SvtxTrack *t1,SvtxTrack* t2)const{
 			static const double eps = 0.000001;

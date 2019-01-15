@@ -66,8 +66,8 @@ int RecoConversionEval::process_event(PHCompositeNode *topNode) {
   return Fun4AllReturnCodes::EVENT_OK;
 }
 
-RecoConversionEval::~RecoConversionEval(){
-
+bool RecoConversionEval::vtxCuts(SvtxVertex *vtx){
+  return true;
 }
 
 int RecoConversionEval::End(PHCompositeNode *topNode) {
