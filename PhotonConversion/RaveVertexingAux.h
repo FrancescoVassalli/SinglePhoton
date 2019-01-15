@@ -39,7 +39,7 @@ public:
   RaveVertexingAux(PHCompositeNode* topNode);
   //!dtor
   ~RaveVertexingAux();
-  
+
   makeVtx(SvtxTrack *t1, SvtxTrack *t2);
 
   inline int get_primary_pid_guess() const
@@ -60,6 +60,9 @@ public:
   {
     _vertex_min_ndf = vertexMinPT;
   }
+  inline bool hasErorrs(){
+    return !_noErrors;
+  }
 private:
   genfit::Track* TranslateSvtxToGenFitTrack(SvtxTrack* svtx);
   PHGenFit::Fitter* _fitter;
@@ -67,5 +70,6 @@ private:
   double _vertex_min_ndf;
   genfit::GFRaveVertexFactory* _vertex_finder;
   std::string _vertexing_method;
+  bool _noErrors=true;
 };
 #endif //__RaveVertexingAux_H__

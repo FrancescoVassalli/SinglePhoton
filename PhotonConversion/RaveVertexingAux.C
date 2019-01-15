@@ -82,12 +82,14 @@ using namespace std;
 	if (!_fitter)
 	{
 		cerr << "critical error: RaveVertexingAux has no fitter" << endl;
+    _noErrors=false;
 	}
 	_vertex_finder = new genfit::GFRaveVertexFactory(Verbosity());
 	_vertex_finder->setMethod(_vertexing_method.data());
 	if (!_vertex_finder)
 	{
 		cerr << "critical error: RaveVertexingAux has no vertexer" << endl;
+    _noErrors=false;
 	}
 }
 

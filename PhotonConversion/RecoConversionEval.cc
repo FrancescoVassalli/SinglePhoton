@@ -50,8 +50,12 @@ int RecoConversionEval::process_event(PHCompositeNode *topNode) {
       		{
       			RawCluster* nextCluster= _mainClusterContainer->getCluster(jter->second->get_cal_cluster_id(SvtxTrack::CAL_LAYER(1)));
       			//what if not cluster is found?
-      			if(nextCluster&&nextCluster->get_prob()>_kEMProbCut){
-      				pairCuts(thisTrack,jter->second);
+      			if(nextCluster&&nextCluster->get_prob()>_kEMProbCut&&pairCuts(thisTrack,jter->second)){
+      				SvtxVertex* vtxCan= _auxVertexer->makeVtx(thisTrack,jter->second);
+              if (vtxCan&&vtxCuts(vtxCan))
+              {
+                /* code */
+              }
       			}
       		}
       	}

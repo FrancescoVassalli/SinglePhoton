@@ -1,4 +1,7 @@
 #include "Conversion.h"
+#include "../PhotonConversion/RaveVertexingAux.h"
+#include <phool/PHCompositeNode.h>
+#include <phool/getClass.h>
 #include <assert.h>
 
 int Conversion::setRecoTracks(SvtxTrackEval* trackeval){	
@@ -128,4 +131,13 @@ int Conversion::firstLayer(SvtxClusterMap* svtxClusterMap){
     else return c1->get_layer();
   }
   else return -1;
+}
+
+SvtxVertex* findRecoVertex(PHCompositeNode *topNode){
+  RaveVertexingAux vertexer(topNode);
+  if (recoCount()==2)
+  {
+    return vertexer.makeVtx(reco1,reco2);
+  }
+  else return NULL;    
 }

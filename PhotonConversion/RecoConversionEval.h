@@ -7,7 +7,7 @@
 /// \author Francesco Vassalli
 //===============================================
 
-
+#include "RaveVertexingAux.h"
 #include <fun4all/SubsysReco.h>
 #include <phool/getClass.h>
 #include <phool/PHDataNode.h>
@@ -36,7 +36,9 @@ class RecoConversionEval : public SubsysReco {
 	public:
 
 		RecoConversionEval(const std::string &name);
-		~RecoConversionEval();	
+		~RecoConversionEval(){
+      if (_auxVertexer) delete _auxVertexer;
+    }	
 		int Init(PHCompositeNode *topNode);
 		int InitRun(PHCompositeNode *topNode);
 		int process_event(PHCompositeNode *topNode);
@@ -47,6 +49,7 @@ class RecoConversionEval : public SubsysReco {
 		RawClusterContainer* _mainClusterContainer;
 		SvtxClusterMap* _svtxClusterMap;
 		SvtxHitMap *_hitMap;
+    RaveVertexingAux *_auxVertexer;
 		std::string _fname;
 		TFile *_file;
 		TTree *_tree;
@@ -56,10 +59,12 @@ class RecoConversionEval : public SubsysReco {
 			_mainClusterContainer = findNode::getClass<RawClusterContainer>(topNode,"CLUSTER_CEMC");
 			_svtxClusterMap = findNode::getClass<SvtxClusterMap>(topNode,"SvtxClusterMap");
 			_hitMap = findNode::getClass<SvtxHitMap>(topNode,"SvtxHitMap");
+      _auxVertexer = new _auxVertexer(topNode);
 		}
 
 		inline bool hasNodePointers()const{
-			return _allTracks &&_mainClusterContainer && _svtxClusterMap&&_hitMap;
+			return _allTracks &&_mainClusterContainer && _svtxClusterMap&&_hitMap
+      &&_auxVertexer&&!_auxVertexer->hasErrors();
 		}
 
 		inline float deltaR( float eta1, float eta2, float phi1, float phi2 )const {

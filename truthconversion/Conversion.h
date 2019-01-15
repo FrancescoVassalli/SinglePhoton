@@ -8,6 +8,7 @@
 #ifndef CONVERSION_H__
 #define CONVERSION_H__
 
+#include "../PhotonConversion/RaveVertexingAux.h"
 #include <g4main/PHG4Particle.h>
 #include <g4main/PHG4VtxPoint.h>
 #include <trackbase_historic/SvtxTrack.h>
@@ -19,6 +20,7 @@
 #include <TVector3.h>
 
 class SvtxTrackEval;
+class PHCompositeNode;
 
 class Conversion
 {
@@ -38,6 +40,7 @@ public:
     this->verbosity=verbosity;
   }
   ~Conversion(){
+    if(recoVertex) delete recoVertex;
     //dont delete the points as you are not the owner and did not make your own copies
   }
   /** sets the daughters of the conversion
@@ -232,6 +235,15 @@ public:
     }
      else return -1; 
   }
+
+  inline SvtxVertex* getRecoVtx(PHCompositeNode *topNode){
+    if (recoVertex)
+    {
+      return recoVertex;
+    }
+    else return findRecoVertex(topNode);
+  }
+
 private:
   PHG4Particle* e1=NULL;
   PHG4Particle* e2=NULL;
@@ -240,10 +252,14 @@ private:
   SvtxTrack* reco1=NULL;
   SvtxTrack* reco2=NULL;
   SvtxTrackEval* trackeval=NULL;
-  SvtxClusterMap* _svtxClusterMap;                                                                              
-  SvtxHitMap *_hitMap;
+  SvtxClusterMap* _svtxClusterMap=NULL;                                                                              
+  SvtxHitMap *_hitMap=NULL;
+  SvtxVertex *recoVertex=NULL;
   static const int _kNSiliconLayer =7; ///<hardcoded 
   int embedID=0;
   int verbosity;
+
+  SvtxVertex* findRecoVertex(PHCompositeNode *topNode);
+
 };
 #endif //CONVERSION_H__
