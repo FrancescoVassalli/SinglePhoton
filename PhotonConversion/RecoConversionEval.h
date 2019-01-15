@@ -103,6 +103,7 @@ class RecoConversionEval : public SubsysReco {
 			}
 			return true;
 		}
+    /* cut on the distance between the closest point between the two tracks*/
 		inline bool approachDistance(SvtxTrack *t1,SvtxTrack* t2)const{
 			static const double eps = 0.000001;
       const TVector3 u(t1->get_px(),t1->get_py(),t1->get_pz());
