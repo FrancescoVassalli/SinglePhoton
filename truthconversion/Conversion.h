@@ -172,6 +172,8 @@ public:
   inline int getEmbed() const {return embedID;}
 
   inline void setEmbed(int embedID) {this->embedID=embedID;}
+  inline void setSourceId(int source){sourceId=source;}
+  inline int getSourceId(){return sourceId;}
   /**Finds the cluster associated with {@link reco1} 
   * if the trackeval was not previously set it needs to be set now
   * if {@link reco1} not set will attempt to set
@@ -255,6 +257,7 @@ private:
   static const int _kNSiliconLayer =7; ///<hardcoded 
   int embedID=0;
   int verbosity;
+  int sourceId;
 
 };
 #endif //CONVERSION_H__

@@ -48,6 +48,7 @@ int TruthConversionEval::InitRun(PHCompositeNode *topNode)
     _tree->Branch("photon_pt",   _b_parent_pt    ,"photon_pt[nVtx]/F");
     _tree->Branch("photon_eta",  _b_parent_eta  ,"photon_eta[nVtx]/F");
     _tree->Branch("photon_phi",  _b_parent_phi  ,"photon_phi[nVtx]/F");
+    _tree->Branch("photon_source_id",  _b_grandparent_id  ,"photon_source_id[nVtx]/I");
     _signalCutTree = new TTree("cutTreeSignal","signal data for making track pair cuts");
     _signalCutTree->SetAutoSave(300);
     _signalCutTree->Branch("track_deta", &_b_track_deta);
@@ -105,6 +106,9 @@ int TruthConversionEval::process_event(PHCompositeNode *topNode)
           (mapConversions[vtx->get_id()]).setVtx(vtx);
           (mapConversions[vtx->get_id()]).setParent(parent);
           (mapConversions[vtx->get_id()]).setEmbed(parentEmbedID);
+          PHG4Particle* grand =_truthinfo->GetParticle(parent->get_parent_id());
+          if (grand) (mapConversions[vtx->get_id()]).setSourceId(grand->get_pid());
+          else (mapConversions[vtx->get_id()]).setSourceId(0);
         }
       }
       else if(trackeval->best_track_from(g4particle)){ //not a conversion but has a track
@@ -157,6 +161,7 @@ std::queue<std::pair<int,int>> TruthConversionEval::numUnique(std::map<int,Conve
     _b_parent_pt[_b_nVtx] =tlv_photon.Pt();
     _b_parent_phi[_b_nVtx]=tlv_photon.Phi();
     _b_parent_eta[_b_nVtx]=tlv_photon.Eta();
+    _b_grandparent_id[_b_nVtx]=i->second.getSourceId();
     temp=i->second.getElectron(); //set the first child 
     tlv_electron.SetPxPyPzE(temp->get_px(),temp->get_py(),temp->get_pz(),temp->get_e());
     _b_electron_pt[_b_nVtx]=tlv_electron.Pt(); //fill tree
