@@ -16,6 +16,7 @@
 #include <trackbase_historic/SvtxClusterMap.h>
 #include <trackbase_historic/SvtxCluster.h>
 #include <g4eval/SvtxTrackEval.h>
+#include <TVector3.h>
 
 class SvtxTrackEval;
 
@@ -135,7 +136,7 @@ public:
   int setRecoTracks(SvtxTrackEval* trackeval);
   int setRecoTracks();
   /// @return the number of matched reco tracks
-  inline int recoCount(){
+  inline int recoCount()const{
     int r=0;
     if (reco1)
     {
@@ -201,9 +202,9 @@ public:
     if (recoCount()==2)
     {
      static const double eps = 0.000001;
-      const TVector3 u(reco1->get_px(),reco1->get_py(),reco1->get_pz());
-      const TVector3 v(reco2->get_px(),reco2->get_py(),reco2->get_pz());
-      const TVector3 w(reco1->get_x()-reco2->get_x(),reco1->get_x()-reco2->get_y(),reco1->get_x()-reco2->get_z());
+      TVector3 u(reco1->get_px(),reco1->get_py(),reco1->get_pz());
+      TVector3 v(reco2->get_px(),reco2->get_py(),reco2->get_pz());
+      TVector3 w(reco1->get_x()-reco2->get_x(),reco1->get_x()-reco2->get_y(),reco1->get_x()-reco2->get_z());
       
       double a = u.Dot(u);
       double b = u.Dot(v);
