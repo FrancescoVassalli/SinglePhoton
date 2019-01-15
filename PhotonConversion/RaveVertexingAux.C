@@ -83,13 +83,18 @@ using namespace std;
 		cerr << "critical error: RaveVertexingAux has no fitter" << endl;
     _noErrors=false;
 	}
-	_vertex_finder = new genfit::GFRaveVertexFactory(Verbosity());
+	_vertex_finder = new genfit::GFRaveVertexFactory(10);
 	_vertex_finder->setMethod(_vertexing_method.data());
 	if (!_vertex_finder)
 	{
 		cerr << "critical error: RaveVertexingAux has no vertexer" << endl;
     _noErrors=false;
 	}
+}
+
+TVector3 RaveVertexingAux::getHelix(SvtxTrack *t1){
+  auto genfit_track1 = TranslateSvtxToGenFitTrack(t1);
+
 }
 
 SvtxVertex* RaveVertexingAux::makeVtx(SvtxTrack *t1, SvtxTrack *t2)
@@ -142,7 +147,6 @@ SvtxVertex* RaveVertexingAux::makeVtx(SvtxTrack *t1, SvtxTrack *t2)
       delete svtx_vtx;
       return NULL;
     }
-
 
     svtx_vtx->set_chisq(rave_vtx->getChi2());
     svtx_vtx->set_ndof(rave_vtx->getNdf());
