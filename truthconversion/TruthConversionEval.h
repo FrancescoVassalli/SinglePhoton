@@ -11,6 +11,10 @@
 #ifndef TRUTHCONVERSIONEVAL_H__
 #define TRUTHCONVERSIONEVAL_H__
 
+#include "TLorentzVector.h"
+#include "Conversion.h"
+#include "../PhotonConversion/RaveVertexingAux.h"
+
 #include <fun4all/Fun4AllServer.h>
 #include <phool/PHCompositeNode.h>
 #include <phool/getClass.h>
@@ -29,9 +33,6 @@
 
 #include <TTree.h>
 #include <TFile.h>
-
-#include "TLorentzVector.h"
-#include "Conversion.h"
 
 #include <vector>
 #include <queue>
@@ -56,7 +57,9 @@ class TruthConversionEval: public SubsysReco
      */
     TruthConversionEval(const std::string &name,unsigned int runnumber, 
         int particleEmbed, int pythiaEmbed,bool makeTTree);
-    ~TruthConversionEval();
+    ~TruthConversionEval(){
+      if(_vertexer) delete _vertexer;
+    }
     int InitRun(PHCompositeNode*);
     /**
      * Find the conversions pass them to numUnique.
@@ -80,6 +83,7 @@ class TruthConversionEval: public SubsysReco
       _truthinfo = findNode::getClass<PHG4TruthInfoContainer>(topNode,"G4TruthInfo");
       _svtxClusterMap = findNode::getClass<SvtxClusterMap>(topNode,"SvtxClusterMap");
       _hitMap = findNode::getClass<SvtxHitMap>(topNode,"SvtxHitMap");
+      _vertexer= new RaveVertexingAux(topNode);
       _topNode=topNode;
     }
     /** helper function for process_event
@@ -110,6 +114,7 @@ class TruthConversionEval: public SubsysReco
     SvtxHitMap *_hitMap;
     std::string _foutname;
     PHCompositeNode *_topNode=NULL;
+    RaveVertexingAux *_vertexer=NULL;
     /** \defgroup mainTreeVars Variables for {@link _tree}
       @{*/
     int _b_event;

@@ -18,6 +18,7 @@
 #include <trackbase_historic/SvtxVertex.h>
 #include <g4eval/SvtxTrackEval.h>
 #include <TVector3.h>
+#include <utility>
 
 class SvtxTrackEval;
 class PHCompositeNode;
@@ -178,6 +179,10 @@ public:
   int get_cluster_id();
   int get_cluster_id(SvtxTrackEval *trackeval);
 
+  inline std::pair<SvtxTrack*,SvtxTrack*> getRecoTracks(){
+    return std::pair<SvtxTrack*,SvtxTrack*>(reco1,reco2);
+  }
+
   /** Finds the delta eta of the reco tracks.
   * @return -1 if reco tracks are not set */
   inline float trackDEta(){
@@ -236,14 +241,6 @@ public:
      else return -1; 
   }
 
-  inline SvtxVertex* getRecoVtx(PHCompositeNode *topNode){
-    if (recoVertex)
-    {
-      return recoVertex;
-    }
-    else return findRecoVertex(topNode);
-  }
-
 private:
   PHG4Particle* e1=NULL;
   PHG4Particle* e2=NULL;
@@ -258,8 +255,6 @@ private:
   static const int _kNSiliconLayer =7; ///<hardcoded 
   int embedID=0;
   int verbosity;
-
-  SvtxVertex* findRecoVertex(PHCompositeNode *topNode);
 
 };
 #endif //CONVERSION_H__

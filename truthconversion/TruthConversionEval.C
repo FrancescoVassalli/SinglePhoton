@@ -10,6 +10,7 @@
 #include <g4eval/SvtxTrackEval.h>
 
 
+#include <utility>
 #include <iostream>
 #include <math.h>
 
@@ -175,7 +176,8 @@ std::queue<std::pair<int,int>> TruthConversionEval::numUnique(std::map<int,Conve
               _b_track_dlayer = i->second.trackDLayer(_svtxClusterMap,_hitMap);
               _b_track_layer = i->second.firstLayer(_svtxClusterMap);
               _b_approach = i->second.approachDistance();
-              SvtxVertex* vtx = i->second.getRecoVtx(_topNode);
+              pair<SvtxVertex*,SvtxVertex*> recoTracks = i->second.getRecoTracks();
+              SvtxVertex* vtx = _vertexer->makeVtx(recoTracks.first,recoTracks.second);
               if(vtx) _b_vtx_radius =sqrt(vtx->get_x()*vtx->get_x()+vtx->get_y()*vtx->get_y());
               else _b_vtx_radius=-1;
               _signalCutTree->Fill(); 
@@ -228,7 +230,8 @@ void TruthConversionEval::processBackground(std::map<int,Conversion> *mymap,Svtx
       _bb_track_dlayer = i->second.trackDLayer(_svtxClusterMap,_hitMap);
       _bb_track_layer = i->second.firstLayer(_svtxClusterMap);
       _bb_approach = i->second.approachDistance();
-      SvtxVertex* vtx = i->second.getRecoVtx(_topNode);
+      pair<SvtxVertex*,SvtxVertex*> recoTracks = i->second.getRecoTracks();
+      SvtxVertex* vtx = _vertexer->makeVtx(recoTracks.first,recoTracks.second);
       if(vtx) _bb_vtx_radius =sqrt(vtx->get_x()*vtx->get_x()+vtx->get_y()*vtx->get_y());
       else _bb_vtx_radius=-1;
       _backgroundCutTree->Fill();
