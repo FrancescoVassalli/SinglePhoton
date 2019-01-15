@@ -41,10 +41,8 @@ public:
     this->vtx=vtx;
     this->verbosity=verbosity;
   }
-  ~Conversion(){
-    if(recoVertex) delete recoVertex;
-    //dont delete the points as you are not the owner and did not make your own copies
-  }
+  //dtor at bottom of public methods
+  
   /** sets the daughters of the conversion
   * use this to set the electron and positron
   * initializes both points but does not determine charge*/
@@ -245,6 +243,13 @@ public:
   }
 
   float setRecoVtx(SvtxVertex* recovtx);
+  TLorentzVector* setRecoPhoton();
+
+  ~Conversion(){
+    if(recoVertex) delete recoVertex;
+    if(recoPhoton) delete recoPhoton;
+    //dont delete the points as you are not the owner and did not make your own copies
+  }
 
 private:
   PHG4Particle* e1=NULL;
@@ -263,6 +268,7 @@ private:
   int embedID=0;
   int verbosity;
   int sourceId;
+  float _kElectronRestM=.5109989461;
 
 };
 #endif //CONVERSION_H__

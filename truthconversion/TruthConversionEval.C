@@ -58,6 +58,8 @@ int TruthConversionEval::InitRun(PHCompositeNode *topNode)
     _signalCutTree->Branch("vtx_radius", &_b_vtx_radius);
     _signalCutTree->Branch("vtx_chi2", &_b_vtx_chi2);
     _signalCutTree->Branch("vtxTrack_dist", &_b_vtxTrack_dist);
+    _signalCutTree->Branch("photon_m", &_b_photon_m);
+    _signalCutTree->Branch("photon_pT", &_b_photon_pT);
     _backgroundCutTree = new TTree("cutTreeBack","background data for making track pair cuts");
     _backgroundCutTree->SetAutoSave(300);
     _backgroundCutTree->Branch("track_deta", &_bb_track_deta);
@@ -67,6 +69,8 @@ int TruthConversionEval::InitRun(PHCompositeNode *topNode)
     _backgroundCutTree->Branch("vtx_chi2", &_bb_vtx_chi2);
     _backgroundCutTree->Branch("approach_dist", &_bb_approach);
     _backgroundCutTree->Branch("vtxTrack_dist", &_bb_vtxTrack_dist);
+    _backgroundCutTree->Branch("photon_m", &_bb_photon_m);
+    _backgroundCutTree->Branch("photon_pT", &_bb_photon_pT);
   }
   return 0;
 }
@@ -194,6 +198,16 @@ std::queue<std::pair<int,int>> TruthConversionEval::numUnique(std::map<int,Conve
               _b_vtx_radius = sqrt(vtx->get_x()*vtx->get_x()+vtx->get_y()*vtx->get_y());
               _b_vtx_chi2 = vtx->get_chisq();
               _b_vtxTrack_dist = i->second.setRecoVtx(truthvVtx);
+              TLorentzVector* recoPhoton = i->second.setRecoPhoton();
+              if (recoPhoton)
+              {
+                _b_photon_m=recoPhoton->Dot(recoPhoton);
+                _b_photon_pT=recoPhoton->Pt();
+              }
+              else{
+                _b_photon_m =0;
+                _b_photon_pT=0;
+              }
               _signalCutTree->Fill();   
             }
             _b_Rpair++;
@@ -253,6 +267,16 @@ void TruthConversionEval::processBackground(std::map<int,Conversion> *mymap,Svtx
       _bb_vtx_radius = sqrt(vtx->get_x()*vtx->get_x()+vtx->get_y()*vtx->get_y());
       _bb_vtx_chi2 = vtx->get_chisq();
       _bb_vtxTrack_dist = i->second.setRecoVtx(truthvVtx);
+      TLorentzVector* recoPhoton = i->second.setRecoPhoton();
+      if (recoPhoton)
+      {
+        _bb_photon_m=recoPhoton->Dot(recoPhoton);
+        _bb_photon_pT=recoPhoton->Pt();
+      }
+      else{
+        _bb_photon_m =0;
+        _bb_photon_pT=0;
+      }
       _backgroundCutTree->Fill();
     }
   }

@@ -55,12 +55,18 @@ int Conversion::setRecoTracks(){
   return r;
 }
 
-/*void Conversion::setRecoPhoton(){
+TLorentzVector* Conversion::setRecoPhoton(){
   if (reco1&&reco2)
   {
-    TLorentzVector tlv1(reco1->get_px(),reco1->get_py(),reco1->get_pz(),)
+    TLorentzVector tlv1(reco1->get_px(),reco1->get_py(),reco1->get_pz(),
+      sqrt(_kElectronRestM*_kElectronRestM+reco1->get_p()*reco1->get_p()));
+    TLorentzVector tlv2(reco2->get_px(),reco2->get_py(),reco2->get_pz(),
+      sqrt(_kElectronRestM*_kElectronRestM+reco2->get_p()*reco2->get_p()));
+    if (recoPhoton) delete recoPhoton;
+    recoPhoton= new TLorentzVector(tlv1+tlv2);
   }
-}*/
+  return recoPhoton;
+}
 
 
 int Conversion::get_cluster_id(){
