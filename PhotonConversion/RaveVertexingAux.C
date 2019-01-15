@@ -119,10 +119,16 @@ SvtxVertex* RaveVertexingAux::makeVtx(SvtxTrack *t1, SvtxTrack *t2)
     {
       _vertex_finder->findVertices(&rave_vertices, gf_tracks);
     }
+    catch(const std::exception &exc){
+      if (Verbosity() > 1)
+        std::cerr << exc.what();
+      delete svtx_vtx;
+      return NULL;
+    }
     catch (...)
     {
       if (Verbosity() > 1)
-        std::cout << "RaveVertexingAux: GFRaveVertexFactory::findVertices failed!";
+        std::cout << "RaveVertexingAux: GFRaveVertexFactory::findVertices failed!\n";
       delete svtx_vtx;
       return NULL;
     }
@@ -132,7 +138,7 @@ SvtxVertex* RaveVertexingAux::makeVtx(SvtxTrack *t1, SvtxTrack *t2)
   {
     if (!rave_vtx)
     {
-      std::cout << "RaveVertexingAux: GFRaveVertexFactory::findVertices failed!";
+      std::cout << "RaveVertexingAux: GFRaveVertexFactory::findVertices failed!\n";
       delete svtx_vtx;
       return NULL;
     }
