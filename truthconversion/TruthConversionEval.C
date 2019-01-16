@@ -142,6 +142,10 @@ int TruthConversionEval::process_event(PHCompositeNode *topNode)
             }
           }
         }
+        if (g4particle->get_pid()==22)
+        {
+          cout<<"photon parent id:"<<g4particle->get_parent_id()<<'\n';
+        }
       }
     }
     else{ //is primary
