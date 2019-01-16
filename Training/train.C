@@ -38,9 +38,17 @@ void makeFactory(TTree* signalTree, TTree* backTree,std::string outfile)
   factory->AddVariable("track_deta",'F');
   factory->AddVariable("track_dlayer",'I');
   factory->AddVariable("track_layer",'I');
+  factory->AddVariable("approach_dist",'F');
+  factory->AddVariable("vtx_radius",'F');
+  //factory->AddVariable("vtx_chi2",'F'); //until reco vtx works this is meaningless
+  factory->AddVariable("vtxTrack_dist",'F');
+  factory->AddVariable("photon_m",'F');
+  factory->AddVariable("photon_pT",'F');
 
-  TCut preTraingCuts("");
-  factory->PrepareTrainingAndTestTree(preTraingCuts,"nTrain_Signal=1500:nTrain_Background=1500:nTest_Signal=1500:nTest_Background=1500");
+  factory->AddSpectator("vtx_chi2",'F'); //until reco vtx works this is meaningless
+
+  TCut preTraingCuts("vtx_radius>0");
+  factory->PrepareTrainingAndTestTree(preTraingCuts,"nTrain_Signal=1800:nTrain_Background=1500:nTest_Signal=1500:nTest_Background=1500");
   factory->BookMethod( TMVA::Types::kLikelihood, "LikelihoodD",
       "!H:!V:!TransformOutput:PDFInterpol=Spline2:NSmoothSig[0]=20:NSmoothBkg[0]=20:NSmooth=5:NAvEvtPerBin=50:VarTransform=Decorrelate" );
   factory->TrainAllMethods();
