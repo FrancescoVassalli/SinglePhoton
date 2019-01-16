@@ -245,7 +245,7 @@ public:
   inline SvtxVertex* getRecoVtx(){
     return recoVtx;
   }
-  float dist(PHG4VtxPoint* vtx, SvtxClusterMap* cmap);
+  double dist(PHG4VtxPoint* vtx, SvtxClusterMap* cmap);
   float setRecoVtx(SvtxVertex* recovtx,SvtxClusterMap* cmap);
   TLorentzVector* setRecoPhoton();
 
