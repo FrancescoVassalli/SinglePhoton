@@ -119,6 +119,7 @@ int TruthConversionEval::process_event(PHCompositeNode *topNode)
           (mapConversions[vtx->get_id()]).setParent(parent);
           (mapConversions[vtx->get_id()]).setEmbed(embedID);
           PHG4Particle* grand =_truthinfo->GetParticle(parent->get_parent_id());
+          cout<<"grand id:"<<parent->get_parent_id()<<'\n';
           if (grand) (mapConversions[vtx->get_id()]).setSourceId(grand->get_pid());
           else (mapConversions[vtx->get_id()]).setSourceId(0);
         }
