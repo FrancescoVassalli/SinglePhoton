@@ -38,20 +38,23 @@ void makeFactory(TTree* signalTree, TTree* backTree,std::string outfile)
   factory->AddVariable("track_deta",'F');
   factory->AddVariable("track_dlayer",'I');
   factory->AddVariable("track_layer",'I');
+  factory->AddVariable("track_pT",'F');
   factory->AddVariable("approach_dist",'F');
   factory->AddVariable("vtx_radius",'F');
   //factory->AddVariable("vtx_chi2",'F'); //until reco vtx works this is meaningless
   factory->AddVariable("vtxTrack_dist",'F');
   factory->AddVariable("photon_m",'F');
   factory->AddVariable("photon_pT",'F');
+  factory->AddVariable("cluster_prob",'F');
 
   factory->AddSpectator("vtx_chi2",'F'); //until reco vtx works this is meaningless
 
 
   string track_pT_cut = "track_pT>0";
   string vtx_radius_cut = "vtx_radius>0";
+  string em_prob_cut = "cluster_prob>.1";
   //do I need photon cuts? 
-  string tCutInitializer = vtx_radius_cut+"&&"+track_pT_cut+"&&track_dlayer>=0&&track_layer>=0&&approach_dist>0&&vtxTrack_dist>0";
+  string tCutInitializer = em_prob_cut+"&&"+ vtx_radius_cut+"&&"+track_pT_cut+"&&track_dlayer>=0&&track_layer>=0&&approach_dist>0&&vtxTrack_dist>0";
   TCut preTraingCuts(tCutInitializer.c_str());
 
 

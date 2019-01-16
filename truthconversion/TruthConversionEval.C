@@ -316,6 +316,7 @@ void TruthConversionEval::processBackground(std::map<int,Conversion> *mymap,Svtx
        cout<<"reco vtx is null"<<endl;
        }*/
       PHG4VtxPoint *vtx = i->second.getVtx();
+      vtx->identify();
       _bb_vtx_radius = sqrt(vtx->get_x()*vtx->get_x()+vtx->get_y()*vtx->get_y());
       //_b_vtx_chi2 = recoVtx->get_chisq();
       _bb_vtxTrack_dist = i->second.dist(vtx,_svtxClusterMap);
