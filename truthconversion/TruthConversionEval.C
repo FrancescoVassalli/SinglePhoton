@@ -45,6 +45,8 @@ int TruthConversionEval::InitRun(PHCompositeNode *topNode)
     _tree->Branch("photon_pt",   _b_parent_pt    ,"photon_pt[nVtx]/F");
     _tree->Branch("photon_eta",  _b_parent_eta  ,"photon_eta[nVtx]/F");
     _tree->Branch("photon_phi",  _b_parent_phi  ,"photon_phi[nVtx]/F");
+    _tree->Branch("e_deta",  _b_e_deta  ,"e_deta[nVtx]/F");
+    _tree->Branch("e_dphi",  _b_e_dphi  ,"e_dphi[nVtx]/F");
     _tree->Branch("photon_source_id",  _b_grandparent_id  ,"photon_source_id[nVtx]/I");
     _tree->Branch("nCluster",_b_nCluster,"nCluster[nRpair]/I");
     _tree->Branch("clus_dphi",_b_cluster_dphi,"clus_dphi[nRpair]/F");
@@ -52,6 +54,7 @@ int TruthConversionEval::InitRun(PHCompositeNode *topNode)
     _signalCutTree = new TTree("cutTreeSignal","signal data for making track pair cuts");
     _signalCutTree->SetAutoSave(300);
     _signalCutTree->Branch("track_deta", &_b_track_deta);
+    _signalCutTree->Branch("track_dphi", &_b_track_dphi);
     _signalCutTree->Branch("track_dlayer",&_b_track_dlayer);
     _signalCutTree->Branch("track_layer", &_b_track_layer);
     _signalCutTree->Branch("track_pT", &_b_track_pT);
@@ -65,6 +68,7 @@ int TruthConversionEval::InitRun(PHCompositeNode *topNode)
     _backgroundCutTree = new TTree("cutTreeBack","background data for making track pair cuts");
     _backgroundCutTree->SetAutoSave(300);
     _backgroundCutTree->Branch("track_deta", &_bb_track_deta);
+    _backgroundCutTree->Branch("track_dphi", &_bb_track_dphi);
     _backgroundCutTree->Branch("track_dlayer", &_bb_track_dlayer);
     _backgroundCutTree->Branch("track_layer", &_bb_track_layer);
     _backgroundCutTree->Branch("track_pT", &_bb_track_pT);
@@ -210,6 +214,8 @@ std::queue<std::pair<int,int>> TruthConversionEval::numUnique(std::map<int,Conve
     _b_parent_phi[_b_nVtx]=tlv_photon.Phi();
     _b_parent_eta[_b_nVtx]=tlv_photon.Eta();
     _b_grandparent_id[_b_nVtx]=i->second.getSourceId();
+    _b_e_deta[_b_nVtx]=-1.;
+    _b_e_dphi[_b_nVtx]=-1.;
     temp=i->second.getElectron(); //set the first child 
     tlv_electron.SetPxPyPzE(temp->get_px(),temp->get_py(),temp->get_pz(),temp->get_e());
     _b_electron_pt[_b_nVtx]=tlv_electron.Pt(); //fill tree
@@ -217,6 +223,8 @@ std::queue<std::pair<int,int>> TruthConversionEval::numUnique(std::map<int,Conve
     if(temp){ //this will be false for conersions with 1 truth track
       tlv_positron.SetPxPyPzE(temp->get_px(),temp->get_py(),temp->get_pz(),temp->get_e()); //init the tlv
       _b_positron_pt[_b_nVtx]=tlv_positron.Pt(); //fill tree
+      _b_e_deta[_b_nVtx]=TMath::Abs(tlv_electron.Eta()-tlv_positron.Eta());
+      _b_e_dphi[_b_nVtx]=TMath::Abs(tlv_electron.Phi()-tlv_positron.Phi());
       if (TMath::Abs(tlv_electron.Eta())<_kRAPIDITYACCEPT&&TMath::Abs(tlv_positron.Eta())<_kRAPIDITYACCEPT)
       {
         _b_Tpair++;
@@ -227,6 +235,7 @@ std::queue<std::pair<int,int>> TruthConversionEval::numUnique(std::map<int,Conve
             {
               if(_kMakeTTree){
                 _b_track_deta = i->second.trackDEta();
+                _b_track_dphi = i->second.trackDPhi();
                 _b_track_dlayer = i->second.trackDLayer(_svtxClusterMap,_hitMap);
                 _b_track_layer = i->second.firstLayer(_svtxClusterMap);
                 _b_track_pT = i->second.minTrackpT();
@@ -327,6 +336,7 @@ void TruthConversionEval::processBackground(std::map<int,Conversion> *mymap,Svtx
     if (nReco==2)
     {
       _bb_track_deta = i->second.trackDEta();
+      _bb_track_dphi = i->second.trackDPhi();
       _bb_track_dlayer = i->second.trackDLayer(_svtxClusterMap,_hitMap);
       _bb_track_layer = i->second.firstLayer(_svtxClusterMap);
       _bb_track_pT = i->second.minTrackpT();

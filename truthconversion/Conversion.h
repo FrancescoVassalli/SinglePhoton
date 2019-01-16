@@ -196,6 +196,13 @@ public:
       }
       else return -1.;
   }
+  inline float trackDPhi(){
+      if (recoCount()==2)
+      {
+        return fabs(reco1->get_phi()-reco2->get_phi());
+      }
+      else return -1.;
+  }
   inline float minTrackpT(){
     switch(recoCount()){
       case 2:
