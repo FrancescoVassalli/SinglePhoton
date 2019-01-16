@@ -40,7 +40,7 @@ void cluster2Plotter()
   ttree->SetBranchAddress("clus_deta",    &deta    );
   ttree->SetBranchAddress("nRpair",    &cluster_n  );
 
-  string outfilename = "2clusplot.root";
+  string outfilename = "clus2plot.root";
   TFile *out = new TFile(outfilename.c_str(),"RECREATE");
 
   string plotname = "clus2plot";
