@@ -18,6 +18,7 @@
 #include <trackbase_historic/SvtxVertex.h>
 #include <g4eval/SvtxTrackEval.h>
 #include <TVector3.h>
+#include <TLorentzVector.h>
 #include <utility>
 
 class SvtxTrackEval;
@@ -40,10 +41,8 @@ public:
     this->vtx=vtx;
     this->verbosity=verbosity;
   }
-  ~Conversion(){
-    if(recoVertex) delete recoVertex;
-    //dont delete the points as you are not the owner and did not make your own copies
-  }
+  //dtor at bottom of public methods
+  
   /** sets the daughters of the conversion
   * use this to set the electron and positron
   * initializes both points but does not determine charge*/
@@ -243,21 +242,33 @@ public:
      else return -1; 
   }
 
+  float setRecoVtx(SvtxVertex* recovtx);
+  TLorentzVector* setRecoPhoton();
+
+  ~Conversion(){
+    if(recoVertex) delete recoVertex;
+    if(recoPhoton) delete recoPhoton;
+    //dont delete the points as you are not the owner and did not make your own copies
+  }
+
 private:
   PHG4Particle* e1=NULL;
   PHG4Particle* e2=NULL;
   PHG4Particle* photon=NULL;
   PHG4VtxPoint* vtx=NULL;
+  SvtxVertex* recoVtx=NULL:
   SvtxTrack* reco1=NULL;
   SvtxTrack* reco2=NULL;
   SvtxTrackEval* trackeval=NULL;
   SvtxClusterMap* _svtxClusterMap=NULL;                                                                              
   SvtxHitMap *_hitMap=NULL;
   SvtxVertex *recoVertex=NULL;
+  TLorentzVector *recoPhoton=NULL;
   static const int _kNSiliconLayer =7; ///<hardcoded 
   int embedID=0;
   int verbosity;
   int sourceId;
+  float _kElectronRestM=.5109989461;
 
 };
 #endif //CONVERSION_H__

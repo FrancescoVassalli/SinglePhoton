@@ -25,6 +25,7 @@ int Conversion::setRecoTracks(SvtxTrackEval* trackeval){
   {
     r++;
   }
+  setRecoPhoton();
   return r;
 }
 
@@ -50,7 +51,21 @@ int Conversion::setRecoTracks(){
   {
     r++;
   }
+  setRecoPhoton();
   return r;
+}
+
+TLorentzVector* Conversion::setRecoPhoton(){
+  if (reco1&&reco2)
+  {
+    TLorentzVector tlv1(reco1->get_px(),reco1->get_py(),reco1->get_pz(),
+      sqrt(_kElectronRestM*_kElectronRestM+reco1->get_p()*reco1->get_p()));
+    TLorentzVector tlv2(reco2->get_px(),reco2->get_py(),reco2->get_pz(),
+      sqrt(_kElectronRestM*_kElectronRestM+reco2->get_p()*reco2->get_p()));
+    if (recoPhoton) delete recoPhoton;
+    recoPhoton= new TLorentzVector(tlv1+tlv2);
+  }
+  return recoPhoton;
 }
 
 
@@ -130,4 +145,17 @@ int Conversion::firstLayer(SvtxClusterMap* svtxClusterMap){
     else return c1->get_layer();
   }
   else return -1;
+}
+
+float Conversion::setRecoVtx(SvtxVertex *recovtx){
+    recoVtx=recovtx;
+    SvtxCluster *c1 = svtxClusterMap->get(*(reco1->begin_clusters()));
+    SvtxCluster *c2 = svtxClusterMap->get(*(reco2->begin_clusters()));
+    float r1 = sqrt(fabs(c1->get_x()-recovtx->get_x()),fabs(c1->get_y()-recovtx->get_y()),fabs(c1->get_z()-recovtx->get_z()));
+    float r2 = sqrt(fabs(c2->get_x()-recovtx->get_x()),fabs(c2->get_y()-recovtx->get_y()),fabs(c2->get_z()-recovtx->get_z()));
+    if (r1>r2)
+    {
+      return r1;
+    }
+    else return r2;
 }

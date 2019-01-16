@@ -92,10 +92,10 @@ using namespace std;
 	}
 }
 
-TVector3 RaveVertexingAux::getHelix(SvtxTrack *t1){
+/*TVector3 RaveVertexingAux::getHelix(SvtxTrack *t1){
   auto genfit_track1 = TranslateSvtxToGenFitTrack(t1);
 
-}
+}*/
 
 SvtxVertex* RaveVertexingAux::makeVtx(SvtxTrack *t1, SvtxTrack *t2)
 {

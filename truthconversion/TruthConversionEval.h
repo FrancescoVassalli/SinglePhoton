@@ -136,6 +136,9 @@ class TruthConversionEval: public SubsysReco
     int _b_track_dlayer ;
     double _b_approach ;
     float _b_vtx_radius;
+    float _b_vtx_chi2;
+    float _b_photon_m;
+    float _b_photon_pT;
     /**@}*/
     /** \defgroup backTreeVars Variables for {@link _signalCutTree}
       @{*/
@@ -144,6 +147,9 @@ class TruthConversionEval: public SubsysReco
     int _bb_track_dlayer ;
     double _bb_approach ;
     float _bb_vtx_radius;
+    float _bb_vtx_chi2;
+    float _bb_photon_m;
+    float _bb_photon_pT;
     /**@}*/
     /** RawClusters associated with truth conversions
      * processed by other modules*/
