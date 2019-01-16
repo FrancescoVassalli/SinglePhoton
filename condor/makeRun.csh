@@ -4,6 +4,6 @@ cd ../../PhotonConversion/build
 make install
 cd ../../ClusterShape/build
 make install
-cd ../truthconversion/build/
+cd ../truthconversion/build
 make install
 cd ../../condor

@@ -187,22 +187,20 @@ std::queue<std::pair<int,int>> TruthConversionEval::numUnique(std::map<int,Conve
               _b_track_dlayer = i->second.trackDLayer(_svtxClusterMap,_hitMap);
               _b_track_layer = i->second.firstLayer(_svtxClusterMap);
               _b_approach = i->second.approachDistance();
-              cout<<"got approach"<<endl;
-              /*pair<SvtxTrack*,SvtxTrack*> recoTracks = i->second.getRecoTracks();
-              RaveVertexAux does not work currently
-              pair<SvtxVertex*,SvtxVertex*> recoTracks = i->second.getRecoTracks();
-              SvtxVertex* vtx = _vertexer->makeVtx(recoTracks.first,recoTracks.second);
-              if(vtx) _b_vtx_radius =sqrt(vtx->get_x()*vtx->get_x()+vtx->get_y()*vtx->get_y());
-              else _b_vtx_radius=-1;*/
-              SvtxVertex *truthvVtx = i->second.getRecoVtx();
-              cout<<"got reco vtx"<<endl;
-              if (!truthvVtx)
-              {
-                cout<<"vtx is null"<<endl;
-              }
+              /*The recoVtx finding doesn't work yet so using truth vtx for now
+               * pair<SvtxTrack*,SvtxTrack*> recoTracks = i->second.getRecoTracks();
+               pair<SvtxVertex*,SvtxVertex*> recoTracks = i->second.getRecoTracks();
+               SvtxVertex* vtx = _vertexer->makeVtx(recoTracks.first,recoTracks.second);
+               if(vtx) _b_vtx_radius =sqrt(vtx->get_x()*vtx->get_x()+vtx->get_y()*vtx->get_y());
+               else _b_vtx_radius=-1;
+               SvtxVertex *recoVtx = i->second.getRecoVtx();
+               if (!recoVtx)
+               {
+               cout<<"reco vtx is null"<<endl;
+               }*/
               _b_vtx_radius = sqrt(vtx->get_x()*vtx->get_x()+vtx->get_y()*vtx->get_y());
-              _b_vtx_chi2 = truthvVtx->get_chisq();
-              _b_vtxTrack_dist = i->second.setRecoVtx(truthvVtx,_svtxClusterMap);
+              //_b_vtx_chi2 = recoVtx->get_chisq();
+              _b_vtxTrack_dist = i->second.dist(vtx,_svtxClusterMap);
               TLorentzVector* recoPhoton = i->second.setRecoPhoton();
               if (recoPhoton)
               {
@@ -263,20 +261,21 @@ void TruthConversionEval::processBackground(std::map<int,Conversion> *mymap,Svtx
       _bb_track_dlayer = i->second.trackDLayer(_svtxClusterMap,_hitMap);
       _bb_track_layer = i->second.firstLayer(_svtxClusterMap);
       _bb_approach = i->second.approachDistance();
-      /*pair<SvtxTrack*,SvtxTrack*> recoTracks = i->second.getRecoTracks();
-       RaveVetexingAux is not currently working
-      SvtxVertex* vtx = _vertexer->makeVtx(recoTracks.first,recoTracks.second);
-      if(vtx) _bb_vtx_radius =sqrt(vtx->get_x()*vtx->get_x()+vtx->get_y()*vtx->get_y());
-      else _bb_vtx_radius=-1;*/
-      SvtxVertex *truthvVtx = i->second.getRecoVtx();
-      cout<<"bg: got reco vtx"<<endl;
-      if (!truthvVtx)
-      {
-        cout<<"bg: vtx is null"<<endl;
-      }
-      _bb_vtx_radius = sqrt(truthvVtx->get_x()*truthvVtx->get_x()+truthvVtx->get_y()*truthvVtx->get_y());
-      _bb_vtx_chi2 = truthvVtx->get_chisq();
-      _bb_vtxTrack_dist = i->second.setRecoVtx(truthvVtx,_svtxClusterMap);
+      /*The recoVtx finding doesn't work yet so using truth vtx for now
+       * pair<SvtxTrack*,SvtxTrack*> recoTracks = i->second.getRecoTracks();
+       pair<SvtxVertex*,SvtxVertex*> recoTracks = i->second.getRecoTracks();
+       SvtxVertex* vtx = _vertexer->makeVtx(recoTracks.first,recoTracks.second);
+       if(vtx) _b_vtx_radius =sqrt(vtx->get_x()*vtx->get_x()+vtx->get_y()*vtx->get_y());
+       else _b_vtx_radius=-1;
+       SvtxVertex *recoVtx = i->second.getRecoVtx();
+       if (!recoVtx)
+       {
+       cout<<"reco vtx is null"<<endl;
+       }*/
+      PHG4VtxPoint *vtx = i->second.getVtx();
+      _b_vtx_radius = sqrt(vtx->get_x()*vtx->get_x()+vtx->get_y()*vtx->get_y());
+      //_b_vtx_chi2 = recoVtx->get_chisq();
+      _b_vtxTrack_dist = i->second.dist(vtx,_svtxClusterMap);
       TLorentzVector* recoPhoton = i->second.setRecoPhoton();
       if (recoPhoton)
       {
