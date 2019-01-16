@@ -242,7 +242,11 @@ public:
      else return -1; 
   }
 
-  float setRecoVtx(SvtxVertex* recovtx);
+  inline SvtxVertex* getRecoVtx(){
+    return recoVtx;
+  }
+
+  float setRecoVtx(SvtxVertex* recovtx,SvtxClusterMap* cmap);
   TLorentzVector* setRecoPhoton();
 
   ~Conversion(){
@@ -256,7 +260,7 @@ private:
   PHG4Particle* e2=NULL;
   PHG4Particle* photon=NULL;
   PHG4VtxPoint* vtx=NULL;
-  SvtxVertex* recoVtx=NULL:
+  SvtxVertex* recoVtx=NULL;
   SvtxTrack* reco1=NULL;
   SvtxTrack* reco2=NULL;
   SvtxTrackEval* trackeval=NULL;

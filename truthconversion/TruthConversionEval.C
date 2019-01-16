@@ -187,20 +187,20 @@ std::queue<std::pair<int,int>> TruthConversionEval::numUnique(std::map<int,Conve
               _b_track_dlayer = i->second.trackDLayer(_svtxClusterMap,_hitMap);
               _b_track_layer = i->second.firstLayer(_svtxClusterMap);
               _b_approach = i->second.approachDistance();
-              pair<SvtxTrack*,SvtxTrack*> recoTracks = i->second.getRecoTracks();
-              /*RaveVertexAux does not work currently
+              /*pair<SvtxTrack*,SvtxTrack*> recoTracks = i->second.getRecoTracks();
+              RaveVertexAux does not work currently
               pair<SvtxVertex*,SvtxVertex*> recoTracks = i->second.getRecoTracks();
               SvtxVertex* vtx = _vertexer->makeVtx(recoTracks.first,recoTracks.second);
               if(vtx) _b_vtx_radius =sqrt(vtx->get_x()*vtx->get_x()+vtx->get_y()*vtx->get_y());
               else _b_vtx_radius=-1;*/
-              SvtxVertex *truthvVtx = i->second.getVtx();
+              SvtxVertex *truthvVtx = i->second.getRecoVtx();
               _b_vtx_radius = sqrt(vtx->get_x()*vtx->get_x()+vtx->get_y()*vtx->get_y());
-              _b_vtx_chi2 = vtx->get_chisq();
-              _b_vtxTrack_dist = i->second.setRecoVtx(truthvVtx);
+              _b_vtx_chi2 = truthvVtx->get_chisq();
+              _b_vtxTrack_dist = i->second.setRecoVtx(truthvVtx,_svtxClusterMap);
               TLorentzVector* recoPhoton = i->second.setRecoPhoton();
               if (recoPhoton)
               {
-                _b_photon_m=recoPhoton->Dot(recoPhoton);
+                _b_photon_m=recoPhoton->Dot(*recoPhoton);
                 _b_photon_pT=recoPhoton->Pt();
               }
               else{
@@ -257,19 +257,19 @@ void TruthConversionEval::processBackground(std::map<int,Conversion> *mymap,Svtx
       _bb_track_dlayer = i->second.trackDLayer(_svtxClusterMap,_hitMap);
       _bb_track_layer = i->second.firstLayer(_svtxClusterMap);
       _bb_approach = i->second.approachDistance();
-      pair<SvtxTrack*,SvtxTrack*> recoTracks = i->second.getRecoTracks();
-      /* RaveVetexingAux is not currently working
+      /*pair<SvtxTrack*,SvtxTrack*> recoTracks = i->second.getRecoTracks();
+       RaveVetexingAux is not currently working
       SvtxVertex* vtx = _vertexer->makeVtx(recoTracks.first,recoTracks.second);
       if(vtx) _bb_vtx_radius =sqrt(vtx->get_x()*vtx->get_x()+vtx->get_y()*vtx->get_y());
       else _bb_vtx_radius=-1;*/
-      SvtxVertex *truthvVtx = i->second.getVtx();
-      _bb_vtx_radius = sqrt(vtx->get_x()*vtx->get_x()+vtx->get_y()*vtx->get_y());
-      _bb_vtx_chi2 = vtx->get_chisq();
-      _bb_vtxTrack_dist = i->second.setRecoVtx(truthvVtx);
+      SvtxVertex *truthvVtx = i->second.getRecoVtx();
+      _bb_vtx_radius = sqrt(truthvVtx->get_x()*truthvVtx->get_x()+truthvVtx->get_y()*truthvVtx->get_y());
+      _bb_vtx_chi2 = truthvVtx->get_chisq();
+      _bb_vtxTrack_dist = i->second.setRecoVtx(truthvVtx,_svtxClusterMap);
       TLorentzVector* recoPhoton = i->second.setRecoPhoton();
       if (recoPhoton)
       {
-        _bb_photon_m=recoPhoton->Dot(recoPhoton);
+        _bb_photon_m=recoPhoton->Dot(*recoPhoton);
         _bb_photon_pT=recoPhoton->Pt();
       }
       else{

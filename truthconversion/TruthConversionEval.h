@@ -136,6 +136,7 @@ class TruthConversionEval: public SubsysReco
     int _b_track_dlayer ;
     double _b_approach ;
     float _b_vtx_radius;
+    float _b_vtxTrack_dist;
     float _b_vtx_chi2;
     float _b_photon_m;
     float _b_photon_pT;
@@ -147,6 +148,7 @@ class TruthConversionEval: public SubsysReco
     int _bb_track_dlayer ;
     double _bb_approach ;
     float _bb_vtx_radius;
+    float _bb_vtxTrack_dist;
     float _bb_vtx_chi2;
     float _bb_photon_m;
     float _bb_photon_pT;
