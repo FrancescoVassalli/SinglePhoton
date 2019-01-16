@@ -46,6 +46,7 @@ int TruthConversionEval::InitRun(PHCompositeNode *topNode)
     _tree->Branch("photon_eta",  _b_parent_eta  ,"photon_eta[nVtx]/F");
     _tree->Branch("photon_phi",  _b_parent_phi  ,"photon_phi[nVtx]/F");
     _tree->Branch("photon_source_id",  _b_grandparent_id  ,"photon_source_id[nVtx]/I");
+    _tree->Branch("nCluster",_b_nCluster,"nCluster[nRpair]/I");
     _tree->Branch("clus_dphi",_b_cluster_dphi,"clus_dphi[nRpair]/F");
     _tree->Branch("clus_deta",_b_cluster_deta,"clus_deta[nRpair]/F");
     _signalCutTree = new TTree("cutTreeSignal","signal data for making track pair cuts");
@@ -259,15 +260,18 @@ std::queue<std::pair<int,int>> TruthConversionEval::numUnique(std::map<int,Conve
               _b_cluster_prob=0;
               _b_cluster_deta[_b_Rpair]=-1.;
               _b_cluster_dphi[_b_Rpair]=-1.;
+              _b_nCluster[_b_Rpair]=0;
               RawCluster *clustemp;
               if(mainClusterContainer->getCluster(clusterIds.first)){//if thre is matching cluster 
                 clustemp =   dynamic_cast<RawCluster*>(mainClusterContainer->getCluster(clusterIds.first)->Clone());
                 _conversionClusters.AddCluster(clustemp); //add the calo cluster to the container
                 _b_cluster_prob=clustemp->get_prob();
+                _b_nCluster[_b_Rpair]=1;
                 RawCluster *clus2 = mainClusterContainer->getCluster(clusterIds.second);
                 if (clus2)
                 {
                   _b_cluster_dphi[_b_Rpair]=fabs(clustemp->get_phi()-clus2->get_phi());
+                  _b_nCluster[_b_Rpair]=2;
                   TVector3 etaCalc(clustemp->get_x(),clustemp->get_y(),clustemp->get_z());
                   float eta1 = etaCalc.PseudoRapidity();
                   etaCalc.SetXYZ(clus2->get_x(),clus2->get_y(),clus2->get_z());
