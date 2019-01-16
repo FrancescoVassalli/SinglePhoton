@@ -134,24 +134,28 @@ class TruthConversionEval: public SubsysReco
     float _b_track_deta ;
     bool _b_track_layer ;
     int _b_track_dlayer ;
+    float _b_track_pT;
     double _b_approach  ;
     double _b_vtx_radius ;
     double _b_vtxTrack_dist;
     float _b_vtx_chi2;
     float _b_photon_m;
     float _b_photon_pT;
+    float _b_cluster_prob;
     /**@}*/
     /** \defgroup backTreeVars Variables for {@link _signalCutTree}
       @{*/
     float _bb_track_deta ;
     int _bb_track_layer ;
     int _bb_track_dlayer ;
+    float _bb_track_pT;
     double _bb_approach ;
     double _bb_vtx_radius;
     double _bb_vtxTrack_dist;
     float _bb_vtx_chi2;
     float _bb_photon_m;
     float _bb_photon_pT;
+    float _bb_cluster_prob;
     /**@}*/
     /** RawClusters associated with truth conversions
      * processed by other modules*/

@@ -51,23 +51,27 @@ int TruthConversionEval::InitRun(PHCompositeNode *topNode)
     _signalCutTree->Branch("track_deta", &_b_track_deta);
     _signalCutTree->Branch("track_dlayer",&_b_track_dlayer);
     _signalCutTree->Branch("track_layer", &_b_track_layer);
+    _signalCutTree->Branch("track_pT", &_b_track_pT);
     _signalCutTree->Branch("approach_dist", &_b_approach);
     _signalCutTree->Branch("vtx_radius", &_b_vtx_radius);
     _signalCutTree->Branch("vtx_chi2", &_b_vtx_chi2);
     _signalCutTree->Branch("vtxTrack_dist", &_b_vtxTrack_dist);
     _signalCutTree->Branch("photon_m", &_b_photon_m);
     _signalCutTree->Branch("photon_pT", &_b_photon_pT);
+    _signalCutTree->Branch("cluster_prob", &_b_cluster_prob);
     _backgroundCutTree = new TTree("cutTreeBack","background data for making track pair cuts");
     _backgroundCutTree->SetAutoSave(300);
     _backgroundCutTree->Branch("track_deta", &_bb_track_deta);
     _backgroundCutTree->Branch("track_dlayer", &_bb_track_dlayer);
     _backgroundCutTree->Branch("track_layer", &_bb_track_layer);
+    _backgroundCutTree->Branch("track_pT", &_bb_track_pT);
     _backgroundCutTree->Branch("vtx_radius", &_bb_vtx_radius);
     _backgroundCutTree->Branch("vtx_chi2", &_bb_vtx_chi2);
     _backgroundCutTree->Branch("approach_dist", &_bb_approach);
     _backgroundCutTree->Branch("vtxTrack_dist", &_bb_vtxTrack_dist);
     _backgroundCutTree->Branch("photon_m", &_bb_photon_m);
     _backgroundCutTree->Branch("photon_pT", &_bb_photon_pT);
+    _sbackgroundTree->Branch("cluster_prob", &_bb_cluster_prob);
   }
   return 0;
 }
@@ -93,11 +97,13 @@ int TruthConversionEval::process_event(PHCompositeNode *topNode)
     PHG4Particle* g4particle = iter->second; 
     PHG4Particle* parent =_truthinfo->GetParticle(g4particle->get_parent_id());
     float radius=0;
-    if(parent){ //if the particle is not primary find its vertex 
+    int embedID;
+    PHG4VtxPoint* vtx=_truthinfo->GetVtx(g4particle->get_vtx_id()); //get the vertex
+    if (parent)
+    {
+      embedID=get_embed(parent,_truthinfo);
       //check that the parent is an embeded(2) photon or a pythia(3) photon that converts
-      PHG4VtxPoint* vtx=_truthinfo->GetVtx(g4particle->get_vtx_id()); //get the vertex
-      int parentEmbedID = get_embed(parent,_truthinfo);
-      if(parentEmbedID==_kParticleEmbed||(parentEmbedID==_kPythiaEmbed
+      if(embedID==_kParticleEmbed||(embedID==_kPythiaEmbed
             &&parent->get_pid()==22&&TMath::Abs(g4particle->get_pid())==11)){
         radius=sqrt(vtx->get_x()*vtx->get_x()+vtx->get_y()*vtx->get_y());
         if (radius<s_kTPCRADIUS) //limits to truth conversions within the tpc radius
@@ -111,21 +117,32 @@ int TruthConversionEval::process_event(PHCompositeNode *topNode)
           (mapConversions[vtx->get_id()]).setElectron(g4particle);
           (mapConversions[vtx->get_id()]).setVtx(vtx);
           (mapConversions[vtx->get_id()]).setParent(parent);
-          (mapConversions[vtx->get_id()]).setEmbed(parentEmbedID);
+          (mapConversions[vtx->get_id()]).setEmbed(embedID);
           PHG4Particle* grand =_truthinfo->GetParticle(parent->get_parent_id());
           if (grand) (mapConversions[vtx->get_id()]).setSourceId(grand->get_pid());
           else (mapConversions[vtx->get_id()]).setSourceId(0);
         }
-      }
-      else if(trackeval->best_track_from(g4particle)){ //not a conversion but has a track
-        (backgroundMap[backi]).setElectron(g4particle);
-        (backgroundMap[backi]).setVtx(vtx);
-        (backgroundMap[backi]).setParent(parent);
-        (backgroundMap[backi]).setEmbed(parentEmbedID);
-        if(++backmod%2==0){
-          backi++;
+        else
+        {
+          SvtxTrack *testTrack = trackeval->best_track_from(g4particle);
+          if (testTrack)
+          {
+            //get the associated cluster
+            RawCluster *clustemp=mainClusterContainer->getCluster(testTrack->get_cal_cluster_id(SvtxTrack::CAL_LAYER(1));
+              if(clustemp){
+              (backgroundMap[backi]).setElectron(g4particle);
+              (backgroundMap[backi]).setVtx(vtx);
+              (backgroundMap[backi]).setParent(parent);
+              (backgroundMap[backi]).setEmbed(embedID);
+              if(++backmod%2==0){
+                backi++;
+              }
+          }
         }
       }
+    }
+    else{ //is primary
+      embedID=get_embed(g4particle,_truthinfo);
     }
   }
   //pass the map to this helper method which fills the fields for the TTree 
@@ -187,6 +204,7 @@ std::queue<std::pair<int,int>> TruthConversionEval::numUnique(std::map<int,Conve
               _b_track_deta = i->second.trackDEta();
               _b_track_dlayer = i->second.trackDLayer(_svtxClusterMap,_hitMap);
               _b_track_layer = i->second.firstLayer(_svtxClusterMap);
+              _b_track_pT = i->second.minTrackpT();
               _b_approach = i->second.approachDistance();
               /*The recoVtx finding doesn't work yet so using truth vtx for now
                * pair<SvtxTrack*,SvtxTrack*> recoTracks = i->second.getRecoTracks();
@@ -212,7 +230,6 @@ std::queue<std::pair<int,int>> TruthConversionEval::numUnique(std::map<int,Conve
                 _b_photon_m =0;
                 _b_photon_pT=0;
               }
-              _signalCutTree->Fill();   
             }
             _b_Rpair++;
             clustidtemp=i->second.get_cluster_id(); //get the cluster id of the current conversion
@@ -229,10 +246,13 @@ std::queue<std::pair<int,int>> TruthConversionEval::numUnique(std::map<int,Conve
             }
             break;
         }
+        _b_cluster_prob=0;
         if(mainClusterContainer->getCluster(clustidtemp)){//if thre is matching cluster 
           RawCluster *clustemp =   dynamic_cast<RawCluster*>(mainClusterContainer->getCluster(clustidtemp)->Clone());
           _conversionClusters.AddCluster(clustemp); //add the calo cluster to the container
+          _b_cluster_prob=clustemp->get_prob();
         }
+        _signalCutTree->Fill();   
       }
     }
     /*this code has been turned off because it is not currently useful 
@@ -261,6 +281,7 @@ void TruthConversionEval::processBackground(std::map<int,Conversion> *mymap,Svtx
       _bb_track_deta = i->second.trackDEta();
       _bb_track_dlayer = i->second.trackDLayer(_svtxClusterMap,_hitMap);
       _bb_track_layer = i->second.firstLayer(_svtxClusterMap);
+      _bb_track_pT = i->second.minTrackpT();
       _bb_approach = i->second.approachDistance();
       /*The recoVtx finding doesn't work yet so using truth vtx for now
        * pair<SvtxTrack*,SvtxTrack*> recoTracks = i->second.getRecoTracks();
@@ -288,6 +309,7 @@ void TruthConversionEval::processBackground(std::map<int,Conversion> *mymap,Svtx
         _bb_photon_m =0;
         _bb_photon_pT=0;
       }
+      _bb_cluster_prob= mainClusterContainer->getCluster(clustidtemp)->get_prob();
       _backgroundCutTree->Fill();
     }
   }

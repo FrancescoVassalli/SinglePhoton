@@ -42,7 +42,6 @@ public:
     this->verbosity=verbosity;
   }
   //dtor at bottom of public methods
-  
   /** sets the daughters of the conversion
   * use this to set the electron and positron
   * initializes both points but does not determine charge*/
@@ -192,6 +191,25 @@ public:
         return fabs(reco1->get_eta()-reco2->get_eta());
       }
       else return -1.;
+  }
+  inline float minTrackpT(){
+    switch(recoCount()){
+      case 2:
+        if (reco1->get_pt()<reco2->get_pt())
+        {
+          return reco1->get_pt();
+        }
+        break;
+      case 1:
+        if (reco1)
+        {
+          return reco1->get_pt();
+        }
+        else return reco2->get_pt();
+        break;
+      default:
+        return -1;
+    }
   }
   /** set the reco maps used for {@link trackDEta}, {@link trackDLayer},{@link hasSilicon}*/
   inline void setRecoMaps(SvtxClusterMap* cmap,SvtxHitMap* hmap){
