@@ -47,7 +47,14 @@ void makeFactory(TTree* signalTree, TTree* backTree,std::string outfile)
 
   factory->AddSpectator("vtx_chi2",'F'); //until reco vtx works this is meaningless
 
-  TCut preTraingCuts("vtx_radius>0");
+
+  string track_pT_cut = "track_pT>0";
+  string vtx_radius_cut = "vtx_radius>0";
+  //do I need photon cuts? 
+  string tCutInitializer = vtx_radius_cut+"&&"+track_pT_cut+"&&track_dlayer>=0&&track_layer>0&&approach_dist>0&&vtxTrack_dist>0";
+  TCut preTraingCuts(tCutInitializer.c_str());
+
+
   factory->PrepareTrainingAndTestTree(preTraingCuts,"nTrain_Signal=1900:nTrain_Background=15000:nTest_Signal=1500:nTest_Background=15000");
   factory->BookMethod( TMVA::Types::kLikelihood, "LikelihoodD",
       "!H:!V:!TransformOutput:PDFInterpol=Spline2:NSmoothSig[0]=20:NSmoothBkg[0]=20:NSmooth=5:NAvEvtPerBin=50:VarTransform=Decorrelate" );
