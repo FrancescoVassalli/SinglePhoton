@@ -128,6 +128,8 @@ class TruthConversionEval: public SubsysReco
     float _b_parent_eta [s_kMAXParticles];
     float _b_parent_phi [s_kMAXParticles];
     int _b_grandparent_id [s_kMAXParticles];
+    float _b_cluster_dphi [s_kMAXParticles];
+    float _b_cluster_deta [s_kMAXParticles];
     /**@}*/
     /** \defgroup signalTreeVars Variables for {@link _signalCutTree}
       @{*/

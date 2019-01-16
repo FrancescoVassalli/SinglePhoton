@@ -46,6 +46,8 @@ int TruthConversionEval::InitRun(PHCompositeNode *topNode)
     _tree->Branch("photon_eta",  _b_parent_eta  ,"photon_eta[nVtx]/F");
     _tree->Branch("photon_phi",  _b_parent_phi  ,"photon_phi[nVtx]/F");
     _tree->Branch("photon_source_id",  _b_grandparent_id  ,"photon_source_id[nVtx]/I");
+    _tree->Branch("clus_dphi",_b_cluster_dphi,"clus_dphi[nRpair]/F");
+    _tree->Branch("clus_deta",_b_cluster_deta,"clus_deta[nRpair]/F");
     _signalCutTree = new TTree("cutTreeSignal","signal data for making track pair cuts");
     _signalCutTree->SetAutoSave(300);
     _signalCutTree->Branch("track_deta", &_b_track_deta);
@@ -248,15 +250,24 @@ std::queue<std::pair<int,int>> TruthConversionEval::numUnique(std::map<int,Conve
                 _b_photon_pT=0;
               }
             }
-            _b_Rpair++;
-            clustidtemp=i->second.get_cluster_id(); //get the cluster id of the current conversion
+            pair<int,int> clusterIds = i->second.get_cluster_ids();
             _b_cluster_prob=0;
-            if(mainClusterContainer->getCluster(clustidtemp)){//if thre is matching cluster 
-              RawCluster *clustemp =   dynamic_cast<RawCluster*>(mainClusterContainer->getCluster(clustidtemp)->Clone());
+            _b_cluster_deta=-1;
+            _b_cluster_dphi=-1;
+            RawCluster *clustemp;
+            if(mainClusterContainer->getCluster(clusterIds.first)){//if thre is matching cluster 
+              clustemp =   dynamic_cast<RawCluster*>(mainClusterContainer->getCluster(clusterIds.first)->Clone());
               _conversionClusters.AddCluster(clustemp); //add the calo cluster to the container
               _b_cluster_prob=clustemp->get_prob();
+              RawCluster *clus2 = mainClusterContainer->getCluster(clusterIds.second);
+              if (clus2)
+              {
+                _b_cluster_dphi[_b_Rpair]=fabs(clustemp->get_phi()-clus2->get_phi());
+                _b_cluster_deta[_b_Rpair]=fabs(clustemp->get_eta()-clus2->get_eta());
+              }
             }
             _signalCutTree->Fill();   
+            _b_Rpair++;
             break;
           case 1: //there's one reco track
             clustidtemp=i->second.get_cluster_id(); //get the cluster id of the current conversion

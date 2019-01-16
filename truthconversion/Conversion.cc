@@ -82,6 +82,24 @@ int Conversion::get_cluster_id(){
   return reco1->get_cal_cluster_id(SvtxTrack::CAL_LAYER(1));//id of the emcal
 }
 
+std::pair<int,int> Conversion::get_cluster_ids(){
+  switch(recoCount()){
+    case 2:
+      return std::pair<int,int>(reco1->get_cal_cluster_id(SvtxTrack::CAL_LAYER(1)),reco2->get_cal_cluster_id(SvtxTrack::CAL_LAYER(1)));
+      break;
+    case 1:
+      if (reco1)
+      {
+        return std::pair<int,int>(reco1->get_cal_cluster_id(SvtxTrack::CAL_LAYER(1)),-1);
+      }
+      else return std::pair<int,int>(reco2->get_cal_cluster_id(SvtxTrack::CAL_LAYER(1)),-1);
+      break;
+    default:
+      return std::pair<int,int>(-1,-1);
+      break;
+  }
+}
+
 int Conversion::get_cluster_id(SvtxTrackEval *trackeval){
   this->trackeval=trackeval;
   if (!reco1)
