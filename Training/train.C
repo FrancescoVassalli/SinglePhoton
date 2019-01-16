@@ -48,7 +48,7 @@ void makeFactory(TTree* signalTree, TTree* backTree,std::string outfile)
   factory->AddSpectator("vtx_chi2",'F'); //until reco vtx works this is meaningless
 
   TCut preTraingCuts("vtx_radius>0");
-  factory->PrepareTrainingAndTestTree(preTraingCuts,"nTrain_Signal=1800:nTrain_Background=1500:nTest_Signal=1500:nTest_Background=1500");
+  factory->PrepareTrainingAndTestTree(preTraingCuts,"nTrain_Signal=1900:nTrain_Background=15000:nTest_Signal=1500:nTest_Background=15000");
   factory->BookMethod( TMVA::Types::kLikelihood, "LikelihoodD",
       "!H:!V:!TransformOutput:PDFInterpol=Spline2:NSmoothSig[0]=20:NSmoothBkg[0]=20:NSmooth=5:NAvEvtPerBin=50:VarTransform=Decorrelate" );
   factory->TrainAllMethods();
