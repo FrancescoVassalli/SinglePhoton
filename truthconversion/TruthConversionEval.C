@@ -119,7 +119,7 @@ int TruthConversionEval::process_event(PHCompositeNode *topNode)
           (mapConversions[vtx->get_id()]).setParent(parent);
           (mapConversions[vtx->get_id()]).setEmbed(embedID);
           PHG4Particle* grand =_truthinfo->GetParticle(parent->get_parent_id());
-          cout<<"grand id:"<<parent->get_parent_id()<<'\n';
+          cout<<"grand id:"<<parent->get_parent_id()<<"with embedID:"<<embedID<<'\n';
           if (grand) (mapConversions[vtx->get_id()]).setSourceId(grand->get_pid());
           else (mapConversions[vtx->get_id()]).setSourceId(0);
         }
@@ -317,7 +317,6 @@ void TruthConversionEval::processBackground(std::map<int,Conversion> *mymap,Svtx
        cout<<"reco vtx is null"<<endl;
        }*/
       PHG4VtxPoint *vtx = i->second.getVtx();
-      vtx->identify();
       _bb_vtx_radius = sqrt(vtx->get_x()*vtx->get_x()+vtx->get_y()*vtx->get_y());
       //_b_vtx_chi2 = recoVtx->get_chisq();
       _bb_vtxTrack_dist = i->second.dist(vtx,_svtxClusterMap);
