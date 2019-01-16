@@ -107,6 +107,7 @@ int TruthConversionEval::process_event(PHCompositeNode *topNode)
           {
             std::cout<<"Conversion with radius [cm]:"<<radius<<'\n';
           }
+          //could be optimized by creating object and using copy opertator
           (mapConversions[vtx->get_id()]).setElectron(g4particle);
           (mapConversions[vtx->get_id()]).setVtx(vtx);
           (mapConversions[vtx->get_id()]).setParent(parent);
@@ -273,6 +274,7 @@ void TruthConversionEval::processBackground(std::map<int,Conversion> *mymap,Svtx
        cout<<"reco vtx is null"<<endl;
        }*/
       PHG4VtxPoint *vtx = i->second.getVtx();
+      vtx->identify();
       _b_vtx_radius = sqrt(vtx->get_x()*vtx->get_x()+vtx->get_y()*vtx->get_y());
       //_b_vtx_chi2 = recoVtx->get_chisq();
       _b_vtxTrack_dist = i->second.dist(vtx,_svtxClusterMap);
