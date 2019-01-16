@@ -147,13 +147,13 @@ int Conversion::firstLayer(SvtxClusterMap* svtxClusterMap){
   else return -1;
 }
 
-float Conversion::dist(PHG4VtxPoint *recovtx,SvtxClusterMap* svtxClusterMap){
+double Conversion::dist(PHG4VtxPoint *recovtx,SvtxClusterMap* svtxClusterMap){
     SvtxCluster *c1 = svtxClusterMap->get(*(reco1->begin_clusters()));
     SvtxCluster *c2 = svtxClusterMap->get(*(reco2->begin_clusters()));
     c1->identify();
     c2->identify();
-    float r1 = sqrt(fabs(c1->get_x()-recovtx->get_x())+fabs(c1->get_y()-recovtx->get_y())+fabs(c1->get_z()-recovtx->get_z()));
-    float r2 = sqrt(fabs(c2->get_x()-recovtx->get_x())+fabs(c2->get_y()-recovtx->get_y())+fabs(c2->get_z()-recovtx->get_z()));
+    double r1 = sqrt(abs(c1->get_x()-recovtx->get_x())+abs(c1->get_y()-recovtx->get_y())+abs(c1->get_z()-recovtx->get_z()));
+    double r2 = sqrt(abs(c2->get_x()-recovtx->get_x())+abs(c2->get_y()-recovtx->get_y())+abs(c2->get_z()-recovtx->get_z()));
     if (r1>r2)
     {
       return r1;
@@ -165,8 +165,8 @@ float Conversion::setRecoVtx(SvtxVertex *recovtx,SvtxClusterMap* svtxClusterMap)
     recoVtx=recovtx;
     SvtxCluster *c1 = svtxClusterMap->get(*(reco1->begin_clusters()));
     SvtxCluster *c2 = svtxClusterMap->get(*(reco2->begin_clusters()));
-    float r1 = sqrt(fabs(c1->get_x()-recovtx->get_x())+fabs(c1->get_y()-recovtx->get_y())+fabs(c1->get_z()-recovtx->get_z()));
-    float r2 = sqrt(fabs(c2->get_x()-recovtx->get_x())+fabs(c2->get_y()-recovtx->get_y())+fabs(c2->get_z()-recovtx->get_z()));
+    float r1 = sqrt(abs(c1->get_x()-recovtx->get_x())+abs(c1->get_y()-recovtx->get_y())+abs(c1->get_z()-recovtx->get_z()));
+    float r2 = sqrt(abs(c2->get_x()-recovtx->get_x())+abs(c2->get_y()-recovtx->get_y())+abs(c2->get_z()-recovtx->get_z()));
     if (r1>r2)
     {
       return r1;

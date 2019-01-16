@@ -120,7 +120,7 @@ class TruthConversionEval: public SubsysReco
     int _b_nVtx;  ///<total conversions
     int _b_Tpair; ///<count acceptance e pairs in truth
     int _b_Rpair; ///<count acceptance e pairs in reco
-    float _b_rVtx[s_kMAXParticles];  ///<truth conversion radius used for the signal tree
+    double _b_rVtx[s_kMAXParticles];  ///<truth conversion radius used for the signal tree
     bool _b_pythia[s_kMAXParticles];  ///<record if the conversion is from pythia or G4 particle
     float _b_electron_pt[s_kMAXParticles];
     float _b_positron_pt[s_kMAXParticles];
@@ -134,9 +134,9 @@ class TruthConversionEval: public SubsysReco
     float _b_track_deta ;
     bool _b_track_layer ;
     int _b_track_dlayer ;
-    double _b_approach ;
-    float _b_vtx_radius;
-    float _b_vtxTrack_dist;
+    double _b_approach  ;
+    double _b_vtx_radius ;
+    double _b_vtxTrack_dist;
     float _b_vtx_chi2;
     float _b_photon_m;
     float _b_photon_pT;
@@ -147,8 +147,8 @@ class TruthConversionEval: public SubsysReco
     int _bb_track_layer ;
     int _bb_track_dlayer ;
     double _bb_approach ;
-    float _bb_vtx_radius;
-    float _bb_vtxTrack_dist;
+    double _bb_vtx_radius;
+    double _bb_vtxTrack_dist;
     float _bb_vtx_chi2;
     float _bb_photon_m;
     float _bb_photon_pT;
