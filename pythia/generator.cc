@@ -17,6 +17,7 @@ void generator(std::string filename, long nEvents){
   pythiaengine.readString("PhaseSpace:pTHatMin = 3.");
   pythiaengine.readString("Random::setSeed = on");
   pythiaengine.readString("Random::seed =0");
+  pythiaengine.readString("111:onMode = off"); ///pi0 won't decay
   pythiaengine.init();
 
   for (int iEvent = 0; iEvent < nEvents; ++iEvent)
