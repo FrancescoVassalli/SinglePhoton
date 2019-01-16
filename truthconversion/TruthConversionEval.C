@@ -219,64 +219,71 @@ std::queue<std::pair<int,int>> TruthConversionEval::numUnique(std::map<int,Conve
         int clustidtemp=-1;
         switch(nRecoTracks){
           case 2: //there are 2 reco tracks
-            if(_kMakeTTree){
-              _b_track_deta = i->second.trackDEta();
-              _b_track_dlayer = i->second.trackDLayer(_svtxClusterMap,_hitMap);
-              _b_track_layer = i->second.firstLayer(_svtxClusterMap);
-              _b_track_pT = i->second.minTrackpT();
-              _b_approach = i->second.approachDistance();
-              /*The recoVtx finding doesn't work yet so using truth vtx for now
-               * pair<SvtxTrack*,SvtxTrack*> recoTracks = i->second.getRecoTracks();
-               pair<SvtxVertex*,SvtxVertex*> recoTracks = i->second.getRecoTracks();
-               SvtxVertex* vtx = _vertexer->makeVtx(recoTracks.first,recoTracks.second);
-               if(vtx) _b_vtx_radius =sqrt(vtx->get_x()*vtx->get_x()+vtx->get_y()*vtx->get_y());
-               else _b_vtx_radius=-1;
-               SvtxVertex *recoVtx = i->second.getRecoVtx();
-               if (!recoVtx)
-               {
-               cout<<"reco vtx is null"<<endl;
-               }*/
-              _b_vtx_radius = sqrt(vtx->get_x()*vtx->get_x()+vtx->get_y()*vtx->get_y());
-              //_b_vtx_chi2 = recoVtx->get_chisq();
-              _b_vtxTrack_dist = i->second.dist(vtx,_svtxClusterMap);
-              TLorentzVector* recoPhoton = i->second.setRecoPhoton();
-              if (recoPhoton)
-              {
-                _b_photon_m=recoPhoton->Dot(*recoPhoton);
-                _b_photon_pT=recoPhoton->Pt();
+            {
+              if(_kMakeTTree){
+                _b_track_deta = i->second.trackDEta();
+                _b_track_dlayer = i->second.trackDLayer(_svtxClusterMap,_hitMap);
+                _b_track_layer = i->second.firstLayer(_svtxClusterMap);
+                _b_track_pT = i->second.minTrackpT();
+                _b_approach = i->second.approachDistance();
+                /*The recoVtx finding doesn't work yet so using truth vtx for now
+                 * pair<SvtxTrack*,SvtxTrack*> recoTracks = i->second.getRecoTracks();
+                 pair<SvtxVertex*,SvtxVertex*> recoTracks = i->second.getRecoTracks();
+                 SvtxVertex* vtx = _vertexer->makeVtx(recoTracks.first,recoTracks.second);
+                 if(vtx) _b_vtx_radius =sqrt(vtx->get_x()*vtx->get_x()+vtx->get_y()*vtx->get_y());
+                 else _b_vtx_radius=-1;
+                 SvtxVertex *recoVtx = i->second.getRecoVtx();
+                 if (!recoVtx)
+                 {
+                 cout<<"reco vtx is null"<<endl;
+                 }*/
+                _b_vtx_radius = sqrt(vtx->get_x()*vtx->get_x()+vtx->get_y()*vtx->get_y());
+                //_b_vtx_chi2 = recoVtx->get_chisq();
+                _b_vtxTrack_dist = i->second.dist(vtx,_svtxClusterMap);
+                TLorentzVector* recoPhoton = i->second.setRecoPhoton();
+                if (recoPhoton)
+                {
+                  _b_photon_m=recoPhoton->Dot(*recoPhoton);
+                  _b_photon_pT=recoPhoton->Pt();
+                }
+                else{
+                  _b_photon_m =0;
+                  _b_photon_pT=0;
+                }
               }
-              else{
-                _b_photon_m =0;
-                _b_photon_pT=0;
+              pair<int,int> clusterIds = i->second.get_cluster_ids();
+              _b_cluster_prob=0;
+              _b_cluster_deta[_b_Rpair]=-1.;
+              _b_cluster_dphi[_b_Rpair]=-1.;
+              RawCluster *clustemp;
+              if(mainClusterContainer->getCluster(clusterIds.first)){//if thre is matching cluster 
+                clustemp =   dynamic_cast<RawCluster*>(mainClusterContainer->getCluster(clusterIds.first)->Clone());
+                _conversionClusters.AddCluster(clustemp); //add the calo cluster to the container
+                _b_cluster_prob=clustemp->get_prob();
+                RawCluster *clus2 = mainClusterContainer->getCluster(clusterIds.second);
+                if (clus2)
+                {
+                  _b_cluster_dphi[_b_Rpair]=fabs(clustemp->get_phi()-clus2->get_phi());
+                  TVector3 etaCalc(clustemp->get_x(),clustemp->get_y(),clustemp->get_z());
+                  float eta1 = etaCalc.PseudoRapidity();
+                  etaCalc.SetXYZ(clus2->get_x(),clus2->get_y(),clus2->get_z());
+                  _b_cluster_deta[_b_Rpair]=fabs(eta1-etaCalc.PseudoRapidity());
+                }
               }
+              _signalCutTree->Fill();   
+              _b_Rpair++;
+              break;
             }
-            pair<int,int> clusterIds = i->second.get_cluster_ids();
-            _b_cluster_prob=0;
-            _b_cluster_deta=-1;
-            _b_cluster_dphi=-1;
-            RawCluster *clustemp;
-            if(mainClusterContainer->getCluster(clusterIds.first)){//if thre is matching cluster 
-              clustemp =   dynamic_cast<RawCluster*>(mainClusterContainer->getCluster(clusterIds.first)->Clone());
-              _conversionClusters.AddCluster(clustemp); //add the calo cluster to the container
-              _b_cluster_prob=clustemp->get_prob();
-              RawCluster *clus2 = mainClusterContainer->getCluster(clusterIds.second);
-              if (clus2)
-              {
-                _b_cluster_dphi[_b_Rpair]=fabs(clustemp->get_phi()-clus2->get_phi());
-                _b_cluster_deta[_b_Rpair]=fabs(clustemp->get_eta()-clus2->get_eta());
-              }
-            }
-            _signalCutTree->Fill();   
-            _b_Rpair++;
-            break;
           case 1: //there's one reco track
-            clustidtemp=i->second.get_cluster_id(); //get the cluster id of the current conversion
-            if(mainClusterContainer->getCluster(clustidtemp)){//if thre is matching cluster 
-              RawCluster *clustemp =   dynamic_cast<RawCluster*>(mainClusterContainer->getCluster(clustidtemp)->Clone());
-              _conversionClusters.AddCluster(clustemp); //add the calo cluster to the container
-              _b_cluster_prob=clustemp->get_prob();
+            {
+              clustidtemp=i->second.get_cluster_id(); //get the cluster id of the current conversion
+              if(mainClusterContainer->getCluster(clustidtemp)){//if thre is matching cluster 
+                RawCluster *clustemp =   dynamic_cast<RawCluster*>(mainClusterContainer->getCluster(clustidtemp)->Clone());
+                _conversionClusters.AddCluster(clustemp); //add the calo cluster to the container
+                _b_cluster_prob=clustemp->get_prob();
+              }
+              break;
             }
-            break;
           case 0: //no reco tracks
             break;
           default:
