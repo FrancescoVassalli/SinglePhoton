@@ -177,6 +177,7 @@ std::queue<std::pair<int,int>> TruthConversionEval::numUnique(std::map<int,Conve
   for (std::map<int,Conversion>::iterator i = mymap->begin(); i != mymap->end(); ++i) {
     //fill the tree
     PHG4VtxPoint *vtx =i->second.getVtx(); //get the vtx
+    vtx->identify();
     _b_rVtx[_b_nVtx] = sqrt(vtx->get_x()*vtx->get_x()+vtx->get_y()*vtx->get_y()); //find the radius
     PHG4Particle *temp = i->second.getPhoton(); //set the photon
     TLorentzVector tlv_photon,tlv_electron,tlv_positron; //make tlv for each particle 
@@ -233,9 +234,21 @@ std::queue<std::pair<int,int>> TruthConversionEval::numUnique(std::map<int,Conve
             }
             _b_Rpair++;
             clustidtemp=i->second.get_cluster_id(); //get the cluster id of the current conversion
+            _b_cluster_prob=0;
+            if(mainClusterContainer->getCluster(clustidtemp)){//if thre is matching cluster 
+              RawCluster *clustemp =   dynamic_cast<RawCluster*>(mainClusterContainer->getCluster(clustidtemp)->Clone());
+              _conversionClusters.AddCluster(clustemp); //add the calo cluster to the container
+              _b_cluster_prob=clustemp->get_prob();
+            }
+            _signalCutTree->Fill();   
             break;
           case 1: //there's one reco track
             clustidtemp=i->second.get_cluster_id(); //get the cluster id of the current conversion
+            if(mainClusterContainer->getCluster(clustidtemp)){//if thre is matching cluster 
+              RawCluster *clustemp =   dynamic_cast<RawCluster*>(mainClusterContainer->getCluster(clustidtemp)->Clone());
+              _conversionClusters.AddCluster(clustemp); //add the calo cluster to the container
+              _b_cluster_prob=clustemp->get_prob();
+            }
             break;
           case 0: //no reco tracks
             break;
@@ -246,13 +259,6 @@ std::queue<std::pair<int,int>> TruthConversionEval::numUnique(std::map<int,Conve
             }
             break;
         }
-        _b_cluster_prob=0;
-        if(mainClusterContainer->getCluster(clustidtemp)){//if thre is matching cluster 
-          RawCluster *clustemp =   dynamic_cast<RawCluster*>(mainClusterContainer->getCluster(clustidtemp)->Clone());
-          _conversionClusters.AddCluster(clustemp); //add the calo cluster to the container
-          _b_cluster_prob=clustemp->get_prob();
-        }
-        _signalCutTree->Fill();   
       }
     }
     /*this code has been turned off because it is not currently useful 
@@ -295,7 +301,6 @@ void TruthConversionEval::processBackground(std::map<int,Conversion> *mymap,Svtx
        cout<<"reco vtx is null"<<endl;
        }*/
       PHG4VtxPoint *vtx = i->second.getVtx();
-      vtx->identify(); 
       _bb_vtx_radius = sqrt(vtx->get_x()*vtx->get_x()+vtx->get_y()*vtx->get_y());
       //_b_vtx_chi2 = recoVtx->get_chisq();
       _bb_vtxTrack_dist = i->second.dist(vtx,_svtxClusterMap);

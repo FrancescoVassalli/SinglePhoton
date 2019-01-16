@@ -209,6 +209,7 @@ public:
         break;
       default:
         return -1;
+        break;
     }
   }
   /** set the reco maps used for {@link trackDEta}, {@link trackDLayer},{@link hasSilicon}*/
