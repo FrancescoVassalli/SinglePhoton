@@ -38,7 +38,7 @@ int TruthConversionEval::InitRun(PHCompositeNode *topNode)
     _tree->Branch("nVtx", &_b_nVtx);
     _tree->Branch("nTpair", &_b_Tpair);
     _tree->Branch("nRpair", &_b_Rpair);
-    _tree->Branch("rVtx", _b_rVtx,"rVtx[nVtx]/F");
+    _tree->Branch("rVtx", _b_rVtx,"rVtx[nVtx]/D");
     _tree->Branch("pythia", _b_pythia,"pythia[nVtx]/B");
     _tree->Branch("electron_pt", _b_electron_pt,"electron_pt[nVtx]/F");
     _tree->Branch("positron_pt", _b_positron_pt,"positron_pt[nVtx]/F");
