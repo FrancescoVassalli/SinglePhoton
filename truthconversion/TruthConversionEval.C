@@ -71,7 +71,7 @@ int TruthConversionEval::InitRun(PHCompositeNode *topNode)
     _backgroundCutTree->Branch("vtxTrack_dist", &_bb_vtxTrack_dist);
     _backgroundCutTree->Branch("photon_m", &_bb_photon_m);
     _backgroundCutTree->Branch("photon_pT", &_bb_photon_pT);
-    _sbackgroundTree->Branch("cluster_prob", &_bb_cluster_prob);
+    _backgroundCutTree->Branch("cluster_prob", &_bb_cluster_prob);
   }
   return 0;
 }
@@ -122,27 +122,42 @@ int TruthConversionEval::process_event(PHCompositeNode *topNode)
           if (grand) (mapConversions[vtx->get_id()]).setSourceId(grand->get_pid());
           else (mapConversions[vtx->get_id()]).setSourceId(0);
         }
-        else
+      }
+      else{//not a conversion
+        SvtxTrack *testTrack = trackeval->best_track_from(g4particle);
+        if (testTrack)
         {
-          SvtxTrack *testTrack = trackeval->best_track_from(g4particle);
-          if (testTrack)
-          {
-            //get the associated cluster
-            RawCluster *clustemp=mainClusterContainer->getCluster(testTrack->get_cal_cluster_id(SvtxTrack::CAL_LAYER(1));
-              if(clustemp){
-              (backgroundMap[backi]).setElectron(g4particle);
-              (backgroundMap[backi]).setVtx(vtx);
-              (backgroundMap[backi]).setParent(parent);
-              (backgroundMap[backi]).setEmbed(embedID);
-              if(++backmod%2==0){
-                backi++;
-              }
+          //get the associated cluster
+          RawCluster *clustemp=_mainClusterContainer->getCluster(testTrack->get_cal_cluster_id(SvtxTrack::CAL_LAYER(1)));
+          if(clustemp){
+            (backgroundMap[backi]).setElectron(g4particle);
+            (backgroundMap[backi]).setVtx(vtx);
+            (backgroundMap[backi]).setParent(parent);
+            (backgroundMap[backi]).setEmbed(embedID);
+            if(++backmod%2==0){
+              backi++;
+            }
           }
         }
       }
     }
     else{ //is primary
       embedID=get_embed(g4particle,_truthinfo);
+      SvtxTrack *testTrack = trackeval->best_track_from(g4particle);
+      if (testTrack)
+      {
+        //get the associated cluster
+        RawCluster *clustemp=_mainClusterContainer->getCluster(testTrack->get_cal_cluster_id(SvtxTrack::CAL_LAYER(1)));
+        if(clustemp){
+          (backgroundMap[backi]).setElectron(g4particle);
+          (backgroundMap[backi]).setVtx(vtx);
+          (backgroundMap[backi]).setParent(parent);
+          (backgroundMap[backi]).setEmbed(embedID);
+          if(++backmod%2==0){
+            backi++;
+          }
+        }
+      }
     }
   }
   //pass the map to this helper method which fills the fields for the TTree 
@@ -309,7 +324,7 @@ void TruthConversionEval::processBackground(std::map<int,Conversion> *mymap,Svtx
         _bb_photon_m =0;
         _bb_photon_pT=0;
       }
-      _bb_cluster_prob= mainClusterContainer->getCluster(clustidtemp)->get_prob();
+      _bb_cluster_prob= _mainClusterContainer->getCluster(i->second.get_cluster_id())->get_prob();
       _backgroundCutTree->Fill();
     }
   }

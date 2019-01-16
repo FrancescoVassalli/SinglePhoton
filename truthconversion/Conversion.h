@@ -199,6 +199,7 @@ public:
         {
           return reco1->get_pt();
         }
+        else return reco2->get_pt();
         break;
       case 1:
         if (reco1)
