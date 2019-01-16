@@ -43,7 +43,7 @@ void cluster2Plotter()
   string outfilename = "2clusplot.root";
   TFile *out = new TFile(outfilename.c_str(),"RECREATE");
 
-  string plotname = "2clusplot";
+  string plotname = "clus2plot";
 
   TH2F *h_2clusplot = new TH2F("2clusplot","",80,0,.5,80,0,.5); 
 	h_2clusplot->SetStats(kFALSE);
