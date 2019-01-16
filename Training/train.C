@@ -46,8 +46,6 @@ void makeFactory(TTree* signalTree, TTree* backTree,std::string outfile)
   factory->TrainAllMethods();
   factory->TestAllMethods();
   factory->EvaluateAllMethods();
-	TCanvas *ROCs=factory->GetROCCurve(jobname);
-	ROCs->Write();
 }
 
 
