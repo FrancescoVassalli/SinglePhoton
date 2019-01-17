@@ -38,7 +38,7 @@ void cluster2Plotter()
   TChain *ttree = handleFile(treePath,treeExtension,"ttree",nFiles);
   ttree->SetBranchAddress("clus_dphi",    &dphi    );
   ttree->SetBranchAddress("clus_deta",    &deta    );
-  ttree->SetBranchAddress("nRpair",    &cluster_n  );
+  ttree->SetBranchAddress("nCluster",    &cluster_n  );
 
   string outfilename = "clus2plot.root";
   TFile *out = new TFile(outfilename.c_str(),"RECREATE");
@@ -46,12 +46,14 @@ void cluster2Plotter()
   string plotname = "clus2plot";
 
   TH2F *h_2clusplot = new TH2F("clus2plot","",80,0,.05,80,0,.05); 
+  TH1I *h_clusCount = new TH1I("cluscount","",3,0,2);
 	h_2clusplot->SetStats(kFALSE);
     h_2clusplot->GetXaxis()->SetTitle("eta");
     h_2clusplot->GetYaxis()->SetTitle("phi");
   for (int event = 0; event < ttree->GetEntries(); ++event)
   {
     ttree->GetEvent(event);
+    h_clusCount->Fill(cluster_n);
     for (int i = 0; i < cluster_n; ++i)
     {
     	h_2clusplot->Fill(deta[i],dphi[i]);
