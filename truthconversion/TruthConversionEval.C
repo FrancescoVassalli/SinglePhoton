@@ -101,12 +101,10 @@ int TruthConversionEval::process_event(PHCompositeNode *topNode)
     float radius=0;
     int embedID;
     PHG4VtxPoint* vtx=_truthinfo->GetVtx(g4particle->get_vtx_id()); //get the vertex
-    if (parent)
+    if (parent)//signal routine
     {
       embedID=get_embed(parent,_truthinfo);
-      //check that the parent is an embeded(2) photon or a pythia(3) photon that converts
-      if(embedID==_kParticleEmbed||(embedID==_kPythiaEmbed
-            &&parent->get_pid()==22&&TMath::Abs(g4particle->get_pid())==11)){
+      if(parent->get_pid()==22&&TMath::Abs(g4particle->get_pid())==11)){
         radius=sqrt(vtx->get_x()*vtx->get_x()+vtx->get_y()*vtx->get_y());
         if (radius<s_kTPCRADIUS) //limits to truth conversions within the tpc radius
         { 
