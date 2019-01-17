@@ -45,8 +45,8 @@ int TruthConversionEval::InitRun(PHCompositeNode *topNode)
     _tree->Branch("photon_pt",   _b_parent_pt    ,"photon_pt[nVtx]/F");
     _tree->Branch("photon_eta",  _b_parent_eta  ,"photon_eta[nVtx]/F");
     _tree->Branch("photon_phi",  _b_parent_phi  ,"photon_phi[nVtx]/F");
-    _tree->Branch("e_deta",  _b_e_deta  ,"e_deta[nVtx]/F");
-    _tree->Branch("e_dphi",  _b_e_dphi  ,"e_dphi[nVtx]/F");
+    _tree->Branch("e_deta",  _b_e_deta  ,"e_deta[nTpair]/F");
+    _tree->Branch("e_dphi",  _b_e_dphi  ,"e_dphi[nTpair]/F");
     _tree->Branch("photon_source_id",  _b_grandparent_id  ,"photon_source_id[nVtx]/I");
     _tree->Branch("nCluster",_b_nCluster,"nCluster[nRpair]/I");
     _tree->Branch("clus_dphi",_b_cluster_dphi,"clus_dphi[nRpair]/F");
@@ -215,10 +215,10 @@ std::queue<std::pair<int,int>> TruthConversionEval::numUnique(std::map<int,Conve
     if(temp){ //this will be false for conersions with 1 truth track
       tlv_positron.SetPxPyPzE(temp->get_px(),temp->get_py(),temp->get_pz(),temp->get_e()); //init the tlv
       _b_positron_pt[_b_nVtx]=tlv_positron.Pt(); //fill tree
-      _b_e_deta[_b_nVtx]=TMath::Abs(tlv_electron.Eta()-tlv_positron.Eta());
-      _b_e_dphi[_b_nVtx]=TMath::Abs(tlv_electron.Phi()-tlv_positron.Phi());
       if (TMath::Abs(tlv_electron.Eta())<_kRAPIDITYACCEPT&&TMath::Abs(tlv_positron.Eta())<_kRAPIDITYACCEPT)
       {
+        _b_e_deta[_b_Tpair]=TMath::Abs(tlv_electron.Eta()-tlv_positron.Eta());
+        _b_e_dphi[_b_Tpair]=TMath::Abs(tlv_electron.Phi()-tlv_positron.Phi());
         _b_Tpair++;
         unsigned int nRecoTracks = i->second.setRecoTracks(trackeval); //find the reco tracks for this conversion
         int clustidtemp=-1;
@@ -256,31 +256,37 @@ std::queue<std::pair<int,int>> TruthConversionEval::numUnique(std::map<int,Conve
                   _b_photon_m =0;
                   _b_photon_pT=0;
                 }
+                _b_cluster_prob=0;
+                _b_cluster_deta[_b_Rpair]=-1.;
+                _b_cluster_dphi[_b_Rpair]=-1.;
+                _b_nCluster[_b_Rpair]=0;
               }
               pair<int,int> clusterIds = i->second.get_cluster_ids();
-              _b_cluster_prob=0;
-              _b_cluster_deta[_b_Rpair]=-1.;
-              _b_cluster_dphi[_b_Rpair]=-1.;
-              _b_nCluster[_b_Rpair]=0;
               RawCluster *clustemp;
               if(mainClusterContainer->getCluster(clusterIds.first)){//if thre is matching cluster 
                 clustemp =   dynamic_cast<RawCluster*>(mainClusterContainer->getCluster(clusterIds.first)->Clone());
                 _conversionClusters.AddCluster(clustemp); //add the calo cluster to the container
-                _b_cluster_prob=clustemp->get_prob();
-                _b_nCluster[_b_Rpair]=1;
-                RawCluster *clus2 = mainClusterContainer->getCluster(clusterIds.second);
-                if (clus2)
+                if (_kMakeTTree)
                 {
-                  _b_cluster_dphi[_b_Rpair]=fabs(clustemp->get_phi()-clus2->get_phi());
-                  _b_nCluster[_b_Rpair]=2;
-                  TVector3 etaCalc(clustemp->get_x(),clustemp->get_y(),clustemp->get_z());
-                  float eta1 = etaCalc.PseudoRapidity();
-                  etaCalc.SetXYZ(clus2->get_x(),clus2->get_y(),clus2->get_z());
-                  _b_cluster_deta[_b_Rpair]=fabs(eta1-etaCalc.PseudoRapidity());
+                  _b_cluster_prob=clustemp->get_prob();
+                  _b_nCluster[_b_Rpair]=1;
+                  RawCluster *clus2 = mainClusterContainer->getCluster(clusterIds.second);
+                  if (clus2)
+                  {
+                    _b_cluster_dphi[_b_Rpair]=fabs(clustemp->get_phi()-clus2->get_phi());
+                    TVector3 etaCalc(clustemp->get_x(),clustemp->get_y(),clustemp->get_z());
+                    float eta1 = etaCalc.PseudoRapidity();
+                    etaCalc.SetXYZ(clus2->get_x(),clus2->get_y(),clus2->get_z());
+                    _b_cluster_deta[_b_Rpair]=fabs(eta1-etaCalc.PseudoRapidity());
+                    if (clusterIds.first!=clusterIds.second) //if there are two district clusters
+                    {
+                      _b_nCluster[_b_Rpair]=2;
+                    }
+                  }
+                  _signalCutTree->Fill();   
+                  _b_Rpair++;
                 }
               }
-              _signalCutTree->Fill();   
-              _b_Rpair++;
               break;
             }
           case 1: //there's one reco track
@@ -289,7 +295,7 @@ std::queue<std::pair<int,int>> TruthConversionEval::numUnique(std::map<int,Conve
               if(mainClusterContainer->getCluster(clustidtemp)){//if thre is matching cluster 
                 RawCluster *clustemp =   dynamic_cast<RawCluster*>(mainClusterContainer->getCluster(clustidtemp)->Clone());
                 _conversionClusters.AddCluster(clustemp); //add the calo cluster to the container
-                _b_cluster_prob=clustemp->get_prob();
+                if (_kMakeTTree) _b_cluster_prob=clustemp->get_prob();
               }
               break;
             }
@@ -316,12 +322,16 @@ std::queue<std::pair<int,int>> TruthConversionEval::numUnique(std::map<int,Conve
       cout<<"with parent:\n";
       i->second.getPhoton()->identify();
       }*/
-    _b_pythia[_b_nVtx]=i->second.getEmbed()==3;
-    _b_nVtx++; 
+    if (_kMakeTTree)
+    {
+      _b_pythia[_b_nVtx]=i->second.getEmbed()==3;
+      _b_nVtx++; 
+    }
   }
   return missingChildren;
 }
 
+//only call if _kMakeTTree is true
 void TruthConversionEval::processBackground(std::map<int,Conversion> *mymap,SvtxTrackEval* trackeval){
   for (std::map<int,Conversion>::iterator i = mymap->begin(); i != mymap->end(); ++i) {
     int nReco=i->second.setRecoTracks(trackeval);
@@ -370,7 +380,7 @@ void TruthConversionEval::findChildren(std::queue<std::pair<int,int>> missingChi
     while(!missingChildren.empty()){
       for (PHG4TruthInfoContainer::ConstIterator iter = _truthinfo->GetParticleRange().first; iter != _truthinfo->GetParticleRange().second; ++iter)
       {
-        if(iter->second->get_parent_id()==missingChildren.front().first&&iter->second->get_track_id()!=missingChildren.front().second){
+        if(Verbosity()>1&& iter->second->get_parent_id()==missingChildren.front().first&&iter->second->get_track_id()!=missingChildren.front().second){
           cout<<"Found Child:\n";
           iter->second->identify();
           cout<<"With mother:\n";
