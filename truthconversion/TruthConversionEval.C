@@ -155,7 +155,7 @@ int TruthConversionEval::process_event(PHCompositeNode *topNode)
           //get the associated cluster
           RawCluster *clustemp=_mainClusterContainer->getCluster(testTrack->get_cal_cluster_id(SvtxTrack::CAL_LAYER(1)));
           if(clustemp){
-            if (TMath::Abs(g4particle->get_pid())==11||g4particle->get_pid()==2)
+            if (TMath::Abs(g4particle->get_pid())==11||g4particle->get_pid()==22)
             {
               (ebackgroundMap[ebacki]).setElectron(g4particle);
               (ebackgroundMap[ebacki]).setVtx(vtx);
@@ -186,7 +186,7 @@ int TruthConversionEval::process_event(PHCompositeNode *topNode)
         //get the associated cluster
         RawCluster *clustemp=_mainClusterContainer->getCluster(testTrack->get_cal_cluster_id(SvtxTrack::CAL_LAYER(1)));
         if(clustemp){
-          if (TMath::Abs(g4particle->get_pid())==11||g4particle->get_pid()==2)
+          if (TMath::Abs(g4particle->get_pid())==11||g4particle->get_pid()==22)
           {
             (ebackgroundMap[ebacki]).setElectron(g4particle);
             (ebackgroundMap[ebacki]).setVtx(vtx);
