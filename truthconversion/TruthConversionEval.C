@@ -67,20 +67,34 @@ int TruthConversionEval::InitRun(PHCompositeNode *topNode)
     _signalCutTree->Branch("photon_m", &_b_photon_m);
     _signalCutTree->Branch("photon_pT", &_b_photon_pT);
     _signalCutTree->Branch("cluster_prob", &_b_cluster_prob);
-    _backgroundCutTree = new TTree("cutTreeBack","background data for making track pair cuts");
-    _backgroundCutTree->SetAutoSave(300);
-    _backgroundCutTree->Branch("track_deta", &_bb_track_deta);
-    _backgroundCutTree->Branch("track_dphi", &_bb_track_dphi);
-    _backgroundCutTree->Branch("track_dlayer", &_bb_track_dlayer);
-    _backgroundCutTree->Branch("track_layer", &_bb_track_layer);
-    _backgroundCutTree->Branch("track_pT", &_bb_track_pT);
-    _backgroundCutTree->Branch("vtx_radius", &_bb_vtx_radius);
-    _backgroundCutTree->Branch("vtx_chi2", &_bb_vtx_chi2);
-    _backgroundCutTree->Branch("approach_dist", &_bb_approach);
-    _backgroundCutTree->Branch("vtxTrack_dist", &_bb_vtxTrack_dist);
-    _backgroundCutTree->Branch("photon_m", &_bb_photon_m);
-    _backgroundCutTree->Branch("photon_pT", &_bb_photon_pT);
-    _backgroundCutTree->Branch("cluster_prob", &_bb_cluster_prob);
+    _h_backgroundCutTree = new TTree("cutTreeBack","background data for making track pair cuts");
+    _h_backgroundCutTree->SetAutoSave(300);
+    _h_backgroundCutTree->Branch("track_deta", &_bb_track_deta);
+    _h_backgroundCutTree->Branch("track_dphi", &_bb_track_dphi);
+    _h_backgroundCutTree->Branch("track_dlayer", &_bb_track_dlayer);
+    _h_backgroundCutTree->Branch("track_layer", &_bb_track_layer);
+    _h_backgroundCutTree->Branch("track_pT", &_bb_track_pT);
+    _h_backgroundCutTree->Branch("vtx_radius", &_bb_vtx_radius);
+    _h_backgroundCutTree->Branch("vtx_chi2", &_bb_vtx_chi2);
+    _h_backgroundCutTree->Branch("approach_dist", &_bb_approach);
+    _h_backgroundCutTree->Branch("vtxTrack_dist", &_bb_vtxTrack_dist);
+    _h_backgroundCutTree->Branch("photon_m", &_bb_photon_m);
+    _h_backgroundCutTree->Branch("photon_pT", &_bb_photon_pT);
+    _h_backgroundCutTree->Branch("cluster_prob", &_bb_cluster_prob);
+    _e_backgroundCutTree = new TTree("cutTreeBack","background data for making track pair cuts");
+    _e_backgroundCutTree->SetAutoSave(300);
+    _e_backgroundCutTree->Branch("track_deta", &_bb_track_deta);
+    _e_backgroundCutTree->Branch("track_dphi", &_bb_track_dphi);
+    _e_backgroundCutTree->Branch("track_dlayer", &_bb_track_dlayer);
+    _e_backgroundCutTree->Branch("track_layer", &_bb_track_layer);
+    _e_backgroundCutTree->Branch("track_pT", &_bb_track_pT);
+    _e_backgroundCutTree->Branch("vtx_radius", &_bb_vtx_radius);
+    _e_backgroundCutTree->Branch("vtx_chi2", &_bb_vtx_chi2);
+    _e_backgroundCutTree->Branch("approach_dist", &_bb_approach);
+    _e_backgroundCutTree->Branch("vtxTrack_dist", &_bb_vtxTrack_dist);
+    _e_backgroundCutTree->Branch("photon_m", &_bb_photon_m);
+    _e_backgroundCutTree->Branch("photon_pT", &_bb_photon_pT);
+    _e_backgroundCutTree->Branch("cluster_prob", &_bb_cluster_prob);
   }
   return 0;
 }
@@ -99,9 +113,13 @@ int TruthConversionEval::process_event(PHCompositeNode *topNode)
   }
   //make a map of the conversions
   std::map<int,Conversion> mapConversions;
-  std::map<int,Conversion> backgroundMap;
-  unsigned int backi=0;
-  unsigned int backmod=0;
+  //h is for hadronic e is for EM
+  std::map<int,Conversion> hbackgroundMap;
+  std::map<int,Conversion> ebackgroundMap;
+  unsigned int hbacki=0;
+  unsigned int hbackmod=0;
+  unsigned int ebacki=0;
+  unsigned int ebackmod=0;
   for ( PHG4TruthInfoContainer::ConstIterator iter = range.first; iter != range.second; ++iter ) {
     PHG4Particle* g4particle = iter->second; 
     PHG4Particle* parent =_truthinfo->GetParticle(g4particle->get_parent_id());
@@ -137,12 +155,24 @@ int TruthConversionEval::process_event(PHCompositeNode *topNode)
           //get the associated cluster
           RawCluster *clustemp=_mainClusterContainer->getCluster(testTrack->get_cal_cluster_id(SvtxTrack::CAL_LAYER(1)));
           if(clustemp){
-            (backgroundMap[backi]).setElectron(g4particle);
-            (backgroundMap[backi]).setVtx(vtx);
-            (backgroundMap[backi]).setParent(parent);
-            (backgroundMap[backi]).setEmbed(embedID);
-            if(++backmod%2==0){
-              backi++;
+            if (TMath::Abs(g4particle->get_pid())==11||g4particle->get_pid()==2)
+            {
+              ebackgroundMap[ebacki]).setElectron(g4particle);
+              (ebackgroundMap[ebacki]).setVtx(vtx);
+              (ebackgroundMap[ebacki]).setParent(parent);
+              (ebackgroundMap[ebacki]).setEmbed(embedID);
+              if(++ebackmod%2==0){
+                ebacki++;
+              }
+            }
+            else{
+              (hbackgroundMap[hbacki]).setElectron(g4particle);
+              (hbackgroundMap[hbacki]).setVtx(vtx);
+              (hbackgroundMap[hbacki]).setParent(parent);
+              (hbackgroundMap[hbacki]).setEmbed(embedID);
+              if(++hbackmod%2==0){
+                hbacki++;
+              }
             }
           }
         }
@@ -156,12 +186,25 @@ int TruthConversionEval::process_event(PHCompositeNode *topNode)
         //get the associated cluster
         RawCluster *clustemp=_mainClusterContainer->getCluster(testTrack->get_cal_cluster_id(SvtxTrack::CAL_LAYER(1)));
         if(clustemp){
-          (backgroundMap[backi]).setElectron(g4particle);
-          (backgroundMap[backi]).setVtx(vtx);
-          (backgroundMap[backi]).setParent(parent);
-          (backgroundMap[backi]).setEmbed(embedID);
-          if(++backmod%2==0){
-            backi++;
+          if (TMath::Abs(g4particle->get_pid())==11||g4particle->get_pid()==2)
+            {
+              ebackgroundMap[ebacki]).setElectron(g4particle);
+              (ebackgroundMap[ebacki]).setVtx(vtx);
+              (ebackgroundMap[ebacki]).setParent(parent);
+              (ebackgroundMap[ebacki]).setEmbed(embedID);
+              if(++ebackmod%2==0){
+                ebacki++;
+              }
+            }
+            else{
+              (hbackgroundMap[hbacki]).setElectron(g4particle);
+              (hbackgroundMap[hbacki]).setVtx(vtx);
+              (hbackgroundMap[hbacki]).setParent(parent);
+              (hbackgroundMap[hbacki]).setEmbed(embedID);
+              if(++hbackmod%2==0){
+                hbacki++;
+              }
+            }
           }
         }
       }
@@ -178,7 +221,8 @@ int TruthConversionEval::process_event(PHCompositeNode *topNode)
   if (_kMakeTTree)
   {
     _tree->Fill();
-    processBackground(&backgroundMap,trackeval);
+    processBackground(&hbackgroundMap,trackeval,_h_backgroundCutTree);
+    processBackground(&ebackgroundMap,trackeval,_e_backgroundCutTree);
   }
   if (Verbosity()>=8)
   {
@@ -340,7 +384,7 @@ std::queue<std::pair<int,int>> TruthConversionEval::numUnique(std::map<int,Conve
 }
 
 //only call if _kMakeTTree is true
-void TruthConversionEval::processBackground(std::map<int,Conversion> *mymap,SvtxTrackEval* trackeval){
+void TruthConversionEval::processBackground(std::map<int,Conversion> *mymap,SvtxTrackEval* trackeval,TTree* tree){
   for (std::map<int,Conversion>::iterator i = mymap->begin(); i != mymap->end(); ++i) {
     int nReco=i->second.setRecoTracks(trackeval);
     if (nReco==2)
@@ -377,7 +421,7 @@ void TruthConversionEval::processBackground(std::map<int,Conversion> *mymap,Svtx
         _bb_photon_pT=0;
       }
       _bb_cluster_prob= _mainClusterContainer->getCluster(i->second.get_cluster_id())->get_prob();
-      _backgroundCutTree->Fill();
+      tree->Fill();
     }
   }
 }

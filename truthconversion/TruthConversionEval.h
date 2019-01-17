@@ -107,7 +107,8 @@ class TruthConversionEval: public SubsysReco
     TFile *_f=NULL; ///< output file
     TTree *_tree=NULL; ///< stores most of the data about the conversions
     TTree *_signalCutTree=NULL; ///<signal data for making track pair cuts
-    TTree *_backgroundCutTree=NULL; ///<background data for making track pair cuts
+    TTree *_h_backgroundCutTree=NULL; ///<hadronic background data for making track pair cuts
+    TTree *_e_backgroundCutTree=NULL; ///<EM background data for making track pair cuts
     RawClusterContainer *_mainClusterContainer; ///< contain 1 cluster associated with each conversion
     PHG4TruthInfoContainer *_truthinfo;
     SvtxClusterMap* _svtxClusterMap;
@@ -156,6 +157,7 @@ class TruthConversionEval: public SubsysReco
     /**@}*/
     /** \defgroup backTreeVars Variables for {@link _signalCutTree}
       @{*/
+    //bb stands for background branch
     float _bb_track_deta ;
     int _bb_track_layer ;
     int _bb_track_dlayer ;
