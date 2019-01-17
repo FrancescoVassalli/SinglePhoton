@@ -262,6 +262,8 @@ std::queue<std::pair<int,int>> TruthConversionEval::numUnique(std::map<int,Conve
                 _b_cluster_deta[_b_Rpair]=-1.;
                 _b_cluster_dphi[_b_Rpair]=-1.;
                 _b_nCluster[_b_Rpair]=0;
+                _b_Scluster_prob[_b_Rpair]=-1;
+                _b_Mcluster_prob[_b_Rpair]=-1;
               }
               pair<int,int> clusterIds = i->second.get_cluster_ids();
               RawCluster *clustemp;
