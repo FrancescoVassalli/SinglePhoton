@@ -28,8 +28,8 @@ TChain* handleFile(string name, string extension, string treename, unsigned int 
 
 void cluster2Plotter()
 {
-  double deta[200];
-  double dphi[200];
+  float deta[200];
+  float dphi[200];
   int    cluster_n;
 
   string treePath = "/sphenix/user/vassalli/gammasample/fourembededonlineanalysis";
@@ -50,8 +50,8 @@ void cluster2Plotter()
   h_2clusplot->SetStats(kFALSE);
   h_2clusplot->GetXaxis()->SetTitle("eta");
   h_2clusplot->GetYaxis()->SetTitle("phi");
-  unsigned double meanEta=0;
-  unsigned double meanPhi=0;
+  float meanEta=0;
+  float meanPhi=0;
   long sum=0;
   for (int event = 0; event < ttree->GetEntries(); ++event)
   {
