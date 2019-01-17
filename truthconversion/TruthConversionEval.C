@@ -67,7 +67,7 @@ int TruthConversionEval::InitRun(PHCompositeNode *topNode)
     _signalCutTree->Branch("photon_m", &_b_photon_m);
     _signalCutTree->Branch("photon_pT", &_b_photon_pT);
     _signalCutTree->Branch("cluster_prob", &_b_cluster_prob);
-    _h_backgroundCutTree = new TTree("cutTreeBack","background data for making track pair cuts");
+    _h_backgroundCutTree = new TTree("cutTreeBackh","background data for making track pair cuts");
     _h_backgroundCutTree->SetAutoSave(300);
     _h_backgroundCutTree->Branch("track_deta", &_bb_track_deta);
     _h_backgroundCutTree->Branch("track_dphi", &_bb_track_dphi);
@@ -81,7 +81,7 @@ int TruthConversionEval::InitRun(PHCompositeNode *topNode)
     _h_backgroundCutTree->Branch("photon_m", &_bb_photon_m);
     _h_backgroundCutTree->Branch("photon_pT", &_bb_photon_pT);
     _h_backgroundCutTree->Branch("cluster_prob", &_bb_cluster_prob);
-    _e_backgroundCutTree = new TTree("cutTreeBack","background data for making track pair cuts");
+    _e_backgroundCutTree = new TTree("cutTreeBacke","background data for making track pair cuts");
     _e_backgroundCutTree->SetAutoSave(300);
     _e_backgroundCutTree->Branch("track_deta", &_bb_track_deta);
     _e_backgroundCutTree->Branch("track_dphi", &_bb_track_dphi);
@@ -222,12 +222,12 @@ int TruthConversionEval::process_event(PHCompositeNode *topNode)
     _tree->Fill();
     processBackground(&hbackgroundMap,trackeval,_h_backgroundCutTree);
     processBackground(&ebackgroundMap,trackeval,_e_backgroundCutTree);
+    _b_event++;
   }
   if (Verbosity()>=8)
   {
     std::cout<<Name()<<" found "<<_b_nVtx<<" truth conversions \n";
   }
-  _b_event++;
   delete stack;
   if (_vertexer) delete _vertexer;
   return 0;
@@ -258,6 +258,7 @@ std::queue<std::pair<int,int>> TruthConversionEval::numUnique(std::map<int,Conve
     }
     temp=i->second.getPositron();
     if(temp){ //this will be false for conversions with 1 truth track
+      cout<<"in 2 T track"<<endl;
       tlv_positron.SetPxPyPzE(temp->get_px(),temp->get_py(),temp->get_pz(),temp->get_e()); //init the tlv
       if(_kMakeTTree) _b_positron_pt[_b_nVtx]=tlv_positron.Pt(); //fill tree
       if (TMath::Abs(tlv_electron.Eta())<_kRAPIDITYACCEPT&&TMath::Abs(tlv_positron.Eta())<_kRAPIDITYACCEPT)
@@ -310,6 +311,7 @@ std::queue<std::pair<int,int>> TruthConversionEval::numUnique(std::map<int,Conve
                 _b_Scluster_prob[_b_Rpair]=-1;
                 _b_Mcluster_prob[_b_Rpair]=-1;
               }
+              cout<<"in 2 R track"<<endl;
               pair<int,int> clusterIds = i->second.get_cluster_ids();
               RawCluster *clustemp;
               if(mainClusterContainer->getCluster(clusterIds.first)){//if thre is matching cluster 
@@ -344,6 +346,7 @@ std::queue<std::pair<int,int>> TruthConversionEval::numUnique(std::map<int,Conve
             }
           case 1: //there's one reco track
             {
+              cout<<"in 1 R track"<<endl;
               clustidtemp=i->second.get_cluster_id(); //get the cluster id of the current conversion
               if(mainClusterContainer->getCluster(clustidtemp)){//if thre is matching cluster 
                 RawCluster *clustemp =   dynamic_cast<RawCluster*>(mainClusterContainer->getCluster(clustidtemp)->Clone());

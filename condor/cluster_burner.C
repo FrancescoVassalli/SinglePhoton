@@ -20,7 +20,7 @@ int cluster_burner( std::string infile = "XjPhi3_pT5_98_dst.root",std::string ou
   hitsin->fileopen( infile );
   se->registerInputManager(hitsin);
  
-  TruthConversionEval *truther = new TruthConversionEval(outfile,runNumber,2,3,false);
+  TruthConversionEval *truther = new TruthConversionEval(outfile,runNumber,2,3,true);
   se->registerSubsystem(truther);
 //  ConvertedPhotonReconstructor *converter=new ConvertedPhotonReconstructor(outfile);
   //se->registerSubsystem(converter);

@@ -27,14 +27,15 @@ TChain* handleFile(string name, string extension, string treename, int filecount
 }
 
 
-void makeFactory(TTree* signalTree, TTree* backTree,std::string outfile)
+void makeFactory(TTree* signalTree, TTree* back1Tree,TTree* back2Tree,std::string outfile)
 {
   using namespace TMVA;
   TString jobname("pairCuts");
   TFile *targetFile = new TFile(outfile.c_str(),"RECREATE");
   Factory *factory = new Factory(jobname,targetFile);
   factory->AddSignalTree(signalTree,1.0);
-  factory->AddBackgroundTree(backTree,1.0);
+  factory->AddBackgroundTree(back1Tree,1.0);
+  factory->AddBackgroundTree(back2Tree,1.0);
   factory->AddVariable("track_deta",'F');
   factory->AddVariable("track_dlayer",'I');
   factory->AddVariable("track_layer",'I');
@@ -75,6 +76,7 @@ int train(){
   unsigned int nFiles=100;
 
   TChain *signalTree = handleFile(treePath,treeExtension,"cutTreeSignal",nFiles);
-  TChain *backTree = handleFile(treePath,treeExtension,"cutTreeBack",nFiles);
-  makeFactory(signalTree,backTree,outname);
+  TChain *backHTree = handleFile(treePath,treeExtension,"cutTreeBackh",nFiles);
+  TChain *backETree = handleFile(treePath,treeExtension,"cutTreeBacke",nFiles);
+  makeFactory(signalTree,backHTree,backETree,outname);
 }
