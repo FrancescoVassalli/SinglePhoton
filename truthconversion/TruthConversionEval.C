@@ -157,7 +157,7 @@ int TruthConversionEval::process_event(PHCompositeNode *topNode)
           if(clustemp){
             if (TMath::Abs(g4particle->get_pid())==11||g4particle->get_pid()==2)
             {
-              ebackgroundMap[ebacki]).setElectron(g4particle);
+              (ebackgroundMap[ebacki]).setElectron(g4particle);
               (ebackgroundMap[ebacki]).setVtx(vtx);
               (ebackgroundMap[ebacki]).setParent(parent);
               (ebackgroundMap[ebacki]).setEmbed(embedID);
@@ -187,23 +187,22 @@ int TruthConversionEval::process_event(PHCompositeNode *topNode)
         RawCluster *clustemp=_mainClusterContainer->getCluster(testTrack->get_cal_cluster_id(SvtxTrack::CAL_LAYER(1)));
         if(clustemp){
           if (TMath::Abs(g4particle->get_pid())==11||g4particle->get_pid()==2)
-            {
-              ebackgroundMap[ebacki]).setElectron(g4particle);
-              (ebackgroundMap[ebacki]).setVtx(vtx);
-              (ebackgroundMap[ebacki]).setParent(parent);
-              (ebackgroundMap[ebacki]).setEmbed(embedID);
-              if(++ebackmod%2==0){
-                ebacki++;
-              }
+          {
+            (ebackgroundMap[ebacki]).setElectron(g4particle);
+            (ebackgroundMap[ebacki]).setVtx(vtx);
+            (ebackgroundMap[ebacki]).setParent(parent);
+            (ebackgroundMap[ebacki]).setEmbed(embedID);
+            if(++ebackmod%2==0){
+              ebacki++;
             }
-            else{
-              (hbackgroundMap[hbacki]).setElectron(g4particle);
-              (hbackgroundMap[hbacki]).setVtx(vtx);
-              (hbackgroundMap[hbacki]).setParent(parent);
-              (hbackgroundMap[hbacki]).setEmbed(embedID);
-              if(++hbackmod%2==0){
-                hbacki++;
-              }
+          }
+          else{
+            (hbackgroundMap[hbacki]).setElectron(g4particle);
+            (hbackgroundMap[hbacki]).setVtx(vtx);
+            (hbackgroundMap[hbacki]).setParent(parent);
+            (hbackgroundMap[hbacki]).setEmbed(embedID);
+            if(++hbackmod%2==0){
+              hbacki++;
             }
           }
         }
@@ -241,31 +240,33 @@ std::queue<std::pair<int,int>> TruthConversionEval::numUnique(std::map<int,Conve
   _b_Rpair=0;
   std::queue<std::pair<int,int>> missingChildren;
   for (std::map<int,Conversion>::iterator i = mymap->begin(); i != mymap->end(); ++i) {
-    //fill the tree
     PHG4VtxPoint *vtx =i->second.getVtx(); //get the vtx
-    _b_rVtx[_b_nVtx] = sqrt(vtx->get_x()*vtx->get_x()+vtx->get_y()*vtx->get_y()); //find the radius
     PHG4Particle *temp = i->second.getPhoton(); //set the photon
     TLorentzVector tlv_photon,tlv_electron,tlv_positron; //make tlv for each particle 
     tlv_photon.SetPxPyPzE(temp->get_px(),temp->get_py(),temp->get_pz(),temp->get_e()); //intialize
-    //fill tree values
-    _b_parent_pt[_b_nVtx] =tlv_photon.Pt();
-    _b_parent_phi[_b_nVtx]=tlv_photon.Phi();
-    _b_parent_eta[_b_nVtx]=tlv_photon.Eta();
-    _b_grandparent_id[_b_nVtx]=i->second.getSourceId();
-    _b_e_deta[_b_nVtx]=-1.;
-    _b_e_dphi[_b_nVtx]=-1.;
     temp=i->second.getElectron(); //set the first child 
     tlv_electron.SetPxPyPzE(temp->get_px(),temp->get_py(),temp->get_pz(),temp->get_e());
-    _b_electron_pt[_b_nVtx]=tlv_electron.Pt(); //fill tree
+    if(_kMakeTTree){//fill tree values
+      _b_rVtx[_b_nVtx] = sqrt(vtx->get_x()*vtx->get_x()+vtx->get_y()*vtx->get_y()); //find the radius
+      _b_parent_pt[_b_nVtx] =tlv_photon.Pt();
+      _b_parent_phi[_b_nVtx]=tlv_photon.Phi();
+      _b_parent_eta[_b_nVtx]=tlv_photon.Eta();
+      _b_grandparent_id[_b_nVtx]=i->second.getSourceId();
+      _b_e_deta[_b_nVtx]=-1.;
+      _b_e_dphi[_b_nVtx]=-1.;
+      _b_electron_pt[_b_nVtx]=tlv_electron.Pt();
+    }
     temp=i->second.getPositron();
-    if(temp){ //this will be false for conersions with 1 truth track
+    if(temp){ //this will be false for conversions with 1 truth track
       tlv_positron.SetPxPyPzE(temp->get_px(),temp->get_py(),temp->get_pz(),temp->get_e()); //init the tlv
-      _b_positron_pt[_b_nVtx]=tlv_positron.Pt(); //fill tree
+      if(_kMakeTTree) _b_positron_pt[_b_nVtx]=tlv_positron.Pt(); //fill tree
       if (TMath::Abs(tlv_electron.Eta())<_kRAPIDITYACCEPT&&TMath::Abs(tlv_positron.Eta())<_kRAPIDITYACCEPT)
       {
-        _b_e_deta[_b_Tpair]=TMath::Abs(tlv_electron.Eta()-tlv_positron.Eta());
-        _b_e_dphi[_b_Tpair]=TMath::Abs(tlv_electron.Phi()-tlv_positron.Phi());
-        _b_Tpair++;
+        if(_kMakeTTree){
+          _b_e_deta[_b_Tpair]=TMath::Abs(tlv_electron.Eta()-tlv_positron.Eta());
+          _b_e_dphi[_b_Tpair]=TMath::Abs(tlv_electron.Phi()-tlv_positron.Phi());
+          _b_Tpair++;
+        }
         unsigned int nRecoTracks = i->second.setRecoTracks(trackeval); //find the reco tracks for this conversion
         int clustidtemp=-1;
         switch(nRecoTracks){

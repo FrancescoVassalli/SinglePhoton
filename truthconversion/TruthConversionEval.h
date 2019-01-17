@@ -95,7 +95,7 @@ class TruthConversionEval: public SubsysReco
     void findChildren(std::queue<std::pair<int,int>> missing,PHG4TruthInfoContainer* truthinfo);
     /** @param map should contain Conversion objects which hold background events i.e. not conversions
      * fills the fields for {@link _backgroundCutTree*/
-    void processBackground(std::map<int,Conversion>* map,SvtxTrackEval* trackEval);
+    void processBackground(std::map<int,Conversion>* map,SvtxTrackEval* trackEval,TTree* tree);
 
     const static int s_kMAXParticles=200; ///< increase this number if arrays go out of bounds
     const static int s_kMAXRecoMatch=20; ///< increase this number if arrays go out of bounds

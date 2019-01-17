@@ -13,14 +13,14 @@ int cluster_burner( std::string infile = "XjPhi3_pT5_98_dst.root",std::string ou
 
   int verbosity = 0;
   Fun4AllServer *se = Fun4AllServer::instance();
-  se->Verbosity(10);
+  se->Verbosity(0);
   recoConsts *rc = recoConsts::instance();
 
   Fun4AllInputManager *hitsin = new Fun4AllDstInputManager("DSTin");
   hitsin->fileopen( infile );
   se->registerInputManager(hitsin);
  
-  TruthConversionEval *truther = new TruthConversionEval(outfile,runNumber,2,3,true);
+  TruthConversionEval *truther = new TruthConversionEval(outfile,runNumber,2,3,false);
   se->registerSubsystem(truther);
 //  ConvertedPhotonReconstructor *converter=new ConvertedPhotonReconstructor(outfile);
   //se->registerSubsystem(converter);
