@@ -12,7 +12,7 @@ using namespace std;
 #include "TLine.h"
 #include "TGraphAsymmErrors.h"
 
-TChain* handleFile(string name, string extension, string treename, int filecount){
+TChain* handleFile(string name, string extension, string treename, unsigned int filecount){
   TChain *all = new TChain(treename.c_str());
   string temp;
   for (int i = 0; i < filecount; ++i)
@@ -26,7 +26,7 @@ TChain* handleFile(string name, string extension, string treename, int filecount
   return all;
 }
 
-void 2clusplotter()
+void cluster2Plotter()
 {
   double deta[200];
   double dphi[200];
@@ -38,15 +38,14 @@ void 2clusplotter()
   TChain *ttree = handleFile(treePath,treeExtension,"ttree",nFiles);
   ttree->SetBranchAddress("clus_dphi",    &dphi    );
   ttree->SetBranchAddress("clus_deta",    &deta    );
-  ttree->SetBranchAddress("cluster_n",&clusterTower_energy );
-  ttree->SetBranchAddress("nRpair",            &cluster_n  );
+  ttree->SetBranchAddress("nRpair",    &cluster_n  );
 
-  string outfilename = "2clusplot.root";
+  string outfilename = "clus2plot.root";
   TFile *out = new TFile(outfilename.c_str(),"RECREATE");
 
-  string plotname = "2clusplot";
+  string plotname = "clus2plot";
 
-  TH2F *h_2clusplot = new TH2F("2clusplot","",80,0,.5,80,0,.5); 
+  TH2F *h_2clusplot = new TH2F("clus2plot","",80,0,.05,80,0,.05); 
 	h_2clusplot->SetStats(kFALSE);
     h_2clusplot->GetXaxis()->SetTitle("eta");
     h_2clusplot->GetYaxis()->SetTitle("phi");

@@ -106,12 +106,10 @@ int TruthConversionEval::process_event(PHCompositeNode *topNode)
     float radius=0;
     int embedID;
     PHG4VtxPoint* vtx=_truthinfo->GetVtx(g4particle->get_vtx_id()); //get the vertex
-    if (parent)
+    if (parent)//signal routine
     {
       embedID=get_embed(parent,_truthinfo);
-      //check that the parent is an embeded(2) photon or a pythia(3) photon that converts
-      if(embedID==_kParticleEmbed||(embedID==_kPythiaEmbed
-            &&parent->get_pid()==22&&TMath::Abs(g4particle->get_pid())==11)){
+      if(parent->get_pid()==22&&TMath::Abs(g4particle->get_pid())==11){
         radius=sqrt(vtx->get_x()*vtx->get_x()+vtx->get_y()*vtx->get_y());
         if (radius<s_kTPCRADIUS) //limits to truth conversions within the tpc radius
         { 
@@ -126,7 +124,6 @@ int TruthConversionEval::process_event(PHCompositeNode *topNode)
           (mapConversions[vtx->get_id()]).setParent(parent);
           (mapConversions[vtx->get_id()]).setEmbed(embedID);
           PHG4Particle* grand =_truthinfo->GetParticle(parent->get_parent_id());
-          cout<<"grand id:"<<parent->get_parent_id()<<"with embedID:"<<embedID<<'\n';
           if (grand) (mapConversions[vtx->get_id()]).setSourceId(grand->get_pid());
           else (mapConversions[vtx->get_id()]).setSourceId(0);
         }
@@ -204,7 +201,6 @@ std::queue<std::pair<int,int>> TruthConversionEval::numUnique(std::map<int,Conve
   for (std::map<int,Conversion>::iterator i = mymap->begin(); i != mymap->end(); ++i) {
     //fill the tree
     PHG4VtxPoint *vtx =i->second.getVtx(); //get the vtx
-    vtx->identify();
     _b_rVtx[_b_nVtx] = sqrt(vtx->get_x()*vtx->get_x()+vtx->get_y()*vtx->get_y()); //find the radius
     PHG4Particle *temp = i->second.getPhoton(); //set the photon
     TLorentzVector tlv_photon,tlv_electron,tlv_positron; //make tlv for each particle 
