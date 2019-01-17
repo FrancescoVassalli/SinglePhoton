@@ -46,7 +46,7 @@ void cluster2Plotter()
   string plotname = "clus2plot";
 
   TH2F *h_2clusplot = new TH2F("clus2plot","",80,0,.05,80,0,.05); 
-  TH1I *h_clusCount = new TH1I("cluscount","",2,0,2);
+  TH1F *h_clusCount = new TH1F("cluscount","",2,0.5,2.5);
 	h_2clusplot->SetStats(kFALSE);
     h_2clusplot->GetXaxis()->SetTitle("eta");
     h_2clusplot->GetYaxis()->SetTitle("phi");
