@@ -98,6 +98,7 @@ class TruthConversionEval: public SubsysReco
     void processBackground(std::map<int,Conversion>* map,SvtxTrackEval* trackEval);
 
     const static int s_kMAXParticles=200; //< increase this number if arrays go out of bounds
+    const static int s_kMAXRecoMatch=20; //< increase this number if arrays go out of bounds
     const unsigned int _kRunNumber;
     const int _kParticleEmbed;
     const int _kPythiaEmbed;
@@ -129,10 +130,12 @@ class TruthConversionEval: public SubsysReco
     float _b_parent_pt  [s_kMAXParticles];
     float _b_parent_eta [s_kMAXParticles];
     float _b_parent_phi [s_kMAXParticles];
-    int   _b_grandparent_id [s_kMAXParticles];
-    int   _b_nCluster [s_kMAXParticles];
-    float _b_cluster_dphi [s_kMAXParticles];
-    float _b_cluster_deta [s_kMAXParticles];
+    int   _b_grandparent_id [s_kMAXParticles]; ///<pid of the source of the photon 0 for prompt
+    int   _b_nCluster [s_kMAXRecoMatch];
+    float _b_cluster_dphi [s_kMAXRecoMatch];
+    float _b_cluster_deta [s_kMAXRecoMatch];
+    float _b_Mcluster_prob[s_kMAXRecoMatch]; ///<cluster prob for merged clusters
+    float _b_Scluster_prob[s_kMAXRecoMatch]; ///<cluster prob for split clusters
     /**@}*/
     /** \defgroup signalTreeVars Variables for {@link _signalCutTree}
       @{*/

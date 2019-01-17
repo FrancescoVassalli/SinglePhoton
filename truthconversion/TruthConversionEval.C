@@ -51,6 +51,8 @@ int TruthConversionEval::InitRun(PHCompositeNode *topNode)
     _tree->Branch("nCluster",_b_nCluster,"nCluster[nRpair]/I");
     _tree->Branch("clus_dphi",_b_cluster_dphi,"clus_dphi[nRpair]/F");
     _tree->Branch("clus_deta",_b_cluster_deta,"clus_deta[nRpair]/F");
+    _signalCutTree->Branch("Scluster_prob", &_b_Scluster_prob,"Scluster_prob[nRpair]/F");
+    _signalCutTree->Branch("Mcluster_prob", &_b_Mcluster_prob,"Mcluster_prob[nRpair]/F");
     _signalCutTree = new TTree("cutTreeSignal","signal data for making track pair cuts");
     _signalCutTree->SetAutoSave(300);
     _signalCutTree->Branch("track_deta", &_b_track_deta);
@@ -269,7 +271,6 @@ std::queue<std::pair<int,int>> TruthConversionEval::numUnique(std::map<int,Conve
                 if (_kMakeTTree)
                 {
                   _b_cluster_prob=clustemp->get_prob();
-                  _b_nCluster[_b_Rpair]=1;
                   RawCluster *clus2 = mainClusterContainer->getCluster(clusterIds.second);
                   if (clus2)
                   {
@@ -281,6 +282,11 @@ std::queue<std::pair<int,int>> TruthConversionEval::numUnique(std::map<int,Conve
                     if (clusterIds.first!=clusterIds.second) //if there are two district clusters
                     {
                       _b_nCluster[_b_Rpair]=2;
+                      _b_Scluster_prob[_b_Rpair]=clustemp->get_prob();
+                    }
+                    else{
+                      _b_nCluster[_b_Rpair]=1;
+                      _b_Mcluster_prob[_b_Rpair]=clustemp->get_prob();
                     }
                   }
                   _signalCutTree->Fill();   
