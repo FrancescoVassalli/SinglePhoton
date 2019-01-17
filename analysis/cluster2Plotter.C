@@ -31,6 +31,8 @@ void cluster2Plotter()
   float deta[200];
   float dphi[200];
   int    cluster_n;
+  float cluster_probS[20];
+  float cluster_probM[20];
 
   string treePath = "/sphenix/user/vassalli/gammasample/fourembededonlineanalysis";
   string treeExtension = ".root";
@@ -38,7 +40,9 @@ void cluster2Plotter()
   TChain *ttree = handleFile(treePath,treeExtension,"ttree",nFiles);
   ttree->SetBranchAddress("clus_dphi",    &dphi    );
   ttree->SetBranchAddress("clus_deta",    &deta    );
-  ttree->SetBranchAddress("nCluster",    &cluster_n  );
+  ttree->SetBranchAddress("nCluster",    &cluster_n);
+  ttree->SetBranchAddress("Scluster_prob",    &cluster_probS );
+  ttree->SetBranchAddress("Mcluster_prob",    &cluster_probM );
 
   string outfilename = "clus2plot.root";
   TFile *out = new TFile(outfilename.c_str(),"RECREATE");
@@ -47,6 +51,8 @@ void cluster2Plotter()
 
   TH2F *h_2clusplot = new TH2F("clus2plot","",80,0,.05,80,0,.5); 
   TH1F *h_clusCount = new TH1F("cluscount","",2,0.5,2.5);
+  TH1F *h_clusSProb = new TH1F("clusSprob","",50,0.,1.);
+  TH1F *h_clusMProb = new TH1F("clusMprob","",50,0.,1.);
   h_2clusplot->SetStats(kFALSE);
   h_2clusplot->GetXaxis()->SetTitle("eta");
   h_2clusplot->GetYaxis()->SetTitle("phi");
@@ -62,6 +68,8 @@ void cluster2Plotter()
       h_2clusplot->Fill(deta[i],dphi[i]);
       meanEta+=deta[i];
       meanPhi+=dphi[i];
+      h_clusSProb->Fill(cluster_probS[i]);
+      h_clusMProb->Fill(cluster_probM[i]);
     }
     sum+=cluster_n;
   }  
