@@ -87,8 +87,8 @@ int TruthConversionEval::process_event(PHCompositeNode *topNode)
 {
   doNodePointers(topNode);
   _conversionClusters.Reset(); //clear the list of conversion clusters
-  PHG4TruthInfoContainer::Range range = _truthinfo->GetParticleRange();
-  SvtxEvalStack *stack = new SvtxEvalStack(topNode);
+  PHG4TruthInfoContainer::Range range = _truthinfo->GetParticleRange(); //look at all truth particles
+  SvtxEvalStack *stack = new SvtxEvalStack(topNode); //truth tracking info
   SvtxTrackEval* trackeval = stack->get_track_eval();
   if (!trackeval)
   {
@@ -106,31 +106,31 @@ int TruthConversionEval::process_event(PHCompositeNode *topNode)
     float radius=0;
     int embedID;
     PHG4VtxPoint* vtx=_truthinfo->GetVtx(g4particle->get_vtx_id()); //get the vertex
-    if (parent)//signal routine
+    if (parent)//if the particle is not primary
     {
       embedID=get_embed(parent,_truthinfo);
-      if(parent->get_pid()==22&&TMath::Abs(g4particle->get_pid())==11){
+      if(parent->get_pid()==22&&TMath::Abs(g4particle->get_pid())==11){ //conversion check
         radius=sqrt(vtx->get_x()*vtx->get_x()+vtx->get_y()*vtx->get_y());
         if (radius<s_kTPCRADIUS) //limits to truth conversions within the tpc radius
         { 
-          //initialize the conversion object -don't use constructor b/c setters have error handling
           if (Verbosity()==10)
           {
             std::cout<<"Conversion with radius [cm]:"<<radius<<'\n';
           }
+          //initialize the conversion object -don't use constructor b/c setters have error handling
           //could be optimized by creating object and using copy opertator
           (mapConversions[vtx->get_id()]).setElectron(g4particle);
           (mapConversions[vtx->get_id()]).setVtx(vtx);
           (mapConversions[vtx->get_id()]).setParent(parent);
           (mapConversions[vtx->get_id()]).setEmbed(embedID);
-          PHG4Particle* grand =_truthinfo->GetParticle(parent->get_parent_id());
+          PHG4Particle* grand =_truthinfo->GetParticle(parent->get_parent_id()); //grandparent
           if (grand) (mapConversions[vtx->get_id()]).setSourceId(grand->get_pid());
           else (mapConversions[vtx->get_id()]).setSourceId(0);
         }
       }
-      else{//not a conversion
+      else if(_kMakeTTree){//not a conversion
         SvtxTrack *testTrack = trackeval->best_track_from(g4particle);
-        if (testTrack)
+        if (testTrack) //not a conversion but has a track 
         {
           //get the associated cluster
           RawCluster *clustemp=_mainClusterContainer->getCluster(testTrack->get_cal_cluster_id(SvtxTrack::CAL_LAYER(1)));
@@ -146,10 +146,10 @@ int TruthConversionEval::process_event(PHCompositeNode *topNode)
         }
       }
     }
-    else{ //is primary
+    else if(_kMakeTTree){ //is primary therefore not a conversion 
       embedID=get_embed(g4particle,_truthinfo);
       SvtxTrack *testTrack = trackeval->best_track_from(g4particle);
-      if (testTrack)
+      if (testTrack) //has associated track
       {
         //get the associated cluster
         RawCluster *clustemp=_mainClusterContainer->getCluster(testTrack->get_cal_cluster_id(SvtxTrack::CAL_LAYER(1)));
