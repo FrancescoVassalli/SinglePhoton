@@ -51,8 +51,8 @@ int TruthConversionEval::InitRun(PHCompositeNode *topNode)
     _tree->Branch("nCluster",_b_nCluster,"nCluster[nRpair]/I");
     _tree->Branch("clus_dphi",_b_cluster_dphi,"clus_dphi[nRpair]/F");
     _tree->Branch("clus_deta",_b_cluster_deta,"clus_deta[nRpair]/F");
-    _signalCutTree->Branch("Scluster_prob", &_b_Scluster_prob,"Scluster_prob[nRpair]/F");
-    _signalCutTree->Branch("Mcluster_prob", &_b_Mcluster_prob,"Mcluster_prob[nRpair]/F");
+    _tree->Branch("Scluster_prob", &_b_Scluster_prob,"Scluster_prob[nRpair]/F");
+    _tree->Branch("Mcluster_prob", &_b_Mcluster_prob,"Mcluster_prob[nRpair]/F");
     _signalCutTree = new TTree("cutTreeSignal","signal data for making track pair cuts");
     _signalCutTree->SetAutoSave(300);
     _signalCutTree->Branch("track_deta", &_b_track_deta);
