@@ -47,21 +47,29 @@ void cluster2Plotter()
 
   TH2F *h_2clusplot = new TH2F("clus2plot","",80,0,.05,80,0,.05); 
   TH1F *h_clusCount = new TH1F("cluscount","",2,0.5,2.5);
-	h_2clusplot->SetStats(kFALSE);
-    h_2clusplot->GetXaxis()->SetTitle("eta");
-    h_2clusplot->GetYaxis()->SetTitle("phi");
+  h_2clusplot->SetStats(kFALSE);
+  h_2clusplot->GetXaxis()->SetTitle("eta");
+  h_2clusplot->GetYaxis()->SetTitle("phi");
+  unsigned double meanEta=0;
+  unsigned double meanPhi=0;
+  long sum=0;
   for (int event = 0; event < ttree->GetEntries(); ++event)
   {
     ttree->GetEvent(event);
     h_clusCount->Fill(cluster_n);
-    for (int i = 0; i < cluster_n; ++i)
+    for (int i = 0; i < cluster_n&&cluster_n>1; ++i)
     {
-    	h_2clusplot->Fill(deta[i],dphi[i]);
+      h_2clusplot->Fill(deta[i],dphi[i]);
+      meanEta+=deta[i];
+      meanPhi+=dphi[i];
     }
+    sum+=cluster_n;
   }  
+  meanEta/=sum;
+  meanPhi/=sum;
+  cout<<"Done with mean eta:"<<meanEta<<" and mean phi:"<<meanPhi<<'\n';
   out->Write();
   out->Close();
   delete ttree;
   delete out;
-
 }
