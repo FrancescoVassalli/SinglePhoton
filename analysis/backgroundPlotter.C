@@ -80,7 +80,7 @@ void backgroundPlotter()
     		break;
     }
   } 
-  counts->Scale(1/ttree->GetEntries());
+  counts->Scale(1./ttree->GetEntries());
   out->Write();
   out->Close();
   delete ttree;
