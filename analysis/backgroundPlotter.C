@@ -43,7 +43,7 @@ void backgroundPlotter()
 
   string plotname = "backgroundProb";
 
-  TH2F *h_pip_prob = new TH1F("clus2plot","",50,0.,1.); 
+  TH1F *h_pip_prob = new TH1F("clus2plot","",50,0.,1.); 
   TH1F *h_pim_prob = new TH1F("cluscount","",50,0.,1.);
   TH1F *h_p_prob = new TH1F("clusSprob","",50,0.,1.);
   TH1F *h_mu_prob = new TH1F("clusMprob","",50,0.,1.);
