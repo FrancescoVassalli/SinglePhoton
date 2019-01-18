@@ -34,8 +34,8 @@ void makeFactory(TTree* signalTree, TTree* back1Tree,TTree* back2Tree,std::strin
   TFile *targetFile = new TFile(outfile.c_str(),"RECREATE");
   Factory *factory = new Factory(jobname,targetFile);
   factory->AddSignalTree(signalTree,1.0);
-  //factory->AddBackgroundTree(back1Tree,1.0);
-  factory->AddBackgroundTree(back2Tree,0.5);
+  factory->AddBackgroundTree(back1Tree,1.0);
+  //factory->AddBackgroundTree(back2Tree,0.5);
   factory->AddVariable("track_deta",'F');
   factory->AddVariable("track_dlayer",'I');
   factory->AddVariable("track_layer",'I');
