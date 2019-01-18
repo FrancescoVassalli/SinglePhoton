@@ -2,7 +2,7 @@
 using namespace std;
 
 #include "TFile.h"
-#include "TTree.h"
+#include "backTree.h"
 #include "TChain.h"
 #include "TLegend.h"
 #include "math.h"
@@ -30,27 +30,39 @@ void backgroundPlotter()
 {
   int pid;
   float cluster_prob;
+  float deta;
+  int layer;
 
   string treePath = "/sphenix/user/vassalli/gammasample/fourembededonlineanalysis";
   string treeExtension = ".root";
   unsigned int nFiles=100;
-  TChain *ttree = handleFile(treePath,treeExtension,"cutTreeBackh",nFiles);
-  ttree->SetBranchAddress("pid",    &pid    );
-  ttree->SetBranchAddress("cluster_prob",    &cluster_prob );
+
+  TChain *backTree = handleFile(treePath,treeExtension,"cutTreeBackh",nFiles);
+  backTree->SetBranchAddress("pid",    &pid    );
+  backTree->SetBranchAddress("cluster_prob",    &cluster_prob );
+  backTree->SetBranchAddress("track_deta", &deta);
+  backTree->SetBranchAddress("track_layer", &layer);
+
+  TChain *signalTree = handleFile(treePath,treeExtension,"cutTreeSignal",nFiles);
+  signalTree->SetBranchAddress("track_deta", &deta);
+  signalTree->SetBranchAddress("track_layer", &layer);
 
   string outfilename = "backgroundProb.root";
   TFile *out = new TFile(outfilename.c_str(),"RECREATE");
-
-  string plotname = "backgroundProb";
 
   TH1F *h_pip_prob = new TH1F("pip","",50,0.,1.); 
   TH1F *h_pim_prob = new TH1F("pim","",50,0.,1.);
   TH1F *h_p_prob = new TH1F("p","",50,0.,1.);
   TH1F *h_mu_prob = new TH1F("mu","",50,0.,1.);
   TH1F *counts = new TH1F("pid_counts","",4,-.5,4.5);
-  for (int event = 0; event < ttree->GetEntries(); ++event)
+  TH1F *s_deta = new TH1F("s_deta","Signal #Delta#eta",100,0,.1);
+  TH1F *b_deta = new TH1F("b_deta","Background #Delta#eta",100,0,.1);
+  TH1F *s_layer = new TH1F("s_layer","Signal Layer",4,-.5,3.5);
+  TH1F *b_layer = new TH1F("b_layer","Background Layer",4,-.5,3.5);
+
+  for (int event = 0; event < backTree->GetEntries(); ++event)
   {
-    ttree->GetEvent(event);
+    backTree->GetEvent(event);
     switch(pid){
     	case 211:
     		h_pip_prob->Fill(cluster_prob);
@@ -79,11 +91,25 @@ void backgroundPlotter()
     	default:
     		break;
     }
+    b_deta->Fill(deta);
+    b_layer->Fill(layer);
   } 
-  counts->Scale(1./(float)ttree->GetEntries());
-  std::cout<<ttree->GetEntries()<<endl;
+  counts->Scale(1./(float)backTree->GetEntries());
+  std::cout<<backTree->GetEntries()<<endl;
+
+  for (int i = 0; i < signalTree->GetEntries(); ++i)
+  {
+  	signalTree->GetEvent(i);
+  	s_deta->Fill(deta);
+  	s_layer->Fill(layer);
+  }
+  b_deta->Scale(1/b_deta->Integral());
+  b_layer->Scale(1/b_deta->Integral());
+  s_deta->Scale(1/b_deta->Integral());
+  s_layer->Scale(1/b_deta->Integral());
+
   out->Write();
   out->Close();
-  delete ttree;
+  delete backTree;
   delete out;
 }
