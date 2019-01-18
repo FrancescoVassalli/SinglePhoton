@@ -43,38 +43,44 @@ void backgroundPlotter()
 
   string plotname = "backgroundProb";
 
-  TH1F *h_pip_prob = new TH1F("clus2plot","",50,0.,1.); 
-  TH1F *h_pim_prob = new TH1F("cluscount","",50,0.,1.);
-  TH1F *h_p_prob = new TH1F("clusSprob","",50,0.,1.);
-  TH1F *h_mu_prob = new TH1F("clusMprob","",50,0.,1.);
-
+  TH1F *h_pip_prob = new TH1F("pip","",50,0.,1.); 
+  TH1F *h_pim_prob = new TH1F("pim","",50,0.,1.);
+  TH1F *h_p_prob = new TH1F("p","",50,0.,1.);
+  TH1F *h_mu_prob = new TH1F("mu","",50,0.,1.);
+  TH1F *counts = new TH1F("pid_counts",4,-.5,4.5);
   for (int event = 0; event < ttree->GetEntries(); ++event)
   {
     ttree->GetEvent(event);
     switch(pid){
     	case 211:
     		h_pip_prob->Fill(cluster_prob);
+    		counts->Fill(0);
     		break;
     	case -211:
     		h_pim_prob->Fill(cluster_prob);
+    		counts->Fill(1);
     		break;
     	case 2212:
     		h_p_prob->Fill(cluster_prob);
+    		counts->Fill(2);
     		break;
     	case -2212:
     		h_p_prob->Fill(cluster_prob);
+    		counts->Fill(2);
     		break;
     	case 13:
     		h_mu_prob->Fill(cluster_prob);
+    		counts->Fill(3);
     		break;
     	case -13:
     		h_mu_prob->Fill(cluster_prob);
+    		counts->Fill(3);
     		break;
     	default:
     		break;
     }
   } 
-   
+  counts->Scale(1/ttree->GetEntries());
   out->Write();
   out->Close();
   delete ttree;
