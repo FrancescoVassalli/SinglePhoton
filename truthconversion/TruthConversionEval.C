@@ -258,7 +258,6 @@ std::queue<std::pair<int,int>> TruthConversionEval::numUnique(std::map<int,Conve
     }
     temp=i->second.getPositron();
     if(temp){ //this will be false for conversions with 1 truth track
-      cout<<"in 2 T track"<<endl;
       tlv_positron.SetPxPyPzE(temp->get_px(),temp->get_py(),temp->get_pz(),temp->get_e()); //init the tlv
       if(_kMakeTTree) _b_positron_pt[_b_nVtx]=tlv_positron.Pt(); //fill tree
       if (TMath::Abs(tlv_electron.Eta())<_kRAPIDITYACCEPT&&TMath::Abs(tlv_positron.Eta())<_kRAPIDITYACCEPT)
@@ -311,7 +310,6 @@ std::queue<std::pair<int,int>> TruthConversionEval::numUnique(std::map<int,Conve
                 _b_Scluster_prob[_b_Rpair]=-1;
                 _b_Mcluster_prob[_b_Rpair]=-1;
               }
-              cout<<"in 2 R track"<<endl;
               pair<int,int> clusterIds = i->second.get_cluster_ids();
               RawCluster *clustemp;
               if(mainClusterContainer->getCluster(clusterIds.first)){//if thre is matching cluster 
@@ -346,7 +344,6 @@ std::queue<std::pair<int,int>> TruthConversionEval::numUnique(std::map<int,Conve
             }
           case 1: //there's one reco track
             {
-              cout<<"in 1 R track"<<endl;
               clustidtemp=i->second.get_cluster_id(); //get the cluster id of the current conversion
               if(mainClusterContainer->getCluster(clustidtemp)){//if thre is matching cluster 
                 RawCluster *clustemp =   dynamic_cast<RawCluster*>(mainClusterContainer->getCluster(clustidtemp)->Clone());
@@ -451,8 +448,10 @@ void TruthConversionEval::findChildren(std::queue<std::pair<int,int>> missingChi
 
 int TruthConversionEval::End(PHCompositeNode *topNode)
 {
-  _f->Write();
-  _f->Close();
+  if(_kMakeTTree){
+    _f->Write();
+    _f->Close();
+  }
   return 0;
 }
 
