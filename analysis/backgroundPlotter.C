@@ -80,7 +80,8 @@ void backgroundPlotter()
     		break;
     }
   } 
-  //counts->Scale(1./ttree->GetEntries());
+  counts->Scale(1./(float)ttree->GetEntries());
+  std::cout<<ttree->GetEntries()<<endl;
   out->Write();
   out->Close();
   delete ttree;
