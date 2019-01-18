@@ -81,6 +81,7 @@ int TruthConversionEval::InitRun(PHCompositeNode *topNode)
     _h_backgroundCutTree->Branch("photon_m", &_bb_photon_m);
     _h_backgroundCutTree->Branch("photon_pT", &_bb_photon_pT);
     _h_backgroundCutTree->Branch("cluster_prob", &_bb_cluster_prob);
+    _h_backgroundCutTree->Branch("pid", &_bb_pid);
     _e_backgroundCutTree = new TTree("cutTreeBacke","background data for making track pair cuts");
     _e_backgroundCutTree->SetAutoSave(300);
     _e_backgroundCutTree->Branch("track_deta", &_bb_track_deta);
@@ -396,6 +397,7 @@ void TruthConversionEval::processBackground(std::map<int,Conversion> *mymap,Svtx
       _bb_track_layer = i->second.firstLayer(_svtxClusterMap);
       _bb_track_pT = i->second.minTrackpT();
       _bb_approach = i->second.approachDistance();
+      _bb_pid = i->second.getElectron()->get_pid();
       /*The recoVtx finding doesn't work yet so using truth vtx for now
        * pair<SvtxTrack*,SvtxTrack*> recoTracks = i->second.getRecoTracks();
        pair<SvtxVertex*,SvtxVertex*> recoTracks = i->second.getRecoTracks();

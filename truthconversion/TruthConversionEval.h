@@ -170,6 +170,7 @@ class TruthConversionEval: public SubsysReco
     float _bb_photon_pT;
     float _bb_cluster_prob;
     float _bb_track_dphi;
+    int _bb_pid;
     /**@}*/
     /** RawClusters associated with truth conversions
      * processed by other modules*/
