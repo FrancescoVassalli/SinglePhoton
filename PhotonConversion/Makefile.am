@@ -5,6 +5,8 @@ INCLUDES = \
   -I$(OFFLINE_MAIN)/include \
   -I`root-config --incdir`
 
+AM_CXXFLAGS = -DRAVE -DRaveDLLExport=
+
 libConvertedPhotonReconstructor_la_LDFLAGS = \
   -nodefaultlibs \
   -L$(libdir) \
@@ -16,14 +18,26 @@ lib_LTLIBRARIES = \
 
 include_HEADERS = \
   ConvertedPhotonReconstructor.h \
-  ConvertedPhotonReconstructorLinkDef.h 
+  ConvertedPhotonReconstructorLinkDef.h \
+  RecoConversionEval.h \
+  RecoConversionEvalLinkDef.h \
+	RaveVertexingAux.h \
+	RaveVertexingAuxLinkDef.h
 
 libConvertedPhotonReconstructor_la_SOURCES = \
-  ConvertedPhotonReconstructor.cc\
-  ConvertedPhotonReconstructor_Dict.C 
+  ConvertedPhotonReconstructor.cc \
+  ConvertedPhotonReconstructor_Dict.C \
+  RecoConversionEval.cc \
+  RecoConversionEval_Dict.C \
+	RaveVertexingAux.C \
+	RaveVertexingAux_Dict.C
 
 libConvertedPhotonReconstructor_la_LIBADD = \
 	-lphool\
+	-lgenfit2 \
+	-lgenfit2exp \
+	-lPHGenFit \
+	-lphgeom \
 	-lg4eval
 BUILT_SOURCES = \
   testexternals.C

@@ -1,6 +1,4 @@
 #include "TruthConversionEval.h"
-
-
 #include <calotrigger/CaloTriggerInfo.h>
 
 #include <calobase/RawCluster.h>
@@ -27,9 +25,9 @@ TruthConversionEval::~TruthConversionEval(){
 
 int TruthConversionEval::InitRun(PHCompositeNode *topNode)
 {
-	_b_event=0;
-	_runNumber=_kRunNumber;
 	if(_kMakeTTree){
+		_b_event=0;
+		_runNumber=_kRunNumber;
 		_f = new TFile( _foutname.c_str(), "RECREATE");
 		_tree = new TTree("ttree","conversion data");
 		_tree->SetAutoSave(300);
@@ -231,7 +229,6 @@ int TruthConversionEval::process_event(PHCompositeNode *topNode)
 }
 
 std::queue<std::pair<int,int>> TruthConversionEval::numUnique(std::map<int,Conversion> *mymap=NULL,SvtxTrackEval* trackeval=NULL,RawClusterContainer *mainClusterContainer=NULL){
-
 	_b_nVtx = 0;
 	_b_Tpair=0;
 	_b_Rpair=0;
@@ -456,12 +453,9 @@ void TruthConversionEval::findChildren(std::queue<std::pair<int,int>> missingChi
 
 int TruthConversionEval::End(PHCompositeNode *topNode)
 {
-	if(_kMakeTTree){
-		_f->Write();
-		_f->Close();
-	}
+		if(_kMakeTTree){
+			_f->Write();
+			_f->Close();
+		}
 	return 0;
 }
-
-
-

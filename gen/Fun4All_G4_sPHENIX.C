@@ -235,7 +235,8 @@ using namespace std;
     {
       // toss low multiplicity dummy events
       PHG4SimpleEventGenerator *gen = new PHG4SimpleEventGenerator();
-      gen->add_particles("gamma", 8);  // mu+,e+,proton,pi+,Upsilon
+      gen->add_particles("gamma", 4);  // mu+,e+,proton,pi+,Upsilon
+      gen->add_particles("pi0", 3);  // mu+,e+,proton,pi+,Upsilon
       //gen->add_particles("pi+",100); // 100 pion option
       if (readhepmc || do_embedding || runpythia8 || runpythia6)
       {
@@ -497,7 +498,7 @@ using namespace std;
     //! positive ID is the embedded event of interest, e.g. jetty event from pythia
     //! negative IDs are backgrounds, .e.g out of time pile up collisions
     //! Usually, ID = 0 means the primary Au+Au collision background
-    //in->set_embedding_id(2);
+    in->set_embedding_id(3);
   }
   else
   {

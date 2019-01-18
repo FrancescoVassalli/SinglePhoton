@@ -16,18 +16,18 @@ lib_LTLIBRARIES = \
 	libtruthconversion.la
   
 include_HEADERS = \
-	TreeMaker.h \
-	TreeMakerLinkDef.h \
+	ConversionClusterTreeMaker.h \
+	ConversionClusterTreeMakerLinkDef.h \
 	TruthConversionEval.h \
 	TruthConversionEvalLinkDef.h \
 	Conversion.h \
 	ConversionLinkDef.h 
 
 libtruthconversion_la_SOURCES = \
-	TreeMaker.cc \
-	TreeMaker_Dict.C \
-	TruthConverionEval.cc \
-	TruthConverionEval_Dict.C \
+	ConversionClusterTreeMaker.C \
+	ConversionClusterTreeMaker_Dict.C \
+	TruthConversionEval.C \
+	TruthConversionEval_Dict.C \
 	Conversion.cc \
 	Conversion_Dict.C
 
@@ -35,6 +35,7 @@ libtruthconversion_la_LIBADD = \
   -lg4dst \
   -lg4eval \
   -lcalotrigger \
+	-lConvertedPhotonReconstructor\
   -lphool
 
 BUILT_SOURCES = \

@@ -21,7 +21,6 @@
 
 using namespace std;
 
-//will decide how to do removal later 
 ConvertedPhotonReconstructor::ConvertedPhotonReconstructor(const std::string &name) :
 	SubsysReco("ConvertedPhotonReconstructor")
 {

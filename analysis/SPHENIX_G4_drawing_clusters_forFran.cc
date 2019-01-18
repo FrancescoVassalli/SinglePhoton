@@ -56,9 +56,10 @@ void SPHENIX_G4_drawing_clusters_forFran()
   int    cluster_n;
   int    NTowers[200];
 
-  string treePath = "/sphenix/user/vassalli/gammasample/test/fourembededonlineanalysis";
+  string treePath = "/sphenix/user/vassalli/gammasample/fourembededonlineanalysis";
   string treeExtension = ".rootcTtree.root";
-  TChain *ttree = handleFile(treePath,treeExtension,"ttree",1);
+  unsigned int nFiles=100;
+  TChain *ttree = handleFile(treePath,treeExtension,"ttree",nFiles);
   ttree->SetBranchAddress("clusterTower_eta",    &clusterTower_eta    );
   ttree->SetBranchAddress("clusterTower_phi",    &clusterTower_phi    );
   ttree->SetBranchAddress("clusterTower_energy", &clusterTower_energy );
@@ -78,6 +79,7 @@ void SPHENIX_G4_drawing_clusters_forFran()
   {
     ttree->GetEvent(event);
     cout<<"Drawing "<<clusterNum<<" of "<<cluster_n<<" clusters\n";
+    if(cluster_n==0) continue;
     ostringstream oss;
     oss<<event;
     string thisPlotname = plotname +string(oss.str());
@@ -85,12 +87,27 @@ void SPHENIX_G4_drawing_clusters_forFran()
     photon_cluster->SetStats(kFALSE);
     photon_cluster->GetXaxis()->SetTitle("eta");
     photon_cluster->GetYaxis()->SetTitle("phi");
+    double maxTowerEnergy=-1.;
+    double maxTowerEta=-2.;
+    double maxTowerPhi=-2.*TMath::Pi();
     for(int i = 0; i < clusterNum; i++)
     {
       for(int toweri = 0; toweri < NTowers[i]; toweri++)
       {
         photon_cluster->Fill(clusterTower_eta[toweri],clusterTower_phi[toweri],clusterTower_energy[toweri]);
-      } 
+        if (clusterTower_energy[toweri]>maxTowerEnergy&&clusterTower_energy[toweri]>0)
+        {
+          maxTowerEnergy=clusterTower_energy[toweri];
+          maxTowerEta=clusterTower_eta[toweri];
+          maxTowerPhi=clusterTower_phi[toweri];
+        }
+      }
+      if (maxTowerEnergy!=-1.)
+       {
+         photon_cluster->GetXaxis()->SetRangeUser(TMath::Max(maxTowerEta-.2,-1.),TMath::Min(maxTowerEta+.2,1.));
+         photon_cluster->GetYaxis()->SetRangeUser(TMath::Max(maxTowerPhi-.2,-1*TMath::Pi()),TMath::Min(maxTowerPhi+.2,TMath::Pi()));
+       } 
+      
     }
   }
   
