@@ -47,7 +47,7 @@ void backgroundPlotter()
   TH1F *h_pim_prob = new TH1F("pim","",50,0.,1.);
   TH1F *h_p_prob = new TH1F("p","",50,0.,1.);
   TH1F *h_mu_prob = new TH1F("mu","",50,0.,1.);
-  TH1F *counts = new TH1F("pid_counts",4,-.5,4.5);
+  TH1F *counts = new TH1F("pid_counts","",4,-.5,4.5);
   for (int event = 0; event < ttree->GetEntries(); ++event)
   {
     ttree->GetEvent(event);
