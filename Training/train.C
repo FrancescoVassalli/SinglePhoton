@@ -64,6 +64,8 @@ void makeFactory(TTree* signalTree, TTree* backTree,std::string outfile,std::str
   factory->TrainAllMethods();
   factory->TestAllMethods();
   factory->EvaluateAllMethods();
+  targetFile->Write();
+  targetFile->Close();
 }
 
 
@@ -71,12 +73,13 @@ int train(){
   using namespace std;
   string treePath = "/sphenix/user/vassalli/gammasample/fourembededonlineanalysis";
   string treeExtension = ".root";
-  string outname = "cutTrain.root";
+  string outname = "cutTrainH.root";
   unsigned int nFiles=100;
 
   TChain *signalTree = handleFile(treePath,treeExtension,"cutTreeSignal",nFiles);
   TChain *backHTree = handleFile(treePath,treeExtension,"cutTreeBackh",nFiles);
   TChain *backETree = handleFile(treePath,treeExtension,"cutTreeBacke",nFiles);
   makeFactory(signalTree,backHTree,outname,"hback");
+  outname="cutTrainE.root";
   makeFactory(signalTree,backETree,outname,"eback");
 }
