@@ -235,9 +235,7 @@ using namespace std;
     {
       // toss low multiplicity dummy events
       PHG4SimpleEventGenerator *gen = new PHG4SimpleEventGenerator();
-      gen->add_particles("gamma", 4);  // mu+,e+,proton,pi+,Upsilon
-      gen->add_particles("pi0", 3);  // mu+,e+,proton,pi+,Upsilon
-      //gen->add_particles("pi+",100); // 100 pion option
+      gen->add_particles("e+", 10);  // mu+,e+,proton,pi+,Upsilon
       if (readhepmc || do_embedding || runpythia8 || runpythia6)
       {
         gen->set_reuse_existing_vertex(true);
