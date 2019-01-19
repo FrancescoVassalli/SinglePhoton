@@ -54,11 +54,16 @@ void backgroundPlotter()
   TH1F *h_pim_prob = new TH1F("pim","",50,0.,1.);
   TH1F *h_p_prob = new TH1F("p","",50,0.,1.);
   TH1F *h_mu_prob = new TH1F("mu","",50,0.,1.);
-  TH1F *counts = new TH1F("pid_counts","",4,-.5,4.5);
+  //TH1F *counts = new TH1F("pid_counts","",4,-.5,4.5);
   TH1F *s_deta = new TH1F("s_deta","Signal #Delta#eta",100,0,.1);
   TH1F *b_deta = new TH1F("b_deta","Background #Delta#eta",100,0,.1);
   TH1F *s_layer = new TH1F("s_layer","Signal Layer",4,-.5,3.5);
   TH1F *b_layer = new TH1F("b_layer","Background Layer",4,-.5,3.5);
+
+  unsigned long pip=0;
+  unsigned long pim=0;
+  unsigned int p=0;
+  unsigned int mu=0;
 
   for (int event = 0; event < backTree->GetEntries(); ++event)
   {
@@ -66,27 +71,33 @@ void backgroundPlotter()
     switch(pid){
     	case 211:
     		h_pip_prob->Fill(cluster_prob);
-    		counts->Fill(0);
+    		//counts->Fill(0);
+    		pip++;
     		break;
     	case -211:
     		h_pim_prob->Fill(cluster_prob);
-    		counts->Fill(1);
+    		//counts->Fill(1);
+    		pim++;
     		break;
     	case 2212:
     		h_p_prob->Fill(cluster_prob);
-    		counts->Fill(2);
+    		//counts->Fill(2);
+    		p++;
     		break;
     	case -2212:
     		h_p_prob->Fill(cluster_prob);
-    		counts->Fill(2);
+    		//counts->Fill(2);
+    		p++;
     		break;
     	case 13:
     		h_mu_prob->Fill(cluster_prob);
-    		counts->Fill(3);
+    		//counts->Fill(3);
+    		mu++;
     		break;
     	case -13:
     		h_mu_prob->Fill(cluster_prob);
-    		counts->Fill(3);
+    		//counts->Fill(3);
+    		mu++;
     		break;
     	default:
     		break;
@@ -94,8 +105,9 @@ void backgroundPlotter()
     b_deta->Fill(deta);
     b_layer->Fill(layer);
   } 
-  counts->Scale(1./(float)backTree->GetEntries());
-  std::cout<<backTree->GetEntries()<<endl;
+  //counts->Scale(1./(float)backTree->GetEntries());
+  float total=backTree->GetEntries();
+  std::cout<<Form("Pi+=%0.3f\%	Pi-=%0.3f	p/pbar=%0.3f	mu=%0.3f",pip/total,pim/total,p/total,mu/total)<<endl;
 
   for (int i = 0; i < signalTree->GetEntries(); ++i)
   {
