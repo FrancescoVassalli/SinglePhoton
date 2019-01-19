@@ -321,7 +321,7 @@ std::queue<std::pair<int,int>> TruthConversionEval::numUnique(std::map<int,Conve
 									if (radius<s_kTPCRADIUS)
 									{
 										RawCluster *clus2 = mainClusterContainer->getCluster(clusterIds.second);
-										if (clus)
+										if (clus2)
 										{
 											_b_cluster_dphi[_b_Rpair]=fabs(clustemp->get_phi()-clus2->get_phi());
 											TVector3 etaCalc(clustemp->get_x(),clustemp->get_y(),clustemp->get_z());
