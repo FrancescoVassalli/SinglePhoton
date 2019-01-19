@@ -45,6 +45,7 @@ void backgroundPlotter()
 
   TChain *signalTree = handleFile(treePath,treeExtension,"cutTreeSignal",nFiles);
   signalTree->SetBranchAddress("track_deta", &deta);
+  signalTree->SetBranchAddress("cluster_prob",    &cluster_prob );
   signalTree->SetBranchAddress("track_layer", &layer);
 
   string outfilename = "backgroundProb.root";
@@ -59,6 +60,7 @@ void backgroundPlotter()
   TH1F *b_deta = new TH1F("b_deta","Background #Delta#eta",100,0,.1);
   TH1F *s_layer = new TH1F("s_layer","Signal Layer",4,-.5,3.5);
   TH1F *b_layer = new TH1F("b_layer","Background Layer",4,-.5,3.5);
+  TH1F *s_prob = new TH1F("s_prob","",50,0.,1.);
 
   unsigned long pip=0;
   unsigned long pim=0;
@@ -114,12 +116,13 @@ void backgroundPlotter()
   	signalTree->GetEvent(i);
   	s_deta->Fill(deta);
   	s_layer->Fill(layer);
+  	s_prob->Fill(cluster_prob);
   }
   b_deta->Scale(1/b_deta->Integral());
   b_layer->Scale(1/b_layer->Integral());
   s_deta->Scale(1/s_deta->Integral());
   s_layer->Scale(1/s_layer->Integral());
-
+  s_prob->Scale(1/s_prob->Integral());
   out->Write();
   out->Close();
   delete backTree;
