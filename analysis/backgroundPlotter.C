@@ -116,9 +116,9 @@ void backgroundPlotter()
   	s_layer->Fill(layer);
   }
   b_deta->Scale(1/b_deta->Integral());
-  b_layer->Scale(1/b_deta->Integral());
-  s_deta->Scale(1/b_deta->Integral());
-  s_layer->Scale(1/b_deta->Integral());
+  b_layer->Scale(1/b_layer->Integral());
+  s_deta->Scale(1/s_deta->Integral());
+  s_layer->Scale(1/s_layer->Integral());
 
   out->Write();
   out->Close();
