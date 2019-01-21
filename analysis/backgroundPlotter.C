@@ -28,9 +28,9 @@ TChain* handleFile(string name, string extension, string treename, unsigned int 
 
 float kPurityCutProb=.8; //for high purity make cluster_prob<.8
 float kEffCutProb=.9; //for high efficiency make cluster_prob<.9
-float kCutProb=kEffCutProb;
-//int kPurityCutLayer=1; //for high purity make layer==1
-//int kEffCutLayer =1; //for high efficiency make layer <=1
+int kPurityCutLayer=1; //for high purity make layer==1
+int kEffCutLayer =1; //for high efficiency make layer <=1
+int kCutLayer=kPurityCutLayer;
 
 void backgroundPlotter()
 {
@@ -76,7 +76,7 @@ void backgroundPlotter()
   for (int event = 0; event < backTree->GetEntries(); ++event)
   {
     backTree->GetEvent(event);
-    if (cluster_prob<kCutProb)
+    if (cluster_prob<kPurityCutProb&&layer==kCutLayer)
     {
     	switch(pid){
 	    	case 211:
@@ -116,16 +116,16 @@ void backgroundPlotter()
 	    b_layer->Fill(layer);
     	rejection++;
     }
-  } 
+	} 
   //counts->Scale(1./(float)backTree->GetEntries());
   float total=backTree->GetEntries();
   std::cout<<Form("Pi+=%0.3f	Pi-=%0.3f	p/pbar=%0.3f	mu=%0.3f",pip/total,pim/total,p/total,mu/total)<<endl;
   unsigned efficiency=0;
   for (int i = 0; i < signalTree->GetEntries(); ++i)
   {
-  	signalTree->GetEvent(i);
-  	if (cluster_prob<kCutProb)
+  	if (cluster_prob<kPurityCutProb&&layer==kCutLayer)
   	{
+  		signalTree->GetEvent(i);
 	  	s_deta->Fill(deta);
 	  	s_layer->Fill(layer);
 	  	s_prob->Fill(cluster_prob);
@@ -141,6 +141,6 @@ void backgroundPlotter()
   out->Close();
   delete backTree;
   delete out;
-  std::cout<<Form("efficiency:%.03f rejection:%0.3f",(float)efficiency/(float)signalTree->GetEntries(),1.-rejection/total)<<endl;
+  std::cout<<Form("efficiency:%.03f rejection:%0.3f",efficiency/(float)signalTree->GetEntries(),rejection/total)<<endl;
 
 }

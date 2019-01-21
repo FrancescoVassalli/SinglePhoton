@@ -34,6 +34,7 @@ int RecoConversionEval::process_event(PHCompositeNode *topNode) {
 	doNodePointers(topNode);
 	cout<<"Did pointers: \n \n";
   int bigLoopCount=0;
+/*the is not optimized but is just a nlogn process*/
   for ( SvtxTrackMap::Iter iter = _allTracks->begin(); iter != _allTracks->end(); ++bigLoopCount) {
     //I want to now only check e tracks so check the clusters of the |charge|=1 tracks
     if (abs(iter->second->get_charge())==1&&iter->second->get_pt()>_kTrackPtCut)
