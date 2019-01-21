@@ -172,6 +172,10 @@ class Conversion
 			_svtxClusterMap=cmap;
 			_hitMap=hmap;
 		}
+    inline int setVerbosity(int v){
+      verbosity=v;
+      return verbosity;
+    }
 		/**Finds the cluster associated with {@link reco1} 
 		 * if the trackeval was not previously set it needs to be set now
 		 * if {@link reco1} not set will attempt to set

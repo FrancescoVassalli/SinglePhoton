@@ -122,9 +122,10 @@ int TruthConversionEval::process_event(PHCompositeNode *topNode)
 	for ( PHG4TruthInfoContainer::ConstIterator iter = range.first; iter != range.second; ++iter ) {
 		PHG4Particle* g4particle = iter->second; 
 		PHG4Particle* parent =_truthinfo->GetParticle(g4particle->get_parent_id());
-		float radius=0;
-		int embedID;
 		PHG4VtxPoint* vtx=_truthinfo->GetVtx(g4particle->get_vtx_id()); //get the vertex
+		float radius=sqrt(vtx->get_x()*vtx->get_x()+vtx->get_y()*vtx->get_y());
+    if(radius>s_kTPCRADIUS) continue;
+		int embedID;
 		if (parent)//if the particle is not primary
 		{
 			embedID=get_embed(parent,_truthinfo);

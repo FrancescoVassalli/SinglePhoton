@@ -33,7 +33,7 @@ bool Conversion::setElectron(){
     }
     else if (e1->get_pid()<0)
     {
-      std::cout<<"Warning in Conversion only 1 positron in conversion"<<std::endl;
+      if(verbosity>1) std::cout<<"Warning in Conversion only 1 positron in conversion"<<std::endl;
       return false;
     }
   }
