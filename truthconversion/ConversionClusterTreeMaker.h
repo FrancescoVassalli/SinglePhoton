@@ -7,8 +7,10 @@
 #include "TFile.h"
 #include "TruthConversionEval.h"
 
+#ifndef __CINT__
 #include <string>
 #include <vector>
+#endif
 
 class PHCompositeNode;
 
