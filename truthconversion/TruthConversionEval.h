@@ -75,15 +75,7 @@ class TruthConversionEval: public SubsysReco
       if ( dphi < -3.14159 ) dphi += 2 * 3.14159;
       return sqrt( pow( deta, 2 ) + pow( dphi, 2 ) );
     }
-    inline void doNodePointers(PHCompositeNode* topNode){
-      _mainClusterContainer = findNode::getClass<RawClusterContainer>(topNode,"CLUSTER_CEMC");
-      _truthinfo = findNode::getClass<PHG4TruthInfoContainer>(topNode,"G4TruthInfo");
-      _svtxClusterMap = findNode::getClass<SvtxClusterMap>(topNode,"SvtxClusterMap");
-      _hitMap = findNode::getClass<SvtxHitMap>(topNode,"SvtxHitMap");
-      _vertexer= new RaveVertexingAux(topNode);
-      _vertexer->Verbosity(Verbosity());
-      _topNode=topNode;
-    }
+    void doNodePointers(PHCompositeNode* topNode);
     /** helper function for process_event
      * fills the member fields with information from the conversions 
      * finds the clusters associated with the conversions
@@ -113,7 +105,6 @@ class TruthConversionEval: public SubsysReco
     SvtxClusterMap* _svtxClusterMap;
     SvtxHitMap *_hitMap;
     std::string _foutname; ///< name of the output file
-    PHCompositeNode *_topNode=NULL;
     RaveVertexingAux *_vertexer=NULL; ///< for reco vertex finding currently does nothing
     /** \defgroup mainTreeVars Variables for {@link _tree}
       @{*/
