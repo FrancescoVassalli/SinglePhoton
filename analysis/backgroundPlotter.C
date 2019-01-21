@@ -43,7 +43,7 @@ void backgroundPlotter()
   string treeExtension = ".root";
   unsigned int nFiles=100;
 
-  TChain *backTree = handleFile(treePath,treeExtension,"cutTreeBackh",nFiles);
+  TChain *backTree = handleFile(treePath,treeExtension,"cutTreeBacke",nFiles);
   backTree->SetBranchAddress("pid",    &pid    );
   backTree->SetBranchAddress("cluster_prob",    &cluster_prob );
   backTree->SetBranchAddress("track_deta", &deta);
@@ -142,5 +142,5 @@ void backgroundPlotter()
   delete backTree;
   delete out;
   std::cout<<Form("efficiency:%.04f rejection:%0.3f",efficiency/(float)signalTree->GetEntries(),1-rejection/total)<<endl;
-
+  cout<<Form("n signal=%i, n background=%0.1f",signalTree->GetEntries(),total)<<endl;
 }

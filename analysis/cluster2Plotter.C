@@ -63,8 +63,8 @@ void cluster2Plotter()
   float meanEta=0;
   float meanPhi=0;
   long sum=0;
-	unsigned truthN=0;
-	unsigned recoN=0;
+	float truthN=0;
+	float recoN=0;
   for (int event = 0; event < ttree->GetEntries(); ++event)
   {
     ttree->GetEvent(event);
@@ -84,7 +84,7 @@ void cluster2Plotter()
   meanEta/=sum;
   meanPhi/=sum;
   cout<<"Done with mean eta:"<<meanEta<<" and mean phi:"<<meanPhi<<'\n';
-  cout<<Form("truth->reco eff=%0.3f",((unsigned float) recoN/truthN))<<'\n';
+  cout<<Form("truth->reco eff=%0.3f",(recoN/truthN))<<'\n';
   out->Write();
   out->Close();
   delete ttree;
