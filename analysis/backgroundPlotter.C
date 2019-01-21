@@ -115,11 +115,10 @@ void backgroundPlotter()
 	    b_layer->Fill(layer);
     	rejection++;
     }
-    
   } 
   //counts->Scale(1./(float)backTree->GetEntries());
   float total=backTree->GetEntries();
-  std::cout<<Form("Pi+=%0.3f\%	Pi-=%0.3f	p/pbar=%0.3f	mu=%0.3f",pip/total,pim/total,p/total,mu/total)<<endl;
+  std::cout<<Form("Pi+=%0.3f	Pi-=%0.3f	p/pbar=%0.3f	mu=%0.3f",pip/total,pim/total,p/total,mu/total)<<endl;
   unsigned efficiency=0;
   for (int i = 0; i < signalTree->GetEntries(); ++i)
   {

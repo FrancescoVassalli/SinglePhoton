@@ -325,6 +325,10 @@ std::queue<std::pair<int,int>> TruthConversionEval::numUnique(std::map<int,Conve
 										{
 											_b_cluster_dphi[_b_Rpair]=fabs(clustemp->get_phi()-clus2->get_phi());
 											TVector3 etaCalc(clustemp->get_x(),clustemp->get_y(),clustemp->get_z());
+                      if (clus2->get_prob()>_b_cluster_prob)
+                      {
+                        _b_cluster_prob=clus2->get_prob();
+                      }
 											float eta1 = etaCalc.PseudoRapidity();
 											etaCalc.SetXYZ(clus2->get_x(),clus2->get_y(),clus2->get_z());
 											_b_cluster_deta[_b_Rpair]=fabs(eta1-etaCalc.PseudoRapidity());
