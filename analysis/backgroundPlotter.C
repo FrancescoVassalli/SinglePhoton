@@ -76,7 +76,7 @@ void backgroundPlotter()
   for (int event = 0; event < backTree->GetEntries(); ++event)
   {
     backTree->GetEvent(event);
-    if (true)
+    if (layer==kCutLayer)
     {
       switch(pid){
         case 211:
@@ -141,6 +141,6 @@ void backgroundPlotter()
   out->Close();
   delete backTree;
   delete out;
-  std::cout<<Form("efficiency:%.04f rejection:%0.3f",efficiency/(float)signalTree->GetEntries(),1-rejection/total)<<endl;
+  std::cout<<Form("efficiency:%.04f rejection:%0.5f",efficiency/(float)signalTree->GetEntries(),1-rejection/total)<<endl;
   cout<<Form("n signal=%i, n background=%0.1f",signalTree->GetEntries(),total)<<endl;
 }
