@@ -1,5 +1,4 @@
 #include <phool/getClass.h>
-#include <phool/PHCompositeNode.h>
 
 #include <fun4all/Fun4AllServer.h>
 
@@ -26,6 +25,8 @@
 #include <g4vertex/GlobalVertexMap.h>
 
 #include <jetbackground/TowerBackground.h>
+
+class PHCompositeNode;
 
 ChaseTower findMaxTower(std::vector<ChaseTower> towers)
 {
