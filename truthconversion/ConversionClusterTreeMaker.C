@@ -9,9 +9,7 @@
 #include <iostream>
 #include <vector>
 
-#ifndef __CINT__
 #include <list>
-#endif //CINT
 
 #include <calotrigger/CaloTriggerInfo.h>
 
