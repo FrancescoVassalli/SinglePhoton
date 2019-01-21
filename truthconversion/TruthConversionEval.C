@@ -345,9 +345,9 @@ std::queue<std::pair<int,int>> TruthConversionEval::numUnique(std::map<int,Conve
 										}
 										_signalCutTree->Fill();  
 									}
-									_b_Rpair++;
 								}
 							}
+							_b_Rpair++;
 							break;
 						}
 					case 1: //there's one reco track
