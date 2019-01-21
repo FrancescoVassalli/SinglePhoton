@@ -31,6 +31,8 @@ void cluster2Plotter()
   float deta[200];
   float dphi[200];
   int    cluster_n;
+  int    truth_n;
+  int    reco_n;
   float cluster_probS[20];
   float cluster_probM[20];
 
@@ -43,6 +45,8 @@ void cluster2Plotter()
   ttree->SetBranchAddress("nCluster",    &cluster_n);
   ttree->SetBranchAddress("Scluster_prob",    &cluster_probS );
   ttree->SetBranchAddress("Mcluster_prob",    &cluster_probM );
+  ttree->SetBranchAddress("nTpair",    &truth_n );
+  ttree->SetBranchAddress("nRpair",    &reco_n );
 
   string outfilename = "clus2plot.root";
   TFile *out = new TFile(outfilename.c_str(),"RECREATE");
@@ -59,6 +63,8 @@ void cluster2Plotter()
   float meanEta=0;
   float meanPhi=0;
   long sum=0;
+	unsigned truthN=0;
+	unsigned recoN=0;
   for (int event = 0; event < ttree->GetEntries(); ++event)
   {
     ttree->GetEvent(event);
@@ -70,12 +76,15 @@ void cluster2Plotter()
       meanPhi+=dphi[i];
       h_clusSProb->Fill(cluster_probS[i]);
       h_clusMProb->Fill(cluster_probM[i]);
+			truthN+=truth_n;
+			recoN+=reco_n;
     }
     sum+=cluster_n;
   }  
   meanEta/=sum;
   meanPhi/=sum;
   cout<<"Done with mean eta:"<<meanEta<<" and mean phi:"<<meanPhi<<'\n';
+  cout<<Form("truth->reco eff=%0.3f",((unsigned float) recoN/truthN))<<'\n';
   out->Write();
   out->Close();
   delete ttree;
