@@ -16,7 +16,6 @@
 #include "../PhotonConversion/RaveVertexingAux.h"
 
 #include <fun4all/Fun4AllServer.h>
-#include <phool/PHCompositeNode.h>
 #include <phool/getClass.h>
 
 #include <fun4all/SubsysReco.h>
