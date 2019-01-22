@@ -227,16 +227,28 @@ int Conversion::trackDLayer(SvtxClusterMap* svtxClusterMap,SvtxHitMap* hitMap){
 	}
 	else return -1;
 }
+
 int Conversion::firstLayer(SvtxClusterMap* svtxClusterMap){
-	if (recoCount()==2){
-		SvtxCluster *c1 = svtxClusterMap->get(*(reco1->begin_clusters()));
-		SvtxCluster *c2 = svtxClusterMap->get(*(reco2->begin_clusters()));
-		if(c1->get_layer()<c2->get_layer()){
-			return c2->get_layer();
-		}
-		else return c1->get_layer();
-	}
-	else return -1;
+  switch(recoCount()){
+    case 2:
+    {
+      SvtxCluster *c1 = svtxClusterMap->get(*(reco1->begin_clusters()));
+      SvtxCluster *c2 = svtxClusterMap->get(*(reco2->begin_clusters()));
+      if(c1->get_layer()<c2->get_layer()){
+        return c2->get_layer();
+      }
+      else return c1->get_layer();
+    }
+    case 1:
+    {
+      SvtxTrack *thisReco;
+      if (reco1)thisReco=reco1;
+      else thisReco=reco2;
+      return svtxClusterMap->get(*(thisReco->begin_clusters()))->get_layer();
+    }
+    default:
+      return -1;
+  }
 }
 
 double Conversion::dist(PHG4VtxPoint *recovtx,SvtxClusterMap* svtxClusterMap){
