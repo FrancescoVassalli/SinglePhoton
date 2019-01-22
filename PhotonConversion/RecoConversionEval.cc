@@ -1,12 +1,10 @@
 #include "RecoConversionEval.h"
 
 #include <fun4all/Fun4AllReturnCodes.h>
-
-
+#include <phool/PHCompositeNode.h>
 #include <trackbase_historic/SvtxVertexMap.h>
 #include <trackbase_historic/SvtxVertex.h>
 #include <g4eval/SvtxEvalStack.h>
-
 #include <g4main/PHG4Particle.h>
 #include <g4main/PHG4VtxPoint.h>
 #include <g4main/PHG4TruthInfoContainer.h>
@@ -29,6 +27,19 @@ int RecoConversionEval::Init(PHCompositeNode *topNode) {
 int RecoConversionEval::InitRun(PHCompositeNode *topNode) {
   return Fun4AllReturnCodes::EVENT_OK;
 }
+
+void RecoConversionEval::doNodePointers(PHCompositeNode *topNode){
+      _allTracks = findNode::getClass<SvtxTrackMap>(topNode,"SvtxTrackMap");
+      _mainClusterContainer = findNode::getClass<RawClusterContainer>(topNode,"CLUSTER_CEMC");
+      _svtxClusterMap = findNode::getClass<SvtxClusterMap>(topNode,"SvtxClusterMap");
+      _hitMap = findNode::getClass<SvtxHitMap>(topNode,"SvtxHitMap");
+      _auxVertexer = new RaveVertexingAux(topNode);
+    }
+
+    bool RecoConversionEval::hasNodePointers()const{
+      return _allTracks &&_mainClusterContainer && _svtxClusterMap&&_hitMap
+        &&_auxVertexer&&!_auxVertexer->hasErrors();
+    }
 
 int RecoConversionEval::process_event(PHCompositeNode *topNode) {
 	doNodePointers(topNode);
@@ -67,6 +78,32 @@ int RecoConversionEval::process_event(PHCompositeNode *topNode) {
   return Fun4AllReturnCodes::EVENT_OK;
 }
 
+bool RecoConversionEval::pairCuts(SvtxTrack* t1, SvtxTrack* t2)const{
+  return detaCut(t1,t2) && hitCuts(t1,t2);
+}
+
+bool RecoConversionEval::hitCuts(SvtxTrack* t1, SvtxTrack* t2)const {
+      SvtxCluster *c1 = _svtxClusterMap->get(*(t1->begin_clusters()));
+      SvtxCluster *c2 = _svtxClusterMap->get(*(t2->begin_clusters()));
+      SvtxHit *h1 = _hitMap->get(*(c1->begin_hits()));
+      SvtxHit *h2 = _hitMap->get(*(c2->begin_hits()));
+      //check that the first hits are close enough
+      if (c1->get_layer()>_kNSiliconLayer&&c2->get_layer()>_kNSiliconLayer)
+      {
+        if (abs(h1->get_layer()-h2->get_layer())>_kFirstHitStrict)
+        {
+          return false;
+        }
+      }
+      else{
+        if (abs(h1->get_layer()-h2->get_layer())>_kFirstHit)
+        {
+          return false;
+        }
+      }
+      return true;
+    }
+
 bool RecoConversionEval::vtxCuts(SvtxVertex *vtx){
   return true;
 }
@@ -74,6 +111,37 @@ bool RecoConversionEval::vtxCuts(SvtxVertex *vtx){
 int RecoConversionEval::End(PHCompositeNode *topNode) {
   return Fun4AllReturnCodes::EVENT_OK;
 }
+
+bool RecoConversionEval::approachDistance(SvtxTrack *t1,SvtxTrack* t2)const{
+      static const double eps = 0.000001;
+      TVector3 u(t1->get_px(),t1->get_py(),t1->get_pz());
+      TVector3 v(t2->get_px(),t2->get_py(),t2->get_pz());
+      TVector3 w(t1->get_x()-t2->get_x(),t1->get_x()-t2->get_y(),t1->get_x()-t2->get_z());
+
+      double a = u.Dot(u);
+      double b = u.Dot(v);
+      double c = v.Dot(v);
+      double d = u.Dot(w);
+      double e = v.Dot(w);
+
+      double D = a*c - b*b;
+      double sc, tc;
+      // compute the line parameters of the two closest points
+      if (D < eps) {         // the lines are almost parallel
+        sc = 0.0;
+        tc = (b>c ? d/b : e/c);   // use the largest denominator
+      }
+      else {
+        sc = (b*e - c*d) / D;
+        tc = (a*e - b*d) / D;
+      }
+      // get the difference of the two closest points
+      u*=sc;
+      v*=tc;
+      w+=u;
+      w-=v;
+      return w.Mag()<=_kApprochCut;   // return the closest distance 
+    }
 
 void RecoConversionEval::process_recoTracks(PHCompositeNode *topNode){
 

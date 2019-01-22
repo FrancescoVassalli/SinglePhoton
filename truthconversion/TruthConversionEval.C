@@ -1,9 +1,9 @@
 #include "TruthConversionEval.h"
-#include <calotrigger/CaloTriggerInfo.h>
 
+#include <phool/PHCompositeNode.h>
+#include <calotrigger/CaloTriggerInfo.h>
 #include <calobase/RawCluster.h>
 #include <calobase/RawClusterv1.h>
-
 #include <g4eval/SvtxEvalStack.h>
 #include <g4eval/SvtxTrackEval.h>
 
@@ -462,6 +462,16 @@ void TruthConversionEval::findChildren(std::queue<std::pair<int,int>> missingChi
 			missingChildren.pop();
 		}
 	}
+}
+
+const RawClusterContainer* TruthConversionEval::getClusters()const {return &_conversionClusters;} 
+
+int TruthConversionEval::get_embed(PHG4Particle* particle, PHG4TruthInfoContainer* truthinfo)const{
+  return truthinfo->isEmbeded(particle->get_track_id());
+}
+
+float TruthConversionEval::vtoR(PHG4VtxPoint* vtx)const{
+  return (float) sqrt(vtx->get_x()*vtx->get_x()+vtx->get_y()*vtx->get_y());
 }
 
 

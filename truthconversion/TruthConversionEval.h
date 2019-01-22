@@ -11,36 +11,25 @@
 #ifndef TRUTHCONVERSIONEVAL_H__
 #define TRUTHCONVERSIONEVAL_H__
 
-#include "TLorentzVector.h"
-#include "Conversion.h"
-#include "../PhotonConversion/RaveVertexingAux.h"
-
-#include <fun4all/Fun4AllServer.h>
-#include <phool/getClass.h>
-
 #include <fun4all/SubsysReco.h>
-#include <g4main/PHG4TruthInfoContainer.h>
-#include <g4main/PHG4Particle.h>
-#include <g4main/PHG4VtxPoint.h>
 
-#include <trackbase_historic/SvtxHitMap.h>
-#include <trackbase_historic/SvtxHit.h>
-#include <trackbase_historic/SvtxClusterMap.h>
-#include <trackbase_historic/SvtxCluster.h>
-
-#include <calobase/RawClusterContainer.h>
-
-#include <TTree.h>
-#include <TFile.h>
-
-#include <vector>
 #include <queue>
-#include <set>
 
 
 class PHCompositeNode;
+class PHG4TruthInfoContainer;
+class PHG4Particle;
+class PHG4VtxPoint;
 class Conversion;
 class SvtxTrackEval;
+class SvtxHitMap;
+class SvtxHit;
+class SvtxClusterMap;
+class SvtxCluster;
+class RawClusterContainer;
+class TTree;
+class TFile;
+class RaveVertexingAux;
 
 class TruthConversionEval: public SubsysReco
 {
@@ -65,16 +54,9 @@ class TruthConversionEval: public SubsysReco
     int process_event(PHCompositeNode*);
     int End(PHCompositeNode*);
     /** get the clusters associated with converions*/
-    inline const RawClusterContainer* getClusters()const {return &_conversionClusters;} 
+    const RawClusterContainer* getClusters()const;
 
   private:
-    inline float deltaR( float eta1, float eta2, float phi1, float phi2 ) {
-      float deta = eta1 - eta2;
-      float dphi = phi1 - phi2;
-      if ( dphi > 3.14159 ) dphi -= 2 * 3.14159;
-      if ( dphi < -3.14159 ) dphi += 2 * 3.14159;
-      return sqrt( pow( deta, 2 ) + pow( dphi, 2 ) );
-    }
     void doNodePointers(PHCompositeNode* topNode);
     /** helper function for process_event
      * fills the member fields with information from the conversions 
@@ -87,6 +69,9 @@ class TruthConversionEval: public SubsysReco
     /** @param map should contain Conversion objects which hold background events i.e. not conversions
      * fills the fields for {@link _backgroundCutTree*/
     void processBackground(std::map<int,Conversion>* map,SvtxTrackEval* trackEval,TTree* tree);
+
+    int get_embed(PHG4Particle* particle, PHG4TruthInfoContainer* truthinfo) const;
+    float vtoR(PHG4VtxPoint* vtx)const;
 
     const static int s_kMAXParticles=200; ///< increase this number if arrays go out of bounds
     const static int s_kMAXRecoMatch=20; ///< increase this number if arrays go out of bounds
@@ -171,12 +156,7 @@ class TruthConversionEval: public SubsysReco
     float _kRAPIDITYACCEPT=1; //<acceptance rapidity currently hard coded to |1|
 };
 
-inline int get_embed(PHG4Particle* particle, PHG4TruthInfoContainer* truthinfo){
-  return truthinfo->isEmbeded(particle->get_track_id());
-}
-inline float vtoR(PHG4VtxPoint* vtx){
-  return (float) sqrt(vtx->get_x()*vtx->get_x()+vtx->get_y()*vtx->get_y());
-}
+
 
 #endif // __TRUTHCONVERSIONEVAL_H__
 
