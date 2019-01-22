@@ -25,6 +25,7 @@ include_HEADERS = \
 
 libtruthconversion_la_SOURCES = \
 	ConversionClusterTreeMaker.C \
+	ConversionClusterTreeMaker_Dict.C \
 	TruthConversionEval.C \
 	TruthConversionEval_Dict.C \
 	Conversion.cc 
