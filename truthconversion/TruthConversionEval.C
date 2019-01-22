@@ -1,12 +1,29 @@
 #include "TruthConversionEval.h"
+#include "Conversion.h"
+#include "../PhotonConversion/RaveVertexingAux.h"
 
 #include <phool/PHCompositeNode.h>
+#include <phool/getClass.h>
+
 #include <calotrigger/CaloTriggerInfo.h>
 #include <calobase/RawCluster.h>
 #include <calobase/RawClusterv1.h>
+
+#include <g4main/PHG4TruthInfoContainer.h>
+#include <g4main/PHG4Particle.h>
+#include <g4main/PHG4VtxPoint.h>
+
+#include <trackbase_historic/SvtxHitMap.h>
+#include <trackbase_historic/SvtxHit.h>
+#include <trackbase_historic/SvtxClusterMap.h>
+#include <trackbase_historic/SvtxCluster.h>
+
 #include <g4eval/SvtxEvalStack.h>
 #include <g4eval/SvtxTrackEval.h>
 
+#include <TFile.h>
+#include <TTree.h>
+#include <TLorentzVector.h>
 
 #include <utility>
 #include <iostream>

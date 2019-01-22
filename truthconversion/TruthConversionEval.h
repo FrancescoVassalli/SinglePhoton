@@ -1,4 +1,3 @@
-
 /**
  * @TruthConversionEval.h
  * @author Francesco Vassalli <Francesco.Vassalli@colorado.edu>
@@ -12,9 +11,8 @@
 #define TRUTHCONVERSIONEVAL_H__
 
 #include <fun4all/SubsysReco.h>
-
+#include <calobase/RawClusterContainer.h>
 #include <queue>
-
 
 class PHCompositeNode;
 class PHG4TruthInfoContainer;

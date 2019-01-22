@@ -1,5 +1,5 @@
 /**
- * @Conversion.h
+ * @ConversionClusterTreeMaker.h
  * @author Francesco Vassalli <Francesco.Vassalli@colorado.edu>
  * @author Chase Smith <Chase.Smith@colorado.edu>
  * @version 1.0

@@ -51,7 +51,8 @@ testexternals.C:
 	echo "{" >> $@
 	echo "  return 0;" >> $@
 	echo "}" >> $@
-
+%_Dict.C: %.h %LinkDef.h
+		rootcint -f $@ -c $(CINTFLAGS) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $^
 ##############################################
 # please add new classes in alphabetical order
 # Rule for generating CINT dictionaries from class headers.
