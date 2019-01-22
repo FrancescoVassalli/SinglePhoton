@@ -116,13 +116,13 @@ int TruthConversionEval::InitRun(PHCompositeNode *topNode)
 }
 
 void TruthConversionEval::doNodePointers(PHCompositeNode* topNode){
-      _mainClusterContainer = findNode::getClass<RawClusterContainer>(topNode,"CLUSTER_CEMC");
-      _truthinfo = findNode::getClass<PHG4TruthInfoContainer>(topNode,"G4TruthInfo");
-      _svtxClusterMap = findNode::getClass<SvtxClusterMap>(topNode,"SvtxClusterMap");
-      _hitMap = findNode::getClass<SvtxHitMap>(topNode,"SvtxHitMap");
-      _vertexer= new RaveVertexingAux(topNode);
-      _vertexer->Verbosity(Verbosity());
-    }
+	_mainClusterContainer = findNode::getClass<RawClusterContainer>(topNode,"CLUSTER_CEMC");
+	_truthinfo = findNode::getClass<PHG4TruthInfoContainer>(topNode,"G4TruthInfo");
+	_svtxClusterMap = findNode::getClass<SvtxClusterMap>(topNode,"SvtxClusterMap");
+	_hitMap = findNode::getClass<SvtxHitMap>(topNode,"SvtxHitMap");
+	_vertexer= new RaveVertexingAux(topNode);
+	_vertexer->Verbosity(Verbosity());
+}
 
 int TruthConversionEval::process_event(PHCompositeNode *topNode)
 {
@@ -150,7 +150,7 @@ int TruthConversionEval::process_event(PHCompositeNode *topNode)
 		PHG4Particle* parent =_truthinfo->GetParticle(g4particle->get_parent_id());
 		PHG4VtxPoint* vtx=_truthinfo->GetVtx(g4particle->get_vtx_id()); //get the vertex
 		float radius=sqrt(vtx->get_x()*vtx->get_x()+vtx->get_y()*vtx->get_y());
-    if(radius>s_kTPCRADIUS) continue;
+		if(radius>s_kTPCRADIUS) continue;
 		int embedID;
 		if (parent)//if the particle is not primary
 		{
@@ -263,12 +263,13 @@ std::queue<std::pair<int,int>> TruthConversionEval::numUnique(std::map<int,Conve
 	for (std::map<int,Conversion>::iterator i = mymap->begin(); i != mymap->end(); ++i) {
 		PHG4VtxPoint *vtx =i->second.getVtx(); //get the vtx
 		float radius=sqrt(vtx->get_x()*vtx->get_x()+vtx->get_y()*vtx->get_y());
+		if (radius>s_kTPCRADIUS) continue;
 		PHG4Particle *temp = i->second.getPhoton(); //set the photon
 		TLorentzVector tlv_photon,tlv_electron,tlv_positron; //make tlv for each particle 
 		tlv_photon.SetPxPyPzE(temp->get_px(),temp->get_py(),temp->get_pz(),temp->get_e()); //intialize
 		temp=i->second.getElectron(); //set the first child 
 		tlv_electron.SetPxPyPzE(temp->get_px(),temp->get_py(),temp->get_pz(),temp->get_e());
-		if(_kMakeTTree&&radius<s_kTPCRADIUS){//fill tree values
+		if(_kMakeTTree){//fill tree values
 			_b_rVtx[_b_nVtx] = sqrt(vtx->get_x()*vtx->get_x()+vtx->get_y()*vtx->get_y()); //find the radius
 			_b_parent_pt[_b_nVtx] =tlv_photon.Pt();
 			_b_parent_phi[_b_nVtx]=tlv_photon.Phi();
@@ -281,10 +282,10 @@ std::queue<std::pair<int,int>> TruthConversionEval::numUnique(std::map<int,Conve
 		temp=i->second.getPositron();
 		if(temp){ //this will be false for conversions with 1 truth track
 			tlv_positron.SetPxPyPzE(temp->get_px(),temp->get_py(),temp->get_pz(),temp->get_e()); //init the tlv
-			if(_kMakeTTree&&radius<s_kTPCRADIUS) _b_positron_pt[_b_nVtx]=tlv_positron.Pt(); //fill tree
+			if(_kMakeTTree) _b_positron_pt[_b_nVtx]=tlv_positron.Pt(); //fill tree
 			if (TMath::Abs(tlv_electron.Eta())<_kRAPIDITYACCEPT&&TMath::Abs(tlv_positron.Eta())<_kRAPIDITYACCEPT)
 			{
-				if(_kMakeTTree&&radius<s_kTPCRADIUS){
+				if(_kMakeTTree){
 					_b_e_deta[_b_Tpair]=TMath::Abs(tlv_electron.Eta()-tlv_positron.Eta());
 					_b_e_dphi[_b_Tpair]=TMath::Abs(tlv_electron.Phi()-tlv_positron.Phi());
 					_b_Tpair++;
@@ -321,20 +322,17 @@ std::queue<std::pair<int,int>> TruthConversionEval::numUnique(std::map<int,Conve
 									_b_photon_m=recoPhoton->Dot(*recoPhoton);
 									_b_photon_pT=recoPhoton->Pt();
 								}
-								else{ //photon was not reconstructed:should these be negative?
-									_b_photon_m =0;
-									_b_photon_pT=0;
+								else{ //photon was not reconstructed
+									_b_photon_m =-1;
+									_b_photon_pT=-1;
 								}
 								//reset the values
-								_b_cluster_prob=0;
-								if (radius<s_kTPCRADIUS)
-								{
-									_b_cluster_deta[_b_Rpair]=-1.;
-									_b_cluster_dphi[_b_Rpair]=-1.;
-									_b_nCluster[_b_Rpair]=0;
-									_b_Scluster_prob[_b_Rpair]=-1;
-									_b_Mcluster_prob[_b_Rpair]=-1;
-								}
+								_b_cluster_prob=-1;
+								_b_cluster_deta[_b_Rpair]=-1.;
+								_b_cluster_dphi[_b_Rpair]=-1.;
+								_b_nCluster[_b_Rpair]=0;
+								_b_Scluster_prob[_b_Rpair]=-1;
+								_b_Mcluster_prob[_b_Rpair]=-1;
 
 							}
 							pair<int,int> clusterIds = i->second.get_cluster_ids();
@@ -345,34 +343,31 @@ std::queue<std::pair<int,int>> TruthConversionEval::numUnique(std::map<int,Conve
 								if (_kMakeTTree)
 								{
 									_b_cluster_prob=clustemp->get_prob();
-									if (radius<s_kTPCRADIUS)
+									RawCluster *clus2 = mainClusterContainer->getCluster(clusterIds.second);
+									if (clus2)
 									{
-										RawCluster *clus2 = mainClusterContainer->getCluster(clusterIds.second);
-										if (clus2)
+										_b_cluster_dphi[_b_Rpair]=fabs(clustemp->get_phi()-clus2->get_phi());
+										TVector3 etaCalc(clustemp->get_x(),clustemp->get_y(),clustemp->get_z());
+										if (clus2->get_prob()>_b_cluster_prob)
 										{
-											_b_cluster_dphi[_b_Rpair]=fabs(clustemp->get_phi()-clus2->get_phi());
-											TVector3 etaCalc(clustemp->get_x(),clustemp->get_y(),clustemp->get_z());
-                      if (clus2->get_prob()>_b_cluster_prob)
-                      {
-                        _b_cluster_prob=clus2->get_prob();
-                      }
-											float eta1 = etaCalc.PseudoRapidity();
-											etaCalc.SetXYZ(clus2->get_x(),clus2->get_y(),clus2->get_z());
-											_b_cluster_deta[_b_Rpair]=fabs(eta1-etaCalc.PseudoRapidity());
-											if (clusterIds.first!=clusterIds.second) //if there are two district clusters
-											{
-												_b_nCluster[_b_Rpair]=2;
-												_b_Scluster_prob[_b_Rpair]=clustemp->get_prob();
-											}
-											else{
-												_b_nCluster[_b_Rpair]=1;
-												_b_Mcluster_prob[_b_Rpair]=clustemp->get_prob();
-											}
+											_b_cluster_prob=clus2->get_prob();
 										}
-										_signalCutTree->Fill();  
+										float eta1 = etaCalc.PseudoRapidity();
+										etaCalc.SetXYZ(clus2->get_x(),clus2->get_y(),clus2->get_z());
+										_b_cluster_deta[_b_Rpair]=fabs(eta1-etaCalc.PseudoRapidity());
+										if (clusterIds.first!=clusterIds.second) //if there are two district clusters
+										{
+											_b_nCluster[_b_Rpair]=2;
+											_b_Scluster_prob[_b_Rpair]=clustemp->get_prob();
+										}
+										else{
+											_b_nCluster[_b_Rpair]=1;
+											_b_Mcluster_prob[_b_Rpair]=clustemp->get_prob();
+										}
 									}
 								}
 							}
+							_signalCutTree->Fill();  
 							_b_Rpair++;
 							break;
 						}
@@ -382,8 +377,7 @@ std::queue<std::pair<int,int>> TruthConversionEval::numUnique(std::map<int,Conve
 							if(mainClusterContainer->getCluster(clustidtemp)){//if thre is matching cluster 
 								RawCluster *clustemp =   dynamic_cast<RawCluster*>(mainClusterContainer->getCluster(clustidtemp)->Clone());
 								if (_kMakeTTree) _b_cluster_prob=clustemp->get_prob();
-								if(radius<s_kTPCRADIUS)_conversionClusters.AddCluster(clustemp); //add the calo cluster to the container
-								else delete clustemp;
+								_conversionClusters.AddCluster(clustemp); //add the calo cluster to the container
 							}
 							break;
 						}
@@ -484,19 +478,19 @@ void TruthConversionEval::findChildren(std::queue<std::pair<int,int>> missingChi
 const RawClusterContainer* TruthConversionEval::getClusters()const {return &_conversionClusters;} 
 
 int TruthConversionEval::get_embed(PHG4Particle* particle, PHG4TruthInfoContainer* truthinfo)const{
-  return truthinfo->isEmbeded(particle->get_track_id());
+	return truthinfo->isEmbeded(particle->get_track_id());
 }
 
 float TruthConversionEval::vtoR(PHG4VtxPoint* vtx)const{
-  return (float) sqrt(vtx->get_x()*vtx->get_x()+vtx->get_y()*vtx->get_y());
+	return (float) sqrt(vtx->get_x()*vtx->get_x()+vtx->get_y()*vtx->get_y());
 }
 
 
 int TruthConversionEval::End(PHCompositeNode *topNode)
 {
-		if(_kMakeTTree){
-			_f->Write();
-			_f->Close();
-		}
+	if(_kMakeTTree){
+		_f->Write();
+		_f->Close();
+	}
 	return 0;
 }
