@@ -340,3 +340,18 @@ float Conversion::minTrackpT(){
 			break;
 	}
 }
+
+std::pair<float,float> Conversion::getTrackpTs(){
+  switch(recoCount()){
+    case 2:
+      return std::pair<float,float>(reco1->get_pt(),reco2->get_pt());
+    case 1:
+      if (reco1) return std::pair<float,float>(reco1->get_pt(),-1);
+      else return std::pair<float,float>(-1,reco1->get_pt());
+      break;
+    default:
+      return std::pair<float,float>(-1,-1);
+      break;
+  }
+}
+

@@ -99,6 +99,8 @@ class TruthConversionEval: public SubsysReco
     bool _b_pythia[s_kMAXParticles];  ///<record if the conversion is from pythia or G4 particle
     float _b_electron_pt[s_kMAXParticles];
     float _b_positron_pt[s_kMAXParticles];
+    float _b_electron_reco_pt[s_kMAXParticles];
+    float _b_positron_reco_pt[s_kMAXParticles];
     float _b_e_deta[s_kMAXParticles];
     float _b_e_dphi[s_kMAXParticles];
     float _b_parent_pt  [s_kMAXParticles];
