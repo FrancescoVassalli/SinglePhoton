@@ -25,11 +25,8 @@ include_HEADERS = \
 
 libtruthconversion_la_SOURCES = \
 	ConversionClusterTreeMaker.C \
-	ConversionClusterTreeMaker_Dict.C \
 	TruthConversionEval.C \
-	TruthConversionEval_Dict.C \
-	Conversion.cc \
-	Conversion_Dict.C
+	Conversion.cc 
 
 libtruthconversion_la_LIBADD = \
   -lg4dst \
@@ -57,8 +54,6 @@ testexternals.C:
 ##############################################
 # please add new classes in alphabetical order
 # Rule for generating CINT dictionaries from class headers.
-%_Dict.C: %.h %LinkDef.h
-	rootcint -f $@ -c $(CINTFLAGS) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $^
 
 clean-local:
 	rm -f *Dict* testexternals.C
