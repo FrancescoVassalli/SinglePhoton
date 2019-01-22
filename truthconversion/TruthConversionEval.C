@@ -379,6 +379,7 @@ std::queue<std::pair<int,int>> TruthConversionEval::numUnique(std::map<int,Conve
 								if (_kMakeTTree) _b_cluster_prob=clustemp->get_prob();
 								_conversionClusters.AddCluster(clustemp); //add the calo cluster to the container
 							}
+              cout<<"Matched 1 reco with layer="<<i->second.firstLayer(_svtxClusterMap)<<'\n';
 							break;
 						}
 					case 0: //no reco tracks
