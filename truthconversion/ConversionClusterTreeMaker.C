@@ -1,4 +1,3 @@
-#include <phool/getClass.h>
 
 #include <fun4all/Fun4AllServer.h>
 
