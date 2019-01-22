@@ -56,8 +56,8 @@ int TruthConversionEval::InitRun(PHCompositeNode *topNode)
 		_tree->Branch("rVtx", _b_rVtx,"rVtx[nVtx]/D");
 		_tree->Branch("pythia", _b_pythia,"pythia[nVtx]/B");
 		_tree->Branch("electron_pt", _b_electron_pt,"electron_pt[nVtx]/F");
-		_tree->Branch("positron_reco_pt", _b_positron_reco_pt,"positron_reco_pt[nVtx]/F");
-		_tree->Branch("electron_reco_pt", _b_electron_reco_pt,"electron_reco_pt[nVtx]/F");
+		_tree->Branch("positron_reco_pt", _b_positron_reco_pt,"positron_reco_pt[nTpair]/F");
+		_tree->Branch("electron_reco_pt", _b_electron_reco_pt,"electron_reco_pt[nTpair]/F");
 		_tree->Branch("positron_pt", _b_positron_pt,"positron_pt[nVtx]/F");
 		_tree->Branch("photon_pt",   _b_parent_pt    ,"photon_pt[nVtx]/F");
 		_tree->Branch("photon_eta",  _b_parent_eta  ,"photon_eta[nVtx]/F");
