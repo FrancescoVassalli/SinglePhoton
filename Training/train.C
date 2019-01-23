@@ -71,7 +71,7 @@ void makeFactory(TTree* signalTree, TTree* backTree,std::string outfile,std::str
 
 int train(){
   using namespace std;
-  string treePath = "/sphenix/user/vassalli/gammasample/fourembededonlineanalysis";
+  string treePath = "/sphenix/user/vassalli/gammasample/background/fourembededonlineanalysis";
   string treeExtension = ".root";
   string outname = "cutTrainH.root";
   unsigned int nFiles=100;
