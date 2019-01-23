@@ -267,7 +267,7 @@ std::queue<std::pair<int,int>> TruthConversionEval::numUnique(std::map<int,Conve
   std::queue<std::pair<int,int>> missingChildren;
   for (std::map<int,Conversion>::iterator i = mymap->begin(); i != mymap->end(); ++i) {
     PHG4VtxPoint *vtx =i->second.getVtx(); //get the vtx
-    if (!temp) // no photon
+    if (!vtx) // no photon
     {
       cout<<"no vtx"<<endl;
     }
