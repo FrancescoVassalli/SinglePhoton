@@ -39,12 +39,12 @@ void makeFactory(TTree* signalTree, TTree* backTree,std::string outfile,std::str
   factory->AddVariable("track_dlayer",'I');
   factory->AddVariable("track_layer",'I');
   factory->AddVariable("track_pT",'F');
-  factory->AddVariable("approach_dist",'F');
+//  factory->AddVariable("approach_dist",'F');
   factory->AddVariable("vtx_radius",'F');
   //factory->AddVariable("vtx_chi2",'F'); //until reco vtx works this is meaningless
   factory->AddVariable("vtxTrack_dist",'F');
-  factory->AddVariable("photon_m",'F');
-  factory->AddVariable("photon_pT",'F');
+  //factory->AddVariable("photon_m",'F');
+  //factory->AddVariable("photon_pT",'F');
   factory->AddVariable("cluster_prob",'F');
 
   factory->AddSpectator("vtx_chi2",'F'); //until reco vtx works this is meaningless
@@ -64,9 +64,9 @@ void makeFactory(TTree* signalTree, TTree* backTree,std::string outfile,std::str
   factory->BookMethod(Types::kCuts,"Cuts","");
   /*factory->BookMethod( Types::kKNN, "kNN", "" ); //>100k events
   factory->BookMethod( Types::kPDERS, "PDERS", "" );//>100k events*/
-  factory->BookMethod( Types::kPDEFoam, "PDEFoam", "VolFrac=.0588i:SigBgSeparate=True" );//>10k events
+  /*factory->BookMethod( Types::kPDEFoam, "PDEFoam", "VolFrac=.0588i:SigBgSeparate=True" );//>10k events
   factory->BookMethod( Types::kFisher, "Fisher", "" );
-  factory->BookMethod( Types::kLD, "LD" );
+  factory->BookMethod( Types::kLD, "LD" );*/
   /*would need to have the options tuned
    * factory->BookMethod( Types::kFDA, "FDA", "Formula=(0)+(1)*x0+(2)*x1+(3)*x2+(4)*x3:\
       ParRanges=(-1,1);(-10,10);(-10,10);(-10,10);(-10,10):\
