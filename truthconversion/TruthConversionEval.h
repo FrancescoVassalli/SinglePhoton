@@ -119,7 +119,7 @@ class TruthConversionEval: public SubsysReco
     /** \defgroup signalTreeVars Variables for {@link _signalCutTree}
       @{*/
     float _b_track_deta ;
-    bool _b_track_layer ;
+    int _b_track_layer ;
     int _b_track_dlayer ;
     float _b_track_pT;
     double _b_approach  ;

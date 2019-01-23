@@ -294,12 +294,11 @@ std::queue<std::pair<int,int>> TruthConversionEval::numUnique(std::map<int,Conve
           _b_e_deta[_b_Tpair]=TMath::Abs(tlv_electron.Eta()-tlv_positron.Eta());
           _b_e_dphi[_b_Tpair]=TMath::Abs(tlv_electron.Phi()-tlv_positron.Phi());
           pair<float,float> pTstemp = i->second.getTrackpTs();
-          _b_fLayer[_b_Tpair]=_b_track_layer = i->second.firstLayer(_svtxClusterMap);
+          _b_fLayer[_b_Tpair]=_b_track_layer = i->second.firstLayer(_svtxClusterMap,_hitMap);
           _b_electron_reco_pt[_b_Tpair]=pTstemp.first;
           _b_positron_reco_pt[_b_Tpair]=pTstemp.second;
           _b_Tpair++;
         }
-        int clustidtemp=-1;
         switch(nRecoTracks)
         {
           case 2: //there are 2 reco tracks
@@ -307,7 +306,7 @@ std::queue<std::pair<int,int>> TruthConversionEval::numUnique(std::map<int,Conve
               if(_kMakeTTree){
                 _b_track_deta = i->second.trackDEta();
                 _b_track_dphi = i->second.trackDPhi();
-                _b_track_dlayer = i->second.trackDLayer(_svtxClusterMap);
+                _b_track_dlayer = i->second.trackDLayer(_svtxClusterMap,_hitMap);
                 _b_track_pT = i->second.minTrackpT();
                 _b_approach = i->second.approachDistance();
                 /*The recoVtx finding doesn't work yet so using truth vtx for now
@@ -381,12 +380,12 @@ std::queue<std::pair<int,int>> TruthConversionEval::numUnique(std::map<int,Conve
             }
           case 1: //there's one reco track
             {
-              clustidtemp=i->second.get_cluster_id(); //get the cluster id of the current conversion
+              int clustidtemp=i->second.get_cluster_id(); //get the cluster id of the current conversion
               if(mainClusterContainer->getCluster(clustidtemp)){//if thre is matching cluster 
                 RawCluster *clustemp =   dynamic_cast<RawCluster*>(mainClusterContainer->getCluster(clustidtemp)->Clone());
                 _conversionClusters.AddCluster(clustemp); //add the calo cluster to the container
               }
-              cout<<"Matched 1 reco with layer="<<i->second.firstLayer(_svtxClusterMap)<<"pTs:"<<tlv_electron.Pt()<<"-"<<tlv_positron.Pt()<<'\n';
+              cout<<"Matched 1 reco with layer="<<i->second.firstLayer(_svtxClusterMap,_hitMap)<<"pTs:"<<tlv_electron.Pt()<<"-"<<tlv_positron.Pt()<<'\n';
               break;
             }
           case 0: //no reco tracks
@@ -429,8 +428,8 @@ void TruthConversionEval::processBackground(std::map<int,Conversion> *mymap,Svtx
     {
       _bb_track_deta = i->second.trackDEta();
       _bb_track_dphi = i->second.trackDPhi();
-      _bb_track_dlayer = i->second.trackDLayer(_svtxClusterMap);
-      _bb_track_layer = i->second.firstLayer(_svtxClusterMap);
+      _bb_track_dlayer = i->second.trackDLayer(_svtxClusterMap,_hitMap);
+      _bb_track_layer = i->second.firstLayer(_svtxClusterMap,_hitMap);
       _bb_track_pT = i->second.minTrackpT();
       _bb_approach = i->second.approachDistance();
       _bb_pid = i->second.getElectron()->get_pid();

@@ -237,8 +237,8 @@ int Conversion::trackDLayer(SvtxClusterMap* svtxClusterMap,SvtxHitMap *hitmap){
   if (recoCount()==2){
     SvtxCluster *c1 = svtxClusterMap->get(*(reco1->begin_clusters()));
     SvtxCluster *c2 = svtxClusterMap->get(*(reco2->begin_clusters()));
-    SvtxHit *h1 = hitMap->get(*(c1->begin_hits()));
-    SvtxHit *h2 = hitMap->get(*(c2->begin_hits()));
+    SvtxHit *h1 = hitmap->get(*(c1->begin_hits()));
+    SvtxHit *h2 = hitmap->get(*(c2->begin_hits()));
     int l1 = h1->get_layer();
     int l2 = h2->get_layer();
     return abs(l1-l2);
@@ -252,8 +252,8 @@ int Conversion::firstLayer(SvtxClusterMap* svtxClusterMap,SvtxHitMap *hitmap){
       {
         SvtxCluster *c1 = svtxClusterMap->get(*(reco1->begin_clusters()));
         SvtxCluster *c2 = svtxClusterMap->get(*(reco2->begin_clusters()));
-        SvtxHit *h1 = hitMap->get(*(c1->begin_hits()));
-        SvtxHit *h2 = hitMap->get(*(c2->begin_hits()));
+        SvtxHit *h1 = hitmap->get(*(c1->begin_hits()));
+        SvtxHit *h2 = hitmap->get(*(c2->begin_hits()));
         if(h1->get_layer()<h2->get_layer()){
           return h2->get_layer();
         }
