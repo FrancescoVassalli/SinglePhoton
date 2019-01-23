@@ -287,6 +287,7 @@ std::queue<std::pair<int,int>> TruthConversionEval::numUnique(std::map<int,Conve
 			if(_kMakeTTree) _b_positron_pt[_b_nVtx]=tlv_positron.Pt(); //fill tree
 			if (TMath::Abs(tlv_electron.Eta())<_kRAPIDITYACCEPT&&TMath::Abs(tlv_positron.Eta())<_kRAPIDITYACCEPT)
 			{
+				unsigned int nRecoTracks = i->second.setRecoTracks(trackeval); //find the reco tracks for this conversion
 				if(_kMakeTTree){
 					_b_e_deta[_b_Tpair]=TMath::Abs(tlv_electron.Eta()-tlv_positron.Eta());
 					_b_e_dphi[_b_Tpair]=TMath::Abs(tlv_electron.Phi()-tlv_positron.Phi());
@@ -295,7 +296,6 @@ std::queue<std::pair<int,int>> TruthConversionEval::numUnique(std::map<int,Conve
 					_b_positron_reco_pt[_b_Tpair]=pTstemp.second;
 					_b_Tpair++;
 				}
-				unsigned int nRecoTracks = i->second.setRecoTracks(trackeval); //find the reco tracks for this conversion
 				int clustidtemp=-1;
 				switch(nRecoTracks){
 					case 2: //there are 2 reco tracks

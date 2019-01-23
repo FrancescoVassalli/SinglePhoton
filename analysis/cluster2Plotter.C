@@ -69,16 +69,16 @@ void cluster2Plotter()
   {
     ttree->GetEvent(event);
     h_clusCount->Fill(cluster_n);
-    for (int i = 0; i < cluster_n&&cluster_n>1; ++i)
+    for (int i = 0; i < cluster_n; ++i)
     {
       h_2clusplot->Fill(deta[i],dphi[i]);
       meanEta+=deta[i];
       meanPhi+=dphi[i];
       h_clusSProb->Fill(cluster_probS[i]);
       h_clusMProb->Fill(cluster_probM[i]);
-			truthN+=truth_n;
-			recoN+=reco_n;
     }
+		truthN+=truth_n;
+		recoN+=reco_n;
     sum+=cluster_n;
   }  
   meanEta/=sum;
