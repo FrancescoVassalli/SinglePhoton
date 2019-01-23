@@ -1,14 +1,9 @@
 #SinglePhoton
 ## This repository is used to generate and analyze photon conversion in G4 sPHENIX simulations.
--**generation**: folders used to generate the events look at the readme's in the subfolder for better understanding 
-- gen: the Fun4All control files used to generate events updated to the most recent coresoftware release that I have run on 
-- condor: csh and submit scripts for condor to call the Fun4All modules to create events and afterburners to process them
--**process**: the after burners to process the events from DSTs to useful roots 
-- SinglePhotonAfter: records basic truth information in a TTree and records convesion assosiated clusters
-- PhotonConversion: recover photons and record them in a vector and TTree
-- ClusterShape: processes the data in the simulation to an easy TTree of cluster information which is formated by @ChaseSmith
+- **gen**:Macros for running G4, ocaationally need to be updated from SPHENIX/coresoftware
+- **condor**: scripts for running through condor and locally modules to create events and afterburners to process them
+- **PhotonConversion**: WIP for finding the conversions only using reco information
 -**analysis**: used to make and plot plots about the coversions 
-- analysis: contains the files used for extracting data from the root trees and plotting them
 
 **Background on Photon Conversion**
 - I have been using ![this ATLAS paper](https://github.com/FrancescoVassalli/SinglePhoton/files/2742038/4layerRecopT.pdf) as a reference. The relevent information starts on page 136 of the pdf
@@ -19,7 +14,3 @@
 ![radius](https://github.com/FrancescoVassalli/SinglePhoton/files/2742038/4layerRecoR.pdf)
 It may be useful to compare this to the ![ATLAS effiency](https://user-images.githubusercontent.com/31448119/50920392-7f50c280-1402-11e9-9750-d93955f9af22.png)
 Note that my photons were 5-30 GeV uniform distribution while the ATLAS study was fixed 20GeV.
-
-
-**Truth Conversion**
-- My work on using truth information to match conversions to EM clusters as been collected into a single package which is the truthconversion folder in this repository. I believe these clusters will be useful in determining how to implement the outside-in method in SPHENIX. 
