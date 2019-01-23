@@ -2,8 +2,8 @@
 @ p = ( ${1} )
 #
 #/sphenix/user/vassalli/gammasample/test/fourembededout0.root
-set OUT_LOCATION="/sphenix/user/vassalli/gammasample/test/"
-set OUT_FILE=${OUT_LOCATION}fourembededonlineanalysis${p}.root
+set OUT_LOCATION="/sphenix/user/vassalli/gammasample/"
+set OUT_FILE=${OUT_LOCATION}/test/fourembededonlineanalysis${p}.root
 set IN_FILE=${OUT_LOCATION}fourembededout${p}.root
 set PYTHIA_FILE="/sphenix/user/vassalli/gammasample/pythiahep.dat"
 #
