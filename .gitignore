@@ -37,3 +37,4 @@ G4_FEMC_EIC.C
 G4_FGEM_fsPHENIX.C
 G4_Tracking_EIC.C
 *_C.so
+Training/weights/*
