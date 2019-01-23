@@ -7,9 +7,7 @@
 /// \author Francesco Vassalli
 //===============================================
 #include "RaveVertexingAux.h"
-
 #include <fun4all/SubsysReco.h>
-
 #include <string>
 #include <cmath>
 class PHCompositeNode;
@@ -50,7 +48,7 @@ class RecoConversionEval : public SubsysReco {
 		bool hasNodePointers()const;
 		void process_recoTracks(PHCompositeNode *topNode);
 
-		inline detaCut(float eta1, float eta2) const{
+		inline bool detaCut(float eta1, float eta2) const{
 			return eta1>eta2?eta1-eta2:eta2-eta1<_kPolarCut;
 		}
 

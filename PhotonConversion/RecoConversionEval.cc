@@ -2,9 +2,11 @@
 
 #include <fun4all/Fun4AllReturnCodes.h>
 #include <phool/PHCompositeNode.h>
+#include <phool/getClass.h>
 #include <calobase/RawClusterContainer.h>
 #include <calobase/RawCluster.h>
 #include <trackbase_historic/SvtxTrack.h>
+#include <trackbase_historic/SvtxTrackMap.h>
 #include <trackbase_historic/SvtxVertexMap.h>
 #include <trackbase_historic/SvtxVertex.h>
 #include <trackbase_historic/SvtxHitMap.h>

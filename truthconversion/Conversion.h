@@ -15,6 +15,7 @@
 #include <trackbase_historic/SvtxClusterMap.h>
 #include <trackbase_historic/SvtxVertex.h>
 #include <g4eval/SvtxTrackEval.h>
+#include <TLorentzVector.h>
 #include <utility>
 
 class SvtxTrackEval;
@@ -28,7 +29,7 @@ class Conversion
 		Conversion(SvtxTrackEval* trackeval,int verbosity=0);
 		Conversion(PHG4VtxPoint* vtx,int verbosity=0);
 		Conversion(PHG4VtxPoint* vtx,SvtxTrackEval *trackeval,int verbosity=0);
-		//dtor at bottom of public methods
+		~Conversion();
 		/** sets the daughters of the conversion
 		 * use this to set the electron and positron
 		 * initializes both points but does not determine charge*/
@@ -154,12 +155,6 @@ class Conversion
 		double dist(PHG4VtxPoint* vtx, SvtxClusterMap* cmap);
 		float setRecoVtx(SvtxVertex* recovtx,SvtxClusterMap* cmap);
 		TLorentzVector* setRecoPhoton();
-
-		~Conversion(){
-			if(recoVertex) delete recoVertex;
-			if(recoPhoton) delete recoPhoton;
-			//dont delete the points as you are not the owner and did not make your own copies
-		}
 
 	private:
 		PHG4Particle* e1=NULL;
