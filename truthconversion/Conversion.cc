@@ -1,7 +1,24 @@
 #include "Conversion.h"
 #include <phool/PHCompositeNode.h>
 #include <phool/getClass.h>
+#include <trackbase_historic/SvtxCluster.h>
+#include <trackbase_historic/SvtxHit.h>
+#include <TLorentzVector.h>
 #include <assert.h>
+
+Conversion::Conversion(SvtxTrackEval* trackeval,int verbosity=0){
+			this->trackeval=trackeval;
+			this->verbosity=verbosity;
+		}
+	Conversion::Conversion(PHG4VtxPoint* vtx,int verbosity=0){
+			this->vtx=vtx;
+			this->verbosity=verbosity;
+		}
+		Conversion::Conversion(PHG4VtxPoint* vtx,SvtxTrackEval *trackeval,int verbosity=0){
+			this->trackeval=trackeval;
+			this->vtx=vtx;
+			this->verbosity=verbosity;
+		}
 
 void Conversion::setElectron(PHG4Particle* e){
 	if (e1)

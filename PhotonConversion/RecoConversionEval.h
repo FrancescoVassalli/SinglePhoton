@@ -6,29 +6,22 @@
 /// \brief Use reco info to tag photon conversions
 /// \author Francesco Vassalli
 //===============================================
-
 #include "RaveVertexingAux.h"
+
 #include <fun4all/SubsysReco.h>
-#include <trackbase_historic/SvtxTrack.h>
-#include <trackbase_historic/SvtxHitMap.h>
-#include <trackbase_historic/SvtxHit.h>
-#include <trackbase_historic/SvtxClusterMap.h>
-#include <trackbase_historic/SvtxCluster.h>
-#include <calobase/RawClusterContainer.h>
-#include <calobase/RawCluster.h>
-#include <TVector3.h>
-#include <TLorentzVector.h>
-#include <TTree.h>
-#include <TFile.h>
-#include <iostream>
+
 #include <string>
-#include <vector>
 #include <cmath>
 class PHCompositeNode;
 class SvtxEvalStack;
-class SvtxClusterMap;
 class SvtxVertex;
+class SvtxTrack;
 class SvtxTrackMap;
+class SvtxHitMap;
+class SvtxClusterMap;
+class RawClusterContainer;
+class TTree;
+class TFile;
 
 class RecoConversionEval : public SubsysReco {
 
@@ -57,8 +50,8 @@ class RecoConversionEval : public SubsysReco {
 		bool hasNodePointers()const;
 		void process_recoTracks(PHCompositeNode *topNode);
 
-		inline detaCut(SvtxTrack *t1,SvtxTrack *t2) const{
-			return fabs(t1->get_eta()-t2->get_eta())<_kPolarCut;
+		inline detaCut(float eta1, float eta2) const{
+			return eta1>eta2?eta1-eta2:eta2-eta1<_kPolarCut;
 		}
 
 		bool pairCuts(SvtxTrack* t1, SvtxTrack* t2)const;

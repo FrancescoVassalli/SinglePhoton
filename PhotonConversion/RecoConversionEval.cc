@@ -2,12 +2,23 @@
 
 #include <fun4all/Fun4AllReturnCodes.h>
 #include <phool/PHCompositeNode.h>
+#include <calobase/RawClusterContainer.h>
+#include <calobase/RawCluster.h>
+#include <trackbase_historic/SvtxTrack.h>
 #include <trackbase_historic/SvtxVertexMap.h>
 #include <trackbase_historic/SvtxVertex.h>
+#include <trackbase_historic/SvtxHitMap.h>
+#include <trackbase_historic/SvtxHit.h>
+#include <trackbase_historic/SvtxClusterMap.h>
+#include <trackbase_historic/SvtxCluster.h>
 #include <g4eval/SvtxEvalStack.h>
 #include <g4main/PHG4Particle.h>
 #include <g4main/PHG4VtxPoint.h>
 #include <g4main/PHG4TruthInfoContainer.h>
+
+#include <TVector3.h>
+#include <TTree.h>
+#include <TFile.h>
 
 #include <iostream>
 #include <cmath> 
@@ -79,7 +90,7 @@ int RecoConversionEval::process_event(PHCompositeNode *topNode) {
 }
 
 bool RecoConversionEval::pairCuts(SvtxTrack* t1, SvtxTrack* t2)const{
-  return detaCut(t1,t2) && hitCuts(t1,t2);
+  return detaCut(t1->get_eta(),t2->get_eta()) && hitCuts(t1,t2);
 }
 
 bool RecoConversionEval::hitCuts(SvtxTrack* t1, SvtxTrack* t2)const {

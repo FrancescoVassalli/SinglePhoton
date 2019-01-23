@@ -12,35 +12,22 @@
 #include <g4main/PHG4VtxPoint.h>
 #include <trackbase_historic/SvtxTrack.h>
 #include <trackbase_historic/SvtxHitMap.h>
-#include <trackbase_historic/SvtxHit.h>
 #include <trackbase_historic/SvtxClusterMap.h>
-#include <trackbase_historic/SvtxCluster.h>
 #include <trackbase_historic/SvtxVertex.h>
 #include <g4eval/SvtxTrackEval.h>
-#include <TVector3.h>
-#include <TLorentzVector.h>
 #include <utility>
 
 class SvtxTrackEval;
 class PHCompositeNode;
+class TLorentzVector;
 
 class Conversion
 {
 	public:
 		Conversion(){verbosity=0;}
-		Conversion(SvtxTrackEval* trackeval,int verbosity=0){
-			this->trackeval=trackeval;
-			this->verbosity=verbosity;
-		}
-		Conversion(PHG4VtxPoint* vtx,int verbosity=0){
-			this->vtx=vtx;
-			this->verbosity=verbosity;
-		}
-		Conversion(PHG4VtxPoint* vtx,SvtxTrackEval *trackeval,int verbosity=0){
-			this->trackeval=trackeval;
-			this->vtx=vtx;
-			this->verbosity=verbosity;
-		}
+		Conversion(SvtxTrackEval* trackeval,int verbosity=0);
+		Conversion(PHG4VtxPoint* vtx,int verbosity=0);
+		Conversion(PHG4VtxPoint* vtx,SvtxTrackEval *trackeval,int verbosity=0);
 		//dtor at bottom of public methods
 		/** sets the daughters of the conversion
 		 * use this to set the electron and positron
