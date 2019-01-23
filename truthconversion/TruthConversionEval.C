@@ -123,8 +123,8 @@ void TruthConversionEval::doNodePointers(PHCompositeNode* topNode){
   _truthinfo = findNode::getClass<PHG4TruthInfoContainer>(topNode,"G4TruthInfo");
   _svtxClusterMap = findNode::getClass<SvtxClusterMap>(topNode,"SvtxClusterMap");
   _hitMap = findNode::getClass<SvtxHitMap>(topNode,"SvtxHitMap");
-  _vertexer= new RaveVertexingAux(topNode);
-  _vertexer->Verbosity(Verbosity());
+  /*_vertexer= new RaveVertexingAux(topNode);
+  _vertexer->Verbosity(Verbosity());*/
 }
 
 int TruthConversionEval::process_event(PHCompositeNode *topNode)

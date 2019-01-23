@@ -67,13 +67,7 @@ bool Conversion::setElectron(){
       }
       return false;
     }
-    else if (e1->get_pid()<0)
-    {
-      PHG4Particle *temp = e1;
-      e1=e2;
-      e2=temp; 
-      return false;
-    }
+    else if (e1->get_pid()<0) return false;
   }
   return true;
 }
