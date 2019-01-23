@@ -48,10 +48,10 @@ void trackpT()
   string outfilename = "pTeffdists.root";
   TFile *out = new TFile(outfilename.c_str(),"RECREATE");
 
-  TH1F *h_TepT = new TH1F("TepT","",60,0,30);
-  TH1F *h_TppT = new TH1F("TppT","",60,0,30);
-  TH1F *h_RepT = new TH1F("RepT","",60,0,30);
-  TH1F *h_RppT = new TH1F("RppT","",60,0,30);
+  TH1F *h_TepT = new TH1F("TepT","",600,0,30);
+  TH1F *h_TppT = new TH1F("TppT","",600,0,30);
+  TH1F *h_RepT = new TH1F("RepT","",600,0,30);
+  TH1F *h_RppT = new TH1F("RppT","",600,0,30);
   
   for (int event = 0; event < ttree->GetEntries(); ++event)
   {
