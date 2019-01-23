@@ -54,13 +54,26 @@ void makeFactory(TTree* signalTree, TTree* backTree,std::string outfile,std::str
   string vtx_radius_cut = "vtx_radius>0";
   string em_prob_cut = "cluster_prob>=0";
   //do I need photon cuts? 
-  string tCutInitializer = em_prob_cut+"&&"+ vtx_radius_cut+"&&"+track_pT_cut+"&&track_dlayer>=0&&track_layer>=0&&approach_dist>0&&vtxTrack_dist>0";
+  string tCutInitializer = em_prob_cut+"&&"+ vtx_radius_cut+"&&"+track_pT_cut+"&&track_dlayer>=0&&track_layer>=0&&approach_dist>0&&vtxTrack_dist>0&&photon_m>0&&photon_pT>0";
   TCut preTraingCuts(tCutInitializer.c_str());
 
 
   factory->PrepareTrainingAndTestTree(preTraingCuts,"nTrain_Signal=0:nTrain_Background=0:nTest_Signal=0:nTest_Background=0");
   factory->BookMethod( TMVA::Types::kLikelihood, "LikelihoodD",
       "!H:!V:!TransformOutput:PDFInterpol=Spline2:NSmoothSig[0]=20:NSmoothBkg[0]=20:NSmooth=5:NAvEvtPerBin=50:VarTransform=Decorrelate" );
+  factory->BookMethod(Types::kCuts,"Cuts","");
+  /*factory->BookMethod( Types::kKNN, "kNN", "" ); //>100k events
+  factory->BookMethod( Types::kPDERS, "PDERS", "" );//>100k events*/
+  factory->BookMethod( Types::kPDEFoam, "PDEFoam", "VolFrac=.0588i:SigBgSeparate=True" );//>10k events
+  factory->BookMethod( Types::kFisher, "Fisher", "" );
+  factory->BookMethod( Types::kLD, "LD" );
+  /*would need to have the options tuned
+   * factory->BookMethod( Types::kFDA, "FDA", "Formula=(0)+(1)*x0+(2)*x1+(3)*x2+(4)*x3:\
+      ParRanges=(-1,1);(-10,10);(-10,10);(-10,10);(-10,10):\
+      FitMethod=MINUIT:\
+      ErrorLevel=1:PrintLevel=-1:FitStrategy=2:UseImprove:UseMinos:SetBatch" );*/
+/* nerual network that would need to be worked on 
+ * factory->BookMethod( Types::kMLP, "MLP_ANN", "<options>" );*/
   factory->TrainAllMethods();
   factory->TestAllMethods();
   factory->EvaluateAllMethods();
