@@ -11,7 +11,6 @@
 #include <g4main/PHG4Particle.h>
 #include <g4main/PHG4VtxPoint.h>
 #include <trackbase_historic/SvtxTrack.h>
-#include <trackbase_historic/SvtxHitMap.h>
 #include <trackbase_historic/SvtxClusterMap.h>
 #include <trackbase_historic/SvtxVertex.h>
 #include <g4eval/SvtxTrackEval.h>
@@ -107,9 +106,8 @@ class Conversion
 			return std::pair<SvtxTrack*,SvtxTrack*>(reco1,reco2);
 		}
 		/** set the reco maps used for {@link trackDEta}, {@link trackDLayer},{@link hasSilicon}*/
-		inline void setRecoMaps(SvtxClusterMap* cmap,SvtxHitMap* hmap){
+		inline void setClusterMap(SvtxClusterMap* cmap){
 			_svtxClusterMap=cmap;
-			_hitMap=hmap;
 		}
 		inline int setVerbosity(int v){
 			verbosity=v;
@@ -143,7 +141,7 @@ class Conversion
 		bool setElectron();
 		/** Return the difference in layers of the first hits of the reco track 
 		 * @return -1 if reco tracks are not set*/
-		int trackDLayer(SvtxClusterMap* cmap,SvtxHitMap* hitMap);
+		int trackDLayer(SvtxClusterMap* cmap);
 		///@return the first layer the associated reco clusters hit
 		int firstLayer(SvtxClusterMap* cmap);
 		///@return true if there are any silicon hits for the conversion
@@ -166,7 +164,6 @@ class Conversion
 		SvtxTrack* reco2=NULL;
 		SvtxTrackEval* trackeval=NULL;
 		SvtxClusterMap* _svtxClusterMap=NULL;                                                                              
-		SvtxHitMap *_hitMap=NULL;
 		SvtxVertex *recoVertex=NULL;
 		TLorentzVector *recoPhoton=NULL;
 		static const int _kNSiliconLayer =7; ///<hardcoded 

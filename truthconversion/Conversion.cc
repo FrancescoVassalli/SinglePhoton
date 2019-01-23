@@ -2,7 +2,6 @@
 #include <phool/PHCompositeNode.h>
 #include <phool/getClass.h>
 #include <trackbase_historic/SvtxCluster.h>
-#include <trackbase_historic/SvtxHit.h>
 #include <assert.h>
 
 Conversion::Conversion(SvtxTrackEval* trackeval,int verbosity){
@@ -70,7 +69,9 @@ bool Conversion::setElectron(){
     }
     else if (e1->get_pid()<0)
     {
-      if(verbosity>1) std::cout<<"Warning in Conversion only 1 positron in conversion"<<std::endl;
+      PHG4Particle *temp = e1;
+      e1=e2;
+      e2=temp; 
       return false;
     }
   }
@@ -93,6 +94,7 @@ PHG4Particle* Conversion::getPositron(){
 
 int Conversion::setRecoTracks(SvtxTrackEval* trackeval){	
   this->trackeval=trackeval;
+  setElectron();
   if (e1)
   {
     reco1=trackeval->best_track_from(e1);  
@@ -236,14 +238,12 @@ bool Conversion::hasSilicon(SvtxClusterMap* svtxClusterMap){
   }
 }
 
-int Conversion::trackDLayer(SvtxClusterMap* svtxClusterMap,SvtxHitMap* hitMap){
+int Conversion::trackDLayer(SvtxClusterMap* svtxClusterMap){
   if (recoCount()==2){
     SvtxCluster *c1 = svtxClusterMap->get(*(reco1->begin_clusters()));
     SvtxCluster *c2 = svtxClusterMap->get(*(reco2->begin_clusters()));
-    SvtxHit *h1 = hitMap->get(*(c1->begin_hits()));
-    SvtxHit *h2 = hitMap->get(*(c2->begin_hits()));
-    int l1 = h1->get_layer();
-    int l2 = h2->get_layer();
+    int l1 = c1->get_layer();
+    int l2 = c2->get_layer();
     return abs(l1-l2);
   }
   else return -1;
@@ -262,10 +262,8 @@ int Conversion::firstLayer(SvtxClusterMap* svtxClusterMap){
       }
     case 1:
       {
-        SvtxTrack *thisReco;
-        if (reco1)thisReco=reco1;
-        else thisReco=reco2;
-        return svtxClusterMap->get(*(thisReco->begin_clusters()))->get_layer();
+        if (reco1)return svtxClusterMap->get(*(reco1->begin_clusters()))->get_layer();
+        else return svtxClusterMap->get(*(reco2->begin_clusters()))->get_layer();
       }
     default:
       return -1;
