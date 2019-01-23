@@ -20,6 +20,7 @@
 class SvtxTrackEval;
 class PHCompositeNode;
 class TLorentzVector;
+class SvtxHitMap;
 
 class Conversion
 {
@@ -141,9 +142,9 @@ class Conversion
 		bool setElectron();
 		/** Return the difference in layers of the first hits of the reco track 
 		 * @return -1 if reco tracks are not set*/
-		int trackDLayer(SvtxClusterMap* cmap);
+		int trackDLayer(SvtxClusterMap* cmap,SvtxHitMap *hitmap);
 		///@return the first layer the associated reco clusters hit
-		int firstLayer(SvtxClusterMap* cmap);
+		int firstLayer(SvtxClusterMap* cmap,SvtxHitMap *hitmap);
 		///@return true if there are any silicon hits for the conversion
 		bool hasSilicon(SvtxClusterMap* cmap);
 		/** distance between two closest points on the reco tracks 
