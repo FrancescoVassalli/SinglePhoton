@@ -236,7 +236,6 @@ int TruthConversionEval::process_event(PHCompositeNode *topNode)
   }
   //pass the map to this helper method which fills the fields for the TTree 
   numUnique(&mapConversions,trackeval,_mainClusterContainer);
-  cout<<"did numU"<<endl;
   //std::queue<std::pair<int,int>> missingChildren= numUnique(&vtxList,&mapConversions,trackeval,mainClusterContainer);
   if (Verbosity()==10)
   {
@@ -248,7 +247,6 @@ int TruthConversionEval::process_event(PHCompositeNode *topNode)
     _tree->Fill();
     processBackground(&hbackgroundMap,trackeval,_h_backgroundCutTree);
     processBackground(&ebackgroundMap,trackeval,_e_backgroundCutTree);
-    cout<<"did background"<<endl;
     _b_event++;
   }
   if (Verbosity()>=8)
@@ -290,9 +288,7 @@ std::queue<std::pair<int,int>> TruthConversionEval::numUnique(std::map<int,Conve
       if(_kMakeTTree) _b_positron_pt[_b_nVtx]=tlv_positron.Pt(); //fill tree
       if (TMath::Abs(tlv_electron.Eta())<_kRAPIDITYACCEPT&&TMath::Abs(tlv_positron.Eta())<_kRAPIDITYACCEPT)
       {
-        cout<<"in eta"<<endl;
         unsigned int nRecoTracks = i->second.setRecoTracks(trackeval); //find the reco tracks for this conversion
-        cout<<"tracks set="<<nRecoTracks<<endl;
         if(_kMakeTTree){
           _b_e_deta[_b_Tpair]=TMath::Abs(tlv_electron.Eta()-tlv_positron.Eta());
           _b_e_dphi[_b_Tpair]=TMath::Abs(tlv_electron.Phi()-tlv_positron.Phi());
@@ -300,7 +296,6 @@ std::queue<std::pair<int,int>> TruthConversionEval::numUnique(std::map<int,Conve
           _b_electron_reco_pt[_b_Tpair]=pTstemp.first;
           _b_positron_reco_pt[_b_Tpair]=pTstemp.second;
           _b_Tpair++;
-          cout<<"filled tree"<<_b_Tpair<<endl;
         }
         int clustidtemp=-1;
         switch(nRecoTracks)
@@ -422,9 +417,7 @@ std::queue<std::pair<int,int>> TruthConversionEval::numUnique(std::map<int,Conve
       _b_pythia[_b_nVtx]=i->second.getEmbed()==_kPythiaEmbed;
       _b_nVtx++; 
     }
-    cout<<"bottom of loop:"<<_b_nVtx<<endl;
   }
-  cout<<"done loop"<<endl;
   return missingChildren;
 }
 
