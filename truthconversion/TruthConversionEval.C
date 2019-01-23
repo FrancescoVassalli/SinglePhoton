@@ -419,7 +419,9 @@ std::queue<std::pair<int,int>> TruthConversionEval::numUnique(std::map<int,Conve
       _b_pythia[_b_nVtx]=i->second.getEmbed()==_kPythiaEmbed;
       _b_nVtx++; 
     }
+    cout<<"bottom of loop:"<<_b_nVtx<<endl;
   }
+  cout<<"done loop"<<endl;
   return missingChildren;
 }
 
