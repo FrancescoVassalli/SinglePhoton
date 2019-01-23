@@ -110,6 +110,7 @@ class TruthConversionEval: public SubsysReco
     /** # of clusters associated with each conversion that has 2 reco tracks
     * 1 indicates the reco tracks go to the same cluster ~15% of conversions*/
     int   _b_nCluster [s_kMAXRecoMatch]; 
+    int   _b_fLayer [s_kMAXRecoMatch]; 
     float _b_cluster_dphi [s_kMAXRecoMatch];
     float _b_cluster_deta [s_kMAXRecoMatch];
     float _b_Mcluster_prob[s_kMAXRecoMatch]; ///<cluster prob for merged clusters

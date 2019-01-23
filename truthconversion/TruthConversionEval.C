@@ -66,6 +66,7 @@ int TruthConversionEval::InitRun(PHCompositeNode *topNode)
 		_tree->Branch("e_dphi",  _b_e_dphi  ,"e_dphi[nTpair]/F");
 		_tree->Branch("photon_source_id",  _b_grandparent_id  ,"photon_source_id[nVtx]/I");
 		_tree->Branch("nCluster",_b_nCluster,"nCluster[nRpair]/I");
+		_tree->Branch("fLayer",_b_fLayer,"fLayer[nRpair]/I");
 		_tree->Branch("clus_dphi",_b_cluster_dphi,"clus_dphi[nRpair]/F");
 		_tree->Branch("clus_deta",_b_cluster_deta,"clus_deta[nRpair]/F");
 		_tree->Branch("Scluster_prob", &_b_Scluster_prob,"Scluster_prob[nRpair]/F");
@@ -304,7 +305,7 @@ std::queue<std::pair<int,int>> TruthConversionEval::numUnique(std::map<int,Conve
 								_b_track_deta = i->second.trackDEta();
 								_b_track_dphi = i->second.trackDPhi();
 								_b_track_dlayer = i->second.trackDLayer(_svtxClusterMap,_hitMap);
-								_b_track_layer = i->second.firstLayer(_svtxClusterMap);
+								_b_fLayer[_b_Rpair]=_b_track_layer = i->second.firstLayer(_svtxClusterMap);
 								_b_track_pT = i->second.minTrackpT();
 								_b_approach = i->second.approachDistance();
 								/*The recoVtx finding doesn't work yet so using truth vtx for now

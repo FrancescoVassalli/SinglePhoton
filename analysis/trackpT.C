@@ -32,7 +32,12 @@ void trackpT()
   float positron_pt[200];
   float electron_reco_pt[200];
   float positron_reco_pt[200];
+  double rVtx[200];
+  int b_layer[20];
   int    truth_n;
+  int  reco_n;
+  int nVtx;
+
 
   string treePath = "/sphenix/user/vassalli/gammasample/fourembededonlineanalysis";
   string treeExtension = ".root";
@@ -43,6 +48,10 @@ void trackpT()
   ttree->SetBranchAddress("positron_pt",     &positron_pt    );
   ttree->SetBranchAddress("positron_reco_pt",&positron_reco_pt    );
   ttree->SetBranchAddress("nTpair",          &truth_n  );
+  ttree->SetBranchAddress("nRpair",          &reco_n  );
+  ttree->SetBranchAddress("fLayer",          &b_layer  );
+  ttree->SetBranchAddress("nVtx",          &nVtx  );
+  ttree->SetBranchAddress("rVtx",          &rVtx  );
   
 
   string outfilename = "pTeffdists.root";
@@ -52,6 +61,9 @@ void trackpT()
   TH1F *h_TppT = new TH1F("TppT","",600,0,30);
   TH1F *h_RepT = new TH1F("RepT","",600,0,30);
   TH1F *h_RppT = new TH1F("RppT","",600,0,30);
+
+  TH1F *h_rvtx = new TH1F("rvtx","",100,0,30);
+  TH1F *h_layer = new TH1F("layer","",24,-.5,23.5);
   
   for (int event = 0; event < ttree->GetEntries(); ++event)
   {
@@ -62,7 +74,14 @@ void trackpT()
       h_RepT->Fill(electron_reco_pt[i]);
       h_RppT->Fill(positron_reco_pt[i]);
       h_TppT->Fill(positron_pt[i]);
-
+    }
+    for (int i = 0; i < nVtx; ++i)
+    {
+      h_rvtx->Fill(rVtx[i]);
+    }
+    for (int i = 0; i < reco_n; ++i)
+    {
+      h_layer->Fill(b_layer[i]);
     }
   }  
   out->Write();
