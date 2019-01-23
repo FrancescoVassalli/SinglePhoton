@@ -64,9 +64,9 @@ int TruthConversionEval::InitRun(PHCompositeNode *topNode)
     _tree->Branch("photon_phi",  _b_parent_phi  ,"photon_phi[nVtx]/F");
     _tree->Branch("e_deta",  _b_e_deta  ,"e_deta[nTpair]/F");
     _tree->Branch("e_dphi",  _b_e_dphi  ,"e_dphi[nTpair]/F");
+    _tree->Branch("fLayer",_b_fLayer,"fLayer[nTpair]/I");
     _tree->Branch("photon_source_id",  _b_grandparent_id  ,"photon_source_id[nVtx]/I");
     _tree->Branch("nCluster",_b_nCluster,"nCluster[nRpair]/I");
-    _tree->Branch("fLayer",_b_fLayer,"fLayer[nRpair]/I");
     _tree->Branch("clus_dphi",_b_cluster_dphi,"clus_dphi[nRpair]/F");
     _tree->Branch("clus_deta",_b_cluster_deta,"clus_deta[nRpair]/F");
     _tree->Branch("Scluster_prob", &_b_Scluster_prob,"Scluster_prob[nRpair]/F");
@@ -294,6 +294,7 @@ std::queue<std::pair<int,int>> TruthConversionEval::numUnique(std::map<int,Conve
           _b_e_deta[_b_Tpair]=TMath::Abs(tlv_electron.Eta()-tlv_positron.Eta());
           _b_e_dphi[_b_Tpair]=TMath::Abs(tlv_electron.Phi()-tlv_positron.Phi());
           pair<float,float> pTstemp = i->second.getTrackpTs();
+          _b_fLayer[_b_Tpair]=_b_track_layer = i->second.firstLayer(_svtxClusterMap);
           _b_electron_reco_pt[_b_Tpair]=pTstemp.first;
           _b_positron_reco_pt[_b_Tpair]=pTstemp.second;
           _b_Tpair++;
@@ -306,8 +307,7 @@ std::queue<std::pair<int,int>> TruthConversionEval::numUnique(std::map<int,Conve
               if(_kMakeTTree){
                 _b_track_deta = i->second.trackDEta();
                 _b_track_dphi = i->second.trackDPhi();
-                _b_track_dlayer = i->second.trackDLayer(_svtxClusterMap,_hitMap);
-                _b_fLayer[_b_Rpair]=_b_track_layer = i->second.firstLayer(_svtxClusterMap);
+                _b_track_dlayer = i->second.trackDLayer(_svtxClusterMap);
                 _b_track_pT = i->second.minTrackpT();
                 _b_approach = i->second.approachDistance();
                 /*The recoVtx finding doesn't work yet so using truth vtx for now
@@ -384,7 +384,6 @@ std::queue<std::pair<int,int>> TruthConversionEval::numUnique(std::map<int,Conve
               clustidtemp=i->second.get_cluster_id(); //get the cluster id of the current conversion
               if(mainClusterContainer->getCluster(clustidtemp)){//if thre is matching cluster 
                 RawCluster *clustemp =   dynamic_cast<RawCluster*>(mainClusterContainer->getCluster(clustidtemp)->Clone());
-                if (_kMakeTTree) _b_cluster_prob=clustemp->get_prob();
                 _conversionClusters.AddCluster(clustemp); //add the calo cluster to the container
               }
               cout<<"Matched 1 reco with layer="<<i->second.firstLayer(_svtxClusterMap)<<"pTs:"<<tlv_electron.Pt()<<"-"<<tlv_positron.Pt()<<'\n';
@@ -430,7 +429,7 @@ void TruthConversionEval::processBackground(std::map<int,Conversion> *mymap,Svtx
     {
       _bb_track_deta = i->second.trackDEta();
       _bb_track_dphi = i->second.trackDPhi();
-      _bb_track_dlayer = i->second.trackDLayer(_svtxClusterMap,_hitMap);
+      _bb_track_dlayer = i->second.trackDLayer(_svtxClusterMap);
       _bb_track_layer = i->second.firstLayer(_svtxClusterMap);
       _bb_track_pT = i->second.minTrackpT();
       _bb_approach = i->second.approachDistance();
