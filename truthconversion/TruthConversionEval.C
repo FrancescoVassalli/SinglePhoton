@@ -267,17 +267,9 @@ std::queue<std::pair<int,int>> TruthConversionEval::numUnique(std::map<int,Conve
   std::queue<std::pair<int,int>> missingChildren;
   for (std::map<int,Conversion>::iterator i = mymap->begin(); i != mymap->end(); ++i) {
     PHG4VtxPoint *vtx =i->second.getVtx(); //get the vtx
-    if (!vtx) // no photon
-    {
-      cout<<"no vtx"<<endl;
-    }
     float radius=sqrt(vtx->get_x()*vtx->get_x()+vtx->get_y()*vtx->get_y());
     if (radius>s_kTPCRADIUS) continue;
     PHG4Particle *temp = i->second.getPhoton(); //set the photon
-    if (!temp) // no photon
-    {
-      cout<<"no photon"<<endl;
-    }
     TLorentzVector tlv_photon,tlv_electron,tlv_positron; //make tlv for each particle 
     tlv_photon.SetPxPyPzE(temp->get_px(),temp->get_py(),temp->get_pz(),temp->get_e()); //intialize
     temp=i->second.getElectron(); //set the first child 
@@ -294,12 +286,13 @@ std::queue<std::pair<int,int>> TruthConversionEval::numUnique(std::map<int,Conve
     }
     temp=i->second.getPositron();
     if(temp){ //this will be false for conversions with 1 truth track
-      cout<<"2 truth"<<endl;
       tlv_positron.SetPxPyPzE(temp->get_px(),temp->get_py(),temp->get_pz(),temp->get_e()); //init the tlv
       if(_kMakeTTree) _b_positron_pt[_b_nVtx]=tlv_positron.Pt(); //fill tree
       if (TMath::Abs(tlv_electron.Eta())<_kRAPIDITYACCEPT&&TMath::Abs(tlv_positron.Eta())<_kRAPIDITYACCEPT)
       {
+        cout<<"in eta"<<endl;
         unsigned int nRecoTracks = i->second.setRecoTracks(trackeval); //find the reco tracks for this conversion
+        cout<<"tracks set="<<nRecoTracks<<endl;
         if(_kMakeTTree){
           _b_e_deta[_b_Tpair]=TMath::Abs(tlv_electron.Eta()-tlv_positron.Eta());
           _b_e_dphi[_b_Tpair]=TMath::Abs(tlv_electron.Phi()-tlv_positron.Phi());
@@ -307,6 +300,7 @@ std::queue<std::pair<int,int>> TruthConversionEval::numUnique(std::map<int,Conve
           _b_electron_reco_pt[_b_Tpair]=pTstemp.first;
           _b_positron_reco_pt[_b_Tpair]=pTstemp.second;
           _b_Tpair++;
+          cout<<"filled tree"<<_b_Tpair<<endl;
         }
         int clustidtemp=-1;
         switch(nRecoTracks)
@@ -411,7 +405,6 @@ std::queue<std::pair<int,int>> TruthConversionEval::numUnique(std::map<int,Conve
         }
       }
     }
-    else cout<<"1 truth"<<endl;
     /*this code has been turned off because it is not currently useful 
       to analyze the conversions with only one truth track 
       else{ //fails the truth 2 track check
