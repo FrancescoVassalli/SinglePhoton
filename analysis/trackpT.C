@@ -48,15 +48,20 @@ void trackpT()
   string outfilename = "pTeffdists.root";
   TFile *out = new TFile(outfilename.c_str(),"RECREATE");
 
-  TH1F *h_TpT_NR = new TH1F("TpT_NR","",60,0,30);
+  TH1F *h_TepT = new TH1F("TepT","",60,0,30);
+  TH1F *h_TppT = new TH1F("TppT","",60,0,30);
+  TH1F *h_RepT = new TH1F("RepT","",60,0,30);
+  TH1F *h_RppT = new TH1F("RppT","",60,0,30);
   
   for (int event = 0; event < ttree->GetEntries(); ++event)
   {
     ttree->GetEvent(event);
     for (int i = 0; i < truth_n; ++i)
     {
-      if (electron_reco_pt[truth_n]>0) h_TpT_NR->Fill(electron_pt[truth_n]);
-      if (positron_reco_pt[truth_n]>0) h_TpT_NR->Fill(positron_pt[truth_n]);
+      h_TepT->Fill(electron_pt[i]);
+      h_RepT->Fill(electron_reco_pt[i]);
+      h_RppT->Fill(positron_reco_pt[i]);
+      h_TppT->Fill(positron_pt[i]);
 
     }
   }  
