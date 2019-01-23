@@ -27,7 +27,7 @@ TChain* handleFile(string name, string extension, string treename, int filecount
 }
 
 
-void makeFactory(TTree* signalTree, TTree* backTree,std::string outfile,std::string factoryname)
+void makeFactory(TTree* signalTree, TTree* backTree,std::string outfile,std::string factoryname, TTree* bgTree2=NULL)
 {
   using namespace TMVA;
   TString jobname(factoryname.c_str());
@@ -35,6 +35,9 @@ void makeFactory(TTree* signalTree, TTree* backTree,std::string outfile,std::str
   Factory *factory = new Factory(jobname,targetFile);
   factory->AddSignalTree(signalTree,1.0);
   factory->AddBackgroundTree(backTree,1.0);
+  if(bgTree2){
+    factory->AddBackgroundTree(bgTree2,1.0);
+  }
   factory->AddVariable("track_deta",'F');
   factory->AddVariable("track_dlayer",'I');
   factory->AddVariable("track_layer",'I');
@@ -86,13 +89,13 @@ int train(){
   using namespace std;
   string treePath = "/sphenix/user/vassalli/gammasample/background/fourembededonlineanalysis";
   string treeExtension = ".root";
-  string outname = "cutTrainH.root";
+  string outname = "cutTrainA.root";
   unsigned int nFiles=100;
 
   TChain *signalTree = handleFile(treePath,treeExtension,"cutTreeSignal",nFiles);
   TChain *backHTree = handleFile(treePath,treeExtension,"cutTreeBackh",nFiles);
   TChain *backETree = handleFile(treePath,treeExtension,"cutTreeBacke",nFiles);
-  makeFactory(signalTree,backHTree,outname,"hback");
-  outname="cutTrainE.root";
-  makeFactory(signalTree,backETree,outname,"eback");
+  makeFactory(signalTree,backHTree,outname,"aback",backETree);
+/*  outname="cutTrainE.root";
+  makeFactory(signalTree,backETree,outname,"eback");*/
 }
