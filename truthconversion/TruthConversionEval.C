@@ -280,6 +280,7 @@ std::queue<std::pair<int,int>> TruthConversionEval::numUnique(std::map<int,Conve
       _b_grandparent_id[_b_nVtx]=i->second.getSourceId();
       _b_e_deta[_b_nVtx]=-1.;
       _b_e_dphi[_b_nVtx]=-1.;
+      _b_positron_pt[_b_nVtx]=-1.;
       _b_electron_pt[_b_nVtx]=tlv_electron.Pt();
     }
     temp=i->second.getPositron();

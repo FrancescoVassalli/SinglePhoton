@@ -57,26 +57,38 @@ void trackpT()
   string outfilename = "pTeffdists.root";
   TFile *out = new TFile(outfilename.c_str(),"RECREATE");
 
-  TH1F *h_TepT = new TH1F("TepT","",600,0,30);
-  TH1F *h_TppT = new TH1F("TppT","",600,0,30);
-  TH1F *h_RepT = new TH1F("RepT","",600,0,30);
-  TH1F *h_RppT = new TH1F("RppT","",600,0,30);
+  TH1F *h_TepT = new TH1F("TepT","",100,0,30);
+  TH1F *h_TppT = new TH1F("TppT","",100,0,30);
+  TH1F *h_RepT = new TH1F("RepT","",100,0,30);
+  TH1F *h_RppT = new TH1F("RppT","",100,0,30);
 
   TH1F *h_rvtx = new TH1F("rvtx","",100,0,30);
   TH1F *h_layer = new TH1F("layer","",24,-.5,23.5);
+
+  h_TepT->GetXaxis()->SetTitle("pT");
+  h_TepT->GetYaxis()->SetTitle("N");
+  h_RepT->GetXaxis()->SetTitle("pT");
+  h_RepT->GetYaxis()->SetTitle("N");
+  h_TppT->GetXaxis()->SetTitle("pT");
+  h_TppT->GetYaxis()->SetTitle("N");
+  h_RppT->GetXaxis()->SetTitle("pT");
+  h_RppT->GetYaxis()->SetTitle("N");
+
+  h_rvtx->GetXaxis()->SetTitle("radius [cm]");
+  h_rvtx->GetYaxis()->SetTitle("N");
   
   for (int event = 0; event < ttree->GetEntries(); ++event)
   {
     ttree->GetEvent(event);
     for (int i = 0; i < truth_n; ++i)
     {
-      h_TepT->Fill(electron_pt[i]);
       h_RepT->Fill(electron_reco_pt[i]);
       h_RppT->Fill(positron_reco_pt[i]);
-      h_TppT->Fill(positron_pt[i]);
     }
     for (int i = 0; i < nVtx; ++i)
     {
+      h_TepT->Fill(electron_pt[i]);
+      h_TppT->Fill(positron_pt[i]);
       h_rvtx->Fill(rVtx[i]);
     }
     for (int i = 0; i < reco_n; ++i)
