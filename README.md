@@ -5,7 +5,7 @@ Everything save some of the plotting macros in the analysis folder are designed 
 - **condor**: scripts for running through condor and locally modules to create events and afterburners to process them
 - **PhotonConversion**: WIP for finding the conversions only using reco information
 -**analysis**: used to make and plot plots about the coversions 
--**pythia**:code for generating a photon-jet background 
+-**pythia**: code for generating a photon-jet background 
 
 **Background on Photon Conversion**
 - I have been using ![this ATLAS paper](https://github.com/FrancescoVassalli/SinglePhoton/files/2742038/4layerRecopT.pdf) as a reference. The relevent information starts on page 136 of the pdf
