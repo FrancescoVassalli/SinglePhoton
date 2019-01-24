@@ -38,7 +38,8 @@ libtruthconversion_la_LIBADD = \
   -lphool
 
 BUILT_SOURCES = \
-	testexternals.C
+	testexternals.C \
+	gcc_test.c
 
 noinst_PROGRAMS = \
 	testexternals
