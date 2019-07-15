@@ -205,14 +205,16 @@ int TruthConversionEval::process_event(PHCompositeNode *topNode)
         (mapConversions[vtx->get_id()]).setParent(parent);
         (mapConversions[vtx->get_id()]).setEmbed(embedID);
         PHG4Particle* grand =_truthinfo->GetParticle(parent->get_parent_id()); //grandparent
-        if (grand) (mapConversions[vtx->get_id()]).setSourceId(grand->get_pid());
-        else (mapConversions[vtx->get_id()]).setSourceId(0);
+        if (grand) (mapConversions[vtx->get_id()]).setSourceId(grand->get_pid());//record pid of the photon's source
+        else (mapConversions[vtx->get_id()]).setSourceId(0);//or it is from the G4 generator?
       }
       else if(_kMakeTTree){//not a conversion
+        cout<<"not a conversion"<<endl;
         SvtxTrack *testTrack = trackeval->best_track_from(g4particle);
         if (testTrack) //not a conversion but has a track 
         {
           //get the associated cluster
+          cout<<"finding cluster"<<endl;
           RawCluster *clustemp=_mainClusterContainer->getCluster(testTrack->get_cal_cluster_id(SvtxTrack::CAL_LAYER(1)));
           if(clustemp){
             if (TMath::Abs(g4particle->get_pid())==11||g4particle->get_pid()==22)
@@ -240,6 +242,7 @@ int TruthConversionEval::process_event(PHCompositeNode *topNode)
     }
     else if(_kMakeTTree){ //is primary therefore not a conversion 
       embedID=get_embed(g4particle,_truthinfo);
+      cout<<"not primary"<<endl;
       SvtxTrack *testTrack = trackeval->best_track_from(g4particle);
       if (testTrack) //has associated track
       {
