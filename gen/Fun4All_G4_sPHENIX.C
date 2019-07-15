@@ -235,8 +235,8 @@ using namespace std;
     {
       // toss low multiplicity dummy events
       PHG4SimpleEventGenerator *gen = new PHG4SimpleEventGenerator();
-      gen->add_particles("gamma", 4);  // mu+,e+,proton,pi+,Upsilon
-      gen->add_particles("pi0", 3);  // mu+,e+,proton,pi+,Upsilon
+      gen->add_particles("gamma", 1);  // mu+,e+,proton,pi+,Upsilon
+      //gen->add_particles("pi0", 3);  // mu+,e+,proton,pi+,Upsilon
       //gen->add_particles("pi+",100); // 100 pion option
       if (readhepmc || do_embedding || runpythia8 || runpythia6)
       {

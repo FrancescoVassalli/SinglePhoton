@@ -145,10 +145,10 @@ void TruthConversionEval::doNodePointers(PHCompositeNode* topNode){
     if(!_truthinfo){
       cerr<<"\t TruthInfoContainer is bad";
     }
-    if(!_mainClusterContainer){
+    if(!_svtxClusterMap){
       cerr<<"\t SvtxClusterMap is bad";
     }
-    if(!_mainClusterContainer){
+    if(!_hitMap){
       cerr<<"\t SvtxHitMap is bad";
     }
     cerr<<endl;
@@ -178,13 +178,15 @@ int TruthConversionEval::process_event(PHCompositeNode *topNode)
   unsigned int hbackmod=0;
   unsigned int ebacki=0;
   unsigned int ebackmod=0;
-  if(range.first==range.second){cout<<"range is not valid"<<endl;}
-  cout<<"enter truth loop"<<endl;
   for ( PHG4TruthInfoContainer::ConstIterator iter = range.first; iter != range.second; ++iter ) {
-    cout<<"made it"<<endl;
     PHG4Particle* g4particle = iter->second; 
     PHG4Particle* parent =_truthinfo->GetParticle(g4particle->get_parent_id());
     PHG4VtxPoint* vtx=_truthinfo->GetVtx(g4particle->get_vtx_id()); //get the vertex
+    if(!vtx){// this is very confusing worth a question
+      cout<<"null truth vertex with id:"<<g4particle->get_vtx_id()<<endl;
+      cout<<"\t and parent id:"<<g4particle->get_parent_id()<<endl;
+      continue;
+    }
     float radius=sqrt(vtx->get_x()*vtx->get_x()+vtx->get_y()*vtx->get_y());
     if(radius>s_kTPCRADIUS) continue;
     int embedID;
