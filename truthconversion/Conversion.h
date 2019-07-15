@@ -103,6 +103,8 @@ class Conversion
 		///@return the minimun reco track pT
 		float minTrackpT();
 		std::pair<float,float> getTrackpTs();
+		std::pair<float,float> getTrackEtas();
+		std::pair<float,float> getTrackPhis();
 		inline std::pair<SvtxTrack*,SvtxTrack*> getRecoTracks()const{
 			return std::pair<SvtxTrack*,SvtxTrack*>(reco1,reco2);
 		}

@@ -71,6 +71,18 @@ int TruthConversionEval::InitRun(PHCompositeNode *topNode)
     _tree->Branch("clus_deta",_b_cluster_deta,"clus_deta[nRpair]/F");
     _tree->Branch("Scluster_prob", &_b_Scluster_prob,"Scluster_prob[nRpair]/F");
     _tree->Branch("Mcluster_prob", &_b_Mcluster_prob,"Mcluster_prob[nRpair]/F");
+
+    _vtxingTree = new TTree("vtxingTree","data predicting vtx from track pair");
+    _vtxingTree->Branch("vtx_r", &_b_vtx_radius);
+    _vtxingTree->Branch("vtx_eta", &_b_vtx_eta);
+    _vtxingTree->Branch("vtx_phi", &_b_vtx_phi);
+    _vtxingTree->Branch("track1_pt", &_b_track1_pt,"track1_pt");
+    _vtxingTree->Branch("track1_eta",& _b_track1_eta,"track1_eta");
+    _vtxingTree->Branch("track1_phi",& _b_track1_phi,"track1_phi");
+    _vtxingTree->Branch("track2_pt", &_b_track2_pt,"track2_pt");
+    _vtxingTree->Branch("track2_eta",& _b_track2_eta,"track2_eta");
+    _vtxingTree->Branch("track2_phi",& _b_track2_phi,"track2_phi");
+    
     _signalCutTree = new TTree("cutTreeSignal","signal data for making track pair cuts");
     _signalCutTree->SetAutoSave(300);
     _signalCutTree->Branch("track_deta", &_b_track_deta);
@@ -85,6 +97,7 @@ int TruthConversionEval::InitRun(PHCompositeNode *topNode)
     _signalCutTree->Branch("photon_m", &_b_photon_m);
     _signalCutTree->Branch("photon_pT", &_b_photon_pT);
     _signalCutTree->Branch("cluster_prob", &_b_cluster_prob);
+
     _h_backgroundCutTree = new TTree("cutTreeBackh","background data for making track pair cuts");
     _h_backgroundCutTree->SetAutoSave(300);
     _h_backgroundCutTree->Branch("track_deta", &_bb_track_deta);
@@ -100,6 +113,7 @@ int TruthConversionEval::InitRun(PHCompositeNode *topNode)
     _h_backgroundCutTree->Branch("photon_pT", &_bb_photon_pT);
     _h_backgroundCutTree->Branch("cluster_prob", &_bb_cluster_prob);
     _h_backgroundCutTree->Branch("pid", &_bb_pid);
+
     _e_backgroundCutTree = new TTree("cutTreeBacke","background data for making track pair cuts");
     _e_backgroundCutTree->SetAutoSave(300);
     _e_backgroundCutTree->Branch("track_deta", &_bb_track_deta);
@@ -295,8 +309,8 @@ std::queue<std::pair<int,int>> TruthConversionEval::numUnique(std::map<int,Conve
           _b_e_dphi[_b_Tpair]=TMath::Abs(tlv_electron.Phi()-tlv_positron.Phi());
           pair<float,float> pTstemp = i->second.getTrackpTs();
           _b_fLayer[_b_Tpair]=_b_track_layer = i->second.firstLayer(_svtxClusterMap,_hitMap);
-          _b_electron_reco_pt[_b_Tpair]=pTstemp.first;
-          _b_positron_reco_pt[_b_Tpair]=pTstemp.second;
+          _b_track1_pt= _b_electron_reco_pt[_b_Tpair]=pTstemp.first;
+          _b_track2_pt= _b_positron_reco_pt[_b_Tpair]=pTstemp.second;
           _b_Tpair++;
         }
         switch(nRecoTracks)
@@ -309,6 +323,12 @@ std::queue<std::pair<int,int>> TruthConversionEval::numUnique(std::map<int,Conve
                 _b_track_dlayer = i->second.trackDLayer(_svtxClusterMap,_hitMap);
                 _b_track_pT = i->second.minTrackpT();
                 _b_approach = i->second.approachDistance();
+                pair<float,float> etasTemp = i->second.getTrackEtas();
+                _b_track1_eta = etasTemp.first;
+                _b_track2_eta = etasTemp.second;
+                pair<float,float> phisTemp = i->second.getTrackPhis();
+                _b_track1_phi = phisTemp.first;
+                _b_track2_phi = phisTemp.second;
                 /*The recoVtx finding doesn't work yet so using truth vtx for now
                  * pair<SvtxTrack*,SvtxTrack*> recoTracks = i->second.getRecoTracks();
                  pair<SvtxVertex*,SvtxVertex*> recoTracks = i->second.getRecoTracks();
@@ -321,6 +341,10 @@ std::queue<std::pair<int,int>> TruthConversionEval::numUnique(std::map<int,Conve
                  cout<<"reco vtx is null"<<endl;
                  }*/
                 _b_vtx_radius = sqrt(vtx->get_x()*vtx->get_x()+vtx->get_y()*vtx->get_y());
+                TVector3 vtx_calc(vtx->get_x(),vtx->get_y(),vtx->get_z());
+                _b_vtx_eta = vtx_calc.Eta();
+                _b_vtx_phi = vtx_calc.Phi();
+                
                 //_b_vtx_chi2 = recoVtx->get_chisq();
                 _b_vtxTrack_dist = i->second.dist(vtx,_svtxClusterMap);
                 TLorentzVector* recoPhoton = i->second.setRecoPhoton();
@@ -344,7 +368,7 @@ std::queue<std::pair<int,int>> TruthConversionEval::numUnique(std::map<int,Conve
               }
               pair<int,int> clusterIds = i->second.get_cluster_ids();
               RawCluster *clustemp;
-              if(mainClusterContainer->getCluster(clusterIds.first)){//if thre is matching cluster 
+              if(mainClusterContainer->getCluster(clusterIds.first)){//if there is matching cluster 
                 clustemp =   dynamic_cast<RawCluster*>(mainClusterContainer->getCluster(clusterIds.first)->Clone());
                 _conversionClusters.AddCluster(clustemp); //add the calo cluster to the container
                 if (_kMakeTTree)
@@ -359,9 +383,11 @@ std::queue<std::pair<int,int>> TruthConversionEval::numUnique(std::map<int,Conve
                     {
                       _b_cluster_prob=clus2->get_prob();
                     }
+                    //calculate deta
                     float eta1 = etaCalc.PseudoRapidity();
                     etaCalc.SetXYZ(clus2->get_x(),clus2->get_y(),clus2->get_z());
                     _b_cluster_deta[_b_Rpair]=fabs(eta1-etaCalc.PseudoRapidity());
+                    /* this may be a logical bug. What are S and M? If this is false the identical cluster prob is recorded twice.*/
                     if (clusterIds.first!=clusterIds.second) //if there are two district clusters
                     {
                       _b_nCluster[_b_Rpair]=2;

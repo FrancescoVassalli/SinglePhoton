@@ -373,3 +373,31 @@ std::pair<float,float> Conversion::getTrackpTs(){
   }
 }
 
+std::pair<float,float> Conversion::getTrackEtas(){
+  switch(recoCount()){
+    case 2:
+      return std::pair<float,float>(reco1->get_eta(),reco2->get_eta());
+    case 1:
+      if (reco1) return std::pair<float,float>(reco1->get_eta(),-1);
+      else return std::pair<float,float>(-1,reco2->get_eta());
+      break;
+    default:
+      return std::pair<float,float>(-1,-1);
+      break;
+  }
+}
+
+std::pair<float,float> Conversion::getTrackPhis(){
+  switch(recoCount()){
+    case 2:
+      return std::pair<float,float>(reco1->get_phi(),reco2->get_phi());
+    case 1:
+      if (reco1) return std::pair<float,float>(reco1->get_phi(),-1);
+      else return std::pair<float,float>(-1,reco2->get_phi());
+      break;
+    default:
+      return std::pair<float,float>(-1,-1);
+      break;
+  }
+}
+
