@@ -129,7 +129,6 @@ int TruthConversionEval::InitRun(PHCompositeNode *topNode)
     _e_backgroundCutTree->Branch("photon_pT", &_bb_photon_pT);
     _e_backgroundCutTree->Branch("cluster_prob", &_bb_cluster_prob);
   }
-  cout<<"Done init"<<endl;
   return 0;
 }
 
@@ -138,6 +137,22 @@ void TruthConversionEval::doNodePointers(PHCompositeNode* topNode){
   _truthinfo = findNode::getClass<PHG4TruthInfoContainer>(topNode,"G4TruthInfo");
   _svtxClusterMap = findNode::getClass<SvtxClusterMap>(topNode,"SvtxClusterMap");
   _hitMap = findNode::getClass<SvtxHitMap>(topNode,"SvtxHitMap");
+  if(!_mainClusterContainer||!_truthinfo||!_svtxClusterMap||!_hitMap){
+    cerr<<Name()<<": critical error-bad nodes \n";
+    if(!_mainClusterContainer){
+      cerr<<"\t RawClusterContainer is bad";
+    }
+    if(!_truthinfo){
+      cerr<<"\t TruthInfoContainer is bad";
+    }
+    if(!_mainClusterContainer){
+      cerr<<"\t SvtxClusterMap is bad";
+    }
+    if(!_mainClusterContainer){
+      cerr<<"\t SvtxHitMap is bad";
+    }
+    cerr<<endl;
+  }
   /*_vertexer= new RaveVertexingAux(topNode);
   _vertexer->Verbosity(Verbosity());*/
 }
@@ -163,13 +178,17 @@ int TruthConversionEval::process_event(PHCompositeNode *topNode)
   unsigned int hbackmod=0;
   unsigned int ebacki=0;
   unsigned int ebackmod=0;
+  if(range.first==range.second){cout<<"range is not valid"<<endl;}
+  cout<<"enter truth loop"<<endl;
   for ( PHG4TruthInfoContainer::ConstIterator iter = range.first; iter != range.second; ++iter ) {
+    cout<<"made it"<<endl;
     PHG4Particle* g4particle = iter->second; 
     PHG4Particle* parent =_truthinfo->GetParticle(g4particle->get_parent_id());
     PHG4VtxPoint* vtx=_truthinfo->GetVtx(g4particle->get_vtx_id()); //get the vertex
     float radius=sqrt(vtx->get_x()*vtx->get_x()+vtx->get_y()*vtx->get_y());
     if(radius>s_kTPCRADIUS) continue;
     int embedID;
+    cout<<"processing parent"<<endl;
     if (parent)//if the particle is not primary
     {
       embedID=get_embed(parent,_truthinfo);
@@ -249,6 +268,7 @@ int TruthConversionEval::process_event(PHCompositeNode *topNode)
       }
     }
   }
+  cout<<"exit truth loop"<<endl;
   //pass the map to this helper method which fills the fields for the TTree 
   numUnique(&mapConversions,trackeval,_mainClusterContainer);
   //std::queue<std::pair<int,int>> missingChildren= numUnique(&vtxList,&mapConversions,trackeval,mainClusterContainer);
@@ -288,6 +308,7 @@ std::queue<std::pair<int,int>> TruthConversionEval::numUnique(std::map<int,Conve
     temp=i->second.getElectron(); //set the first child 
     tlv_electron.SetPxPyPzE(temp->get_px(),temp->get_py(),temp->get_pz(),temp->get_e());
     if(_kMakeTTree){//fill tree values
+      cout<<"numUnique filling tree"<<endl;
       _b_rVtx[_b_nVtx] = sqrt(vtx->get_x()*vtx->get_x()+vtx->get_y()*vtx->get_y()); //find the radius
       _b_parent_pt[_b_nVtx] =tlv_photon.Pt();
       _b_parent_phi[_b_nVtx]=tlv_photon.Phi();
