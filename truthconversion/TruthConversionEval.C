@@ -11,6 +11,7 @@
 
 #include <g4main/PHG4TruthInfoContainer.h>
 #include <g4main/PHG4Particle.h>
+#include <g4main/PHG4Particlev1.h>
 #include <g4main/PHG4VtxPoint.h>
 
 #include <trackbase_historic/SvtxHitMap.h>
@@ -82,7 +83,7 @@ int TruthConversionEval::InitRun(PHCompositeNode *topNode)
     _vtxingTree->Branch("track2_pt", &_b_track2_pt,"track2_pt");
     _vtxingTree->Branch("track2_eta",& _b_track2_eta,"track2_eta");
     _vtxingTree->Branch("track2_phi",& _b_track2_phi,"track2_phi");
-    
+
     _signalCutTree = new TTree("cutTreeSignal","signal data for making track pair cuts");
     _signalCutTree->SetAutoSave(300);
     _signalCutTree->Branch("track_deta", &_b_track_deta);
@@ -154,7 +155,7 @@ void TruthConversionEval::doNodePointers(PHCompositeNode* topNode){
     cerr<<endl;
   }
   /*_vertexer= new RaveVertexingAux(topNode);
-  _vertexer->Verbosity(Verbosity());*/
+    _vertexer->Verbosity(Verbosity());*/
 }
 
 int TruthConversionEval::process_event(PHCompositeNode *topNode)
@@ -179,18 +180,16 @@ int TruthConversionEval::process_event(PHCompositeNode *topNode)
   unsigned int ebacki=0;
   unsigned int ebackmod=0;
   for ( PHG4TruthInfoContainer::ConstIterator iter = range.first; iter != range.second; ++iter ) {
-    PHG4Particle* g4particle = iter->second; 
-    PHG4Particle* parent =_truthinfo->GetParticle(g4particle->get_parent_id());
-    PHG4VtxPoint* vtx=_truthinfo->GetVtx(g4particle->get_vtx_id()); //get the vertex
-    if(!vtx){// this is very confusing worth a question
-      cout<<"null truth vertex with id:"<<g4particle->get_vtx_id()<<endl;
-      cout<<"\t and parent id:"<<g4particle->get_parent_id()<<endl;
+    PHG4Particle* g4particle = dynamic_cast<PHG4Particlev1*> (iter->second); 
+    /*I think G4 is keeping a list of "calculations" in the truth particle container and only the particles with postive track ids are real*/
+    if(!g4particle||g4particle->get_track_id()<0){
       continue;
     }
+    PHG4Particle* parent =_truthinfo->GetParticle(g4particle->get_parent_id());
+    PHG4VtxPoint* vtx=_truthinfo->GetVtx(g4particle->get_vtx_id()); //get the vertex
     float radius=sqrt(vtx->get_x()*vtx->get_x()+vtx->get_y()*vtx->get_y());
     if(radius>s_kTPCRADIUS) continue;
     int embedID;
-    cout<<"processing parent"<<endl;
     if (parent)//if the particle is not primary
     {
       embedID=get_embed(parent,_truthinfo);
@@ -368,7 +367,7 @@ std::queue<std::pair<int,int>> TruthConversionEval::numUnique(std::map<int,Conve
                 TVector3 vtx_calc(vtx->get_x(),vtx->get_y(),vtx->get_z());
                 _b_vtx_eta = vtx_calc.Eta();
                 _b_vtx_phi = vtx_calc.Phi();
-                
+
                 //_b_vtx_chi2 = recoVtx->get_chisq();
                 _b_vtxTrack_dist = i->second.dist(vtx,_svtxClusterMap);
                 TLorentzVector* recoPhoton = i->second.setRecoPhoton();
