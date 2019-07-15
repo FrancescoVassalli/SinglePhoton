@@ -1,6 +1,6 @@
 #include "TruthConversionEval.h"
 #include "Conversion.h"
-#include "../PhotonConversion/RaveVertexingAux.h"
+//#include "../PhotonConversion/RaveVertexingAux.h"
 
 #include <phool/PHCompositeNode.h>
 #include <phool/getClass.h>
@@ -254,7 +254,7 @@ int TruthConversionEval::process_event(PHCompositeNode *topNode)
     std::cout<<Name()<<" found "<<_b_nVtx<<" truth conversions \n";
   }
   delete stack;
-  if (_vertexer) delete _vertexer;
+  //if (_vertexer) delete _vertexer;
   return 0;
 }
 
