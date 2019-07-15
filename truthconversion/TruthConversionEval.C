@@ -129,6 +129,7 @@ int TruthConversionEval::InitRun(PHCompositeNode *topNode)
     _e_backgroundCutTree->Branch("photon_pT", &_bb_photon_pT);
     _e_backgroundCutTree->Branch("cluster_prob", &_bb_cluster_prob);
   }
+  cout<<"Done init"<<endl;
   return 0;
 }
 
