@@ -1,6 +1,6 @@
 AUTOMAKE_OPTIONS = foreign
 
-INCLUDES = \
+AM_CPPFLAGS = \
   -I$(includedir) \
   -I$(OFFLINE_MAIN)/include \
   -I`root-config --incdir`
@@ -15,7 +15,7 @@ libtruthconversion_la_LDFLAGS = \
 lib_LTLIBRARIES = \
 	libtruthconversion.la
   
-include_HEADERS = \
+pkginclude_HEADERS = \
 	ConversionClusterTreeMaker.h \
 	ConversionClusterTreeMakerLinkDef.h \
 	TruthConversionEval.h \
@@ -25,17 +25,16 @@ include_HEADERS = \
 
 libtruthconversion_la_SOURCES = \
 	ConversionClusterTreeMaker.C \
-	ConversionClusterTreeMaker_Dict.C \
 	TruthConversionEval.C \
-	TruthConversionEval_Dict.C \
 	Conversion.cc 
 
 libtruthconversion_la_LIBADD = \
-  -lg4dst \
-  -lg4eval \
-  -lcalotrigger \
-	-lConvertedPhotonReconstructor\
-  -lphool
+  -lphool\
+  -lg4eval\
+  -lg4dst\
+  -lcalotrigger\
+	-lcalo_io\
+	-lcalo_util
 
 BUILT_SOURCES = \
 	testexternals.C \
