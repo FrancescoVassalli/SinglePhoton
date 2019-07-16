@@ -368,7 +368,6 @@ PHGenFit::Track* SVReco::MakeGenFitTrack(PHCompositeNode *topNode, const SvtxTra
     cerr << PHWHERE << " Input SvtxTrack is NULL!" << endl;
     return NULL;
   }
-
   PHG4CylinderGeomContainer* geom_container_intt = findNode::getClass<PHG4CylinderGeomContainer>(topNode, "CYLINDERGEOM_INTT");
   PHG4CylinderGeomContainer* geom_container_maps = findNode::getClass<PHG4CylinderGeomContainer>(topNode, "CYLINDERGEOM_MVTX");
 
@@ -377,6 +376,14 @@ PHGenFit::Track* SVReco::MakeGenFitTrack(PHCompositeNode *topNode, const SvtxTra
     return NULL;
   }
 
+  Vector3 seed_pos(intrack->get_x(), intrack->get_y(), intrack->get_z());
+  TVector3 seed_mom(intrack->get_px(), intrack->get_py(), intrack->get_pz());
+  TMatrixDSym seed_cov(6);
+  for (int i=0; i<6; i++){
+    for (int j=0; j<6; j++){
+      seed_cov[i][j] = intrack->get_error(i,j);
+    }
+  }
   TVector3 seed_pos(intrack->get_x(), intrack->get_y(), intrack->get_z());
   TVector3 seed_mom(intrack->get_px(), intrack->get_py(), intrack->get_pz());
   TMatrixDSym seed_cov(6);
@@ -388,30 +395,18 @@ PHGenFit::Track* SVReco::MakeGenFitTrack(PHCompositeNode *topNode, const SvtxTra
 
   // Create measurements
   std::vector<PHGenFit::Measurement*> measurements;
-  std::map<float, unsigned int> m_r_cluster_id;
 
   for (auto iter = intrack->begin_clusters(); iter != intrack->end_clusters(); ++iter){
     unsigned int cluster_id = *iter;
-    TrkrCluster* cluster = _clustermap->findCluster(cluster_id);
-    float x = cluster->getPosition(0);
-    float y = cluster->getPosition(1);
-    float r = sqrt(x*x+y*y);
-    m_r_cluster_id.insert(std::pair<float, unsigned int>(r, cluster_id));
-  }
-
-  //what is the point of this loop
-  for (auto iter = m_r_cluster_id.begin(); iter != m_r_cluster_id.end(); ++iter){
-    //for (SvtxTrack::ConstClusterIter iter = intrack->begin_clusters(); iter != intrack->end_clusters(); ++iter){
-    unsigned int cluster_id = iter->second;
     TrkrCluster* cluster = _clustermap->findCluster(cluster_id);
     if (!cluster) {
       LogError("No cluster Found!");
       continue;
     }
-
+    float x = cluster->getPosition(0);
+    float y = cluster->getPosition(1);
+    float radius = sqrt(x*x+y*y);
     TVector3 pos(cluster->getPosition(0), cluster->getPosition(1), cluster->getPosition(2));
-    float radius = sqrt(cluster->getPosition(0)*cluster->getPosition(0)  + cluster->getPosition(1)*cluster->getPosition(1));
-
     seed_mom.SetPhi(pos.Phi());
     seed_mom.SetTheta(pos.Theta());
 
@@ -419,7 +414,6 @@ PHGenFit::Track* SVReco::MakeGenFitTrack(PHCompositeNode *topNode, const SvtxTra
 
     unsigned int trkrid = TrkrDefs::getTrkrId(cluster_id);
     unsigned int layer = TrkrDefs::getLayer(cluster_id);
-
     if (_use_ladder_geom){ //I don't understand this bool
       if (trkrid == TrkrDefs::mvtxId) {
         int stave_index = MvtxDefs::getStaveId(cluster_id);
@@ -443,13 +437,9 @@ PHGenFit::Track* SVReco::MakeGenFitTrack(PHCompositeNode *topNode, const SvtxTra
         n.RotateZ(geom->get_strip_phi_tilt());
       }
     }//if use_ladder_geom
-
-    PHGenFit::Measurement* meas = new PHGenFit::PlanarMeasurement(pos, n,
-        radius*cluster->getPhiError(), cluster->getZError());
+    PHGenFit::Measurement* meas = new PHGenFit::PlanarMeasurement(pos, n,radius*cluster->getPhiError(), cluster->getZError());
     measurements.push_back(meas);
-  }//for clusters
-
-  //TODO Add multiple TrackRep choices.
+  }//cluster loop
   genfit::AbsTrackRep* rep = new genfit::RKTrackRep(_primary_pid_guess);
   PHGenFit::Track* track(new PHGenFit::Track(rep, seed_pos, seed_mom, seed_cov));
   track->addMeasurements(measurements);
@@ -463,8 +453,7 @@ PHGenFit::Track* SVReco::MakeGenFitTrack(PHCompositeNode *topNode, const SvtxTra
   track->getGenFitTrack()->setMcTrackId(intrack->get_id());
 
   return track;
-  }
-
+}
 
   /*
    * Fill SvtxVertexMap from GFRaveVertexes and Tracks
