@@ -119,7 +119,7 @@ SVReco::SVReco(const string &name) :
 
 int SVReco::InitEvent(PHCompositeNode *topNode) {
   GetNodes(topNode);
-
+  cout<<"got vertexing nodes"<<endl;
   //! stands for Refit_GenFit_Tracks
   vector<genfit::Track*> rf_gf_tracks;
   rf_gf_tracks.clear();
@@ -129,9 +129,9 @@ int SVReco::InitEvent(PHCompositeNode *topNode) {
   svtxtrk_gftrk_map.clear();
   svtxtrk_wt_map.clear();
   svtxtrk_id.clear();
-
   //is this the priamry vetex?
   SvtxVertex *vertex = _vertexmap->get(0);
+  cout<<"strating track loop"<<endl;
 
   //iterate over all tracks to find priary vertex and make rave/genfit objects
   for (SvtxTrackMap::Iter iter = _trackmap->begin(); iter != _trackmap->end();
@@ -150,6 +150,7 @@ int SVReco::InitEvent(PHCompositeNode *topNode) {
       continue;
 
     int n_MVTX = 0, n_INTT = 0, n_TPC = 0;
+    cout<<"starting cluster loop"<<endl;
     for (SvtxTrack::ConstClusterIter iter2 = svtx_track->begin_clusters(); iter2!=svtx_track->end_clusters(); iter2++) {
       //this line is buggy
       TrkrDefs::cluskey cluster_key = *iter2;
@@ -168,8 +169,9 @@ int SVReco::InitEvent(PHCompositeNode *topNode) {
 
     //cout << (svtx_track->get_chisq()/svtx_track->get_ndf()) << ", " << n_TPC << ", " << svtx_track->get_pt() << endl;
     //cout << svtx_track->get_ndf() << ", " << svtx_track->size_clusters() << endl;
-
+    cout<<"making genfit"<<endl;
     PHGenFit::Track* rf_phgf_track = MakeGenFitTrack(topNode, svtx_track, vertex);
+    cout<<"made genfit"<<endl;
 
     //cout << "DONE" << endl;
 
@@ -180,6 +182,7 @@ int SVReco::InitEvent(PHCompositeNode *topNode) {
       rf_gf_tracks.push_back(rf_phgf_track->getGenFitTrack());
     }
   }
+  cout<<"exit track loop ntracks="<<rf_gf_tracks.size()<<endl;
 
   //! find vertex using tracks
   std::vector<genfit::GFRaveVertex*> rave_vertices;
@@ -194,6 +197,7 @@ int SVReco::InitEvent(PHCompositeNode *topNode) {
     }
   }
 
+  cout<<"filling vtx map"<<endl;
   FillVertexMap(rave_vertices, rf_gf_tracks);
 
   return Fun4AllReturnCodes::EVENT_OK;

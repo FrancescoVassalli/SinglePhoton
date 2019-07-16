@@ -176,10 +176,13 @@ void TruthConversionEval::doNodePointers(PHCompositeNode* topNode){
 int TruthConversionEval::process_event(PHCompositeNode *topNode)
 {
   doNodePointers(topNode);
+  cout<<"did nodes"<<endl;
   _vertexer->InitEvent(topNode);
+  cout<<"made vertexer"<<endl;
   _conversionClusters.Reset(); //clear the list of conversion clusters
   PHG4TruthInfoContainer::Range range = _truthinfo->GetParticleRange(); //look at all truth particles
   SvtxEvalStack *stack = new SvtxEvalStack(topNode); //truth tracking info
+  cout<<"made track eval"<<endl;
   SvtxTrackEval* trackeval = stack->get_track_eval();
   if (!trackeval)
   {
@@ -195,6 +198,7 @@ int TruthConversionEval::process_event(PHCompositeNode *topNode)
   unsigned int hbackmod=0;
   unsigned int ebacki=0;
   unsigned int ebackmod=0;
+  cout<<"enter truth particle loop"<<endl;
   for ( PHG4TruthInfoContainer::ConstIterator iter = range.first; iter != range.second; ++iter ) {
     PHG4Particle* g4particle = dynamic_cast<PHG4Particlev1*> (iter->second); 
     /*I think G4 is keeping a list of "calculations" in the truth particle container and only the particles with postive track ids are real*/
@@ -309,7 +313,6 @@ int TruthConversionEval::process_event(PHCompositeNode *topNode)
     std::cout<<Name()<<" found "<<_b_nVtx<<" truth conversions \n";
   }
   delete stack;
-  //if (_vertexer) delete _vertexer;
   return 0;
 }
 
@@ -351,7 +354,7 @@ std::queue<std::pair<int,int>> TruthConversionEval::numUnique(std::map<int,Conve
           _b_e_dphi[_b_Tpair]=TMath::Abs(tlv_electron.Phi()-tlv_positron.Phi());
           pair<float,float> pTstemp = i->second.getTrackpTs();
           //_b_fLayer[_b_Tpair]=_b_track_layer = i->second.firstLayer(_clusterMap,_hitMap); This is broken because of the Svtx->Trkr issue
-          _b_fLayer=-1;
+          _b_fLayer[_b_Tpair]=-1;
           _b_track1_pt= _b_electron_reco_pt[_b_Tpair]=pTstemp.first;
           _b_track2_pt= _b_positron_reco_pt[_b_Tpair]=pTstemp.second;
           _b_Tpair++;
@@ -504,9 +507,8 @@ void TruthConversionEval::processBackground(std::map<int,Conversion> *mymap,Svtx
       v_tracks.push_back(i->second.getRecoTracks());
       genfit::GFRaveVertex* recoVert = _vertexer->findSecondaryVertices(&v_tracks)[0];
       TVector3 recoVertPos = recoVert->getPos();
-      PHG4VtxPoint *vtx = i->second.getVtx();
       _bb_vtx_radius = sqrt(recoVertPos.x()*recoVertPos.x()+recoVertPos.y()*recoVertPos.y());
-      _bb_vtx_chi2 = recoVert->get_chisq();
+      _bb_vtx_chi2 = recoVert->getChi2();
       //_bb_vtxTrack_dist = i->second.dist(vtx,_clusterMap); This is broken because the Svtx->Trkr issue
       TLorentzVector* recoPhoton = i->second.setRecoPhoton();
       if (recoPhoton)
