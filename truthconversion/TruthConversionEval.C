@@ -22,6 +22,8 @@
 #include <g4eval/SvtxEvalStack.h>
 #include <g4eval/SvtxTrackEval.h>
 
+#include <GenFit/GFRaveConverters.h>
+
 #include <TFile.h>
 #include <TTree.h>
 #include <TLorentzVector.h>
@@ -39,10 +41,13 @@ TruthConversionEval::TruthConversionEval(const std::string &name, unsigned int r
 
 TruthConversionEval::~TruthConversionEval(){
   if (_f) delete _f;
+  if (_vertexer) delete _vertexer;
 }
 
 int TruthConversionEval::InitRun(PHCompositeNode *topNode)
 {
+  _vertexer = new SVReco();
+
   if(_kMakeTTree){
     _b_event=0;
     _runNumber=_kRunNumber;
@@ -161,6 +166,7 @@ void TruthConversionEval::doNodePointers(PHCompositeNode* topNode){
 int TruthConversionEval::process_event(PHCompositeNode *topNode)
 {
   doNodePointers(topNode);
+  _vertexer->InitEvent(topNode);
   _conversionClusters.Reset(); //clear the list of conversion clusters
   PHG4TruthInfoContainer::Range range = _truthinfo->GetParticleRange(); //look at all truth particles
   SvtxEvalStack *stack = new SvtxEvalStack(topNode); //truth tracking info
@@ -355,24 +361,15 @@ std::queue<std::pair<int,int>> TruthConversionEval::numUnique(std::map<int,Conve
                 pair<float,float> phisTemp = i->second.getTrackPhis();
                 _b_track1_phi = phisTemp.first;
                 _b_track2_phi = phisTemp.second;
-                /*The recoVtx finding doesn't work yet so using truth vtx for now
-                 * pair<SvtxTrack*,SvtxTrack*> recoTracks = i->second.getRecoTracks();
-                 pair<SvtxVertex*,SvtxVertex*> recoTracks = i->second.getRecoTracks();
-                 SvtxVertex* vtx = _vertexer->makeVtx(recoTracks.first,recoTracks.second);
-                 if(vtx) _b_vtx_radius =sqrt(vtx->get_x()*vtx->get_x()+vtx->get_y()*vtx->get_y());
-                 else _b_vtx_radius=-1;
-                 SvtxVertex *recoVtx = i->second.getRecoVtx();
-                 if (!recoVtx)
-                 {
-                 cout<<"reco vtx is null"<<endl;
-                 }*/
-                _b_vtx_radius = sqrt(vtx->get_x()*vtx->get_x()+vtx->get_y()*vtx->get_y());
-                TVector3 vtx_calc(vtx->get_x(),vtx->get_y(),vtx->get_z());
-                _b_vtx_eta = vtx_calc.Eta();
-                _b_vtx_phi = vtx_calc.Phi();
-
-                //_b_vtx_chi2 = recoVtx->get_chisq();
-                _b_vtxTrack_dist = i->second.dist(vtx,_svtxClusterMap);
+                std::vector<pair<SvtxTrack*, SvtxTrack*>> v_tracks;
+                v_tracks.push_back(i->second.getRecoTracks());
+                GFRaveVertex* recoVert = _vertexer->findSecondaryVerticies(v_tracks)[0];
+                TVector3 recoVertPos = recoVert->getPos();
+                _b_vtx_radius = sqrt(recoVertPos.x()*recoVertPos.x()+recoVertPos.y()*recoVertPos.y());
+                _b_vtx_eta = recoVertPos.Eta();
+                _b_vtx_phi = recoVertPos.Phi();
+                _b_vtx_chi2 = recoVert->get_Chi2();
+                _b_vtxTrack_dist = i->second.dist(recoVertPos,_svtxClusterMap);
                 TLorentzVector* recoPhoton = i->second.setRecoPhoton();
                 if (recoPhoton)
                 {

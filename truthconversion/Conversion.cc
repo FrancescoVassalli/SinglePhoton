@@ -281,6 +281,18 @@ double Conversion::dist(PHG4VtxPoint *recovtx,SvtxClusterMap* svtxClusterMap){
   else return r2;
 }
 
+double Conversion::dist(TVector3 *recovtx,SvtxClusterMap* svtxClusterMap){
+  SvtxCluster *c1 = svtxClusterMap->get(*(reco1->begin_clusters()));
+  SvtxCluster *c2 = svtxClusterMap->get(*(reco2->begin_clusters()));
+  double r1 = sqrt(abs(c1->get_x()-recovtx->x())+abs(c1->get_y()-recovtx->y())+abs(c1->get_z()-recovtx->z()));
+  double r2 = sqrt(abs(c2->get_x()-recovtx->x())+abs(c2->get_y()-recovtx->y())+abs(c2->get_z()-recovtx->z()));
+  if (r1>r2)
+  {
+    return r1;
+  }
+  else return r2;
+}
+
 float Conversion::setRecoVtx(SvtxVertex *recovtx,SvtxClusterMap* svtxClusterMap){
   recoVtx=recovtx;
   SvtxCluster *c1 = svtxClusterMap->get(*(reco1->begin_clusters()));

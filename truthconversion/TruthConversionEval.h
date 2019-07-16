@@ -27,7 +27,7 @@ class SvtxCluster;
 class RawClusterContainer;
 class TTree;
 class TFile;
-//class RaveVertexingAux;
+class SVReco;
 
 class TruthConversionEval: public SubsysReco
 {
@@ -89,7 +89,7 @@ class TruthConversionEval: public SubsysReco
     SvtxClusterMap* _svtxClusterMap;
     SvtxHitMap *_hitMap;
     std::string _foutname; ///< name of the output file
-    //RaveVertexingAux *_vertexer=NULL; ///< for reco vertex finding currently does nothing
+    SVReco *_vertexer=NULL; ///< for reco vertex finding
     /** \defgroup mainTreeVars Variables for {@link _tree}
       @{*/
     int _b_event;

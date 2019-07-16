@@ -34,7 +34,7 @@ class TFile;
 class TTree;
 
 //! \brief		Refit SvtxTracks with PHGenFit.
-class SVReco: public SubsysReco {
+class SVReco {
 public:
 
 	//! Default constructor
@@ -44,13 +44,13 @@ public:
 	~SVReco();
 
 	//!Initialization, called for initialization
-	int Init(PHCompositeNode *);
+	int InitEvent(PHCompositeNode *);
 
 	//!Initialization Run, called for initialization of a run
 	int InitRun(PHCompositeNode *);
 
 	//!Process Event, called for each event
-	int process_event(PHCompositeNode *);
+	int findSecondaryVerticies(PHCompositeNode *);
 
 	//!End, write and close files
 	int End(PHCompositeNode *);
@@ -62,7 +62,6 @@ public:
 			_eval_outname = file;
 	}
 
-	void init_eval_tree();
 	void reset_eval_variables();
 
 	void set_do_eval(bool doEval){
@@ -139,9 +138,6 @@ public:
 
 private:
 
-	//! Event counter
-	int _event;
-
 	//! Get all the nodes
 	int GetNodes(PHCompositeNode *);
 
@@ -171,6 +167,8 @@ private:
 
 	//!
 	std::string _mag_field_file_name;
+
+	vector<PHGenFit::Track*> _main_rf_phgf_tracks;
 
 	//! rescale mag field, modify the original mag field read in
 	float _mag_field_re_scaling_factor;
@@ -214,8 +212,6 @@ private:
 
 	//! jetmap name for secondary vertex finding
 	std::string _jetmap_name;
-
-	TTree* _eval_tree;
 
 	float gf_prim_vtx[3];
 	float gf_prim_vtx_err[3];

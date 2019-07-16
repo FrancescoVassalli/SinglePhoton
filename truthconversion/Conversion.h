@@ -15,6 +15,7 @@
 #include <trackbase_historic/SvtxVertex.h>
 #include <g4eval/SvtxTrackEval.h>
 #include <TLorentzVector.h>
+#include <TVector3.h>
 #include <utility>
 
 class SvtxTrackEval;
@@ -154,6 +155,7 @@ class Conversion
 		double approachDistance()const;
 
 		double dist(PHG4VtxPoint* vtx, SvtxClusterMap* cmap);
+		double dist(TVector3* vtx, SvtxClusterMap* cmap);
 		float setRecoVtx(SvtxVertex* recovtx,SvtxClusterMap* cmap);
 		TLorentzVector* setRecoPhoton();
 
