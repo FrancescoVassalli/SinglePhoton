@@ -162,7 +162,7 @@ void TruthConversionEval::doNodePointers(PHCompositeNode* topNode){
       cerr<<"\t TruthInfoContainer is bad";
     }
     if(!_clusterMap){
-      cerr<<"\t SvtxClusterMap is bad";
+      cerr<<"\t TrkrClusterMap is bad";
     }
     /*if(!_hitMap){
       cerr<<"\t SvtxHitMap is bad";
@@ -350,7 +350,8 @@ std::queue<std::pair<int,int>> TruthConversionEval::numUnique(std::map<int,Conve
           _b_e_deta[_b_Tpair]=TMath::Abs(tlv_electron.Eta()-tlv_positron.Eta());
           _b_e_dphi[_b_Tpair]=TMath::Abs(tlv_electron.Phi()-tlv_positron.Phi());
           pair<float,float> pTstemp = i->second.getTrackpTs();
-          _b_fLayer[_b_Tpair]=_b_track_layer = i->second.firstLayer(_clusterMap,_hitMap);
+          //_b_fLayer[_b_Tpair]=_b_track_layer = i->second.firstLayer(_clusterMap,_hitMap); This is broken because of the Svtx->Trkr issue
+          _b_fLayer=-1;
           _b_track1_pt= _b_electron_reco_pt[_b_Tpair]=pTstemp.first;
           _b_track2_pt= _b_positron_reco_pt[_b_Tpair]=pTstemp.second;
           _b_Tpair++;
@@ -362,7 +363,10 @@ std::queue<std::pair<int,int>> TruthConversionEval::numUnique(std::map<int,Conve
               if(_kMakeTTree){
                 _b_track_deta = i->second.trackDEta();
                 _b_track_dphi = i->second.trackDPhi();
+                /*This is broken because of the Svtx->Trkr issue
                 _b_track_dlayer = i->second.trackDLayer(_clusterMap,_hitMap);
+                */
+                _b_track_dlayer=-1;
                 _b_track_pT = i->second.minTrackpT();
                 _b_approach = i->second.approachDistance();
                 pair<float,float> etasTemp = i->second.getTrackEtas();
@@ -379,7 +383,7 @@ std::queue<std::pair<int,int>> TruthConversionEval::numUnique(std::map<int,Conve
                 _b_vtx_eta = recoVertPos.Eta();
                 _b_vtx_phi = recoVertPos.Phi();
                 _b_vtx_chi2 = recoVert->getChi2();
-                _b_vtxTrack_dist = i->second.dist(&recoVertPos,_clusterMap);
+                //_b_vtxTrack_dist = i->second.dist(&recoVertPos,_clusterMap); This is broken because of the Svtx->Trkr issue
                 TLorentzVector* recoPhoton = i->second.setRecoPhoton();
                 if (recoPhoton)
                 {
@@ -444,7 +448,8 @@ std::queue<std::pair<int,int>> TruthConversionEval::numUnique(std::map<int,Conve
                 RawCluster *clustemp =   dynamic_cast<RawCluster*>(mainClusterContainer->getCluster(clustidtemp)->Clone());
                 _conversionClusters.AddCluster(clustemp); //add the calo cluster to the container
               }
-              cout<<"Matched 1 reco with layer="<<i->second.firstLayer(_clusterMap,_hitMap)<<"pTs:"<<tlv_electron.Pt()<<"-"<<tlv_positron.Pt()<<'\n';
+              //This is broken because of the Svtx->Trkr issue
+              //cout<<"Matched 1 reco with layer="<<i->second.firstLayer(_clusterMap,_hitMap)<<"pTs:"<<tlv_electron.Pt()<<"-"<<tlv_positron.Pt()<<'\n';
               break;
             }
           case 0: //no reco tracks
@@ -487,26 +492,22 @@ void TruthConversionEval::processBackground(std::map<int,Conversion> *mymap,Svtx
     {
       _bb_track_deta = i->second.trackDEta();
       _bb_track_dphi = i->second.trackDPhi();
+      /*This is broken because of the Svtx->Trkr issue
       _bb_track_dlayer = i->second.trackDLayer(_clusterMap,_hitMap);
-      _bb_track_layer = i->second.firstLayer(_clusterMap,_hitMap);
+      _bb_track_layer = i->second.firstLayer(_clusterMap,_hitMap);*/
+      _bb_track_layer=-1;
+      _bb_track_dlayer=-1;
       _bb_track_pT = i->second.minTrackpT();
       _bb_approach = i->second.approachDistance();
       _bb_pid = i->second.getElectron()->get_pid();
-      /*The recoVtx finding doesn't work yet so using truth vtx for now
-       * pair<SvtxTrack*,SvtxTrack*> recoTracks = i->second.getRecoTracks();
-       pair<SvtxVertex*,SvtxVertex*> recoTracks = i->second.getRecoTracks();
-       SvtxVertex* vtx = _vertexer->makeVtx(recoTracks.first,recoTracks.second);
-       if(vtx) _b_vtx_radius =sqrt(vtx->get_x()*vtx->get_x()+vtx->get_y()*vtx->get_y());
-       else _b_vtx_radius=-1;
-       SvtxVertex *recoVtx = i->second.getRecoVtx();
-       if (!recoVtx)
-       {
-       cout<<"reco vtx is null"<<endl;
-       }*/
+      std::vector<pair<SvtxTrack*, SvtxTrack*>> v_tracks;
+      v_tracks.push_back(i->second.getRecoTracks());
+      genfit::GFRaveVertex* recoVert = _vertexer->findSecondaryVertices(&v_tracks)[0];
+      TVector3 recoVertPos = recoVert->getPos();
       PHG4VtxPoint *vtx = i->second.getVtx();
-      _bb_vtx_radius = sqrt(vtx->get_x()*vtx->get_x()+vtx->get_y()*vtx->get_y());
-      //_b_vtx_chi2 = recoVtx->get_chisq();
-      _bb_vtxTrack_dist = i->second.dist(vtx,_clusterMap);
+      _bb_vtx_radius = sqrt(recoVertPos.x()*recoVertPos.x()+recoVertPos.y()*recoVertPos.y());
+      _bb_vtx_chi2 = recoVert->get_chisq();
+      //_bb_vtxTrack_dist = i->second.dist(vtx,_clusterMap); This is broken because the Svtx->Trkr issue
       TLorentzVector* recoPhoton = i->second.setRecoPhoton();
       if (recoPhoton)
       {
