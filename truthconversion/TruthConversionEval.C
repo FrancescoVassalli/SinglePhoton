@@ -15,10 +15,11 @@
 #include <g4main/PHG4Particlev1.h>
 #include <g4main/PHG4VtxPoint.h>
 
-#include <trackbase_historic/SvtxHitMap.h>
+/*#include <trackbase_historic/SvtxHitMap.h>
 #include <trackbase_historic/SvtxHit.h>
 #include <trackbase_historic/SvtxClusterMap.h>
-#include <trackbase_historic/SvtxCluster.h>
+#include <trackbase_historic/SvtxCluster.h>*/
+#include <trackbase/TrkrClusterContainer.h>
 
 #include <g4eval/SvtxEvalStack.h>
 #include <g4eval/SvtxTrackEval.h>
@@ -149,9 +150,10 @@ int TruthConversionEval::InitRun(PHCompositeNode *topNode)
 void TruthConversionEval::doNodePointers(PHCompositeNode* topNode){
   _mainClusterContainer = findNode::getClass<RawClusterContainer>(topNode,"CLUSTER_CEMC");
   _truthinfo = findNode::getClass<PHG4TruthInfoContainer>(topNode,"G4TruthInfo");
-  _svtxClusterMap = findNode::getClass<SvtxClusterMap>(topNode,"SvtxClusterMap");
-  _hitMap = findNode::getClass<SvtxHitMap>(topNode,"SvtxHitMap");
-  if(!_mainClusterContainer||!_truthinfo||!_svtxClusterMap||!_hitMap){
+  _clusterMap = findNode::getClass<TrkrClusterContainer>(topNode, "TRKR_CLUSTER");
+//  _hitMap = findNode::getClass<SvtxHitMap>(topNode,"SvtxHitMap");
+  //if(!_mainClusterContainer||!_truthinfo||!_clusterMap||!_hitMap){
+  if(!_mainClusterContainer||!_truthinfo||!_clusterMap){
     cerr<<Name()<<": critical error-bad nodes \n";
     if(!_mainClusterContainer){
       cerr<<"\t RawClusterContainer is bad";
@@ -159,12 +161,12 @@ void TruthConversionEval::doNodePointers(PHCompositeNode* topNode){
     if(!_truthinfo){
       cerr<<"\t TruthInfoContainer is bad";
     }
-    if(!_svtxClusterMap){
+    if(!_clusterMap){
       cerr<<"\t SvtxClusterMap is bad";
     }
-    if(!_hitMap){
+    /*if(!_hitMap){
       cerr<<"\t SvtxHitMap is bad";
-    }
+    }*/
     cerr<<endl;
   }
   /*_vertexer= new RaveVertexingAux(topNode);
@@ -348,7 +350,7 @@ std::queue<std::pair<int,int>> TruthConversionEval::numUnique(std::map<int,Conve
           _b_e_deta[_b_Tpair]=TMath::Abs(tlv_electron.Eta()-tlv_positron.Eta());
           _b_e_dphi[_b_Tpair]=TMath::Abs(tlv_electron.Phi()-tlv_positron.Phi());
           pair<float,float> pTstemp = i->second.getTrackpTs();
-          _b_fLayer[_b_Tpair]=_b_track_layer = i->second.firstLayer(_svtxClusterMap,_hitMap);
+          _b_fLayer[_b_Tpair]=_b_track_layer = i->second.firstLayer(_clusterMap,_hitMap);
           _b_track1_pt= _b_electron_reco_pt[_b_Tpair]=pTstemp.first;
           _b_track2_pt= _b_positron_reco_pt[_b_Tpair]=pTstemp.second;
           _b_Tpair++;
@@ -360,7 +362,7 @@ std::queue<std::pair<int,int>> TruthConversionEval::numUnique(std::map<int,Conve
               if(_kMakeTTree){
                 _b_track_deta = i->second.trackDEta();
                 _b_track_dphi = i->second.trackDPhi();
-                _b_track_dlayer = i->second.trackDLayer(_svtxClusterMap,_hitMap);
+                _b_track_dlayer = i->second.trackDLayer(_clusterMap,_hitMap);
                 _b_track_pT = i->second.minTrackpT();
                 _b_approach = i->second.approachDistance();
                 pair<float,float> etasTemp = i->second.getTrackEtas();
@@ -377,7 +379,7 @@ std::queue<std::pair<int,int>> TruthConversionEval::numUnique(std::map<int,Conve
                 _b_vtx_eta = recoVertPos.Eta();
                 _b_vtx_phi = recoVertPos.Phi();
                 _b_vtx_chi2 = recoVert->getChi2();
-                _b_vtxTrack_dist = i->second.dist(&recoVertPos,_svtxClusterMap);
+                _b_vtxTrack_dist = i->second.dist(&recoVertPos,_clusterMap);
                 TLorentzVector* recoPhoton = i->second.setRecoPhoton();
                 if (recoPhoton)
                 {
@@ -442,7 +444,7 @@ std::queue<std::pair<int,int>> TruthConversionEval::numUnique(std::map<int,Conve
                 RawCluster *clustemp =   dynamic_cast<RawCluster*>(mainClusterContainer->getCluster(clustidtemp)->Clone());
                 _conversionClusters.AddCluster(clustemp); //add the calo cluster to the container
               }
-              cout<<"Matched 1 reco with layer="<<i->second.firstLayer(_svtxClusterMap,_hitMap)<<"pTs:"<<tlv_electron.Pt()<<"-"<<tlv_positron.Pt()<<'\n';
+              cout<<"Matched 1 reco with layer="<<i->second.firstLayer(_clusterMap,_hitMap)<<"pTs:"<<tlv_electron.Pt()<<"-"<<tlv_positron.Pt()<<'\n';
               break;
             }
           case 0: //no reco tracks
@@ -485,8 +487,8 @@ void TruthConversionEval::processBackground(std::map<int,Conversion> *mymap,Svtx
     {
       _bb_track_deta = i->second.trackDEta();
       _bb_track_dphi = i->second.trackDPhi();
-      _bb_track_dlayer = i->second.trackDLayer(_svtxClusterMap,_hitMap);
-      _bb_track_layer = i->second.firstLayer(_svtxClusterMap,_hitMap);
+      _bb_track_dlayer = i->second.trackDLayer(_clusterMap,_hitMap);
+      _bb_track_layer = i->second.firstLayer(_clusterMap,_hitMap);
       _bb_track_pT = i->second.minTrackpT();
       _bb_approach = i->second.approachDistance();
       _bb_pid = i->second.getElectron()->get_pid();
@@ -504,7 +506,7 @@ void TruthConversionEval::processBackground(std::map<int,Conversion> *mymap,Svtx
       PHG4VtxPoint *vtx = i->second.getVtx();
       _bb_vtx_radius = sqrt(vtx->get_x()*vtx->get_x()+vtx->get_y()*vtx->get_y());
       //_b_vtx_chi2 = recoVtx->get_chisq();
-      _bb_vtxTrack_dist = i->second.dist(vtx,_svtxClusterMap);
+      _bb_vtxTrack_dist = i->second.dist(vtx,_clusterMap);
       TLorentzVector* recoPhoton = i->second.setRecoPhoton();
       if (recoPhoton)
       {

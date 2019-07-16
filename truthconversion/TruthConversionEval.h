@@ -28,6 +28,7 @@ class RawClusterContainer;
 class TTree;
 class TFile;
 class SVReco;
+class TrkrClusterContainer;
 
 class TruthConversionEval: public SubsysReco
 {
@@ -86,7 +87,7 @@ class TruthConversionEval: public SubsysReco
     TTree *_e_backgroundCutTree=NULL; ///<EM background data for making track pair cuts
     RawClusterContainer *_mainClusterContainer; ///< contain 1 cluster associated with each conversion
     PHG4TruthInfoContainer *_truthinfo;
-    SvtxClusterMap* _svtxClusterMap;
+    TrkrClusterContainer* _clusterMap;
     SvtxHitMap *_hitMap;
     std::string _foutname; ///< name of the output file
     SVReco *_vertexer=NULL; ///< for reco vertex finding

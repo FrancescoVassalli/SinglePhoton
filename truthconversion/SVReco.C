@@ -376,14 +376,6 @@ PHGenFit::Track* SVReco::MakeGenFitTrack(PHCompositeNode *topNode, const SvtxTra
     return NULL;
   }
 
-  Vector3 seed_pos(intrack->get_x(), intrack->get_y(), intrack->get_z());
-  TVector3 seed_mom(intrack->get_px(), intrack->get_py(), intrack->get_pz());
-  TMatrixDSym seed_cov(6);
-  for (int i=0; i<6; i++){
-    for (int j=0; j<6; j++){
-      seed_cov[i][j] = intrack->get_error(i,j);
-    }
-  }
   TVector3 seed_pos(intrack->get_x(), intrack->get_y(), intrack->get_z());
   TVector3 seed_mom(intrack->get_px(), intrack->get_py(), intrack->get_pz());
   TMatrixDSym seed_cov(6);
@@ -455,157 +447,154 @@ PHGenFit::Track* SVReco::MakeGenFitTrack(PHCompositeNode *topNode, const SvtxTra
   return track;
 }
 
-  /*
-   * Fill SvtxVertexMap from GFRaveVertexes and Tracks
-   */
-  void SVReco::FillVertexMap(
-      const std::vector<genfit::GFRaveVertex*>& rave_vertices,
-      const std::vector<genfit::Track*>& gf_tracks){
+/*
+ * Fill SvtxVertexMap from GFRaveVertexes and Tracks
+ */
+void SVReco::FillVertexMap(
+    const std::vector<genfit::GFRaveVertex*>& rave_vertices,
+    const std::vector<genfit::Track*>& gf_tracks){
 
-    for (unsigned int ivtx=0; ivtx<rave_vertices.size(); ++ivtx){
-      genfit::GFRaveVertex* rave_vtx = rave_vertices[ivtx];
+  for (unsigned int ivtx=0; ivtx<rave_vertices.size(); ++ivtx){
+    genfit::GFRaveVertex* rave_vtx = rave_vertices[ivtx];
 
-      //cout << "V0 x: " << rave_vtx->getPos().X() << ", y: " << rave_vtx->getPos().Y() << ", z: " << rave_vtx->getPos().Z() << endl;
-      if (_do_eval)
-      {
-        rv_prim_vtx[0] = rave_vtx->getPos().X();
-        rv_prim_vtx[1] = rave_vtx->getPos().Y();
-        rv_prim_vtx[2] = rave_vtx->getPos().Z();
-
-        rv_prim_vtx_err[0] = sqrt(rave_vtx->getCov()[0][0]);
-        rv_prim_vtx_err[1] = sqrt(rave_vtx->getCov()[1][1]);
-        rv_prim_vtx_err[2] = sqrt(rave_vtx->getCov()[2][2]);
-      }
-
-      rv_prim_vtx_ntrk = rave_vtx->getNTracks();
-
-      //TVector3 vertex_position(rv_prim_vtx[0], rv_prim_vtx[1], rv_prim_vtx[2]);
-
-      //cout << "N TRK gf: " << gf_tracks.size() << ", rv: " << rv_prim_vtx_ntrk << endl;
-
-      for (unsigned int itrk=0; itrk<(unsigned int)rv_prim_vtx_ntrk; itrk++){
-
-        TVector3 rvtrk_mom = rave_vtx->getParameters(itrk)->getMom();
-        float rvtrk_w = rave_vtx->getParameters(itrk)->getWeight();
-
-        unsigned int rvtrk_mc_id = rave_vtx->getParameters(itrk)->getTrack()->getMcTrackId();
-        svtxtrk_wt_map[rvtrk_mc_id] = rvtrk_w;
-
-        //cout << "w: " << rvtrk_w << ", mc id: " << rvtrk_mc_id << endl;
-        /*
-           SvtxTrack* svtx_track = _trackmap->get(rvtrk_mc_id);
-
-           cout << "rave trk, px: " << rvtrk_mom.Px() << ", py: " << rvtrk_mom.Py() << ", pz: " << rvtrk_mom.Pz() << endl;
-           cout << "svtx trk, px: " << svtx_track->get_px() << ", py: " << svtx_track->get_py() << ", pz: " << svtx_track->get_pz() << endl;
-           */
-
-        /*
-           for (SvtxTrackMap::ConstIter iter3=_trackmap->begin(); iter3!=_trackmap->end(); iter3++)
-           {
-           SvtxTrack* svtx_track = iter3->second;
-
-           if ( fabs((svtx_track->get_px()-rvtrk_mom.Px())/svtx_track->get_px())<0.10
-           && fabs((svtx_track->get_py()-rvtrk_mom.Py())/svtx_track->get_py())<0.10
-           && fabs((svtx_track->get_pz()-rvtrk_mom.Pz())/svtx_track->get_pz())<0.10 ){
-           cout << "rave trk, px: " << rvtrk_mom.Px() << ", py: " << rvtrk_mom.Py() << ", pz: " << rvtrk_mom.Pz() << endl;
-        //cout << "ggff trk, px: " << gftrk_mom.Px() << ", py: " << gftrk_mom.Py() << ", pz: " << gftrk_mom.Pz() << endl;
-        cout << "svtx trk, px: " << svtx_track->get_px() << ", py: " << svtx_track->get_py() << ", pz: " << svtx_track->get_pz() << endl;
-        }
-        }//iter3
-        */
-
-        //unsigned int trk_id = svtxtrk_id[itrk];
-
-        /*
-           cout << "W: " << w_trk 
-           << ", id: " << rave_vtx->getParameters(itrk)->GetUniqueID()
-           << ", px: " << rave_vtx->getParameters(itrk)->getMom().Px() 
-           << ", py: " << rave_vtx->getParameters(itrk)->getMom().Py() 
-           << ", pz: " << rave_vtx->getParameters(itrk)->getMom().Pz() 
-           << endl;
-           */
-
-        //if (svtxtrk_gftrk_map.find(svtx_track->get_id())!=svtxtrk_gftrk_map.end()){
-        //}
-
-        //TVector3 mom_trk = rave_vtx->getParameters(itrk)->getMom();
-      }
-    }
+    //cout << "V0 x: " << rave_vtx->getPos().X() << ", y: " << rave_vtx->getPos().Y() << ", z: " << rave_vtx->getPos().Z() << endl;
     if (_do_eval)
     {
-      for (SvtxVertexMap::Iter iter = _vertexmap->begin(); iter != _vertexmap->end(); ++iter){
-        SvtxVertex *svtx_vertex = iter->second;
+      rv_prim_vtx[0] = rave_vtx->getPos().X();
+      rv_prim_vtx[1] = rave_vtx->getPos().Y();
+      rv_prim_vtx[2] = rave_vtx->getPos().Z();
 
-        //cout << "V1 x: " << svtx_vertex->get_x() << ", y: " << svtx_vertex->get_y() << ", z: " << svtx_vertex->get_z() << endl;
-        gf_prim_vtx[0] = svtx_vertex->get_x();
-        gf_prim_vtx[1] = svtx_vertex->get_y();
-        gf_prim_vtx[2] = svtx_vertex->get_z();
-
-        gf_prim_vtx_err[0] = sqrt(svtx_vertex->get_error(0,0));
-        gf_prim_vtx_err[1] = sqrt(svtx_vertex->get_error(1,1));
-        gf_prim_vtx_err[2] = sqrt(svtx_vertex->get_error(2,2));
-
-        gf_prim_vtx_ntrk = int(svtx_vertex->size_tracks());
-      }
+      rv_prim_vtx_err[0] = sqrt(rave_vtx->getCov()[0][0]);
+      rv_prim_vtx_err[1] = sqrt(rave_vtx->getCov()[1][1]);
+      rv_prim_vtx_err[2] = sqrt(rave_vtx->getCov()[2][2]);
     }
-    return;
+
+    rv_prim_vtx_ntrk = rave_vtx->getNTracks();
+
+    //TVector3 vertex_position(rv_prim_vtx[0], rv_prim_vtx[1], rv_prim_vtx[2]);
+
+    //cout << "N TRK gf: " << gf_tracks.size() << ", rv: " << rv_prim_vtx_ntrk << endl;
+
+    for (unsigned int itrk=0; itrk<(unsigned int)rv_prim_vtx_ntrk; itrk++){
+
+      TVector3 rvtrk_mom = rave_vtx->getParameters(itrk)->getMom();
+      float rvtrk_w = rave_vtx->getParameters(itrk)->getWeight();
+
+      unsigned int rvtrk_mc_id = rave_vtx->getParameters(itrk)->getTrack()->getMcTrackId();
+      svtxtrk_wt_map[rvtrk_mc_id] = rvtrk_w;
+
+      //cout << "w: " << rvtrk_w << ", mc id: " << rvtrk_mc_id << endl;
+      /*
+         SvtxTrack* svtx_track = _trackmap->get(rvtrk_mc_id);
+
+         cout << "rave trk, px: " << rvtrk_mom.Px() << ", py: " << rvtrk_mom.Py() << ", pz: " << rvtrk_mom.Pz() << endl;
+         cout << "svtx trk, px: " << svtx_track->get_px() << ", py: " << svtx_track->get_py() << ", pz: " << svtx_track->get_pz() << endl;
+         */
+
+      /*
+         for (SvtxTrackMap::ConstIter iter3=_trackmap->begin(); iter3!=_trackmap->end(); iter3++)
+         {
+         SvtxTrack* svtx_track = iter3->second;
+
+         if ( fabs((svtx_track->get_px()-rvtrk_mom.Px())/svtx_track->get_px())<0.10
+         && fabs((svtx_track->get_py()-rvtrk_mom.Py())/svtx_track->get_py())<0.10
+         && fabs((svtx_track->get_pz()-rvtrk_mom.Pz())/svtx_track->get_pz())<0.10 ){
+         cout << "rave trk, px: " << rvtrk_mom.Px() << ", py: " << rvtrk_mom.Py() << ", pz: " << rvtrk_mom.Pz() << endl;
+      //cout << "ggff trk, px: " << gftrk_mom.Px() << ", py: " << gftrk_mom.Py() << ", pz: " << gftrk_mom.Pz() << endl;
+      cout << "svtx trk, px: " << svtx_track->get_px() << ", py: " << svtx_track->get_py() << ", pz: " << svtx_track->get_pz() << endl;
+      }
+      }//iter3
+      */
+
+      //unsigned int trk_id = svtxtrk_id[itrk];
+
+      /*
+         cout << "W: " << w_trk 
+         << ", id: " << rave_vtx->getParameters(itrk)->GetUniqueID()
+         << ", px: " << rave_vtx->getParameters(itrk)->getMom().Px() 
+         << ", py: " << rave_vtx->getParameters(itrk)->getMom().Py() 
+         << ", pz: " << rave_vtx->getParameters(itrk)->getMom().Pz() 
+         << endl;
+         */
+
+      //if (svtxtrk_gftrk_map.find(svtx_track->get_id())!=svtxtrk_gftrk_map.end()){
+      //}
+
+      //TVector3 mom_trk = rave_vtx->getParameters(itrk)->getMom();
+    }
   }
+  if (_do_eval)
+  {
+    for (SvtxVertexMap::Iter iter = _vertexmap->begin(); iter != _vertexmap->end(); ++iter){
+      SvtxVertex *svtx_vertex = iter->second;
 
-  int SVReco::GetSVMass_mom(
-      const genfit::GFRaveVertex* rave_vtx,
-      float & vtx_mass,
-      float & vtx_px,
-      float & vtx_py,
-      float & vtx_pz,
-      int & ntrk_good_pv
-      ){
+      //cout << "V1 x: " << svtx_vertex->get_x() << ", y: " << svtx_vertex->get_y() << ", z: " << svtx_vertex->get_z() << endl;
+      gf_prim_vtx[0] = svtx_vertex->get_x();
+      gf_prim_vtx[1] = svtx_vertex->get_y();
+      gf_prim_vtx[2] = svtx_vertex->get_z();
 
-    float sum_E = 0, sum_px = 0, sum_py = 0, sum_pz = 0;
+      gf_prim_vtx_err[0] = sqrt(svtx_vertex->get_error(0,0));
+      gf_prim_vtx_err[1] = sqrt(svtx_vertex->get_error(1,1));
+      gf_prim_vtx_err[2] = sqrt(svtx_vertex->get_error(2,2));
 
-    int N_good = 0, N_good_pv = 0;
-
-    for (unsigned int itrk=0; itrk<rave_vtx->getNTracks(); itrk++){
-      TVector3 mom_trk = rave_vtx->getParameters(itrk)->getMom(); 
-
-      double w_trk = rave_vtx->getParameters(itrk)->getWeight();
-
-      sum_px += mom_trk.X();
-      sum_py += mom_trk.Y();
-      sum_pz += mom_trk.Z();
-      sum_E += sqrt(mom_trk.Mag2() + 0.140*0.140);
-
-      //cout << "W: " << w_trk << endl;
-      if ( w_trk>0.7 ){
-        N_good++;
-
-        unsigned int rvtrk_mc_id = rave_vtx->getParameters(itrk)->getTrack()->getMcTrackId();
-        //cout << "mc_id: " << rvtrk_mc_id << ", wt: " << svtxtrk_wt_map[rvtrk_mc_id] << endl;
-        if ( svtxtrk_wt_map[rvtrk_mc_id]>0.7 ){
-          N_good_pv++;
-        }
-      }//
-
-    }//itrk
-
-    vtx_mass =  sqrt(sum_E*sum_E - sum_px*sum_px - sum_py*sum_py - sum_pz*sum_pz);
-    vtx_px = sum_px;
-    vtx_py = sum_py;
-    vtx_pz = sum_pz;
-
-    ntrk_good_pv = N_good_pv;
-
-    //cout << "Mass: " << vtx_mass << ", pT: " << vtx_pT << endl;
-    return N_good;
+      gf_prim_vtx_ntrk = int(svtx_vertex->size_tracks());
+    }
   }
+  return;
+}
+
+int SVReco::GetSVMass_mom(
+    const genfit::GFRaveVertex* rave_vtx,
+    float & vtx_mass,
+    float & vtx_px,
+    float & vtx_py,
+    float & vtx_pz,
+    int & ntrk_good_pv
+    ){
+
+  float sum_E = 0, sum_px = 0, sum_py = 0, sum_pz = 0;
+
+  int N_good = 0, N_good_pv = 0;
+
+  for (unsigned int itrk=0; itrk<rave_vtx->getNTracks(); itrk++){
+    TVector3 mom_trk = rave_vtx->getParameters(itrk)->getMom(); 
+
+    double w_trk = rave_vtx->getParameters(itrk)->getWeight();
+
+    sum_px += mom_trk.X();
+    sum_py += mom_trk.Y();
+    sum_pz += mom_trk.Z();
+    sum_E += sqrt(mom_trk.Mag2() + 0.140*0.140);
+
+    //cout << "W: " << w_trk << endl;
+    if ( w_trk>0.7 ){
+      N_good++;
+
+      unsigned int rvtrk_mc_id = rave_vtx->getParameters(itrk)->getTrack()->getMcTrackId();
+      //cout << "mc_id: " << rvtrk_mc_id << ", wt: " << svtxtrk_wt_map[rvtrk_mc_id] << endl;
+      if ( svtxtrk_wt_map[rvtrk_mc_id]>0.7 ){
+        N_good_pv++;
+      }
+    }//
+
+  }//itrk
+
+  vtx_mass =  sqrt(sum_E*sum_E - sum_px*sum_px - sum_py*sum_py - sum_pz*sum_pz);
+  vtx_px = sum_px;
+  vtx_py = sum_py;
+  vtx_pz = sum_pz;
+
+  ntrk_good_pv = N_good_pv;
+
+  //cout << "Mass: " << vtx_mass << ", pT: " << vtx_pT << endl;
+  return N_good;
+}
 
 
-  void SVReco::FillSVMap(
-      const std::vector<genfit::GFRaveVertex*>& rave_vertices,
-      const std::vector<genfit::Track*>& gf_tracks){
+void SVReco::FillSVMap(
+    const std::vector<genfit::GFRaveVertex*>& rave_vertices,
+    const std::vector<genfit::Track*>& gf_tracks){
 
-    return;
-
-  }
-
+  return;
 
 }
