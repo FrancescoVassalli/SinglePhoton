@@ -1,11 +1,13 @@
 #include "SVReco.h"
 #include <trackbase_historic/SvtxCluster.h>
-#include <trackbase_historic/SvtxClusterMap.h>
+//#include <trackbase_historic/SvtxClusterMap.h>
 #include <trackbase_historic/SvtxHitMap.h>
 #include <trackbase_historic/SvtxTrack.h>
 #include <trackbase_historic/SvtxVertex.h>
 #include <trackbase_historic/SvtxTrackMap.h>
 #include <trackbase_historic/SvtxVertexMap.h>
+
+#include <trackbase/TrkrClusterContainer.h>
 
 #include <g4jets/JetMap.h>
 
@@ -772,10 +774,19 @@ int SVReco::CreateNodes(PHCompositeNode *topNode){
 int SVReco::GetNodes(PHCompositeNode * topNode){
 	//DST objects
 
-	// Input Svtx Clusters
+	/* Input Svtx Clusters
+	SvtxClusters have been moved to TrkrClusterContainer see:
+	https://github.com/sPHENIX-Collaboration/coresoftware/commit/fd7228dba1ad6ee26152006aeddd5a34563599b9#diff-fc82b294b9b151bbb2aa9ffd0c7bd77e
 	_clustermap = findNode::getClass<SvtxClusterMap>(topNode, "SvtxClusterMap");
 	if (!_clustermap && _event < 2){
 		cout << PHWHERE << " SvtxClusterMap node not found on node tree"
+				<< endl;
+		return Fun4AllReturnCodes::ABORTEVENT;
+	}*/
+
+	_clustermap = findNode::getClass<TrkrClusterContainer>(topNode, "TRKR_CLUSTERS");
+	if (!_clustermap && _event < 2){
+		cout << PHWHERE << " TRKR_CLUSTERS node not found on node tree"
 				<< endl;
 		return Fun4AllReturnCodes::ABORTEVENT;
 	}
@@ -783,7 +794,7 @@ int SVReco::GetNodes(PHCompositeNode * topNode){
 	// Input Svtx Tracks
 	_trackmap = findNode::getClass<SvtxTrackMap>(topNode, "SvtxTrackMap");
 	if (!_trackmap && _event < 2){
-		cout << PHWHERE << " SvtxClusterMap node not found on node tree"
+		cout << PHWHERE << " SvtxTrackMap node not found on node tree"
 				<< endl;
 		return Fun4AllReturnCodes::ABORTEVENT;
 	}
