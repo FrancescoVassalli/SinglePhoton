@@ -58,7 +58,6 @@ using namespace std;
   const bool readhits = false;
   // Or:
   // read files in HepMC format (typically output from event generators like hijing or pythia)
-
   const bool readhepmc = (bool) inputFile;  // read HepMC files
   // Or:
   // Use pythia
@@ -126,7 +125,7 @@ using namespace std;
 
   bool do_calotrigger = true && do_cemc_twr && do_hcalin_twr && do_hcalout_twr;
 
-  bool do_jet_reco = false;
+  bool do_jet_reco = true;
   bool do_jet_eval = do_jet_reco && false;
   // HI Jet Reco for p+Au / Au+Au collisions (default is false for
   // single particle / p+p-only simulations, or for p+Au / Au+Au

@@ -18,7 +18,7 @@ cp  $SOURCE_PHOTONMAKER $SCRATCH_AREA
 cp $BURNERPATH/* $SCRATCH_AREA
 #
 cd $SCRATCH_AREA
-#root -b -q Fun4All_G4_sPHENIX.C\(5,\"$IN_FILE\",\"$PYTHIA_FILE\"\) 
+root -b -q Fun4All_G4_sPHENIX.C\(5,\"$IN_FILE\",\"$PYTHIA_FILE\"\) 
 root -b -q $BURNERNAME\(5,\"$IN_FILE\"\)
 #
 rm -rf $SCRATCH_AREA
