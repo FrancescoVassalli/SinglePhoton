@@ -26,7 +26,8 @@ class SvtxVertexMap;
 class SvtxVertex;
 class PHCompositeNode;
 class PHG4TruthInfoContainer;
-class SvtxClusterMap;
+//class SvtxClusterMap;
+class TrkrClusterContainer;
 class SvtxEvalStack;
 class JetMap;
 class TFile;
@@ -200,7 +201,7 @@ private:
 	std::string _vertexing_method;
 
 	//! Input Node pointers
-	SvtxClusterMap* _clustermap;
+	TrkrClusterContainer* _clustermap;
 	SvtxTrackMap* _trackmap;
 	SvtxVertexMap* _vertexmap;
 	JetMap* _jetmap;
