@@ -246,13 +246,13 @@ std::vector<genfit::GFRaveVertex*> SVReco::findSecondaryVertices(std::vector<std
 
 				unsigned int trk_index = svtxtrk_gftrk_map[track1->get_id()];
 				PHGenFit::Track* rf_phgf_track = _main_rf_phgf_tracks[trk_index];
-				rf_gf_tracks_conversion.push_back(rf_phgf_track);
+				rf_gf_tracks_conversion.push_back(rf_phgf_track->getGenFitTrack());
 
 				trk_index = svtxtrk_gftrk_map[track2->get_id()];
-				PHGenFit::Track* rf_phgf_track = _main_rf_phgf_tracks[trk_index];
-				rf_gf_tracks_conversion.push_back(rf_phgf_track);
+				rf_phgf_track = _main_rf_phgf_tracks[trk_index];
+				rf_gf_tracks_conversion.push_back(rf_phgf_track->getGenFitTrack());
 			}
-		if (rf_gf_tracks_jet.size()>1){
+		if (rf_gf_tracks_conversion.size()>1){
 			try{
 				_vertex_finder->findVertices(&rave_vertices_conversion, rf_gf_tracks_conversion);
 			}catch (...){
