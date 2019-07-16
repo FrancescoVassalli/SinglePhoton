@@ -168,7 +168,9 @@ private:
 	//!
 	std::string _mag_field_file_name;
 
-	vector<PHGenFit::Track*> _main_rf_phgf_tracks;
+	std::vector<PHGenFit::Track*> _main_rf_phgf_tracks;
+
+	int _verbosity;
 
 	//! rescale mag field, modify the original mag field read in
 	float _mag_field_re_scaling_factor;

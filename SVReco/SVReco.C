@@ -86,7 +86,6 @@ using namespace std;
  * Constructor
  */
 SVReco::SVReco(const string &name) :
-	SubsysReco(name),
 	_mag_field_file_name("/phenix/upgrades/decadal/fieldmaps/sPHENIX.2d.root"),
 	_mag_field_re_scaling_factor(1.4 / 1.5),
 	_reverse_mag_field(false),
@@ -112,18 +111,13 @@ SVReco::SVReco(const string &name) :
 	_do_eval(false),
 	_eval_outname("SVReco_eval_tree.root"),
 	_jetmap_name("AntiKt_Truth_r04"),
-	_do_evt_display(false){
-
-		_event = 0;
+	_do_evt_display(false),
+	_verbosity(10){
 
 	}
 
 
 int SVReco::InitEvent(PHCompositeNode *topNode) {
-	_event++;
-	if (_event % 1000 == 0)
-		cout << PHWHERE << "Events processed: " << _event << endl;
-
 	GetNodes(topNode);
 
 	//! stands for Refit_GenFit_Tracks
@@ -221,7 +215,7 @@ int SVReco::InitRun(PHCompositeNode *topNode) {
 		return Fun4AllReturnCodes::ABORTRUN;
 	}
 
-	_vertex_finder = new genfit::GFRaveVertexFactory(Verbosity());
+	_vertex_finder = new genfit::GFRaveVertexFactory(_verbosity);
 	_vertex_finder->setMethod(_vertexing_method.data());
 
 	if (!_vertex_finder) {
@@ -229,17 +223,10 @@ int SVReco::InitRun(PHCompositeNode *topNode) {
 		return Fun4AllReturnCodes::ABORTRUN;
 	}
 
-	if (_do_eval) {
-		if(Verbosity() >= 1)
-			cout << PHWHERE << " Openning file: " << _eval_outname << endl;
-		PHTFileServer::get().open(_eval_outname, "RECREATE");
-		init_eval_tree();
-	}
-
 	return Fun4AllReturnCodes::EVENT_OK;
 }
 
-std::vector<ggenfit::GFRaveVertex*> SVReco::findSecondaryVertices(std::vector<std::pair<SvtxTrack*, SvtxTrack*>> *conversion_pairs) {
+std::vector<genfit::GFRaveVertex*> SVReco::findSecondaryVertices(std::vector<std::pair<SvtxTrack*, SvtxTrack*>> *conversion_pairs) {
 	_vertex_finder->setMethod("avr-smoothing:1");
 	//_vertex_finder->setMethod("avr");
 	vector<genfit::GFRaveVertex*> rave_vertices_conversion;
@@ -278,14 +265,6 @@ std::vector<ggenfit::GFRaveVertex*> SVReco::findSecondaryVertices(std::vector<st
 }
 
 int SVReco::End(PHCompositeNode *topNode){
-
-	if (_do_eval){
-		if(Verbosity() >= 1)
-			cout << PHWHERE << " Writing to file: " << _eval_outname << endl;
-		PHTFileServer::get().cd(_eval_outname);
-		_eval_tree->Write();
-	}
-
 	return Fun4AllReturnCodes::EVENT_OK;
 }
 
@@ -374,7 +353,7 @@ return Fun4AllReturnCodes::ABORTEVENT;
 }*/
 
 _clustermap = findNode::getClass<TrkrClusterContainer>(topNode, "TRKR_CLUSTER");
-if (!_clustermap && _event < 2){
+if (!_clustermap){
 	cout << PHWHERE << " TRKR_CLUSTERS node not found on node tree"
 		<< endl;
 	return Fun4AllReturnCodes::ABORTEVENT;
@@ -382,7 +361,7 @@ if (!_clustermap && _event < 2){
 
 // Input Svtx Tracks
 _trackmap = findNode::getClass<SvtxTrackMap>(topNode, "SvtxTrackMap");
-if (!_trackmap && _event < 2){
+if (!_trackmap){
 	cout << PHWHERE << " SvtxTrackMap node not found on node tree"
 		<< endl;
 	return Fun4AllReturnCodes::ABORTEVENT;
@@ -390,18 +369,10 @@ if (!_trackmap && _event < 2){
 
 // Input Svtx Vertices
 _vertexmap = findNode::getClass<SvtxVertexMap>(topNode, "SvtxVertexMap");
-if (!_vertexmap && _event < 2){
+if (!_vertexmap){
 	cout << PHWHERE << " SvtxVertexrMap node not found on node tree"
 		<< endl;
 	return Fun4AllReturnCodes::ABORTEVENT;
-}
-
-// Input Jet Map 
-_jetmap = findNode::getClass<JetMap>(topNode, _jetmap_name.data());
-if (!_jetmap && _event < 2 && _cut_jet){
-	cout << PHWHERE << " JetMap node not found on node tree"
-		<< endl;
-	//return Fun4AllReturnCodes::ABORTEVENT;
 }
 
 return Fun4AllReturnCodes::EVENT_OK;
@@ -552,7 +523,7 @@ PHGenFit::Track* SVReco::MakeGenFitTrack(PHCompositeNode *topNode, const SvtxTra
 	track->addMeasurements(measurements);
 
 	if (_fitter->processTrack(track, false) != 0) {
-		if (Verbosity() >= 1)
+		if (_verbosity >= 1)
 			LogWarning("Track fitting failed");
 		return NULL;
 	}
