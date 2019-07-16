@@ -279,6 +279,7 @@ int SVReco::process_event(PHCompositeNode *topNode) {
   rave_vertices_jet.clear();
 
   //! scan jetmap
+  //here
   for (JetMap::ConstIter iter=_jetmap->begin(); iter!=_jetmap->end(); iter++)
   {
     Jet *jet = iter->second;
@@ -791,7 +792,7 @@ cout << PHWHERE << " SvtxClusterMap node not found on node tree"
 return Fun4AllReturnCodes::ABORTEVENT;
 }*/
 
-_clustermap = findNode::getClass<TrkrClusterContainer>(topNode, "TRKR_CLUSTERS");
+_clustermap = findNode::getClass<TrkrClusterContainer>(topNode, "TRKR_CLUSTER");
 if (!_clustermap && _event < 2){
   cout << PHWHERE << " TRKR_CLUSTERS node not found on node tree"
     << endl;
