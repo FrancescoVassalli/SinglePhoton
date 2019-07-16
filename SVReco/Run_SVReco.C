@@ -1,3 +1,9 @@
+#include <fun4all/Fun4AllServer.h>
+#include <fun4all/Fun4AllDstInputManager.h>
+#include "SVReco.h"
+
+R__LOAD_LIBRARY(libfun4all.so)
+R__LOAD_LIBRARY(libSVReco.so)
 
 int Run_SVReco(
 		const int nEvents = 0,
@@ -16,7 +22,7 @@ int Run_SVReco(
   gSystem->Load("libg4hough.so");
   //gSystem->Load("libcemc.so");
   gSystem->Load("libg4eval.so");
-	gSystem->Load("/gpfs/mnt/gpfs04/sphenix/user/shlim/02.MVTX/04.SVreco/test_20180617/SVReco/install/lib/libSVReco.so");
+	gSystem->Load("libSVReco.so");
 
   //---------------
   // Fun4All server
