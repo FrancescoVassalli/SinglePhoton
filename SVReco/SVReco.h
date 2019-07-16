@@ -50,7 +50,7 @@ public:
 	int InitRun(PHCompositeNode *);
 
 	//!Process Event, called for each event
-	int findSecondaryVerticies(PHCompositeNode *);
+	std::vector<genfit::GFRaveVertex*> findSecondaryVertices(std::vector<std::pair<SvtxTrack*, SvtxTrack*>> *);
 
 	//!End, write and close files
 	int End(PHCompositeNode *);
@@ -170,8 +170,6 @@ private:
 
 	std::vector<PHGenFit::Track*> _main_rf_phgf_tracks;
 
-	int _verbosity;
-
 	//! rescale mag field, modify the original mag field read in
 	float _mag_field_re_scaling_factor;
 
@@ -204,16 +202,14 @@ private:
 	TrkrClusterContainer* _clustermap;
 	SvtxTrackMap* _trackmap;
 	SvtxVertexMap* _vertexmap;
-	JetMap* _jetmap;
 
 	//! switch eval out
 	bool _do_eval;
 
 	//! eval output filename
 	std::string _eval_outname;
-
-	//! jetmap name for secondary vertex finding
-	std::string _jetmap_name;
+	
+  int _verbosity;
 
 	float gf_prim_vtx[3];
 	float gf_prim_vtx_err[3];

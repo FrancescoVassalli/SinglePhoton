@@ -110,9 +110,9 @@ SVReco::SVReco(const string &name) :
 	_vertexmap(NULL),
 	_do_eval(false),
 	_eval_outname("SVReco_eval_tree.root"),
-	_jetmap_name("AntiKt_Truth_r04"),
-	_do_evt_display(false),
-	_verbosity(10){
+	_verbosity(10),
+	_do_evt_display(false)
+	{
 
 	}
 
