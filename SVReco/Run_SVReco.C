@@ -69,7 +69,7 @@ int Run_SVReco(
       return;
     }
 	*/
-
+  cout<<"running"<<endl;
   se->run(nEvents);
 
   //-----
@@ -80,4 +80,5 @@ int Run_SVReco(
   std::cout << "All done" << std::endl;
   delete se;
   gSystem->Exit(0);
+  return 0;
 }
