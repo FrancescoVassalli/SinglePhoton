@@ -1,5 +1,6 @@
 #include "TruthConversionEval.h"
 #include "Conversion.h"
+#include "SVReco.h"
 //#include "../PhotonConversion/RaveVertexingAux.h"
 
 #include <phool/PHCompositeNode.h>
@@ -22,7 +23,14 @@
 #include <g4eval/SvtxEvalStack.h>
 #include <g4eval/SvtxTrackEval.h>
 
-#include <GenFit/GFRaveConverters.h>
+//#include <GenFit/GFRaveConverters.h>
+#include <GenFit/FieldManager.h>
+#include <GenFit/GFRaveVertex.h>
+#include <GenFit/GFRaveVertexFactory.h>
+#include <GenFit/MeasuredStateOnPlane.h>
+#include <GenFit/RKTrackRep.h>
+#include <GenFit/StateOnPlane.h>
+#include <GenFit/Track.h>
 
 #include <TFile.h>
 #include <TTree.h>
@@ -363,13 +371,13 @@ std::queue<std::pair<int,int>> TruthConversionEval::numUnique(std::map<int,Conve
                 _b_track2_phi = phisTemp.second;
                 std::vector<pair<SvtxTrack*, SvtxTrack*>> v_tracks;
                 v_tracks.push_back(i->second.getRecoTracks());
-                GFRaveVertex* recoVert = _vertexer->findSecondaryVerticies(v_tracks)[0];
+                genfit::GFRaveVertex* recoVert = _vertexer->findSecondaryVertices(&v_tracks)[0];
                 TVector3 recoVertPos = recoVert->getPos();
                 _b_vtx_radius = sqrt(recoVertPos.x()*recoVertPos.x()+recoVertPos.y()*recoVertPos.y());
                 _b_vtx_eta = recoVertPos.Eta();
                 _b_vtx_phi = recoVertPos.Phi();
-                _b_vtx_chi2 = recoVert->get_Chi2();
-                _b_vtxTrack_dist = i->second.dist(recoVertPos,_svtxClusterMap);
+                _b_vtx_chi2 = recoVert->getChi2();
+                _b_vtxTrack_dist = i->second.dist(&recoVertPos,_svtxClusterMap);
                 TLorentzVector* recoPhoton = i->second.setRecoPhoton();
                 if (recoPhoton)
                 {

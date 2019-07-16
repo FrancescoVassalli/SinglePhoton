@@ -22,12 +22,15 @@ pkginclude_HEADERS = \
 	TruthConversionEval.h \
 	TruthConversionEvalLinkDef.h \
 	Conversion.h \
-	ConversionLinkDef.h 
+	ConversionLinkDef.h\
+	SVReco.h\
+	SVRecoLinkDef.h
 
 libtruthconversion_la_SOURCES = \
 	ConversionClusterTreeMaker.C \
 	TruthConversionEval.C \
-	Conversion.cc 
+	Conversion.cc \
+  SVReco.C 
 
 libtruthconversion_la_LIBADD = \
   -lphool\
@@ -35,6 +38,14 @@ libtruthconversion_la_LIBADD = \
   -lg4dst\
   -lcalotrigger\
 	-lcalo_io\
+  -lfun4all \
+	-lg4detectors \
+	-lgenfit2 \
+	-lgenfit2exp \
+	-lPHGenFit \
+	-lg4tpc \
+	-lg4intt \
+	-lg4mvtx \
 	-lcalo_util
 
 BUILT_SOURCES = \
