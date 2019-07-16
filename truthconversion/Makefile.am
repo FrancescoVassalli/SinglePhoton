@@ -3,6 +3,7 @@ AUTOMAKE_OPTIONS = foreign
 AM_CPPFLAGS = \
   -I$(includedir) \
   -I$(OFFLINE_MAIN)/include \
+  -I$(OFFLINE_MAIN)/include/eigen3 \
   -I`root-config --incdir`
 
 libtruthconversion_la_LDFLAGS = \

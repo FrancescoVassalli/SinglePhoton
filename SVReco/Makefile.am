@@ -1,6 +1,6 @@
 AUTOMAKE_OPTIONS = foreign
 
-INCLUDES = \
+AM_CPPFLAGS = \
   -I$(includedir) \
 	-I$(MY_INSTALL)/include \
   -I$(OFFLINE_MAIN)/include \
@@ -21,17 +21,18 @@ AM_LDFLAGS = \
 	-L$(MY_INSTALL)/lib \
 	-L$(OFFLINE_MAIN)/lib
 
+pkginclude_HEADERS = \
+	SVReco.h\
+	SVRecoLinkDef.h
+
 libSVReco_la_SOURCES = \
-  PVReco.C \
-  PVReco_Dict.C
- 
+  SVReco.C 
 
 libSVReco_la_LIBADD = \
   -lfun4all \
 	-lg4detectors \
   -lg4dst \
   -lg4eval \
-	-lg4hough_io \
   -lg4jets \
 	-lgenfit2 \
 	-lgenfit2exp \
