@@ -93,7 +93,7 @@ SVReco::SVReco(const string &name) :
   _track_fitting_alg_name("DafRef"),
   _n_maps_layer(3),
   _n_intt_layer(4),
-  _primary_pid_guess(22),
+  _primary_pid_guess(11),
   _cut_jet(true),
   _cut_Ncluster(false),
   _cut_min_pT(0.1),
@@ -396,9 +396,9 @@ int SVReco::GetNodes(PHCompositeNode * topNode){
   // Create measurements
   std::vector<PHGenFit::Measurement*> measurements;
 
-  for (auto iter = intrack->begin_clusters(); iter != intrack->end_clusters(); ++iter){
-    unsigned int cluster_id = *iter;
-    TrkrCluster* cluster = _clustermap->findCluster(cluster_id);
+  for (auto iter = intrack->begin_cluster_keys(); iter != intrack->end_cluster_keys(); ++iter){
+//    unsigned int cluster_id = *iter;
+    TrkrCluster* cluster = _clustermap->findCluster(*iter);
     if (!cluster) {
       LogError("No cluster Found!");
       continue;
@@ -411,13 +411,14 @@ int SVReco::GetNodes(PHCompositeNode * topNode){
     seed_mom.SetTheta(pos.Theta());
 
     TVector3 n(cluster->getPosition(0), cluster->getPosition(1), 0);
+    cout<<"Cluster with {"<<cluster->getPosition(0)<<','<<cluster->getPosition(0)<<"}\n";
 
-    unsigned int trkrid = TrkrDefs::getTrkrId(cluster_id);
-    unsigned int layer = TrkrDefs::getLayer(cluster_id);
     if (_use_ladder_geom){ //I don't understand this bool
+      unsigned int trkrid = TrkrDefs::getTrkrId(*iter);
+      unsigned int layer = TrkrDefs::getLayer(*iter);
       if (trkrid == TrkrDefs::mvtxId) {
-        int stave_index = MvtxDefs::getStaveId(cluster_id);
-        int chip_index = MvtxDefs::getChipId(cluster_id);
+        int stave_index = MvtxDefs::getStaveId(*iter);
+        int chip_index = MvtxDefs::getChipId(*iter);
 
         double ladder_location[3] = { 0.0, 0.0, 0.0 };
         //not exactly sure where the cylinder geoms are currently objectified. check this 
@@ -431,7 +432,7 @@ int SVReco::GetNodes(PHCompositeNode * topNode){
         //this may bug but it looks ok for now
         CylinderGeomIntt* geom = (CylinderGeomIntt*) geom_container_intt->GetLayerGeom(layer);
         double hit_location[3] = { 0.0, 0.0, 0.0 };
-        geom->find_segment_center(InttDefs::getLadderZId(cluster_id),InttDefs::getLadderPhiId(cluster_id), hit_location);
+        geom->find_segment_center(InttDefs::getLadderZId(*iter),InttDefs::getLadderPhiId(*iter), hit_location);
 
         n.SetXYZ(hit_location[0], hit_location[1], 0);
         n.RotateZ(geom->get_strip_phi_tilt());
