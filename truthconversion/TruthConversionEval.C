@@ -97,6 +97,9 @@ int TruthConversionEval::InitRun(PHCompositeNode *topNode)
     _signalCutTree->Branch("track_pT", &_b_track_pT);
     _signalCutTree->Branch("approach_dist", &_b_approach);
     _signalCutTree->Branch("vtx_radius", &_b_vtx_radius);
+    _signalCutTree->Branch("tvtx_radius", &_b_tvtx_radius);
+    _signalCutTree->Branch("vtx_phi", &_b_vtx_phi);
+    _signalCutTree->Branch("tvtx_phi", &_b_tvtx_phi);
     _signalCutTree->Branch("vtx_chi2", &_b_vtx_chi2);
     _signalCutTree->Branch("vtxTrack_dist", &_b_vtxTrack_dist);
     _signalCutTree->Branch("photon_m", &_b_photon_m);
@@ -363,6 +366,10 @@ std::queue<std::pair<int,int>> TruthConversionEval::numUnique(std::map<int,Conve
                 genfit::GFRaveVertex* recoVert = _vertexer->findSecondaryVertices(&v_tracks)[0];
                 TVector3 recoVertPos = recoVert->getPos();
                 _b_vtx_radius = sqrt(recoVertPos.x()*recoVertPos.x()+recoVertPos.y()*recoVertPos.y());
+                _b_tvtx_radius = _b_rVtx[_b_nVtx];
+                _b_vtx_phi = recoVertPos.Phi();
+                TVector3 tVertPos(vtx->get_x(),vtx->get_y(),vtx->get_z());
+                _b_tvtx_phi = tVertPos.Phi();
                 _b_vtx_chi2 = recoVert->getChi2();
                 _b_vtxTrack_dist = i->second.dist(&recoVertPos,_clusterMap);
                 TLorentzVector* recoPhoton = i->second.setRecoPhoton();

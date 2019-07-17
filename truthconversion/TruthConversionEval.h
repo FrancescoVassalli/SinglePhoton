@@ -125,6 +125,9 @@ class TruthConversionEval: public SubsysReco
     float _b_track_pT;
     double _b_approach  ;
     double _b_vtx_radius ;
+    double _b_vtx_phi ;
+    double _b_tvtx_radius ;
+    double _b_tvtx_phi ;
     double _b_vtxTrack_dist;
     float _b_vtx_chi2;
     float _b_photon_m;
