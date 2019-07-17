@@ -362,6 +362,7 @@ std::queue<std::pair<int,int>> TruthConversionEval::numUnique(std::map<int,Conve
                 v_tracks.push_back(i->second.getRecoTracks());
                 genfit::GFRaveVertex* recoVert = _vertexer->findSecondaryVertices(&v_tracks)[0];
                 TVector3 recoVertPos = recoVert->getPos();
+                _b_vtx_radius = sqrt(recoVertPos.x()*recoVertPos.x()+recoVertPos.y()*recoVertPos.y());
                 _b_vtx_chi2 = recoVert->getChi2();
                 _b_vtxTrack_dist = i->second.dist(&recoVertPos,_clusterMap);
                 TLorentzVector* recoPhoton = i->second.setRecoPhoton();
