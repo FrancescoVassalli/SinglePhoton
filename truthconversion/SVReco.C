@@ -370,8 +370,8 @@ int SVReco::GetNodes(PHCompositeNode * topNode){
   return Fun4AllReturnCodes::EVENT_OK;
 }
 
-/*From @sh-lim
- * PHGenFit::Track* SVReco::MakeGenFitTrack(PHCompositeNode *topNode, const SvtxTrack* intrack, const SvtxVertex* vertex){
+//From @sh-lim
+ PHGenFit::Track* SVReco::MakeGenFitTrack(PHCompositeNode *topNode, const SvtxTrack* intrack, const SvtxVertex* vertex){
   if (!intrack){
     cerr << PHWHERE << " Input SvtxTrack is NULL!" << endl;
     return NULL;
@@ -453,7 +453,7 @@ int SVReco::GetNodes(PHCompositeNode * topNode){
   track->getGenFitTrack()->setMcTrackId(intrack->get_id());
 
   return track;
-}*/
+}
 
 /*
  * Fill SvtxVertexMap from GFRaveVertexes and Tracks
