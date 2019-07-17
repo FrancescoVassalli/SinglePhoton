@@ -224,7 +224,6 @@ int TruthConversionEval::process_event(PHCompositeNode *topNode)
         {
           std::cout<<"Conversion with radius [cm]:"<<radius<<'\n';
         }
-        cout<<"Recording: "<<radius<<endl;
         //initialize the conversion object -don't use constructor b/c setters have error handling
         //could be optimized by creating object and using copy opertator
         (mapConversions[vtx->get_id()]).setElectron(g4particle);
@@ -325,11 +324,9 @@ std::queue<std::pair<int,int>> TruthConversionEval::numUnique(std::map<int,Conve
   _b_nVtx = 0;
   _b_Tpair=0;
   _b_Rpair=0;
-  std::queue<std::pair<int,int>> missingChildren;
+  std::queue<std::pair<int,int>> missingChildren;//this is deprecated
   for (std::map<int,Conversion>::iterator i = mymap->begin(); i != mymap->end(); ++i) {
     PHG4VtxPoint *vtx =i->second.getVtx(); //get the vtx
-    float radius=sqrt(vtx->get_x()*vtx->get_x()+vtx->get_y()*vtx->get_y());
-    if (radius>s_kTPCRADIUS) continue;
     PHG4Particle *temp = i->second.getPhoton(); //set the photon
     TLorentzVector tlv_photon,tlv_electron,tlv_positron; //make tlv for each particle 
     tlv_photon.SetPxPyPzE(temp->get_px(),temp->get_py(),temp->get_pz(),temp->get_e()); //intialize
@@ -363,7 +360,7 @@ std::queue<std::pair<int,int>> TruthConversionEval::numUnique(std::map<int,Conve
           _b_track1_pt= _b_electron_reco_pt[_b_Tpair]=pTstemp.first;
           _b_track2_pt= _b_positron_reco_pt[_b_Tpair]=pTstemp.second;
           _b_Tpair++;
-        }
+        }//tree
         switch(nRecoTracks)
         {
           case 2: //there are 2 reco tracks
@@ -465,27 +462,15 @@ std::queue<std::pair<int,int>> TruthConversionEval::numUnique(std::map<int,Conve
               cerr<<Name()<<" error setting reco tracks"<<endl;
             }
             break;
-        }
+        }//switch
+      }//rapidity cut
+      if (_kMakeTTree)
+      {
+        _b_pythia[_b_nVtx]=i->second.getEmbed()==_kPythiaEmbed;
+        _b_nVtx++; 
       }
-    }
-    /*this code has been turned off because it is not currently useful 
-      to analyze the conversions with only one truth track 
-      else{ //fails the truth 2 track check
-      cout<<"1 track event \n";
-      temp=i->second.getElectron(); //go back to the first track 
-      _b_positron_pt[_b_nVtx]=-1; //set the second track to null
-      missingChildren.push(pair<int, int>(temp->get_parent_id(),temp->get_track_id())); //add the known ids to the list missing a child
-      cout<<"No pair for:\n";
-      temp->identify();
-      cout<<"with parent:\n";
-      i->second.getPhoton()->identify();
-      }*/
-    if (_kMakeTTree)
-    {
-      _b_pythia[_b_nVtx]=i->second.getEmbed()==_kPythiaEmbed;
-      _b_nVtx++; 
-    }
-  }
+    }// has 2 truth tracks
+  }//map loop
   return missingChildren;
 }
 
