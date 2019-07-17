@@ -3,6 +3,8 @@
 #include <phool/getClass.h>
 #include <trackbase_historic/SvtxCluster.h>
 #include <trackbase_historic/SvtxHitMap.h>
+#include <trackbase/TrkrClusterContainer.h>
+#include <trackbase/TrkrClusterv1.h>
 #include <assert.h>
 
 Conversion::Conversion(SvtxTrackEval* trackeval,int verbosity){
@@ -296,7 +298,7 @@ int Conversion::firstLayer(TrkrClusterContainer* clusterMap){
     case 1:
       {
         if (reco1)return TrkrDefs::getLayer(*(reco1->begin_cluster_keys()));
-        else return rkrDefs::getLayer(*(reco2->begin_cluster_keys()));
+        else return TrkrDefs::getLayer(*(reco2->begin_cluster_keys()));
       }
     default:
       return -1;

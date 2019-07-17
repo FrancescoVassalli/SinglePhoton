@@ -224,6 +224,7 @@ int TruthConversionEval::process_event(PHCompositeNode *topNode)
         {
           std::cout<<"Conversion with radius [cm]:"<<radius<<'\n';
         }
+        cout<<"Recording: "<<radius<<flush;
         //initialize the conversion object -don't use constructor b/c setters have error handling
         //could be optimized by creating object and using copy opertator
         (mapConversions[vtx->get_id()]).setElectron(g4particle);
@@ -239,7 +240,6 @@ int TruthConversionEval::process_event(PHCompositeNode *topNode)
         if (testTrack) //not a conversion but has a track 
         {
           //get the associated cluster
-          cout<<"finding cluster"<<endl;
           RawCluster *clustemp=_mainClusterContainer->getCluster(testTrack->get_cal_cluster_id(SvtxTrack::CAL_LAYER(1)));
           if(clustemp){
             if (TMath::Abs(g4particle->get_pid())==11||g4particle->get_pid()==22)
@@ -510,7 +510,7 @@ void TruthConversionEval::processBackground(std::map<int,Conversion> *mymap,Svtx
       TVector3 recoVertPos = recoVert->getPos();
       _bb_vtx_radius = sqrt(recoVertPos.x()*recoVertPos.x()+recoVertPos.y()*recoVertPos.y());
       _bb_vtx_chi2 = recoVert->getChi2();
-      _bb_vtxTrack_dist = i->second.dist(vtx,_clusterMap);
+      _bb_vtxTrack_dist = i->second.dist(&recoVertPos,_clusterMap);
       TLorentzVector* recoPhoton = i->second.setRecoPhoton();
       if (recoPhoton)
       {
