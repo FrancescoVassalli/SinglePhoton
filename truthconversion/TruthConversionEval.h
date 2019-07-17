@@ -117,16 +117,6 @@ class TruthConversionEval: public SubsysReco
     float _b_Mcluster_prob[s_kMAXRecoMatch]; ///<cluster prob for merged clusters
     float _b_Scluster_prob[s_kMAXRecoMatch]; ///<cluster prob for split clusters
     /**@}*/
-    /** \defgroup vtxingTree Variables for {@link _vtxingTree} {@link _b_vtx_radius} is also recorded.
-      @{*/
-    float _b_vtx_eta;
-    float _b_vtx_phi;
-    float _b_track1_pt;
-    float _b_track1_eta;
-    float _b_track1_phi;
-    float _b_track2_pt;
-    float _b_track2_eta;
-    float _b_track2_phi;
     /** \defgroup signalTreeVars Variables for {@link _signalCutTree}
       @{*/
     float _b_track_deta ;
