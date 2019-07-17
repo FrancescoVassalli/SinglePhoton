@@ -119,7 +119,7 @@ SVReco::SVReco(const string &name) :
 
 int SVReco::InitEvent(PHCompositeNode *topNode) {
   GetNodes(topNode);
-  cout<<"got vertexing nodes"<<endl;
+  //cout<<"got vertexing nodes"<<endl;
   //! stands for Refit_GenFit_Tracks
   vector<genfit::Track*> rf_gf_tracks;
   rf_gf_tracks.clear();
@@ -131,7 +131,7 @@ int SVReco::InitEvent(PHCompositeNode *topNode) {
   svtxtrk_id.clear();
   //is this the priamry vetex?
   SvtxVertex *vertex = _vertexmap->get(0);
-  cout<<"starting track loop"<<endl;
+  //cout<<"starting track loop"<<endl;
 
   //iterate over all tracks to find priary vertex and make rave/genfit objects
   for (SvtxTrackMap::Iter iter = _trackmap->begin(); iter != _trackmap->end();
@@ -150,17 +150,17 @@ int SVReco::InitEvent(PHCompositeNode *topNode) {
       continue;
 
     int n_MVTX = 0, n_INTT = 0, n_TPC = 0;
-    cout<<"Keys:";
+    //cout<<"Keys:";
     for (SvtxTrack::ConstClusterKeyIter iter2 = svtx_track->begin_cluster_keys(); iter2!=svtx_track->end_cluster_keys(); iter2++) {
       TrkrDefs::cluskey cluster_key = *iter2;
       float layer = (float) TrkrDefs::getLayer(cluster_key);
-      cout<<cluster_key<<',';
+      //cout<<cluster_key<<',';
       if (layer<_n_maps_layer) n_MVTX++;
       else if (layer<_n_maps_layer+_n_intt_layer) n_INTT++;
       else n_TPC++;
     }//cluster loop
     //cluster cuts
-    cout<<"\n cluster loop with n_MVTX="<<n_MVTX<<" n_INTT="<<n_INTT<<" and nTPC="<<n_TPC<<endl;
+    //cout<<"\n cluster loop with n_MVTX="<<n_MVTX<<" n_INTT="<<n_INTT<<" and nTPC="<<n_TPC<<endl;
     if ( _cut_Ncluster && (n_MVTX<2 || n_INTT<2) ){
       continue;
     }
@@ -168,13 +168,14 @@ int SVReco::InitEvent(PHCompositeNode *topNode) {
 
     //cout << (svtx_track->get_chisq()/svtx_track->get_ndf()) << ", " << n_TPC << ", " << svtx_track->get_pt() << endl;
     //cout << svtx_track->get_ndf() << ", " << svtx_track->size_clusters() << endl;
-    cout<<"making genfit"<<endl;
+    //cout<<"making genfit"<<endl;
     PHGenFit::Track* rf_phgf_track = MakeGenFitTrack(topNode, svtx_track, vertex);
-    cout<<"made genfit"<<endl;
+    //cout<<"made genfit"<<endl;
 
     //cout << "DONE" << endl;
 
     if (rf_phgf_track) {
+      svtx_track->identify();
       svtxtrk_id.push_back(svtx_track->get_id());
       svtxtrk_gftrk_map[svtx_track->get_id()] = _main_rf_phgf_tracks.size();
       _main_rf_phgf_tracks.push_back(rf_phgf_track);
@@ -198,11 +199,11 @@ int SVReco::InitEvent(PHCompositeNode *topNode) {
     }catch (...){
       std::cerr << PHWHERE << "GFRaveVertexFactory::findVertices failed!";
     }
-    cout<<"filling vtx map"<<endl;
+    //cout<<"filling vtx map"<<endl;
     FillVertexMap(rave_vertices, rf_gf_tracks);
   }
 
-  cout<<"Done event init"<<endl;
+  //cout<<"Done event init"<<endl;
   return Fun4AllReturnCodes::EVENT_OK;
 }
 
@@ -411,7 +412,7 @@ int SVReco::GetNodes(PHCompositeNode * topNode){
     seed_mom.SetTheta(pos.Theta());
 
     TVector3 n(cluster->getPosition(0), cluster->getPosition(1), 0);
-    cout<<"Cluster with {"<<cluster->getPosition(0)<<','<<cluster->getPosition(0)<<"}\n";
+    //cout<<"Cluster with {"<<cluster->getPosition(0)<<','<<cluster->getPosition(0)<<"}\n";
 
     if (_use_ladder_geom){ //I don't understand this bool
       unsigned int trkrid = TrkrDefs::getTrkrId(*iter);

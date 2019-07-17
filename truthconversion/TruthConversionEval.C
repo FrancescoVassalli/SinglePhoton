@@ -13,6 +13,7 @@
 #include <g4main/PHG4TruthInfoContainer.h>
 #include <g4main/PHG4Particle.h>
 #include <g4main/PHG4Particlev1.h>
+#include <g4main/PHG4Particlev2.h>
 #include <g4main/PHG4VtxPoint.h>
 
 /*#include <trackbase_historic/SvtxHitMap.h>
@@ -198,23 +199,31 @@ int TruthConversionEval::process_event(PHCompositeNode *topNode)
   unsigned int ebackmod=0;
   cout<<"enter truth particle loop"<<endl;
   for ( PHG4TruthInfoContainer::ConstIterator iter = range.first; iter != range.second; ++iter ) {
-    PHG4Particle* g4particle = dynamic_cast<PHG4Particlev1*> (iter->second); 
-    /*I think G4 is keeping a list of "calculations" in the truth particle container and only the particles with postive track ids are real*/
+//    PHG4Particlev2* g4particle = dynamic_cast<PHG4Particlev2*> (iter->second); 
+    PHG4Particle* g4particle = iter->second;
     if(!g4particle||g4particle->get_track_id()<0){
       continue;
     }
     PHG4Particle* parent =_truthinfo->GetParticle(g4particle->get_parent_id());
+    //cout<<"partent id:"<<g4particle->get_parent_id()<<endl;
+    //cout<<g4particle->get_track_id()<<endl;
     PHG4VtxPoint* vtx=_truthinfo->GetVtx(g4particle->get_vtx_id()); //get the vertex
+    if(!vtx){
+      cout<<"null vtx primaryid="<<g4particle->get_primary_id()<<'\n';
+      g4particle->identify();
+      cout<<endl;
+      continue;
+    }
     float radius=sqrt(vtx->get_x()*vtx->get_x()+vtx->get_y()*vtx->get_y());
-    cout<<"got vtx with r="<<radius<<endl;
-    //if outside the tracker shkip this
-    if(radius>s_kTPCRADIUS) continue;
+    //if outside the tracker skip this
+    //if(radius>s_kTPCRADIUS) continue;
+    //cout<<"got vtx with r="<<radius<<endl;
     int embedID;
     if (parent)//if the particle is not primary
     {
-      cout<<"got vtx not primary"<<endl;
       embedID=get_embed(parent,_truthinfo);
       if(parent->get_pid()==22&&TMath::Abs(g4particle->get_pid())==11){ //conversion check
+        cout<<"conversion\n";
         if (Verbosity()==10)
         {
           std::cout<<"Conversion with radius [cm]:"<<radius<<'\n';
@@ -230,7 +239,6 @@ int TruthConversionEval::process_event(PHCompositeNode *topNode)
         else (mapConversions[vtx->get_id()]).setSourceId(0);//or it is from the G4 generator?
       }
       else if(_kMakeTTree){//not a conversion
-        cout<<"not a conversion"<<endl;
         SvtxTrack *testTrack = trackeval->best_track_from(g4particle);
         if (testTrack) //not a conversion but has a track 
         {
@@ -256,14 +264,14 @@ int TruthConversionEval::process_event(PHCompositeNode *topNode)
               if(++hbackmod%2==0){
                 hbacki++;
               }
-            }
-          }
-        }
-      }
-    }
+            }//hback
+          }//has cluster
+        }//has track
+      }//make tree
+    }// not primary 
     else if(_kMakeTTree){ //is primary therefore not a conversion 
       embedID=get_embed(g4particle,_truthinfo);
-      cout<<"got vtx for primary particle"<<endl;
+      //cout<<"primary particle"<<endl;
       SvtxTrack *testTrack = trackeval->best_track_from(g4particle);
       if (testTrack) //has associated track
       {
@@ -288,11 +296,11 @@ int TruthConversionEval::process_event(PHCompositeNode *topNode)
             if(++hbackmod%2==0){
               hbacki++;
             }
-          }
-        }
-      }
-    }
-  }
+          }//hback
+        }//has cluster
+      }//has track
+    }//make tree
+  }//truth particle loop
   cout<<"exit truth loop"<<endl;
   //pass the map to this helper method which fills the fields for the TTree 
   numUnique(&mapConversions,trackeval,_mainClusterContainer);
