@@ -37,23 +37,20 @@ class TTree;
 class SVReco {
 public:
 
-	//! Default constructor
+	//! default ctor with hardcoded settings
 	SVReco(const std::string &name = "SVReco");
 
 	//! dtor
 	~SVReco();
 
-	//!Initialization, called for initialization
+	//!Initialization, called for initialization at each event
 	int InitEvent(PHCompositeNode *);
 
 	//!Initialization Run, called for initialization of a run
 	int InitRun(PHCompositeNode *);
 
-	//!Process Event, called for each event
+	//!@return a vertex for each track pair
 	std::vector<genfit::GFRaveVertex*> findSecondaryVertices(std::vector<std::pair<SvtxTrack*, SvtxTrack*>> *);
-
-	//!End, write and close files
-	int End(PHCompositeNode *);
 
 	//! For evalution
 	//! Change eval output filename
@@ -67,7 +64,7 @@ public:
 	void set_do_eval(bool doEval){
 		_do_eval = doEval;
 	}
-
+	//! changes how genfit tracks are calculated and vtx fit
 	void set_use_ladder_geom(bool useLadderGeom){
 		_use_ladder_geom = useLadderGeom;
 	}
@@ -83,7 +80,7 @@ public:
 	void set_mag_field_re_scaling_factor(float magFieldReScalingFactor){
 		_mag_field_re_scaling_factor = magFieldReScalingFactor;
 	}
-
+	//! string name for the rave hueristic
 	void set_vertexing_method(const std::string& vertexingMethod){
 		_vertexing_method = vertexingMethod;
 	}
@@ -99,7 +96,7 @@ public:
 	void set_track_fitting_alg_name(const std::string& trackFittingAlgName){
 		_track_fitting_alg_name = trackFittingAlgName;
 	}
-
+	//! used for building the tracks
 	void set_primary_pid_guess(int primaryPidGuess){
 		_primary_pid_guess = primaryPidGuess;
 	}
@@ -116,16 +113,8 @@ public:
 		_cut_chi2_ndf = cutChi2Ndf;
 	}
 
-	void set_cut_jet(bool cutJet){
-		_cut_jet = cutJet;
-	}
-
 	void set_cut_ncluster(bool cutNcluster){
 		_cut_Ncluster = cutNcluster;
-	}
-
-	void set_cut_jet_R(float cutJetR){
-		_cut_jet_R = cutJetR;
 	}
 
 	void set_n_maps_layer(unsigned int n){
@@ -168,6 +157,7 @@ private:
 	//!
 	std::string _mag_field_file_name;
 
+	//! created by InitEvent to associate genfit to Svtx
 	std::vector<PHGenFit::Track*> _main_rf_phgf_tracks;
 
 	//! rescale mag field, modify the original mag field read in
@@ -183,14 +173,10 @@ private:
 	unsigned int _n_intt_layer;
 
 	int _primary_pid_guess;
-	bool _cut_jet;
 	bool _cut_Ncluster;
 	double _cut_min_pT;
 	double _cut_dca;
 	double _cut_chi2_ndf;
-	double _cut_jet_pT;
-	double _cut_jet_eta;
-	double _cut_jet_R;
 
 	bool _use_ladder_geom;
 
@@ -205,12 +191,10 @@ private:
 
 	//! switch eval out
 	bool _do_eval;
-
-	//! eval output filename
-	std::string _eval_outname;
 	
   int _verbosity;
-
+/** \defgroup eval Variables
+      @{*/
 	float gf_prim_vtx[3];
 	float gf_prim_vtx_err[3];
 	int gf_prim_vtx_ntrk;
@@ -293,7 +277,7 @@ private:
 	float rv_sv_pT15_vtx_jet_theta[10][30];
 	float rv_sv_pT15_vtx_chi2[10][30];
 	float rv_sv_pT15_vtx_ndf[10][30];
-
+/**@}*/
 
 	bool _do_evt_display;
 

@@ -110,7 +110,8 @@ class Conversion
 		inline std::pair<SvtxTrack*,SvtxTrack*> getRecoTracks()const{
 			return std::pair<SvtxTrack*,SvtxTrack*>(reco1,reco2);
 		}
-		/** set the reco maps used for {@link trackDEta}, {@link trackDLayer},{@link hasSilicon}*/
+		/** set the reco maps used for {@link trackDEta}, {@link trackDLayer},{@link hasSilicon}
+		*Note that all use of SvtxClusterMap is now deprecated*/
 		inline void setClusterMap(SvtxClusterMap* cmap){
 			_svtxClusterMap=cmap;
 		}
@@ -151,12 +152,12 @@ class Conversion
 		///@return the first layer the associated reco clusters hit
 		int firstLayer(SvtxClusterMap* cmap,SvtxHitMap *hitmap);
 		int firstLayer(TrkrClusterContainer* );
-		///@return true if there are any silicon hits for the conversion
+		///@return true if there are any silicon hits for the conversion. Is deprecated.
 		bool hasSilicon(SvtxClusterMap* );
 		/** distance between two closest points on the reco tracks 
 		 * @return -1 if tracks are not set*/
 		double approachDistance()const;
-
+		///@return distance between the vertex and the closest track hit
 		double dist(PHG4VtxPoint* vtx, SvtxClusterMap* cmap);
 		double dist(TVector3* vtx, SvtxClusterMap* cmap);
 		double dist(TVector3* vtx, TrkrClusterContainer* cmap);

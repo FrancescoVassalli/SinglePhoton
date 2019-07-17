@@ -364,14 +364,18 @@ std::queue<std::pair<int,int>> TruthConversionEval::numUnique(std::map<int,Conve
                 std::vector<pair<SvtxTrack*, SvtxTrack*>> v_tracks;
                 v_tracks.push_back(i->second.getRecoTracks());
                 genfit::GFRaveVertex* recoVert = _vertexer->findSecondaryVertices(&v_tracks)[0];
-                TVector3 recoVertPos = recoVert->getPos();
-                _b_vtx_radius = sqrt(recoVertPos.x()*recoVertPos.x()+recoVertPos.y()*recoVertPos.y());
-                _b_tvtx_radius = _b_rVtx[_b_nVtx];
-                _b_vtx_phi = recoVertPos.Phi();
-                TVector3 tVertPos(vtx->get_x(),vtx->get_y(),vtx->get_z());
-                _b_tvtx_phi = tVertPos.Phi();
-                _b_vtx_chi2 = recoVert->getChi2();
-                _b_vtxTrack_dist = i->second.dist(&recoVertPos,_clusterMap);
+                if (recoVert)
+                {
+                  TVector3 recoVertPos = recoVert->getPos();
+                  _b_vtx_radius = sqrt(recoVertPos.x()*recoVertPos.x()+recoVertPos.y()*recoVertPos.y());
+                  _b_tvtx_radius = _b_rVtx[_b_nVtx];
+                  _b_vtx_phi = recoVertPos.Phi();
+                  TVector3 tVertPos(vtx->get_x(),vtx->get_y(),vtx->get_z());
+                  _b_tvtx_phi = tVertPos.Phi();
+                  _b_vtx_chi2 = recoVert->getChi2();
+                  _b_vtxTrack_dist = i->second.dist(&recoVertPos,_clusterMap);
+                }
+                
                 TLorentzVector* recoPhoton = i->second.setRecoPhoton();
                 if (recoPhoton)
                 {
@@ -477,10 +481,13 @@ void TruthConversionEval::processBackground(std::map<int,Conversion> *mymap,Svtx
       std::vector<pair<SvtxTrack*, SvtxTrack*>> v_tracks;
       v_tracks.push_back(i->second.getRecoTracks());
       genfit::GFRaveVertex* recoVert = _vertexer->findSecondaryVertices(&v_tracks)[0];
-      TVector3 recoVertPos = recoVert->getPos();
-      _bb_vtx_radius = sqrt(recoVertPos.x()*recoVertPos.x()+recoVertPos.y()*recoVertPos.y());
-      _bb_vtx_chi2 = recoVert->getChi2();
-      _bb_vtxTrack_dist = i->second.dist(&recoVertPos,_clusterMap);
+      if (recoVert)
+      {
+        TVector3 recoVertPos = recoVert->getPos();
+        _bb_vtx_radius = sqrt(recoVertPos.x()*recoVertPos.x()+recoVertPos.y()*recoVertPos.y());
+        _bb_vtx_chi2 = recoVert->getChi2();
+        _bb_vtxTrack_dist = i->second.dist(&recoVertPos,_clusterMap);
+      }
       TLorentzVector* recoPhoton = i->second.setRecoPhoton();
       if (recoPhoton)
       {

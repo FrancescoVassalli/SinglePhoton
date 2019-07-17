@@ -94,14 +94,10 @@ SVReco::SVReco(const string &name) :
   _n_maps_layer(3),
   _n_intt_layer(4),
   _primary_pid_guess(11),
-  _cut_jet(true),
   _cut_Ncluster(false),
   _cut_min_pT(0.1),
   _cut_dca(5.0),
   _cut_chi2_ndf(5),
-  _cut_jet_pT(20.0),
-  _cut_jet_eta(0.6),
-  _cut_jet_R(0.4),
   _use_ladder_geom(false),
   _vertex_finder(NULL),
   _vertexing_method("avf-smoothing:1"),
@@ -109,7 +105,6 @@ SVReco::SVReco(const string &name) :
   _trackmap(NULL),
   _vertexmap(NULL),
   _do_eval(false),
-  _eval_outname("SVReco_eval_tree.root"),
   _verbosity(10),
   _do_evt_display(false)
 {
@@ -270,10 +265,6 @@ std::vector<genfit::GFRaveVertex*> SVReco::findSecondaryVertices(std::vector<std
   }//conversion pairs
 
   return rave_vertices_conversion;
-}
-
-int SVReco::End(PHCompositeNode *topNode){
-  return Fun4AllReturnCodes::EVENT_OK;
 }
 
 SVReco::~SVReco(){
