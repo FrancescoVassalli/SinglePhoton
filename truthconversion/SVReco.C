@@ -151,15 +151,12 @@ int SVReco::InitEvent(PHCompositeNode *topNode) {
 
     int n_MVTX = 0, n_INTT = 0, n_TPC = 0;
     cout<<"starting cluster loop"<<endl;
-    for (SvtxTrack::ConstClusterIter iter2 = svtx_track->begin_clusters(); iter2!=svtx_track->end_clusters(); iter2++) {
-      //this line is buggy
-      TrkrDefs::cluskey cluster_key = *iter2;
-      float layer = (float) TrkrDefs::getLayer(cluster_key);
+    TrkrDefs::cluskey cluster_key = *iter2;
+    float layer = (float) TrkrDefs::getLayer(cluster_key);
 
-      if (layer<_n_maps_layer) n_MVTX++;
-      else if (layer<_n_maps_layer+_n_intt_layer) n_INTT++;
-      else n_TPC++;
-    }
+    if (layer<_n_maps_layer) n_MVTX++;
+    else if (layer<_n_maps_layer+_n_intt_layer) n_INTT++;
+    else n_TPC++;
 
     if ( _cut_Ncluster && (n_MVTX<2 || n_INTT<2) ){
       continue;
@@ -187,19 +184,23 @@ int SVReco::InitEvent(PHCompositeNode *topNode) {
   //! find vertex using tracks
   std::vector<genfit::GFRaveVertex*> rave_vertices;
   rave_vertices.clear();
-  //!
+  //
+  if(!_vertex_finder){
+    std::cerr<< PHWHERE<<" bad run init no SVR"<<endl;
+    return Fun4AllReturnCodes::ABORTRUN;
+  } 
   _vertex_finder->setMethod(_vertexing_method.data());
   if (rf_gf_tracks.size()>=2){
     try {
       _vertex_finder->findVertices(&rave_vertices, rf_gf_tracks);
     }catch (...){
-      std::cout << PHWHERE << "GFRaveVertexFactory::findVertices failed!";
+      std::cerr << PHWHERE << "GFRaveVertexFactory::findVertices failed!";
     }
+    cout<<"filling vtx map"<<endl;
+    FillVertexMap(rave_vertices, rf_gf_tracks);
   }
 
-  cout<<"filling vtx map"<<endl;
-  FillVertexMap(rave_vertices, rf_gf_tracks);
-
+  cout<<"Done event init"<<endl;
   return Fun4AllReturnCodes::EVENT_OK;
 }
 
