@@ -213,7 +213,7 @@ int TruthConversionEval::process_event(PHCompositeNode *topNode)
     }
     float radius=sqrt(vtx->get_x()*vtx->get_x()+vtx->get_y()*vtx->get_y());
     //if outside the tracker skip this
-    //if(radius>s_kTPCRADIUS) continue;
+    if(radius>s_kTPCRADIUS) continue;
     //cout<<"got vtx with r="<<radius<<endl;
     int embedID;
     if (parent)//if the particle is not primary
@@ -224,7 +224,7 @@ int TruthConversionEval::process_event(PHCompositeNode *topNode)
         {
           std::cout<<"Conversion with radius [cm]:"<<radius<<'\n';
         }
-        cout<<"Recording: "<<radius<<flush;
+        cout<<"Recording: "<<radius<<endl;
         //initialize the conversion object -don't use constructor b/c setters have error handling
         //could be optimized by creating object and using copy opertator
         (mapConversions[vtx->get_id()]).setElectron(g4particle);
