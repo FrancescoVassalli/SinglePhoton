@@ -201,9 +201,6 @@ int TruthConversionEval::process_event(PHCompositeNode *topNode)
   for ( PHG4TruthInfoContainer::ConstIterator iter = range.first; iter != range.second; ++iter ) {
 //    PHG4Particlev2* g4particle = dynamic_cast<PHG4Particlev2*> (iter->second); 
     PHG4Particle* g4particle = iter->second;
-    if(!g4particle||g4particle->get_track_id()<0){
-      continue;
-    }
     PHG4Particle* parent =_truthinfo->GetParticle(g4particle->get_parent_id());
     //cout<<"partent id:"<<g4particle->get_parent_id()<<endl;
     //cout<<g4particle->get_track_id()<<endl;
@@ -223,7 +220,6 @@ int TruthConversionEval::process_event(PHCompositeNode *topNode)
     {
       embedID=get_embed(parent,_truthinfo);
       if(parent->get_pid()==22&&TMath::Abs(g4particle->get_pid())==11){ //conversion check
-        cout<<"conversion\n";
         if (Verbosity()==10)
         {
           std::cout<<"Conversion with radius [cm]:"<<radius<<'\n';

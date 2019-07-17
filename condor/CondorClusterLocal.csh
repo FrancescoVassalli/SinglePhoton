@@ -19,7 +19,7 @@ cp ../truthconversion/* $SCRATCH_AREA
 #
 cd $SCRATCH_AREA
 echo $IN_FILE
-#root -b -q Fun4All_G4_sPHENIX.C\(5,\"$IN_FILE\"\) 
+#root -b -q Fun4All_G4_sPHENIX.C\(3,\"$IN_FILE\"\) 
 root -b -q cluster_burner.C\(\"$IN_FILE\",\"$OUT_FILE\",$p\)
 #
 rm -rf $SCRATCH_AREA
