@@ -56,7 +56,7 @@ TruthConversionEval::~TruthConversionEval(){
 int TruthConversionEval::InitRun(PHCompositeNode *topNode)
 {
   _vertexer = new SVReco();
-
+  _vertexer->InitRun(topNode);
   if(_kMakeTTree){
     _b_event=0;
     _runNumber=_kRunNumber;
@@ -169,8 +169,6 @@ void TruthConversionEval::doNodePointers(PHCompositeNode* topNode){
     }*/
     cerr<<endl;
   }
-  /*_vertexer= new RaveVertexingAux(topNode);
-    _vertexer->Verbosity(Verbosity());*/
 }
 
 int TruthConversionEval::process_event(PHCompositeNode *topNode)
@@ -208,10 +206,13 @@ int TruthConversionEval::process_event(PHCompositeNode *topNode)
     PHG4Particle* parent =_truthinfo->GetParticle(g4particle->get_parent_id());
     PHG4VtxPoint* vtx=_truthinfo->GetVtx(g4particle->get_vtx_id()); //get the vertex
     float radius=sqrt(vtx->get_x()*vtx->get_x()+vtx->get_y()*vtx->get_y());
+    cout<<"got vtx with r="<<radius<<endl;
+    //if outside the tracker shkip this
     if(radius>s_kTPCRADIUS) continue;
     int embedID;
     if (parent)//if the particle is not primary
     {
+      cout<<"got vtx not primary"<<endl;
       embedID=get_embed(parent,_truthinfo);
       if(parent->get_pid()==22&&TMath::Abs(g4particle->get_pid())==11){ //conversion check
         if (Verbosity()==10)
@@ -262,7 +263,7 @@ int TruthConversionEval::process_event(PHCompositeNode *topNode)
     }
     else if(_kMakeTTree){ //is primary therefore not a conversion 
       embedID=get_embed(g4particle,_truthinfo);
-      cout<<"not primary"<<endl;
+      cout<<"got vtx for primary particle"<<endl;
       SvtxTrack *testTrack = trackeval->best_track_from(g4particle);
       if (testTrack) //has associated track
       {

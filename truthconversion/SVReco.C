@@ -131,7 +131,7 @@ int SVReco::InitEvent(PHCompositeNode *topNode) {
   svtxtrk_id.clear();
   //is this the priamry vetex?
   SvtxVertex *vertex = _vertexmap->get(0);
-  cout<<"strating track loop"<<endl;
+  cout<<"starting track loop"<<endl;
 
   //iterate over all tracks to find priary vertex and make rave/genfit objects
   for (SvtxTrackMap::Iter iter = _trackmap->begin(); iter != _trackmap->end();
@@ -150,18 +150,20 @@ int SVReco::InitEvent(PHCompositeNode *topNode) {
       continue;
 
     int n_MVTX = 0, n_INTT = 0, n_TPC = 0;
-    cout<<"starting cluster loop"<<endl;
-    TrkrDefs::cluskey cluster_key = *iter2;
-    float layer = (float) TrkrDefs::getLayer(cluster_key);
-
-    if (layer<_n_maps_layer) n_MVTX++;
-    else if (layer<_n_maps_layer+_n_intt_layer) n_INTT++;
-    else n_TPC++;
-
+    cout<<"Keys:";
+    for (SvtxTrack::ConstClusterKeyIter iter2 = svtx_track->begin_cluster_keys(); iter2!=svtx_track->end_cluster_keys(); iter2++) {
+      TrkrDefs::cluskey cluster_key = *iter2;
+      float layer = (float) TrkrDefs::getLayer(cluster_key);
+      cout<<cluster_key<<',';
+      if (layer<_n_maps_layer) n_MVTX++;
+      else if (layer<_n_maps_layer+_n_intt_layer) n_INTT++;
+      else n_TPC++;
+    }//cluster loop
+    //cluster cuts
+    cout<<"\n cluster loop with n_MVTX="<<n_MVTX<<" n_INTT="<<n_INTT<<" and nTPC="<<n_TPC<<endl;
     if ( _cut_Ncluster && (n_MVTX<2 || n_INTT<2) ){
       continue;
     }
-
     if ( n_TPC<25 ) continue;
 
     //cout << (svtx_track->get_chisq()/svtx_track->get_ndf()) << ", " << n_TPC << ", " << svtx_track->get_pt() << endl;
@@ -368,7 +370,8 @@ int SVReco::GetNodes(PHCompositeNode * topNode){
   return Fun4AllReturnCodes::EVENT_OK;
 }
 
-PHGenFit::Track* SVReco::MakeGenFitTrack(PHCompositeNode *topNode, const SvtxTrack* intrack, const SvtxVertex* vertex){
+/*From @sh-lim
+ * PHGenFit::Track* SVReco::MakeGenFitTrack(PHCompositeNode *topNode, const SvtxTrack* intrack, const SvtxVertex* vertex){
   if (!intrack){
     cerr << PHWHERE << " Input SvtxTrack is NULL!" << endl;
     return NULL;
@@ -450,7 +453,12 @@ PHGenFit::Track* SVReco::MakeGenFitTrack(PHCompositeNode *topNode, const SvtxTra
   track->getGenFitTrack()->setMcTrackId(intrack->get_id());
 
   return track;
-}
+}*/
+
+//from @blackcathj (Jin Huang)
+
+
+
 
 /*
  * Fill SvtxVertexMap from GFRaveVertexes and Tracks
