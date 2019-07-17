@@ -88,17 +88,6 @@ int TruthConversionEval::InitRun(PHCompositeNode *topNode)
     _tree->Branch("Scluster_prob", &_b_Scluster_prob,"Scluster_prob[nRpair]/F");
     _tree->Branch("Mcluster_prob", &_b_Mcluster_prob,"Mcluster_prob[nRpair]/F");
 
-    _vtxingTree = new TTree("vtxingTree","data predicting vtx from track pair");
-    _vtxingTree->Branch("vtx_r", &_b_vtx_radius);
-    _vtxingTree->Branch("vtx_eta", &_b_vtx_eta);
-    _vtxingTree->Branch("vtx_phi", &_b_vtx_phi);
-    _vtxingTree->Branch("track1_pt", &_b_track1_pt,"track1_pt");
-    _vtxingTree->Branch("track1_eta",& _b_track1_eta,"track1_eta");
-    _vtxingTree->Branch("track1_phi",& _b_track1_phi,"track1_phi");
-    _vtxingTree->Branch("track2_pt", &_b_track2_pt,"track2_pt");
-    _vtxingTree->Branch("track2_eta",& _b_track2_eta,"track2_eta");
-    _vtxingTree->Branch("track2_phi",& _b_track2_phi,"track2_phi");
-
     _signalCutTree = new TTree("cutTreeSignal","signal data for making track pair cuts");
     _signalCutTree->SetAutoSave(300);
     _signalCutTree->Branch("track_deta", &_b_track_deta);
@@ -357,8 +346,6 @@ std::queue<std::pair<int,int>> TruthConversionEval::numUnique(std::map<int,Conve
           pair<float,float> pTstemp = i->second.getTrackpTs();
           _b_fLayer[_b_Tpair]=_b_track_layer = i->second.firstLayer(_clusterMap); 
           _b_fLayer[_b_Tpair]=-1;
-          _b_track1_pt= _b_electron_reco_pt[_b_Tpair]=pTstemp.first;
-          _b_track2_pt= _b_positron_reco_pt[_b_Tpair]=pTstemp.second;
           _b_Tpair++;
         }//tree
         switch(nRecoTracks)
@@ -373,18 +360,11 @@ std::queue<std::pair<int,int>> TruthConversionEval::numUnique(std::map<int,Conve
                 _b_track_pT = i->second.minTrackpT();
                 _b_approach = i->second.approachDistance();
                 pair<float,float> etasTemp = i->second.getTrackEtas();
-                _b_track1_eta = etasTemp.first;
-                _b_track2_eta = etasTemp.second;
                 pair<float,float> phisTemp = i->second.getTrackPhis();
-                _b_track1_phi = phisTemp.first;
-                _b_track2_phi = phisTemp.second;
                 std::vector<pair<SvtxTrack*, SvtxTrack*>> v_tracks;
                 v_tracks.push_back(i->second.getRecoTracks());
                 genfit::GFRaveVertex* recoVert = _vertexer->findSecondaryVertices(&v_tracks)[0];
                 TVector3 recoVertPos = recoVert->getPos();
-                _b_vtx_radius = sqrt(recoVertPos.x()*recoVertPos.x()+recoVertPos.y()*recoVertPos.y());
-                _b_vtx_eta = recoVertPos.Eta();
-                _b_vtx_phi = recoVertPos.Phi();
                 _b_vtx_chi2 = recoVert->getChi2();
                 _b_vtxTrack_dist = i->second.dist(&recoVertPos,_clusterMap);
                 TLorentzVector* recoPhoton = i->second.setRecoPhoton();
