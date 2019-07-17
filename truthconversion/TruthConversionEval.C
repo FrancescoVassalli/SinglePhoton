@@ -343,7 +343,6 @@ std::queue<std::pair<int,int>> TruthConversionEval::numUnique(std::map<int,Conve
         if(_kMakeTTree){
           _b_e_deta[_b_Tpair]=TMath::Abs(tlv_electron.Eta()-tlv_positron.Eta());
           _b_e_dphi[_b_Tpair]=TMath::Abs(tlv_electron.Phi()-tlv_positron.Phi());
-          pair<float,float> pTstemp = i->second.getTrackpTs();
           _b_fLayer[_b_Tpair]=_b_track_layer = i->second.firstLayer(_clusterMap); 
           _b_fLayer[_b_Tpair]=-1;
           _b_Tpair++;
@@ -359,8 +358,6 @@ std::queue<std::pair<int,int>> TruthConversionEval::numUnique(std::map<int,Conve
                 _b_track_dlayer=-1;
                 _b_track_pT = i->second.minTrackpT();
                 _b_approach = i->second.approachDistance();
-                pair<float,float> etasTemp = i->second.getTrackEtas();
-                pair<float,float> phisTemp = i->second.getTrackPhis();
                 std::vector<pair<SvtxTrack*, SvtxTrack*>> v_tracks;
                 v_tracks.push_back(i->second.getRecoTracks());
                 genfit::GFRaveVertex* recoVert = _vertexer->findSecondaryVertices(&v_tracks)[0];
