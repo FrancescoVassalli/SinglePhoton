@@ -246,6 +246,17 @@ int Conversion::trackDLayer(SvtxClusterMap* svtxClusterMap,SvtxHitMap *hitmap){
   else return -1;
 }
 
+int Conversion::trackDLayer(TrkrClusterContainer* clusterMap){
+  if (recoCount()==2){
+    TrkrCluster *c1 = clusterMap->findCluster(*(reco1->begin_cluster_keys()));
+    TrkrCluster *c2 = clusterMap->findCluster(*(reco2->begin_cluster_keys()));
+    unsigned l1 = TrkrDefs::getLayer(c1->getClusKey());
+    unsigned l2 = TrkrDefs::getLayer(c2->getClusKey());
+    return abs(l1-l2);
+  }
+  else return -1;
+}
+
 int Conversion::firstLayer(SvtxClusterMap* svtxClusterMap,SvtxHitMap *hitmap){
   switch(recoCount()){
     case 2:
@@ -254,7 +265,7 @@ int Conversion::firstLayer(SvtxClusterMap* svtxClusterMap,SvtxHitMap *hitmap){
         SvtxCluster *c2 = svtxClusterMap->get(*(reco2->begin_clusters()));
         SvtxHit *h1 = hitmap->get(*(c1->begin_hits()));
         SvtxHit *h2 = hitmap->get(*(c2->begin_hits()));
-        if(h1->get_layer()<h2->get_layer()){
+        if(h1->get_layer()>h2->get_layer()){
           return h2->get_layer();
         }
         else return h1->get_layer();
@@ -263,6 +274,29 @@ int Conversion::firstLayer(SvtxClusterMap* svtxClusterMap,SvtxHitMap *hitmap){
       {
         if (reco1)return svtxClusterMap->get(*(reco1->begin_clusters()))->get_layer();
         else return svtxClusterMap->get(*(reco2->begin_clusters()))->get_layer();
+      }
+    default:
+      return -1;
+  }
+}
+
+int Conversion::firstLayer(TrkrClusterContainer* clusterMap){
+  switch(recoCount()){
+    case 2:
+      {
+        TrkrCluster *c1 = clusterMap->findCluster(*(reco1->begin_cluster_keys()));
+        TrkrCluster *c2 = clusterMap->findCluster(*(reco2->begin_cluster_keys()));
+        unsigned l1 = TrkrDefs::getLayer(c1->getClusKey());
+        unsigned l2 = TrkrDefs::getLayer(c2->getClusKey());
+        if(l1>l2){
+          return l1;
+        }
+        else return l2;
+      }
+    case 1:
+      {
+        if (reco1)return TrkrDefs::getLayer(*(reco1->begin_cluster_keys()));
+        else return rkrDefs::getLayer(*(reco2->begin_cluster_keys()));
       }
     default:
       return -1;
@@ -286,6 +320,18 @@ double Conversion::dist(TVector3 *recovtx,SvtxClusterMap* svtxClusterMap){
   SvtxCluster *c2 = svtxClusterMap->get(*(reco2->begin_clusters()));
   double r1 = sqrt(abs(c1->get_x()-recovtx->x())+abs(c1->get_y()-recovtx->y())+abs(c1->get_z()-recovtx->z()));
   double r2 = sqrt(abs(c2->get_x()-recovtx->x())+abs(c2->get_y()-recovtx->y())+abs(c2->get_z()-recovtx->z()));
+  if (r1>r2)
+  {
+    return r1;
+  }
+  else return r2;
+}
+
+double Conversion::dist(TVector3 *recovtx,TrkrClusterContainer* clusterMap){
+  TrkrCluster *c1 = clusterMap->findCluster(*(reco1->begin_cluster_keys()));
+  TrkrCluster *c2 = clusterMap->findCluster(*(reco2->begin_cluster_keys()));
+  double r1 = sqrt(abs(c1->getX()-recovtx->x())+abs(c1->getY()-recovtx->y())+abs(c1->getZ()-recovtx->z()));
+  double r2 = sqrt(abs(c2->getX()-recovtx->x())+abs(c2->getY()-recovtx->y())+abs(c2->getZ()-recovtx->z()));
   if (r1>r2)
   {
     return r1;
