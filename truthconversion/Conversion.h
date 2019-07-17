@@ -4,6 +4,7 @@
  * @version 1.0
  *
  * @brief Simple class to hold conversion information
+ * This could be optimized by initializing the object with the necessary node pointers
  */
 #ifndef CONVERSION_H__
 #define CONVERSION_H__
@@ -146,16 +147,19 @@ class Conversion
 		/** Return the difference in layers of the first hits of the reco track 
 		 * @return -1 if reco tracks are not set*/
 		int trackDLayer(SvtxClusterMap* cmap,SvtxHitMap *hitmap);
+		int trackDLayer(TrkrClusterContainer* );
 		///@return the first layer the associated reco clusters hit
 		int firstLayer(SvtxClusterMap* cmap,SvtxHitMap *hitmap);
+		int firstLayer(TrkrClusterContainer* );
 		///@return true if there are any silicon hits for the conversion
-		bool hasSilicon(SvtxClusterMap* cmap);
+		bool hasSilicon(SvtxClusterMap* );
 		/** distance between two closest points on the reco tracks 
 		 * @return -1 if tracks are not set*/
 		double approachDistance()const;
 
 		double dist(PHG4VtxPoint* vtx, SvtxClusterMap* cmap);
 		double dist(TVector3* vtx, SvtxClusterMap* cmap);
+		double dist(TVector3* vtx, TrkrClusterContainer* cmap);
 		float setRecoVtx(SvtxVertex* recovtx,SvtxClusterMap* cmap);
 		TLorentzVector* setRecoPhoton();
 
