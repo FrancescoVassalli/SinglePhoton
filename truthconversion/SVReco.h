@@ -133,6 +133,7 @@ private:
 	void FillVertexMap(
 			const std::vector<genfit::GFRaveVertex*> & rave_vertices,
 			const std::vector<genfit::Track*> & gf_tracks);
+  void printGenFitTrackKinematics(PHGenFit::Track* track);
 
 	void FillSVMap(
 			const std::vector<genfit::GFRaveVertex*> & rave_vertices,
@@ -152,6 +153,7 @@ private:
 
 	//! created by InitEvent to associate genfit to Svtx
 	std::vector<PHGenFit::Track*> _main_rf_phgf_tracks;
+  SvtxVertex* _primvertex=NULL;
 
 	//! rescale mag field, modify the original mag field read in
 	float _mag_field_re_scaling_factor;

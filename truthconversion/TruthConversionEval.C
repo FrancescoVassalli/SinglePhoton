@@ -95,10 +95,19 @@ int TruthConversionEval::InitRun(PHCompositeNode *topNode)
     _signalCutTree->Branch("track_dlayer",&_b_track_dlayer);
     _signalCutTree->Branch("track_layer", &_b_track_layer);
     _signalCutTree->Branch("track_pT", &_b_track_pT);
+    _signalCutTree->Branch("ttrack_pT", &_b_ttrack_pT);
     _signalCutTree->Branch("approach_dist", &_b_approach);
     _signalCutTree->Branch("vtx_radius", &_b_vtx_radius);
     _signalCutTree->Branch("tvtx_radius", &_b_tvtx_radius);
     _signalCutTree->Branch("vtx_phi", &_b_vtx_phi);
+    _signalCutTree->Branch("vtx_eta", &_b_vtx_eta);
+    _signalCutTree->Branch("vtx_x", &_b_vtx_x);
+    _signalCutTree->Branch("vtx_y", &_b_vtx_y);
+    _signalCutTree->Branch("vtx_z", &_b_vtx_z);
+    _signalCutTree->Branch("tvtx_eta", &_b_tvtx_eta);
+    _signalCutTree->Branch("tvtx_x", &_b_tvtx_x);
+    _signalCutTree->Branch("tvtx_y", &_b_tvtx_y);
+    _signalCutTree->Branch("tvtx_z", &_b_tvtx_z);
     _signalCutTree->Branch("tvtx_phi", &_b_tvtx_phi);
     _signalCutTree->Branch("vtx_chi2", &_b_vtx_chi2);
     _signalCutTree->Branch("vtxTrack_dist", &_b_vtxTrack_dist);
@@ -360,6 +369,8 @@ std::queue<std::pair<int,int>> TruthConversionEval::numUnique(std::map<int,Conve
                 _b_track_dlayer = i->second.trackDLayer(_clusterMap);
                 _b_track_dlayer=-1;
                 _b_track_pT = i->second.minTrackpT();
+                if(tlv_electron.Pt()>tlv_positron.Pt()) _b_ttrack_pT = tlv_positron.Pt();
+                else _b_ttrack_pT = tlv_electron.Pt();
                 _b_approach = i->second.approachDistance();
                 pair<SvtxTrack*, SvtxTrack*> reco_tracks=i->second.getRecoTracks();
                 genfit::GFRaveVertex* recoVert = _vertexer->findSecondaryVertex(reco_tracks.first,reco_tracks.second);
@@ -369,8 +380,16 @@ std::queue<std::pair<int,int>> TruthConversionEval::numUnique(std::map<int,Conve
                   _b_vtx_radius = sqrt(recoVertPos.x()*recoVertPos.x()+recoVertPos.y()*recoVertPos.y());
                   _b_tvtx_radius = _b_rVtx[_b_nVtx];
                   _b_vtx_phi = recoVertPos.Phi();
+                  _b_vtx_eta = recoVertPos.Eta();
+                  _b_vtx_z = recoVertPos.Z();
+                  _b_vtx_x = recoVertPos.X();
+                  _b_vtx_y = recoVertPos.Y();
                   TVector3 tVertPos(vtx->get_x(),vtx->get_y(),vtx->get_z());
                   _b_tvtx_phi = tVertPos.Phi();
+                  _b_tvtx_eta = tVertPos.Eta();
+                  _b_tvtx_z = tVertPos.Z();
+                  _b_tvtx_x = tVertPos.X();
+                  _b_tvtx_y = tVertPos.Y();
                   _b_vtx_chi2 = recoVert->getChi2();
                   _b_vtxTrack_dist = i->second.dist(&recoVertPos,_clusterMap);
                 }

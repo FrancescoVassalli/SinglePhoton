@@ -123,9 +123,18 @@ class TruthConversionEval: public SubsysReco
     int _b_track_layer ;
     int _b_track_dlayer ;
     float _b_track_pT;
+    float _b_ttrack_pT;
     double _b_approach  ;
     double _b_vtx_radius ;
     double _b_vtx_phi ;
+    double _b_vtx_eta ;
+    double _b_vtx_x ;
+    double _b_vtx_y ;
+    double _b_vtx_z ;
+    double _b_tvtx_eta ;
+    double _b_tvtx_x ;
+    double _b_tvtx_y ;
+    double _b_tvtx_z ;
     double _b_tvtx_radius ;
     double _b_tvtx_phi ;
     double _b_vtxTrack_dist;

@@ -123,12 +123,12 @@ int SVReco::InitEvent(PHCompositeNode *topNode) {
   _svtxtrk_gftrk_map.clear();
   _svtxtrk_wt_map.clear();
   _svtxtrk_id.clear();
-  //is this the priamry vetex?
-  SvtxVertex *vertex = _vertexmap->get(0);
+  //the priamry vetex
+  _primvertex = _vertexmap->get(0);
   cout<<"starting track loop with vertex:\n";
-  if (vertex)
+  if (_primvertex)
   {
-    vertex->identify();
+    _primvertex->identify();
   }
   else{
     cout<<"NULL"<<endl;
@@ -163,7 +163,7 @@ int SVReco::InitEvent(PHCompositeNode *topNode) {
     //cout << (svtx_track->get_chisq()/svtx_track->get_ndf()) << ", " << n_TPC << ", " << svtx_track->get_pt() << endl;
     //cout << svtx_track->get_ndf() << ", " << svtx_track->size_clusters() << endl;
     //cout<<"making genfit"<<endl;
-    PHGenFit::Track* rf_phgf_track = MakeGenFitTrack(topNode, svtx_track, vertex); //convert SvtxTrack to GenFit Track
+    PHGenFit::Track* rf_phgf_track = MakeGenFitTrack(topNode, svtx_track, _primvertex); //convert SvtxTrack to GenFit Track
     //cout<<"made genfit"<<endl;
 
     if (rf_phgf_track) {
@@ -216,39 +216,74 @@ genfit::GFRaveVertex* SVReco::findSecondaryVertex(SvtxTrack* track1, SvtxTrack* 
   vector<genfit::GFRaveVertex*> rave_vertices_conversion;
   vector<genfit::Track*> rf_gf_tracks_conversion;
 
-    if (_svtxtrk_gftrk_map.find(track1->get_id())!=_svtxtrk_gftrk_map.end()&&
-        _svtxtrk_gftrk_map.find(track2->get_id())!=_svtxtrk_gftrk_map.end())
-    {
-      unsigned int trk_index = _svtxtrk_gftrk_map[track1->get_id()];
-      PHGenFit::Track* rf_phgf_track = _main_rf_phgf_tracks[trk_index];
-      rf_gf_tracks_conversion.push_back(rf_phgf_track->getGenFitTrack());
+  if (_svtxtrk_gftrk_map.find(track1->get_id())!=_svtxtrk_gftrk_map.end()&&
+      _svtxtrk_gftrk_map.find(track2->get_id())!=_svtxtrk_gftrk_map.end())
+  {
+    unsigned int trk_index = _svtxtrk_gftrk_map[track1->get_id()];
+    PHGenFit::Track* rf_phgf_track = _main_rf_phgf_tracks[trk_index];
+    rf_gf_tracks_conversion.push_back(rf_phgf_track->getGenFitTrack());
+    //check the genfit track is working
+    cout<<"Track Comparison Original:\n";
+    track1->identify();
+    printGenFitTrackKinematics(rf_phgf_track);
 
-      trk_index = _svtxtrk_gftrk_map[track2->get_id()];
-      rf_phgf_track = _main_rf_phgf_tracks[trk_index];
-      rf_gf_tracks_conversion.push_back(rf_phgf_track->getGenFitTrack());
+    trk_index = _svtxtrk_gftrk_map[track2->get_id()];
+    rf_phgf_track = _main_rf_phgf_tracks[trk_index];
+    track2->identify();
+    printGenFitTrackKinematics(rf_phgf_track);
+    rf_gf_tracks_conversion.push_back(rf_phgf_track->getGenFitTrack());
+  }
+  cout<<rf_gf_tracks_conversion.size()<<endl;
+  if (rf_gf_tracks_conversion.size()>1){
+    try{
+      _vertex_finder->findVertices(&rave_vertices_conversion, rf_gf_tracks_conversion);
+    }catch (...){
+      std::cout << PHWHERE << "GFRaveVertexFactory::findVertices failed!";
     }
-    cout<<rf_gf_tracks_conversion.size()<<endl;
-    if (rf_gf_tracks_conversion.size()>1){
-      try{
-        _vertex_finder->findVertices(&rave_vertices_conversion, rf_gf_tracks_conversion);
-      }catch (...){
-        std::cout << PHWHERE << "GFRaveVertexFactory::findVertices failed!";
-      }
-      return rave_vertices_conversion[0];
-    }
-    else{
-      return NULL;
-    }
+    /*      if(TMath::Abs(rave_vertices_conversion[0]->getChi2()-1.)>.3){
+            cout<<"PRINTING:\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\n";
+            rave_vertices_conversion[0]->Print();
+            track1->identify();
+            track2->identify();
+            cout<<"\n\n\n\n\n";
+            }*/
+    return rave_vertices_conversion[0];
+  }
+  else{
+    return NULL;
+  }
 }
 
 SVReco::~SVReco(){
   cout<<PHWHERE<<"delete"<<endl;
   delete _fitter;
   delete _vertex_finder;
+  if(_primvertex) delete _primvertex;
   for (std::vector<PHGenFit::Track*>::iterator i = _main_rf_phgf_tracks.begin(); i != _main_rf_phgf_tracks.end(); ++i)
   {
     delete *i;
   }
+}
+
+void SVReco::printGenFitTrackKinematics(PHGenFit::Track* track){
+
+  TVector3 vertex_position(0, 0, 0);
+  if (_primvertex){
+    vertex_position.SetXYZ(_primvertex->get_x(), _primvertex->get_y(), _primvertex->get_z());
+  }
+
+  std::shared_ptr<genfit::MeasuredStateOnPlane> gf_state_vertex_ca = NULL;
+  try {
+    gf_state_vertex_ca = std::shared_ptr < genfit::MeasuredStateOnPlane> (track->extrapolateToPoint(vertex_position));
+  } catch (...) {
+    if (_verbosity >= 2)
+      LogWarning("extrapolateToPoint failed!");
+  }
+  TVector3 mom = gf_state_vertex_ca->getMom();
+  TMatrixDSym cov = gf_state_vertex_ca->get6DCov();
+
+  cout << "OUT Ex: " << sqrt(cov[0][0]) << ", Ey: " << sqrt(cov[1][1]) << ", Ez: " << sqrt(cov[2][2]) << endl;
+  cout << "OUT Px: " << mom.X() << ", Py: " << mom.Y() << ", Pz: " << mom.Z() << endl; 
 }
 
 void SVReco::reset_eval_variables(){
