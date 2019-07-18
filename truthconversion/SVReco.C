@@ -87,20 +87,20 @@ using namespace std;
  */
 SVReco::SVReco(const string &name) :
   _mag_field_file_name("/phenix/upgrades/decadal/fieldmaps/sPHENIX.2d.root"),
-  _mag_field_re_scaling_factor(1.4 / 1.5),
+  _mag_field_re_scaling_factor(1.4 / 1.5), //what is this and why?
   _reverse_mag_field(false),
   _fitter(NULL),
   _track_fitting_alg_name("DafRef"),
   _n_maps_layer(3),
   _n_intt_layer(4),
-  _primary_pid_guess(11),
+  _primary_pid_guess(11), //for the tracks
   _cut_Ncluster(false),
   _cut_min_pT(0.1),
-  _cut_dca(5.0),
+  _cut_dca(5.0), //probably in mm
   _cut_chi2_ndf(5),
   _use_ladder_geom(false),
   _vertex_finder(NULL),
-  _vertexing_method("avf-smoothing:1"),
+  _vertexing_method("avf-smoothing:1"), /*need a list of these and their proper domains*/
   _clustermap(NULL),
   _trackmap(NULL),
   _vertexmap(NULL),
@@ -117,8 +117,10 @@ int SVReco::InitEvent(PHCompositeNode *topNode) {
   //cout<<"got vertexing nodes"<<endl;
   //! stands for Refit_GenFit_Tracks
   vector<genfit::Track*> rf_gf_tracks;
+  for(auto p:)
   rf_gf_tracks.clear();
 
+  for(auto p : _main_rf_phgf_tracks) delete p;
   _main_rf_phgf_tracks.clear();
 
   svtxtrk_gftrk_map.clear();
@@ -126,7 +128,8 @@ int SVReco::InitEvent(PHCompositeNode *topNode) {
   svtxtrk_id.clear();
   //is this the priamry vetex?
   SvtxVertex *vertex = _vertexmap->get(0);
-  //cout<<"starting track loop"<<endl;
+  cout<<"starting track loop with vertex:\n";
+  vertex->identify();
 
   //iterate over all tracks to find priary vertex and make rave/genfit objects
   for (SvtxTrackMap::Iter iter = _trackmap->begin(); iter != _trackmap->end();
@@ -195,7 +198,7 @@ int SVReco::InitEvent(PHCompositeNode *topNode) {
       std::cerr << PHWHERE << "GFRaveVertexFactory::findVertices failed!";
     }
     //cout<<"filling vtx map"<<endl;
-    FillVertexMap(rave_vertices, rf_gf_tracks);
+    //FillVertexMap(rave_vertices, rf_gf_tracks);
   }
 
   //cout<<"Done event init"<<endl;
@@ -230,8 +233,9 @@ int SVReco::InitRun(PHCompositeNode *topNode) {
 }
 
 std::vector<genfit::GFRaveVertex*> SVReco::findSecondaryVertices(std::vector<std::pair<SvtxTrack*, SvtxTrack*>> *conversion_pairs) {
-  _vertex_finder->setMethod("avr-smoothing:1");
+  //_vertex_finder->setMethod("avr-smoothing:1");
   //_vertex_finder->setMethod("avr");
+  _vertex_finder->setMethod("avf");
   vector<genfit::GFRaveVertex*> rave_vertices_conversion;
   rave_vertices_conversion.clear();
 
@@ -263,7 +267,6 @@ std::vector<genfit::GFRaveVertex*> SVReco::findSecondaryVertices(std::vector<std
       }
     }
   }//conversion pairs
-
   return rave_vertices_conversion;
 }
 
@@ -476,7 +479,7 @@ void SVReco::FillVertexMap(
 
     //cout << "N TRK gf: " << gf_tracks.size() << ", rv: " << rv_prim_vtx_ntrk << endl;
 
-    for (unsigned int itrk=0; itrk<(unsigned int)rv_prim_vtx_ntrk; itrk++){
+    for (int itrk=0; itrk< rv_prim_vtx_ntrk; itrk++){
 
       TVector3 rvtrk_mom = rave_vtx->getParameters(itrk)->getMom();
       float rvtrk_w = rave_vtx->getParameters(itrk)->getWeight();
