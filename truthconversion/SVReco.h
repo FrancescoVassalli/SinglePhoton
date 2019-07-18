@@ -50,7 +50,7 @@ public:
 	int InitRun(PHCompositeNode *);
 
 	//!@return a vertex for each track pair
-	std::vector<genfit::GFRaveVertex*> findSecondaryVertices(std::vector<std::pair<SvtxTrack*, SvtxTrack*>> *);
+	genfit::GFRaveVertex* findSecondaryVertex(SvtxTrack* track1, SvtxTrack* track2);
 
 	void reset_eval_variables();
 
@@ -274,10 +274,10 @@ private:
 
 	bool _do_evt_display;
 
-	std::map<unsigned int, unsigned int> svtxtrk_gftrk_map;
-	std::map<unsigned int, float> svtxtrk_wt_map;
-	std::map<unsigned int, float> svtxtrk_pt_map;
-	std::vector<unsigned int> svtxtrk_id;
+	std::map<unsigned int, unsigned int> _svtxtrk_gftrk_map;
+	std::map<unsigned int, float> _svtxtrk_wt_map;
+	std::map<unsigned int, float> _svtxtrk_pt_map;
+	std::vector<unsigned int> _svtxtrk_id;
 
 };
 

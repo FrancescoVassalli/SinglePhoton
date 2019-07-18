@@ -116,21 +116,13 @@ int SVReco::InitEvent(PHCompositeNode *topNode) {
   GetNodes(topNode);
   //cout<<"got vertexing nodes"<<endl;
   //! stands for Refit_GenFit_Tracks
-  vector<genfit::Track*> rf_gf_tracks;
-  for(auto p:rf_gf_tracks) delete p;
-  rf_gf_tracks.clear();
 
   for(auto p : _main_rf_phgf_tracks) delete p;
   _main_rf_phgf_tracks.clear();
 
-  //! find vertex using tracks
-  std::vector<genfit::GFRaveVertex*> rave_vertices;
-  for(auto p : rave_vertices) delete p;
-  rave_vertices.clear();
-
-  svtxtrk_gftrk_map.clear();
-  svtxtrk_wt_map.clear();
-  svtxtrk_id.clear();
+  _svtxtrk_gftrk_map.clear();
+  _svtxtrk_wt_map.clear();
+  _svtxtrk_id.clear();
   //is this the priamry vetex?
   SvtxVertex *vertex = _vertexmap->get(0);
   cout<<"starting track loop with vertex:\n";
@@ -177,26 +169,13 @@ int SVReco::InitEvent(PHCompositeNode *topNode) {
     if (rf_phgf_track) {
       //svtx_track->identify();
       //make a map to connect SvtxTracks to their respective GenFit Tracks
-      svtxtrk_id.push_back(svtx_track->get_id());
-      svtxtrk_gftrk_map[svtx_track->get_id()] = _main_rf_phgf_tracks.size();
+      _svtxtrk_id.push_back(svtx_track->get_id());
+      _svtxtrk_gftrk_map[svtx_track->get_id()] = _main_rf_phgf_tracks.size();
       _main_rf_phgf_tracks.push_back(rf_phgf_track); //to be used by findSecondaryVerticies
-      rf_gf_tracks.push_back(rf_phgf_track->getGenFitTrack());
     }
   }
-  cout<<"exit track loop ntracks="<<rf_gf_tracks.size()<<endl;
-  //
-  _vertex_finder->setMethod(_vertexing_method.data());
-  if (rf_gf_tracks.size()>=2){
-    try {
-      _vertex_finder->findVertices(&rave_vertices, rf_gf_tracks);
-    }catch (...){
-      std::cerr << PHWHERE << "GFRaveVertexFactory::findVertices failed!";
-    }
-    //cout<<"filling vtx map"<<endl;
-    //FillVertexMap(rave_vertices, rf_gf_tracks);
-  }
+  cout<<"exit track loop ntracks="<<_main_rf_phgf_tracks.size()<<endl;
 
-  //cout<<"Done event init"<<endl;
   return Fun4AllReturnCodes::EVENT_OK;
 }
 
@@ -227,46 +206,43 @@ int SVReco::InitRun(PHCompositeNode *topNode) {
   return Fun4AllReturnCodes::EVENT_OK;
 }
 
-std::vector<genfit::GFRaveVertex*> SVReco::findSecondaryVertices(std::vector<std::pair<SvtxTrack*, SvtxTrack*>> *conversion_pairs) {
+//note that this might only work for conversion like events
+genfit::GFRaveVertex* SVReco::findSecondaryVertex(SvtxTrack* track1, SvtxTrack* track2) {
   //_vertex_finder->setMethod("avr-smoothing:1");
   _vertex_finder->setMethod("avr");
+  cout<<PHWHERE<<" here"<<endl;
   //_vertex_finder->setMethod("avf-smoothing:1");
   //_vertex_finder->setMethod("kalman");
   vector<genfit::GFRaveVertex*> rave_vertices_conversion;
-  rave_vertices_conversion.clear();
-    
   vector<genfit::Track*> rf_gf_tracks_conversion;
 
-  //calculate secondary verticies
-  for (std::vector<std::pair<SvtxTrack*, SvtxTrack*>>::iterator iter = conversion_pairs->begin(); iter!=conversion_pairs->end(); iter++)
-  {
-    SvtxTrack* track1 = iter->first;
-    SvtxTrack* track2 = iter->second;
-
-    if (svtxtrk_gftrk_map.find(track1->get_id())!=svtxtrk_gftrk_map.end()&&
-        svtxtrk_gftrk_map.find(track2->get_id())!=svtxtrk_gftrk_map.end()){
-
-      unsigned int trk_index = svtxtrk_gftrk_map[track1->get_id()];
+    if (_svtxtrk_gftrk_map.find(track1->get_id())!=_svtxtrk_gftrk_map.end()&&
+        _svtxtrk_gftrk_map.find(track2->get_id())!=_svtxtrk_gftrk_map.end())
+    {
+      unsigned int trk_index = _svtxtrk_gftrk_map[track1->get_id()];
       PHGenFit::Track* rf_phgf_track = _main_rf_phgf_tracks[trk_index];
       rf_gf_tracks_conversion.push_back(rf_phgf_track->getGenFitTrack());
 
-      trk_index = svtxtrk_gftrk_map[track2->get_id()];
+      trk_index = _svtxtrk_gftrk_map[track2->get_id()];
       rf_phgf_track = _main_rf_phgf_tracks[trk_index];
       rf_gf_tracks_conversion.push_back(rf_phgf_track->getGenFitTrack());
     }
+    cout<<rf_gf_tracks_conversion.size()<<endl;
     if (rf_gf_tracks_conversion.size()>1){
       try{
         _vertex_finder->findVertices(&rave_vertices_conversion, rf_gf_tracks_conversion);
       }catch (...){
         std::cout << PHWHERE << "GFRaveVertexFactory::findVertices failed!";
       }
+      return rave_vertices_conversion[0];
     }
-    rf_gf_tracks_conversion.clear();
-  }//conversion pairs
-  return rave_vertices_conversion;
+    else{
+      return NULL;
+    }
 }
 
 SVReco::~SVReco(){
+  cout<<PHWHERE<<"delete"<<endl;
   delete _fitter;
   delete _vertex_finder;
   for (std::vector<PHGenFit::Track*>::iterator i = _main_rf_phgf_tracks.begin(); i != _main_rf_phgf_tracks.end(); ++i)
@@ -486,7 +462,7 @@ void SVReco::FillVertexMap(
       float rvtrk_w = rave_vtx->getParameters(itrk)->getWeight();
 
       unsigned int rvtrk_mc_id = rave_vtx->getParameters(itrk)->getTrack()->getMcTrackId();
-      svtxtrk_wt_map[rvtrk_mc_id] = rvtrk_w;
+      _svtxtrk_wt_map[rvtrk_mc_id] = rvtrk_w;
 
       //cout << "w: " << rvtrk_w << ", mc id: " << rvtrk_mc_id << endl;
       /*
@@ -577,7 +553,7 @@ int SVReco::GetSVMass_mom(
 
       unsigned int rvtrk_mc_id = rave_vtx->getParameters(itrk)->getTrack()->getMcTrackId();
       //cout << "mc_id: " << rvtrk_mc_id << ", wt: " << svtxtrk_wt_map[rvtrk_mc_id] << endl;
-      if ( svtxtrk_wt_map[rvtrk_mc_id]>0.7 ){
+      if ( _svtxtrk_wt_map[rvtrk_mc_id]>0.7 ){
         N_good_pv++;
       }
     }//

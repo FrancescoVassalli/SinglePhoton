@@ -361,9 +361,8 @@ std::queue<std::pair<int,int>> TruthConversionEval::numUnique(std::map<int,Conve
                 _b_track_dlayer=-1;
                 _b_track_pT = i->second.minTrackpT();
                 _b_approach = i->second.approachDistance();
-                std::vector<pair<SvtxTrack*, SvtxTrack*>> v_tracks;
-                v_tracks.push_back(i->second.getRecoTracks());
-                genfit::GFRaveVertex* recoVert = _vertexer->findSecondaryVertices(&v_tracks)[0];
+                pair<SvtxTrack*, SvtxTrack*> reco_tracks=i->second.getRecoTracks();
+                genfit::GFRaveVertex* recoVert = _vertexer->findSecondaryVertex(reco_tracks.first,reco_tracks.second);
                 if (recoVert)
                 {
                   TVector3 recoVertPos = recoVert->getPos();
@@ -478,9 +477,8 @@ void TruthConversionEval::processBackground(std::map<int,Conversion> *mymap,Svtx
       _bb_track_pT = i->second.minTrackpT();
       _bb_approach = i->second.approachDistance();
       _bb_pid = i->second.getElectron()->get_pid();
-      std::vector<pair<SvtxTrack*, SvtxTrack*>> v_tracks;
-      v_tracks.push_back(i->second.getRecoTracks());
-      genfit::GFRaveVertex* recoVert = _vertexer->findSecondaryVertices(&v_tracks)[0];
+      pair<SvtxTrack*, SvtxTrack*> reco_tracks=i->second.getRecoTracks();
+      genfit::GFRaveVertex* recoVert = _vertexer->findSecondaryVertex(reco_tracks.first,reco_tracks.second);
       if (recoVert)
       {
         TVector3 recoVertPos = recoVert->getPos();
