@@ -7,12 +7,12 @@ AM_CPPFLAGS = \
   -I$(OFFLINE_MAIN)/include/eigen3 \
   -I`root-config --incdir`
 
-#libSVReco_la_LDFLAGS = \
+#libPVReco_la_LDFLAGS = \
 #  -L$(libdir) \
 #  -L$(OFFLINE_MAIN)/lib
 
 lib_LTLIBRARIES = \
-   libSVReco.la
+   libPVReco.la
 
 AM_CXXFLAGS = -Wall -Werror -msse2 -DRAVE -DRaveDllExport=
 
@@ -22,13 +22,13 @@ AM_LDFLAGS = \
 	-L$(OFFLINE_MAIN)/lib
 
 pkginclude_HEADERS = \
-	SVReco.h\
-	SVRecoLinkDef.h
+	PVReco.h\
+	PVRecoLinkDef.h
 
-libSVReco_la_SOURCES = \
-  SVReco.C 
+libPVReco_la_SOURCES = \
+  PVReco.C 
 
-libSVReco_la_LIBADD = \
+libPVReco_la_LIBADD = \
   -lfun4all \
 	-lg4detectors \
   -lg4dst \
@@ -60,7 +60,7 @@ BUILT_SOURCES = \
   testexternals.C
 
 testexternals_LDADD = \
-  libSVReco.la
+  libPVReco.la
 
 testexternals_SOURCES = testexternals.C
 
