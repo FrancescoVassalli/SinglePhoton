@@ -52,13 +52,6 @@ public:
 	//!@return a vertex for each track pair
 	std::vector<genfit::GFRaveVertex*> findSecondaryVertices(std::vector<std::pair<SvtxTrack*, SvtxTrack*>> *);
 
-	//! For evalution
-	//! Change eval output filename
-	void set_eval_filename(const char* file){
-		if (file)
-			_eval_outname = file;
-	}
-
 	void reset_eval_variables();
 
 	void set_do_eval(bool doEval){

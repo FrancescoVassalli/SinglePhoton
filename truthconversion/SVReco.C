@@ -117,7 +117,7 @@ int SVReco::InitEvent(PHCompositeNode *topNode) {
   //cout<<"got vertexing nodes"<<endl;
   //! stands for Refit_GenFit_Tracks
   vector<genfit::Track*> rf_gf_tracks;
-  for(auto p:)
+  for(auto p:rf_gf_tracks) delete p;
   rf_gf_tracks.clear();
 
   for(auto p : _main_rf_phgf_tracks) delete p;
