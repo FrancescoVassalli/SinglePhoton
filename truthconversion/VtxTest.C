@@ -10,6 +10,8 @@
 #include <calobase/RawCluster.h>
 #include <calobase/RawClusterv1.h>
 
+#include <fun4all/Fun4AllReturnCodes.h>
+
 #include <g4main/PHG4TruthInfoContainer.h>
 #include <g4main/PHG4Particle.h>
 #include <g4main/PHG4Particlev1.h>
@@ -194,10 +196,11 @@ int VtxTest::process_event(PHCompositeNode *topNode)
       else{
         PHG4VtxPoint *vtemp = truth_vtx;
         truth_vtx=_truthinfo->GetVtx(g4particle->get_vtx_id());
-        if(*truth_vtx!=vtemp) cout<<"vtx does not agree"<<endl;
+        if(!(*truth_vtx==*vtemp)) cout<<"vtx does not agree"<<endl;
       }
     }
   }
+  if(!svtxtrack1||!svtxtrack2) return Fun4AllReturnCodes::ABORTEVENT;
   genfit::GFRaveVertex* recoVert=_vertexer->findSecondaryVertex(svtxtrack1,svtxtrack2);
   if (recoVert)
   {
