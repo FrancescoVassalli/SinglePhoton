@@ -123,73 +123,68 @@ int SVReco::InitEvent(PHCompositeNode *topNode) {
   for(auto p : _main_rf_phgf_tracks) delete p;
   _main_rf_phgf_tracks.clear();
 
+  //! find vertex using tracks
+  std::vector<genfit::GFRaveVertex*> rave_vertices;
+  for(auto p : rave_vertices) delete p;
+  rave_vertices.clear();
+
   svtxtrk_gftrk_map.clear();
   svtxtrk_wt_map.clear();
   svtxtrk_id.clear();
   //is this the priamry vetex?
   SvtxVertex *vertex = _vertexmap->get(0);
   cout<<"starting track loop with vertex:\n";
-  vertex->identify();
+  if (vertex)
+  {
+    vertex->identify();
+  }
+  else{
+    cout<<"NULL"<<endl;
+  }
 
   //iterate over all tracks to find priary vertex and make rave/genfit objects
   for (SvtxTrackMap::Iter iter = _trackmap->begin(); iter != _trackmap->end();
       ++iter) {
     SvtxTrack* svtx_track = iter->second;
     // do track cuts
-    if (!svtx_track)
-      continue;
-    if ( svtx_track->get_ndf()<40 )
-      continue;
-    if (!(svtx_track->get_pt()>_cut_min_pT))
-      continue;
-    if ((svtx_track->get_chisq()/svtx_track->get_ndf())>_cut_chi2_ndf)
-      continue;
-    if (fabs(svtx_track->get_dca3d_xy())>_cut_dca || fabs(svtx_track->get_dca3d_z())>_cut_dca )
+    if (!svtx_track || svtx_track->get_ndf()<40 || svtx_track->get_pt()<_cut_min_pT ||
+      svtx_track->get_chisq()/svtx_track->get_ndf())>_cut_chi2_ndf ||
+      fabs(svtx_track->get_dca3d_xy())>_cut_dca || fabs(svtx_track->get_dca3d_z())>_cut_dca)
       continue;
 
     int n_MVTX = 0, n_INTT = 0, n_TPC = 0;
     //cout<<"Keys:";
     for (SvtxTrack::ConstClusterKeyIter iter2 = svtx_track->begin_cluster_keys(); iter2!=svtx_track->end_cluster_keys(); iter2++) {
       TrkrDefs::cluskey cluster_key = *iter2;
-      float layer = (float) TrkrDefs::getLayer(cluster_key);
       //cout<<cluster_key<<',';
+      //count where the hits are
+      float layer = (float) TrkrDefs::getLayer(cluster_key);
       if (layer<_n_maps_layer) n_MVTX++;
       else if (layer<_n_maps_layer+_n_intt_layer) n_INTT++;
       else n_TPC++;
     }//cluster loop
     //cluster cuts
     //cout<<"\n cluster loop with n_MVTX="<<n_MVTX<<" n_INTT="<<n_INTT<<" and nTPC="<<n_TPC<<endl;
-    if ( _cut_Ncluster && (n_MVTX<2 || n_INTT<2) ){
+    if ( _cut_Ncluster && (n_MVTX<2 || n_INTT<2 || n_TPC<25) ){
       continue;
     }
-    if ( n_TPC<25 ) continue;
-
     //cout << (svtx_track->get_chisq()/svtx_track->get_ndf()) << ", " << n_TPC << ", " << svtx_track->get_pt() << endl;
     //cout << svtx_track->get_ndf() << ", " << svtx_track->size_clusters() << endl;
     //cout<<"making genfit"<<endl;
-    PHGenFit::Track* rf_phgf_track = MakeGenFitTrack(topNode, svtx_track, vertex);
+    PHGenFit::Track* rf_phgf_track = MakeGenFitTrack(topNode, svtx_track, vertex); //convert SvtxTrack to GenFit Track
     //cout<<"made genfit"<<endl;
 
-    //cout << "DONE" << endl;
-
     if (rf_phgf_track) {
-      svtx_track->identify();
+      //svtx_track->identify();
+      //make a map to connect SvtxTracks to their respective GenFit Tracks
       svtxtrk_id.push_back(svtx_track->get_id());
       svtxtrk_gftrk_map[svtx_track->get_id()] = _main_rf_phgf_tracks.size();
-      _main_rf_phgf_tracks.push_back(rf_phgf_track);
+      _main_rf_phgf_tracks.push_back(rf_phgf_track); //to be used by findSecondaryVerticies
       rf_gf_tracks.push_back(rf_phgf_track->getGenFitTrack());
     }
   }
   cout<<"exit track loop ntracks="<<rf_gf_tracks.size()<<endl;
-
-  //! find vertex using tracks
-  std::vector<genfit::GFRaveVertex*> rave_vertices;
-  rave_vertices.clear();
   //
-  if(!_vertex_finder){
-    std::cerr<< PHWHERE<<" bad run init no SVR"<<endl;
-    return Fun4AllReturnCodes::ABORTRUN;
-  } 
   _vertex_finder->setMethod(_vertexing_method.data());
   if (rf_gf_tracks.size()>=2){
     try {
@@ -225,7 +220,7 @@ int SVReco::InitRun(PHCompositeNode *topNode) {
   _vertex_finder->setMethod(_vertexing_method.data());
 
   if (!_vertex_finder) {
-    cerr << PHWHERE << endl;
+    std::cerr<< PHWHERE<<" bad run init no SVR"<<endl;
     return Fun4AllReturnCodes::ABORTRUN;
   }
 
@@ -361,6 +356,11 @@ int SVReco::GetNodes(PHCompositeNode * topNode){
       << endl;
     return Fun4AllReturnCodes::ABORTEVENT;
   }
+
+  if(!_vertex_finder){
+    std::cerr<< PHWHERE<<" bad run init no SVR"<<endl;
+    return Fun4AllReturnCodes::ABORTRUN;
+  } 
 
   return Fun4AllReturnCodes::EVENT_OK;
 }
