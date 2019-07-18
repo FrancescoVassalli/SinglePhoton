@@ -148,8 +148,8 @@ int SVReco::InitEvent(PHCompositeNode *topNode) {
     SvtxTrack* svtx_track = iter->second;
     // do track cuts
     if (!svtx_track || svtx_track->get_ndf()<40 || svtx_track->get_pt()<_cut_min_pT ||
-      svtx_track->get_chisq()/svtx_track->get_ndf())>_cut_chi2_ndf ||
-      fabs(svtx_track->get_dca3d_xy())>_cut_dca || fabs(svtx_track->get_dca3d_z())>_cut_dca)
+        (svtx_track->get_chisq()/svtx_track->get_ndf())>_cut_chi2_ndf ||
+        fabs(svtx_track->get_dca3d_xy())>_cut_dca || fabs(svtx_track->get_dca3d_z())>_cut_dca)
       continue;
 
     int n_MVTX = 0, n_INTT = 0, n_TPC = 0;
@@ -229,19 +229,19 @@ int SVReco::InitRun(PHCompositeNode *topNode) {
 
 std::vector<genfit::GFRaveVertex*> SVReco::findSecondaryVertices(std::vector<std::pair<SvtxTrack*, SvtxTrack*>> *conversion_pairs) {
   //_vertex_finder->setMethod("avr-smoothing:1");
-  //_vertex_finder->setMethod("avr");
-  _vertex_finder->setMethod("avf");
+  _vertex_finder->setMethod("avr");
+  //_vertex_finder->setMethod("avf-smoothing:1");
+  //_vertex_finder->setMethod("kalman");
   vector<genfit::GFRaveVertex*> rave_vertices_conversion;
   rave_vertices_conversion.clear();
+    
+  vector<genfit::Track*> rf_gf_tracks_conversion;
 
   //calculate secondary verticies
   for (std::vector<std::pair<SvtxTrack*, SvtxTrack*>>::iterator iter = conversion_pairs->begin(); iter!=conversion_pairs->end(); iter++)
   {
     SvtxTrack* track1 = iter->first;
     SvtxTrack* track2 = iter->second;
-
-    vector<genfit::Track*> rf_gf_tracks_conversion;
-    rf_gf_tracks_conversion.clear();
 
     if (svtxtrk_gftrk_map.find(track1->get_id())!=svtxtrk_gftrk_map.end()&&
         svtxtrk_gftrk_map.find(track2->get_id())!=svtxtrk_gftrk_map.end()){
@@ -261,6 +261,7 @@ std::vector<genfit::GFRaveVertex*> SVReco::findSecondaryVertices(std::vector<std
         std::cout << PHWHERE << "GFRaveVertexFactory::findVertices failed!";
       }
     }
+    rf_gf_tracks_conversion.clear();
   }//conversion pairs
   return rave_vertices_conversion;
 }
@@ -366,7 +367,7 @@ int SVReco::GetNodes(PHCompositeNode * topNode){
 }
 
 //From @sh-lim
- PHGenFit::Track* SVReco::MakeGenFitTrack(PHCompositeNode *topNode, const SvtxTrack* intrack, const SvtxVertex* vertex){
+PHGenFit::Track* SVReco::MakeGenFitTrack(PHCompositeNode *topNode, const SvtxTrack* intrack, const SvtxVertex* vertex){
   if (!intrack){
     cerr << PHWHERE << " Input SvtxTrack is NULL!" << endl;
     return NULL;
@@ -392,7 +393,7 @@ int SVReco::GetNodes(PHCompositeNode * topNode){
   std::vector<PHGenFit::Measurement*> measurements;
 
   for (auto iter = intrack->begin_cluster_keys(); iter != intrack->end_cluster_keys(); ++iter){
-//    unsigned int cluster_id = *iter;
+    //    unsigned int cluster_id = *iter;
     TrkrCluster* cluster = _clustermap->findCluster(*iter);
     if (!cluster) {
       LogError("No cluster Found!");
