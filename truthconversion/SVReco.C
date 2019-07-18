@@ -134,7 +134,13 @@ int SVReco::InitEvent(PHCompositeNode *topNode) {
   //is this the priamry vetex?
   SvtxVertex *vertex = _vertexmap->get(0);
   cout<<"starting track loop with vertex:\n";
-  vertex->identify();
+  if (vertex)
+  {
+    vertex->identify();
+  }
+  else{
+    cout<<"NULL"<<endl;
+  }
 
   //iterate over all tracks to find priary vertex and make rave/genfit objects
   for (SvtxTrackMap::Iter iter = _trackmap->begin(); iter != _trackmap->end();
