@@ -24,13 +24,16 @@ pkginclude_HEADERS = \
 	Conversion.h \
 	ConversionLinkDef.h\
 	SVReco.h\
-	SVRecoLinkDef.h
+	SVRecoLinkDef.h\
+	VtxTest.h\
+	VtxTestLinkDef.h
 
 libtruthconversion_la_SOURCES = \
 	ConversionClusterTreeMaker.C \
 	TruthConversionEval.C \
 	Conversion.cc \
-  SVReco.C 
+  SVReco.C\
+	VtxTest.C	
 
 libtruthconversion_la_LIBADD = \
   -lphool\

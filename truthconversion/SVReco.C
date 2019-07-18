@@ -258,7 +258,7 @@ SVReco::~SVReco(){
   cout<<PHWHERE<<"delete"<<endl;
   delete _fitter;
   delete _vertex_finder;
-  if(_primvertex) delete _primvertex;
+//  if(_primvertex) delete _primvertex;
   for (std::vector<PHGenFit::Track*>::iterator i = _main_rf_phgf_tracks.begin(); i != _main_rf_phgf_tracks.end(); ++i)
   {
     delete *i;
