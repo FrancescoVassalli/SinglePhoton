@@ -247,7 +247,7 @@ using namespace std;
         gen->set_vertex_distribution_function(PHG4SimpleEventGenerator::Uniform,
                                               PHG4SimpleEventGenerator::Uniform,
                                               PHG4SimpleEventGenerator::Uniform);
-        gen->set_vertex_distribution_mean(0.0, 0.0, 0.0);
+        gen->set_vertex_distribution_mean(10.4, 10.4, 0.0);
         gen->set_vertex_distribution_width(0.0, 0.0, 0.0);
       }
       gen->set_vertex_size_function(PHG4SimpleEventGenerator::Uniform);
