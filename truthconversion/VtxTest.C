@@ -187,7 +187,8 @@ int VtxTest::process_event(PHCompositeNode *topNode)
   PHG4VtxPoint *truth_vtx=NULL;
   for ( PHG4TruthInfoContainer::ConstIterator iter = range.first; iter != range.second; ++iter ) {
     PHG4Particle* g4particle = iter->second;
-    if(g4particle&&g4particle->get_pid()==221){
+    if(g4particle&&g4particle->get_pid()==211&&!_truthinfo->GetParticle(g4particle->get_parent_id())){
+      cout<<"found pion\n";
       TLorentzVector truth;
       truth.SetPxPyPzE(g4particle->get_px(),g4particle->get_py(),g4particle->get_pz(),g4particle->get_e());
       if(!svtxtrack1)svtxtrack1=trackeval->best_track_from(g4particle);
@@ -200,8 +201,16 @@ int VtxTest::process_event(PHCompositeNode *topNode)
       }
     }
   }
-  if(!svtxtrack1||!svtxtrack2) return Fun4AllReturnCodes::ABORTEVENT;
+  if(!truth_vtx){
+    cout<<"did not find truth_vtx"<<endl;
+    return Fun4AllReturnCodes::ABORTEVENT;
+  }
+  if(!svtxtrack1||!svtxtrack2){
+    cout<<"did not find tracks"<<endl;
+    return Fun4AllReturnCodes::ABORTEVENT;
+  }
   genfit::GFRaveVertex* recoVert=_vertexer->findSecondaryVertex(svtxtrack1,svtxtrack2);
+  cout<<"here"<<endl;
   if (recoVert)
   {
     TVector3 recoVertPos = recoVert->getPos();
