@@ -3,7 +3,7 @@
 #
 set OUT_LOCATION="/sphenix/user/vassalli/gammasample"
 set OUT_FILE=${OUT_LOCATION}/test/vtxtest${p}.root
-set IN_FILE="/sphenix/user/vassalli/gammasample/test/gammaout.root"
+set IN_FILE="/sphenix/user/vassalli/gammasample/test/piVtxout${p}.root"
 set PYTHIA_FILE="/sphenix/user/vassalli/gammasample/pythiahep.dat"
 #
 set SCRATCH_AREA="/sphenix/user/vassalli/scratch"                                                                                                              
