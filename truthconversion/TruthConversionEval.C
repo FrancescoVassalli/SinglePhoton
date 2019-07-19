@@ -112,6 +112,7 @@ int TruthConversionEval::InitRun(PHCompositeNode *topNode)
     _signalCutTree = new TTree("cutTreeSignal","signal data for making track pair cuts");
     _signalCutTree->SetAutoSave(300);
     _signalCutTree->Branch("track_deta", &_b_track_deta);
+    _signalCutTree->Branch("track_dca", &_b_track_dca);
     _signalCutTree->Branch("track_dphi", &_b_track_dphi);
     _signalCutTree->Branch("track_dlayer",&_b_track_dlayer);
     _signalCutTree->Branch("track_layer", &_b_track_layer);
@@ -119,19 +120,9 @@ int TruthConversionEval::InitRun(PHCompositeNode *topNode)
     _signalCutTree->Branch("ttrack_pT", &_b_ttrack_pT);
     _signalCutTree->Branch("approach_dist", &_b_approach);
     _signalCutTree->Branch("vtx_radius", &_b_vtx_radius);
-    _signalCutTree->Branch("tvtx_radius", &_b_tvtx_radius);
-    _signalCutTree->Branch("vtx_phi", &_b_vtx_phi);
-    _signalCutTree->Branch("vtx_eta", &_b_vtx_eta);
-    _signalCutTree->Branch("vtx_x", &_b_vtx_x);
-    _signalCutTree->Branch("vtx_y", &_b_vtx_y);
-    _signalCutTree->Branch("vtx_z", &_b_vtx_z);
-    _signalCutTree->Branch("tvtx_eta", &_b_tvtx_eta);
-    _signalCutTree->Branch("tvtx_x", &_b_tvtx_x);
-    _signalCutTree->Branch("tvtx_y", &_b_tvtx_y);
-    _signalCutTree->Branch("tvtx_z", &_b_tvtx_z);
-    _signalCutTree->Branch("tvtx_phi", &_b_tvtx_phi);
     _signalCutTree->Branch("vtx_chi2", &_b_vtx_chi2);
-    _signalCutTree->Branch("vtxTrack_dist", &_b_vtxTrack_dist);
+    _signalCutTree->Branch("vtxTrackRZ_dist", &_b_vtxTrackRZ_dist);
+    _signalCutTree->Branch("vtxTrackRPhi_dist", &_b_vtxTrackRPhi_dist);
     _signalCutTree->Branch("photon_m", &_b_photon_m);
     _signalCutTree->Branch("photon_pT", &_b_photon_pT);
     _signalCutTree->Branch("cluster_prob", &_b_cluster_prob);
@@ -139,6 +130,7 @@ int TruthConversionEval::InitRun(PHCompositeNode *topNode)
     _h_backgroundCutTree = new TTree("cutTreeBackh","background data for making track pair cuts");
     _h_backgroundCutTree->SetAutoSave(300);
     _h_backgroundCutTree->Branch("track_deta", &_bb_track_deta);
+    _h_backgroundCutTree->Branch("track_dca", &_bb_track_dca);
     _h_backgroundCutTree->Branch("track_dphi", &_bb_track_dphi);
     _h_backgroundCutTree->Branch("track_dlayer", &_bb_track_dlayer);
     _h_backgroundCutTree->Branch("track_layer", &_bb_track_layer);
@@ -146,14 +138,16 @@ int TruthConversionEval::InitRun(PHCompositeNode *topNode)
     _h_backgroundCutTree->Branch("vtx_radius", &_bb_vtx_radius);
     _h_backgroundCutTree->Branch("vtx_chi2", &_bb_vtx_chi2);
     _h_backgroundCutTree->Branch("approach_dist", &_bb_approach);
-    _h_backgroundCutTree->Branch("vtxTrack_dist", &_bb_vtxTrack_dist);
+    _h_backgroundCutTree->Branch("vtxTrackRZ_dist", &_bb_vtxTrackRZ_dist);
+    _h_backgroundCutTree->Branch("vtxTrackRPhi_dist", &_bb_vtxTrackRPhi_dist);
     _h_backgroundCutTree->Branch("photon_m", &_bb_photon_m);
     _h_backgroundCutTree->Branch("photon_pT", &_bb_photon_pT);
     _h_backgroundCutTree->Branch("cluster_prob", &_bb_cluster_prob);
     _h_backgroundCutTree->Branch("pid", &_bb_pid);
 
     _e_backgroundCutTree = new TTree("cutTreeBacke","background data for making track pair cuts");
-    _e_backgroundCutTree->SetAutoSave(300);
+    _e_backgroundCutTree->SetAutoSave(300); 
+    _e_backgroundCutTree->Branch("track_dca", &_bb_track_dca);
     _e_backgroundCutTree->Branch("track_deta", &_bb_track_deta);
     _e_backgroundCutTree->Branch("track_dphi", &_bb_track_dphi);
     _e_backgroundCutTree->Branch("track_dlayer", &_bb_track_dlayer);
@@ -162,7 +156,8 @@ int TruthConversionEval::InitRun(PHCompositeNode *topNode)
     _e_backgroundCutTree->Branch("vtx_radius", &_bb_vtx_radius);
     _e_backgroundCutTree->Branch("vtx_chi2", &_bb_vtx_chi2);
     _e_backgroundCutTree->Branch("approach_dist", &_bb_approach);
-    _e_backgroundCutTree->Branch("vtxTrack_dist", &_bb_vtxTrack_dist);
+    _e_backgroundCutTree->Branch("vtxTrackRZ_dist", &_bb_vtxTrackRZ_dist);
+    _e_backgroundCutTree->Branch("vtxTrackRPhi_dist", &_bb_vtxTrackRPhi_dist);
     _e_backgroundCutTree->Branch("photon_m", &_bb_photon_m);
     _e_backgroundCutTree->Branch("photon_pT", &_bb_photon_pT);
     _e_backgroundCutTree->Branch("cluster_prob", &_bb_cluster_prob);
@@ -394,6 +389,8 @@ std::queue<std::pair<int,int>> TruthConversionEval::numUnique(std::map<int,Conve
                 if(tlv_electron.Pt()>tlv_positron.Pt()) _b_ttrack_pT = tlv_positron.Pt();
                 else _b_ttrack_pT = tlv_electron.Pt();
                 _b_approach = i->second.approachDistance();
+                _b_track_dca = i->second.minDca();
+                //TODO make Conversion find the reco vertex
                 pair<SvtxTrack*, SvtxTrack*> reco_tracks=i->second.getRecoTracks();
                 genfit::GFRaveVertex* recoVert = _vertexer->findSecondaryVertex(reco_tracks.first,reco_tracks.second);
                 if (recoVert)
@@ -413,7 +410,8 @@ std::queue<std::pair<int,int>> TruthConversionEval::numUnique(std::map<int,Conve
                   _b_tvtx_x = tVertPos.X();
                   _b_tvtx_y = tVertPos.Y();
                   _b_vtx_chi2 = recoVert->getChi2();
-                  _b_vtxTrack_dist = i->second.dist(&recoVertPos,_clusterMap);
+                  _b_vtxTrackRZ_dist = i->second.vtxTrackRZ(recoVertPos);
+                  _b_vtxTrackRPhi_dist = i->second.vtxTrackRPhi(recoVertPos);
 
                   _b_track1_pt = _b_electron_reco_pt[_b_Tpair-1];
                   _b_track2_pt = _b_positron_reco_pt[_b_Tpair-1];
@@ -514,7 +512,7 @@ std::queue<std::pair<int,int>> TruthConversionEval::numUnique(std::map<int,Conve
 }
 
 //only call if _kMakeTTree is true
-void TruthConversionEval::processBackground(std::map<int,Conversion> *mymap,SvtxTrackEval* trackeval,TTree* tree){
+void TruthConversionEval::processBackground(std::map<int,Conversion> *mymap,SvtxTrackEval* trackeval,TTree* background_tree){
   for (std::map<int,Conversion>::iterator i = mymap->begin(); i != mymap->end(); ++i) {
     int nReco=i->second.setRecoTracks(trackeval);
     if (nReco==2)
@@ -535,7 +533,8 @@ void TruthConversionEval::processBackground(std::map<int,Conversion> *mymap,Svtx
         TVector3 recoVertPos = recoVert->getPos();
         _bb_vtx_radius = sqrt(recoVertPos.x()*recoVertPos.x()+recoVertPos.y()*recoVertPos.y());
         _bb_vtx_chi2 = recoVert->getChi2();
-        _bb_vtxTrack_dist = i->second.dist(&recoVertPos,_clusterMap);
+        _bb_vtxTrackRZ_dist = i->second.vtxTrackRZ(recoVertPos);
+        _bb_vtxTrackRPhi_dist = i->second.vtxTrackRPhi(recoVertPos);
       }
       TLorentzVector* recoPhoton = i->second.setRecoPhoton();
       if (recoPhoton)
@@ -548,7 +547,7 @@ void TruthConversionEval::processBackground(std::map<int,Conversion> *mymap,Svtx
         _bb_photon_pT=0;
       }
       _bb_cluster_prob= _mainClusterContainer->getCluster(i->second.get_cluster_id())->get_prob();
-      tree->Fill();
+      background_tree->Fill();
     }
   }
 }

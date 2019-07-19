@@ -1,4 +1,5 @@
 #include "RecoConversionEval.h"
+#include "SVReco.h"
 
 #include <fun4all/Fun4AllReturnCodes.h>
 #include <phool/PHCompositeNode.h>
@@ -17,6 +18,8 @@
 #include <g4main/PHG4Particle.h>
 #include <g4main/PHG4VtxPoint.h>
 #include <g4main/PHG4TruthInfoContainer.h>
+#include <GenFit/GFRaveVertex.h>
+
 
 #include <TVector3.h>
 #include <TTree.h>
@@ -38,6 +41,9 @@ int RecoConversionEval::Init(PHCompositeNode *topNode) {
 }
 
 int RecoConversionEval::InitRun(PHCompositeNode *topNode) {
+	_vertexer = new SVReco();
+	//TODO turn this back into a subsystem and put it on the node tree
+	_vertexer->InitRun(topNode);
 	return Fun4AllReturnCodes::EVENT_OK;
 }
 
@@ -46,7 +52,7 @@ void RecoConversionEval::doNodePointers(PHCompositeNode *topNode){
 	_mainClusterContainer = findNode::getClass<RawClusterContainer>(topNode,"CLUSTER_CEMC");
 	_svtxClusterMap = findNode::getClass<SvtxClusterMap>(topNode,"SvtxClusterMap");
 	_hitMap = findNode::getClass<SvtxHitMap>(topNode,"SvtxHitMap");
-	_auxVertexer = new RaveVertexingAux(topNode);
+	_vertexer->InitEvent(topNode);
 }
 
 bool RecoConversionEval::hasNodePointers()const{
@@ -57,15 +63,14 @@ bool RecoConversionEval::hasNodePointers()const{
 int RecoConversionEval::process_event(PHCompositeNode *topNode) {
 	doNodePointers(topNode);
 	cout<<"Did pointers: \n \n";
-	int bigLoopCount=0;
 	/*the is not optimized but is just a nlogn process*/
-	for ( SvtxTrackMap::Iter iter = _allTracks->begin(); iter != _allTracks->end(); ++bigLoopCount) {
+	for ( SvtxTrackMap::Iter iter = _allTracks->begin(); iter != _allTracks->end(); ++iter) {
 		//I want to now only check e tracks so check the clusters of the |charge|=1 tracks
-		if (abs(iter->second->get_charge())==1&&iter->second->get_pt()>_kTrackPtCut)
+		if (abs(iter->second->get_charge())==1&&iter->second->get_pt()>_kTrackPtCut) //TODO dca cut
 		{
 			SvtxTrack* thisTrack = iter->second;
 			RawCluster* bestCluster= _mainClusterContainer->getCluster(thisTrack->get_cal_cluster_id(SvtxTrack::CAL_LAYER(1)));
-			//what if no cluster is found?
+			//TODO what if no cluster is found?
 			if(bestCluster&&bestCluster->get_prob()>_kEMProbCut){
 				//loop over the following tracks
 				for (SvtxTrackMap::Iter jter = iter; jter != _allTracks->end(); ++jter)
@@ -76,40 +81,42 @@ int RecoConversionEval::process_event(PHCompositeNode *topNode) {
 						RawCluster* nextCluster= _mainClusterContainer->getCluster(jter->second->get_cal_cluster_id(SvtxTrack::CAL_LAYER(1)));
 						//what if no cluster is found?
 						if(nextCluster&&nextCluster->get_prob()>_kEMProbCut&&pairCuts(thisTrack,jter->second)){
-							SvtxVertex* vtxCan= _auxVertexer->makeVtx(thisTrack,jter->second);
+							genfit::GFRaveVertex* vtxCan = _vertexer->findSecondaryVertex(thisTrack,jter->second);
 							if (vtxCan&&vtxCuts(vtxCan))
 							{
-								/* code */
+								cout<<"Found conversion\n";
+								thisTrack->identify();
+								jter->second->identify();
+								vtxCan->print();
 							}
 						}
 					}
 				}
 			}
 		}
-		++iter;
 	}
 	return Fun4AllReturnCodes::EVENT_OK;
 }
 
 bool RecoConversionEval::pairCuts(SvtxTrack* t1, SvtxTrack* t2)const{
-	return detaCut(t1->get_eta(),t2->get_eta()) && hitCuts(t1,t2);
+	return detaCut(t1->get_eta(),t2->get_eta()) && hitCuts(t1,t2); //TODO add approach distance ?
 }
 
 bool RecoConversionEval::hitCuts(SvtxTrack* t1, SvtxTrack* t2)const {
-	SvtxCluster *c1 = _svtxClusterMap->get(*(t1->begin_clusters()));
-	SvtxCluster *c2 = _svtxClusterMap->get(*(t2->begin_clusters()));
-	SvtxHit *h1 = _hitMap->get(*(c1->begin_hits()));
-	SvtxHit *h2 = _hitMap->get(*(c2->begin_hits()));
+	TrkrCluster *c1 = clusterMap->findCluster(*(reco1->begin_cluster_keys()));
+    TrkrCluster *c2 = clusterMap->findCluster(*(reco2->begin_cluster_keys()));
+    unsigned l1 = TrkrDefs::getLayer(c1->getClusKey());
+    unsigned l2 = TrkrDefs::getLayer(c2->getClusKey());
 	//check that the first hits are close enough
-	if (c1->get_layer()>_kNSiliconLayer&&c2->get_layer()>_kNSiliconLayer)
+	if (l1>_kNSiliconLayer&&l1>_kNSiliconLayer)
 	{
-		if (abs(h1->get_layer()-h2->get_layer())>_kFirstHitStrict)
+		if (abs(l1-l2)>_kFirstHitStrict)
 		{
 			return false;
 		}
 	}
 	else{
-		if (abs(h1->get_layer()-h2->get_layer())>_kFirstHit)
+		if (abs(l1-l2)>_kFirstHit)
 		{
 			return false;
 		}
@@ -117,8 +124,28 @@ bool RecoConversionEval::hitCuts(SvtxTrack* t1, SvtxTrack* t2)const {
 	return true;
 }
 
-bool RecoConversionEval::vtxCuts(SvtxVertex *vtx){
-	return true;
+bool RecoConversionEval::vtxCuts(genfit::GFRaveVertex* vtxCan, SvtxTrack* t1; SvtxTrack *t2){
+	//TODO program the cuts invariant mass, pT
+	return vtxRadiusCut(vtxCan->getPos()) && vtxTrackRPhiCut(vtxCan->getPos(),t1)&&vtxTrackRPhiCut(vtxCan->getPos(),t2)&& 
+		vtxTrackRZCut(vtxCan->getPos(),t1)&&vtxTrackRZCut(vtxCan->getPos(),t2)&&vtxCan->getChi2()>_kVtxChi2Cut;
+}
+
+bool RecoConversionEval::vtxTrackRZCut(TVector3 recoVertPos, SvtxTrack* track){
+	float dR = sqrt(recoVertPos.x()*recoVertPos.x()+recoVertPos.y()*recoVertPos.y())-sqrt(track->get_x()*track->get_x()+track->get_y()*track->get_y())
+	float dZ = recoVertPos.z()-track->get_z();
+	return sqrt(dR*dR+dZ*dZ)<_kVtxRZCut;
+}
+
+//bool RecoConversionEval::invariantMassCut()
+
+bool RecoConversionEval::vtxTrackRPhiCut(TVector3 recoVertPos, SvtxTrack* track){
+	float vtxR=sqrt(recoVertPos.x()*recoVertPos.x()+recoVertPos.y()*recoVertPos.y());
+	float trackR=sqrt(track->get_x()*track->get_x()+track->get_y()*track->get_y());
+	return sqrt(vtxR*vtxR+trackR*trackR-2*vtxR*trackR*cos(recoVertPos.Phi()-track->get_phi()))<_kVtxRPhiCut;
+}
+
+bool RecoConversionEval::vtxRadiusCut(TVector3 recoVertPos){
+	return sqrt(recoVertPos.x()*recoVertPos.x()+recoVertPos.y()*recoVertPos.y()) > _kVtxRCut;
 }
 
 int RecoConversionEval::End(PHCompositeNode *topNode) {

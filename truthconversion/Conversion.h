@@ -157,10 +157,17 @@ class Conversion
 		/** distance between two closest points on the reco tracks 
 		 * @return -1 if tracks are not set*/
 		double approachDistance()const;
-		///@return distance between the vertex and the closest track hit
+		///@return distance in xyz space between the vertex and the closest track hit
 		double dist(PHG4VtxPoint* vtx, SvtxClusterMap* cmap);
 		double dist(TVector3* vtx, SvtxClusterMap* cmap);
 		double dist(TVector3* vtx, TrkrClusterContainer* cmap);
+		///@return dca of the reco track with the lower dca
+		float minDca();
+		///@return the RPhi distance between the reco vtx and further track
+		float vtxTrackRPhi(TVector3 vertpos);
+		///@return the RZ distance between the reco vtx and further track
+		float vtxTrackRZ(TVector3 vertpos);
+
 		float setRecoVtx(SvtxVertex* recovtx,SvtxClusterMap* cmap);
 		TLorentzVector* setRecoPhoton();
 
@@ -181,6 +188,11 @@ class Conversion
 		int verbosity;
 		int sourceId;
 		float _kElectronRestM=.5109989461;
+
+		///helper function 
+		float vtxTrackRZ(TVector3 recoVertPos,SvtxTrack *track);
+		///helper function 
+		float vtxTrackRPhi(TVector3 recoVertPos,SvtxTrack *track);
 
 };
 #endif //CONVERSION_H__

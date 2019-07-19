@@ -235,6 +235,30 @@ bool Conversion::hasSilicon(SvtxClusterMap* svtxClusterMap){
   }
 }
 
+float Conversion::vtxTrackRZ(TVector3 vertpos){
+  float d1=vtxTrackRZ(vertpos,reco1);
+  float d2=vtxTrackRZ(vertpos,reco2);
+  return d1>d2?d1:d2;
+}
+
+float Conversion::vtxTrackRPhi(TVector3 vertpos){
+  float d1=vtxTrackRPhi(vertpos,reco1);
+  float d2=vtxTrackRPhi(vertpos,reco2);
+  return d1>d2?d1:d2;
+}
+
+float Conversion::vtxTrackRZ(TVector3 recoVertPos,SvtxTrack *track){
+  float dR = sqrt(recoVertPos.x()*recoVertPos.x()+recoVertPos.y()*recoVertPos.y())-sqrt(track->get_x()*track->get_x()+track->get_y()*track->get_y())
+  float dZ = recoVertPos.z()-track->get_z();
+  return sqrt(dR*dR+dZ*dZ);
+}
+
+float Conversion::vtxTrackRPhi(TVector3 recoVertPos,SvtxTrack *track){
+  loat vtxR=sqrt(recoVertPos.x()*recoVertPos.x()+recoVertPos.y()*recoVertPos.y());
+  float trackR=sqrt(track->get_x()*track->get_x()+track->get_y()*track->get_y());
+  return sqrt(vtxR*vtxR+trackR*trackR-2*vtxR*trackR*cos(recoVertPos.Phi()-track->get_phi()));
+}
+
 int Conversion::trackDLayer(SvtxClusterMap* svtxClusterMap,SvtxHitMap *hitmap){
   if (recoCount()==2){
     SvtxCluster *c1 = svtxClusterMap->get(*(reco1->begin_clusters()));
@@ -246,6 +270,10 @@ int Conversion::trackDLayer(SvtxClusterMap* svtxClusterMap,SvtxHitMap *hitmap){
     return abs(l1-l2);
   }
   else return -1;
+}
+
+float Conversion::minDca(){
+  return reco1->get_dca()>reco2->get_dca()?reco2->get_dca():reco1->get_dca();
 }
 
 int Conversion::trackDLayer(TrkrClusterContainer* clusterMap){
@@ -290,6 +318,7 @@ int Conversion::firstLayer(TrkrClusterContainer* clusterMap){
         TrkrCluster *c2 = clusterMap->findCluster(*(reco2->begin_cluster_keys()));
         unsigned l1 = TrkrDefs::getLayer(c1->getClusKey());
         unsigned l2 = TrkrDefs::getLayer(c2->getClusKey());
+        //maybe i need this? TrkrDefs::hitsetkey hitsetkey = TrkrDefs::getHitSetKeyFromClusKey(cluskey);
         if(l1>l2){
           return l1;
         }
