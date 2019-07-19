@@ -41,8 +41,8 @@ void makeFactory(TTree* signalTree,std::string outfile,std::string factoryname)
   factory->AddVariable("track1_eta",'F');
   factory->AddVariable("track2_eta",'F');
   factory->AddTarget("vtx_radius","radius","[cm]");
-  factory->AddTarget("vtx_eta","#eta");
-  factory->AddTarget("vtx_phi","#phi");
+  //factory->AddTarget("vtx_eta","#eta");
+  //factory->AddTarget("vtx_phi","#phi"); //maybe I can use the SVR to populate these values as inputs
 
   string track_pT_cut = "track1_pT>0&&track2_pT>0";
 
@@ -50,7 +50,7 @@ void makeFactory(TTree* signalTree,std::string outfile,std::string factoryname)
   string tCutInitializer = track_pT_cut;
   TCut preTraingCuts(tCutInitializer.c_str());
   factory->PrepareTrainingAndTestTree(preTraingCuts,"nTrain_Regression=0:nTest_Regression=0");
-  factory->BookMethod(Types::kMLP,"MLP_ANN","HiddenLayers=9");
+  factory->BookMethod(Types::kMLP,"MLP_ANN","HiddenLayers=1000");
 
   
   factory->TrainAllMethods();
