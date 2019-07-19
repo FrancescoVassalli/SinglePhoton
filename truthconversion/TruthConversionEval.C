@@ -88,6 +88,27 @@ int TruthConversionEval::InitRun(PHCompositeNode *topNode)
     _tree->Branch("Scluster_prob", &_b_Scluster_prob,"Scluster_prob[nRpair]/F");
     _tree->Branch("Mcluster_prob", &_b_Mcluster_prob,"Mcluster_prob[nRpair]/F");
 
+    _vtxingTree = new TTree("vtxingTree","data predicting vtx from track pair");
+    _vtxingTree->Branch("vtx_radius", &_b_vtx_radius);
+    _vtxingTree->Branch("tvtx_radius", &_b_tvtx_radius);
+    _vtxingTree->Branch("vtx_phi", &_b_vtx_phi);
+    _vtxingTree->Branch("vtx_eta", &_b_vtx_eta);
+    _vtxingTree->Branch("vtx_x", &_b_vtx_x);
+    _vtxingTree->Branch("vtx_y", &_b_vtx_y);
+    _vtxingTree->Branch("vtx_z", &_b_vtx_z);
+    _vtxingTree->Branch("tvtx_eta", &_b_tvtx_eta);
+    _vtxingTree->Branch("tvtx_x", &_b_tvtx_x);
+    _vtxingTree->Branch("tvtx_y", &_b_tvtx_y);
+    _vtxingTree->Branch("tvtx_z", &_b_tvtx_z);
+    _vtxingTree->Branch("tvtx_phi", &_b_tvtx_phi);
+    _vtxingTree->Branch("vtx_chi2", &_b_vtx_chi2);
+    _vtxingTree->Branch("track1_pt", &_b_track1_pt,"track1_pt");
+    _vtxingTree->Branch("track1_eta",& _b_track1_eta,"track1_eta");
+    _vtxingTree->Branch("track1_phi",& _b_track1_phi,"track1_phi");
+    _vtxingTree->Branch("track2_pt", &_b_track2_pt,"track2_pt");
+    _vtxingTree->Branch("track2_eta",& _b_track2_eta,"track2_eta");
+    _vtxingTree->Branch("track2_phi",& _b_track2_phi,"track2_phi");
+
     _signalCutTree = new TTree("cutTreeSignal","signal data for making track pair cuts");
     _signalCutTree->SetAutoSave(300);
     _signalCutTree->Branch("track_deta", &_b_track_deta);
@@ -356,7 +377,9 @@ std::queue<std::pair<int,int>> TruthConversionEval::numUnique(std::map<int,Conve
           _b_e_deta[_b_Tpair]=TMath::Abs(tlv_electron.Eta()-tlv_positron.Eta());
           _b_e_dphi[_b_Tpair]=TMath::Abs(tlv_electron.Phi()-tlv_positron.Phi());
           _b_fLayer[_b_Tpair]=_b_track_layer = i->second.firstLayer(_clusterMap); 
-          _b_fLayer[_b_Tpair]=-1;
+          pair<float,float> pTstemp = i->second.getTrackpTs();
+          _b_electron_reco_pt[_b_Tpair]=pTstemp.first;
+          _b_positron_reco_pt[_b_Tpair]=pTstemp.second;
           _b_Tpair++;
         }//tree
         switch(nRecoTracks)
@@ -367,7 +390,6 @@ std::queue<std::pair<int,int>> TruthConversionEval::numUnique(std::map<int,Conve
                 _b_track_deta = i->second.trackDEta();
                 _b_track_dphi = i->second.trackDPhi();
                 _b_track_dlayer = i->second.trackDLayer(_clusterMap);
-                _b_track_dlayer=-1;
                 _b_track_pT = i->second.minTrackpT();
                 if(tlv_electron.Pt()>tlv_positron.Pt()) _b_ttrack_pT = tlv_positron.Pt();
                 else _b_ttrack_pT = tlv_electron.Pt();
@@ -392,6 +414,16 @@ std::queue<std::pair<int,int>> TruthConversionEval::numUnique(std::map<int,Conve
                   _b_tvtx_y = tVertPos.Y();
                   _b_vtx_chi2 = recoVert->getChi2();
                   _b_vtxTrack_dist = i->second.dist(&recoVertPos,_clusterMap);
+
+                  _b_track1_pt = _b_electron_reco_pt[_b_Tpair-1];
+                  _b_track2_pt = _b_positron_reco_pt[_b_Tpair-1];
+                  pair<float,float> etasTemp = i->second.getTrackEtas();
+                  _b_track1_eta = etasTemp.first;
+                  _b_track2_eta = etasTemp.second;
+                  pair<float,float> phisTemp = i->second.getTrackPhis();
+                  _b_track1_phi = phisTemp.first;
+                  _b_track2_phi = phisTemp.second;
+                  _vtxingTree->Fill();
                 }
                 
                 TLorentzVector* recoPhoton = i->second.setRecoPhoton();
