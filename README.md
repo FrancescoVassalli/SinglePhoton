@@ -10,7 +10,7 @@ Everything save some of the plotting macros in the analysis folder are designed 
 - **HIPhotonConversion**: WIP package for finding conversion in Heavy Ion collisions
 
 **Background on Photon Conversion**
-- I have been using ![this ATLAS paper](https://github.com/FrancescoVassalli/SinglePhoton/files/2742038/4layerRecopT.pdf) as a reference. The relevent information starts on page 136 of the pdf
+- I have been using ![this ATLAS paper](https://arxiv.org/pdf/0901.0512.pdf) as a reference. The relevent information starts on page 136 of the pdf
 
 **Conversion Efficiency** 
 - At begin I studied the existing efficiency of the sPHENIX simulation to recover converted photons. These two plots were made on 12/3/18 and describe the effiency relative to radius and pT for single photon events using SvtxTrack reconstruction. This is also known as the inside out method. 
