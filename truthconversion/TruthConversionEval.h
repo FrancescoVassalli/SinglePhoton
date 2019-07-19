@@ -82,7 +82,7 @@ class TruthConversionEval: public SubsysReco
     TFile *_f=NULL; ///< output file
     TTree *_tree=NULL; ///< stores most of the data about the conversions
     TTree *_signalCutTree=NULL; ///<signal data for making track pair cuts
-    TTree *_vertexingTree=NULL; ///<data for training vtxing
+    TTree *_vtxingTree=NULL; ///<data for training vtxing
     TTree *_h_backgroundCutTree=NULL; ///<hadronic background data for making track pair cuts
     TTree *_e_backgroundCutTree=NULL; ///<EM background data for making track pair cuts
     RawClusterContainer *_mainClusterContainer; ///< contain 1 cluster associated with each conversion
@@ -110,13 +110,22 @@ class TruthConversionEval: public SubsysReco
     float _b_parent_phi [s_kMAXParticles];
     int   _b_grandparent_id [s_kMAXParticles]; ///<pid of the source of the photon 0 for prompt
     /** # of clusters associated with each conversion that has 2 reco tracks
-    * 1 indicates the reco tracks go to the same cluster ~15% of conversions*/
+     * 1 indicates the reco tracks go to the same cluster ~15% of conversions*/
     int   _b_nCluster [s_kMAXRecoMatch]; 
     int   _b_fLayer [s_kMAXRecoMatch]; 
     float _b_cluster_dphi [s_kMAXRecoMatch];
     float _b_cluster_deta [s_kMAXRecoMatch];
     float _b_Mcluster_prob[s_kMAXRecoMatch]; ///<cluster prob for merged clusters
     float _b_Scluster_prob[s_kMAXRecoMatch]; ///<cluster prob for split clusters
+    /**@}*/
+    /** \defgroup  variables  for {@link _vtxingtree}
+      @{*/
+    float _b_track1_pt;
+    float _b_track1_eta;
+    float _b_track1_phi;
+    float _b_track2_pt;
+    float _b_track2_eta;
+    float _b_track2_phi;
     /**@}*/
     /** \defgroup signalTreeVars Variables for {@link _signalCutTree}
       @{*/

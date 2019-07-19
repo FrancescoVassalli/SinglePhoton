@@ -2,8 +2,8 @@
 @ p = ( ${1} )
 #
 set OUT_LOCATION="/sphenix/user/vassalli/gammasample/"
-set OUT_FILE=${OUT_LOCATION}conversiononlineanalysis${p}.root
-set IN_FILE=${OUT_LOCATION}conversionout${p}.root
+set OUT_FILE=conversiononlineanalysis${p}.root
+set IN_FILE=conversionout${p}.root
 set PYTHIA_FILE="/sphenix/user/vassalli/gammasample/pythiahep.dat"
 #
 set SCRATCH_AREA="$_CONDOR_SCRATCH_DIR/fran_photons"                                                                                                              
@@ -19,6 +19,8 @@ cp $BURNER $SCRATCH_AREA
 cd $SCRATCH_AREA
 root -b -q Fun4All_G4_sPHENIX.C\(10,\"$IN_FILE\"\) 
 root -b -q cluster_burner.C\(\"$IN_FILE\",\"$OUT_FILE\",$p\)
+cp $OUTFILE $OUTLOCATION$OUTFILE
+cp $INFILE $OUTLOCATION$INFILE
 #
 rm -rf $SCRATCH_AREA
 #

@@ -1,11 +1,11 @@
 #include <fun4all/Fun4AllServer.h>
 #include <fun4all/Fun4AllDstInputManager.h>
-#include "TruthConversionEval.h"
+#include "VtxTest.h"
 
 R__LOAD_LIBRARY(libfun4all.so)
 R__LOAD_LIBRARY(libtruthconversion.so)
 
-int cluster_burner( std::string infile = "XjPhi3_pT5_98_dst.root",std::string outfile="cluster_burner_out.root", int runNumber=0)
+int vtxTest_burner( std::string infile = "XjPhi3_pT5_98_dst.root",std::string outfile="cluster_burner_out.root", int runNumber=0)
 {
   
   gSystem->Load("libfun4all.so");

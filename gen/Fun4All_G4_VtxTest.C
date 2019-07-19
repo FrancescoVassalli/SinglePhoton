@@ -37,7 +37,7 @@ R__LOAD_LIBRARY(libPHPythia8.so)
 using namespace std;
 
 
-  int Fun4All_G4_sPHENIX(
+  int Fun4All_G4_VtxTest(
       const int nEvents = 100,
       const char *outputFile = "G4sPHENIX.root",
       const char *inputFile = NULL)
