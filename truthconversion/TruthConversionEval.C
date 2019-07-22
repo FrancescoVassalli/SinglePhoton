@@ -91,6 +91,7 @@ int TruthConversionEval::InitRun(PHCompositeNode *topNode)
     _tree->Branch("Mcluster_prob", &_b_Mcluster_prob,"Mcluster_prob[nRpair]/F");
 
     _vtxingTree = new TTree("vtxingTree","data predicting vtx from track pair");
+    _vtxingTree->SetAutoSave(300);
     _vtxingTree->Branch("vtx_radius", &_b_vtx_radius);
     _vtxingTree->Branch("tvtx_radius", &_b_tvtx_radius);
     _vtxingTree->Branch("vtx_phi", &_b_vtx_phi);
@@ -520,8 +521,6 @@ void TruthConversionEval::processBackground(std::map<int,Conversion> *mymap,Svtx
       _bb_track_dphi = i->second.trackDPhi();
       _bb_track_dlayer = i->second.trackDLayer(_clusterMap);
       _bb_track_layer = i->second.firstLayer(_clusterMap);
-      _bb_track_layer=-1;
-      _bb_track_dlayer=-1;
       _bb_track_pT = i->second.minTrackpT();
       _bb_approach = i->second.approachDistance();
       _bb_pid = i->second.getElectron()->get_pid();
