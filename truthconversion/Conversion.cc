@@ -273,7 +273,8 @@ int Conversion::trackDLayer(SvtxClusterMap* svtxClusterMap,SvtxHitMap *hitmap){
 }
 
 float Conversion::minDca(){
-  return reco1->get_dca()>reco2->get_dca()?reco2->get_dca():reco1->get_dca();
+  if(reco1->get_dca()>reco2->get_dca()) return reco2->get_dca();
+  else return reco1->get_dca();
 }
 
 int Conversion::trackDLayer(TrkrClusterContainer* clusterMap){
