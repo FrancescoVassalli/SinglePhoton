@@ -28,7 +28,7 @@ pkginclude_HEADERS = \
 	VtxTest.h\
 	VtxTestLinkDef.h\
 	RecoConversionEval.h\
-	RecoConversionLinkDefEval.h
+	RecoConversionEvalLinkDef.h
 
 libtruthconversion_la_SOURCES = \
 	ConversionClusterTreeMaker.C \
@@ -36,7 +36,7 @@ libtruthconversion_la_SOURCES = \
 	Conversion.cc \
   SVReco.C\
 	VtxTest.C\
-	RecoConversionEval.C
+	RecoConversionEval.cc
 
 libtruthconversion_la_LIBADD = \
   -lphool\

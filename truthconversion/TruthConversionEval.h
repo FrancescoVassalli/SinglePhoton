@@ -133,6 +133,7 @@ class TruthConversionEval: public SubsysReco
     int _b_track_layer ;
     int _b_track_dlayer ;
     float _b_track_pT;
+    float _b_track_dca;
     float _b_ttrack_pT;
     double _b_approach  ;
     float _b_vtx_radius ;
@@ -159,6 +160,8 @@ class TruthConversionEval: public SubsysReco
       @{*/
     //bb stands for background branch
     float _bb_track_deta ;
+    float _bb_vtx_radius ;
+    float _bb_track_dca ;
     int _bb_track_layer ;
     int _bb_track_dlayer ;
     float _bb_track_pT;

@@ -7,6 +7,8 @@
 /// \author Francesco Vassalli
 //===============================================
 #include <fun4all/SubsysReco.h>
+#include <GenFit/GFRaveVertex.h>
+#include <TVector3.h>
 #include <string>
 #include <cmath>
 class PHCompositeNode;
@@ -15,7 +17,7 @@ class SvtxVertex;
 class SvtxTrack;
 class SvtxTrackMap;
 class SvtxHitMap;
-class SvtxClusterMap;
+class TrkrClusterContainer;
 class RawClusterContainer;
 class TTree;
 class TFile;
@@ -26,9 +28,7 @@ class RecoConversionEval : public SubsysReco {
 	public:
 
 		RecoConversionEval(const std::string &name);
-		~RecoConversionEval(){
-			if (_auxVertexer) delete _auxVertexer;
-		}	
+		~RecoConversionEval();
 		int Init(PHCompositeNode *topNode);
 		int InitRun(PHCompositeNode *topNode);
 		void doNodePointers(PHCompositeNode *topNode);
@@ -36,14 +36,14 @@ class RecoConversionEval : public SubsysReco {
 		int End(PHCompositeNode *topNode);
 
 	private:
-		SvtxTrackMap* _allTracks;
-		RawClusterContainer* _mainClusterContainer;
-		SvtxClusterMap* _svtxClusterMap;
-		SvtxHitMap *_hitMap;
-		SVReco *_vertexer;
+		SvtxTrackMap* _allTracks=NULL;
+		RawClusterContainer* _mainClusterContainer=NULL;
+		TrkrClusterContainer* _clusterMap=NULL;
+		SvtxHitMap *_hitMap=NULL;
+		SVReco *_vertexer=NULL;
 		std::string _fname;
-		TFile *_file;
-		TTree *_tree;
+		TFile *_file=NULL;
+		TTree *_tree=NULL;
 
 		bool hasNodePointers()const;
 		void process_recoTracks(PHCompositeNode *topNode);
@@ -58,16 +58,17 @@ class RecoConversionEval : public SubsysReco {
 		 * also need to check the approach distance
 		 */
 		bool hitCuts(SvtxTrack* t1, SvtxTrack* t2)const ;
-		bool vtxCuts(SvtxVertex* vtx);
+		bool vtxCuts(genfit::GFRaveVertex* vtxCan, SvtxTrack* t1, SvtxTrack *t2);
 		//!track must be closer in RZ space to the vtx than the cut
 		bool vtxTrackRZCut(TVector3 recoVertPos, SvtxTrack* track);
 		//!track must be closer in RPhi space to the vtx than the cut
 		bool vtxTrackRPhiCut(TVector3 recoVertPos, SvtxTrack* track);
 		//! vtx radius must be greater than the cut
-		bool vtxRadiusCut(TVector3 recoVertPos)
+		bool vtxRadiusCut(TVector3 recoVertPos);
 		/* cut on the distance between the closest point between the two tracks*/
 		bool approachDistance(SvtxTrack *t1,SvtxTrack* t2)const;
 		// I want these to be static constexpr
+    // TODO confirm these numbers
 		unsigned int _kNSiliconLayer=7;
 		float _kEMProbCut=.5;
 		float _kPolarCut=.1;
@@ -75,6 +76,11 @@ class RecoConversionEval : public SubsysReco {
 		float _kFirstHitStrict=1;
 		float _kTrackPtCut=.4; //MeV
 		double _kApprochCut=.2;
+    //these are guesses 
+    float _kVtxRPhiCut=.4;
+    float _kVtxRCut=1.;
+    float _kVtxRZCut=.4;
+    float _kVtxChi2Cut=.4;
 
 
 };

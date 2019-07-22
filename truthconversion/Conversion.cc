@@ -248,13 +248,13 @@ float Conversion::vtxTrackRPhi(TVector3 vertpos){
 }
 
 float Conversion::vtxTrackRZ(TVector3 recoVertPos,SvtxTrack *track){
-  float dR = sqrt(recoVertPos.x()*recoVertPos.x()+recoVertPos.y()*recoVertPos.y())-sqrt(track->get_x()*track->get_x()+track->get_y()*track->get_y())
+  float dR = sqrt(recoVertPos.x()*recoVertPos.x()+recoVertPos.y()*recoVertPos.y())-sqrt(track->get_x()*track->get_x()+track->get_y()*track->get_y());
   float dZ = recoVertPos.z()-track->get_z();
   return sqrt(dR*dR+dZ*dZ);
 }
 
 float Conversion::vtxTrackRPhi(TVector3 recoVertPos,SvtxTrack *track){
-  loat vtxR=sqrt(recoVertPos.x()*recoVertPos.x()+recoVertPos.y()*recoVertPos.y());
+  float vtxR=sqrt(recoVertPos.x()*recoVertPos.x()+recoVertPos.y()*recoVertPos.y());
   float trackR=sqrt(track->get_x()*track->get_x()+track->get_y()*track->get_y());
   return sqrt(vtxR*vtxR+trackR*trackR-2*vtxR*trackR*cos(recoVertPos.Phi()-track->get_phi()));
 }
