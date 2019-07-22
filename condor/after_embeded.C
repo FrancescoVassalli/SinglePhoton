@@ -1,3 +1,9 @@
+#include <fun4all/Fun4AllServer.h>
+#include <fun4all/Fun4AllDstInputManager.h>
+#include "TruthConversionEval.h"
+
+R__LOAD_LIBRARY(libfun4all.so)
+R__LOAD_LIBRARY(libtruthconversion.so)
 int after_embeded( std::string infile = "XjPhi3_pT5_98_dst.root",std::string outfile)
 {
   
@@ -16,12 +22,14 @@ int after_embeded( std::string infile = "XjPhi3_pT5_98_dst.root",std::string out
   int verbosity = 0;
   Fun4AllServer *se = Fun4AllServer::instance();
   se->Verbosity(10);
-  recoConsts *rc = recoConsts::instance();
+  //recoConsts *rc = recoConsts::instance();
 
   Fun4AllInputManager *hitsin = new Fun4AllDstInputManager("DSTin");
   hitsin->fileopen( infile );
   se->registerInputManager(hitsin);
   
+  TruthConversionEval *truther = new TruthConversionEval(outfile,runNumber,2,3,true);
+  se->registerSubsystem(truther);
   RecoConversionEval *rCE = new RecoConversionEval(outfile);
   se->registerSubsystem( rCE );
 

@@ -24,7 +24,7 @@ Rank		= CPU_Speed
 
 # Jobs with higher numerical priority will run before jobs 
 # with lower numerical priority (-20 to 20).
-Priority        = +19
+Priority        = +10
 
 # Used to give jobs a directory with respect to file input 
 # and output.
@@ -46,7 +46,7 @@ Log          = /direct/phenix+u/vassalli/sphenix/single/condor_logs/log.p.$(Proc
 Notify_user     = frva5829@colorado.edu
 
 
-request_memory = 0M
+request_memory = 3000M
 # This should be the last command and tells condor to queue the
 # job.  If a number is placed after the command (i.e. Queue 15)
 # then the job will be submitted N times.  Use the $(Process)
