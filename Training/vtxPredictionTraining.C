@@ -32,25 +32,26 @@ void makeFactory(TTree* signalTree,std::string outfile,std::string factoryname)
   using namespace TMVA;
   TString jobname(factoryname.c_str());
   TFile *targetFile = new TFile(outfile.c_str(),"RECREATE");
-  Factory *factory = new Factory(jobname,targetFile,"AnalysisType:Regression");
-  factory->AddRegressionTree(signalTree,1.0);
-  factory->AddVariable("track1_pt",'F');
-  factory->AddVariable("track2_pt",'F');
-  factory->AddVariable("track1_phi",'F');
-  factory->AddVariable("track2_phi",'F');
-  factory->AddVariable("track1_eta",'F');
-  factory->AddVariable("track2_eta",'F');
-  factory->AddTarget("vtx_radius","radius","[cm]");
-  //factory->AddTarget("vtx_eta","#eta");
-  //factory->AddTarget("vtx_phi","#phi"); //maybe I can use the SVR to populate these values as inputs
+  Factory *factory = new Factory(jobname,targetFile,"AnalysisType=Regression");
+  DataLoader *loader = new DataLoader();
+  loader->AddRegressionTree(signalTree,1.0);
+  loader->AddVariable("track1_pt",'F');
+  loader->AddVariable("track2_pt",'F');
+  loader->AddVariable("track1_phi",'F');
+  loader->AddVariable("track2_phi",'F');
+  loader->AddVariable("track1_eta",'F');
+  loader->AddVariable("track2_eta",'F');
+  loader->AddVariable("vtx_eta",'F',"#eta");
+  loader->AddVariable("vtx_phi",'F',"#phi"); 
+  loader->AddTarget("vtx_radius","radius","[cm]");
 
-  string track_pT_cut = "track1_pT>0&&track2_pT>0";
+  //string track_pT_cut = "track1_pT>0&&track2_pT>0";
 
   //string vtx_radius_cut = "vtx_radius>0"; //can I cut based on label?
-  string tCutInitializer = track_pT_cut;
+  string tCutInitializer = "";
   TCut preTraingCuts(tCutInitializer.c_str());
-  factory->PrepareTrainingAndTestTree(preTraingCuts,"nTrain_Regression=0:nTest_Regression=0");
-  factory->BookMethod(Types::kMLP,"MLP_ANN","HiddenLayers=1000");
+  loader->PrepareTrainingAndTestTree(preTraingCuts,"nTrain_Regression=0:nTest_Regression=0");
+  factory->BookMethod(loader,Types::kMLP,"MLP_ANN","HiddenLayers=5");
 
   
   factory->TrainAllMethods();
@@ -72,4 +73,5 @@ int vtxPredictionTraining(){
   makeFactory(signalTree,outname,"vtxFactory");
 /*  outname="cutTrainE.root";
   makeFactory(signalTree,backETree,outname,"eback");*/
+  return 0;
 }
