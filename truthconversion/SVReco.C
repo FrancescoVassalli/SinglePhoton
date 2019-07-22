@@ -254,12 +254,20 @@ genfit::GFRaveVertex* SVReco::findSecondaryVertex(SvtxTrack* track1, SvtxTrack* 
 
 SVReco::~SVReco(){
   cout<<PHWHERE<<"delete"<<endl;
-  delete _fitter;
-  delete _vertex_finder;
+  if(_fitter){
+    delete _fitter;
+    _fitter=NULL;
+  }
+  if(_vertex_finder){
+    delete _vertex_finder;
+    _vertex_finder=NULL;
+  }
 //  if(_primvertex) delete _primvertex;
   for (std::vector<PHGenFit::Track*>::iterator i = _main_rf_phgf_tracks.begin(); i != _main_rf_phgf_tracks.end(); ++i)
   {
+    if(*i)
     delete *i;
+    *i=NULL;
   }
 }
 

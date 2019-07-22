@@ -19,7 +19,7 @@ int cluster_burner( std::string infile = "XjPhi3_pT5_98_dst.root",std::string ou
   gSystem->Load("libcalotrigger.so");
   gSystem->Load("libtruthconversion.so");
 
-  int verbosity = 10;
+  int verbosity = 0;
   Fun4AllServer *se = Fun4AllServer::instance();
   se->Verbosity(verbosity);
   //recoConsts *rc = recoConsts::instance();

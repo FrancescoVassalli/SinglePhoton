@@ -37,9 +37,6 @@ RecoConversionEval::RecoConversionEval(const std::string &name) :
 {}
 
 RecoConversionEval::~RecoConversionEval(){
-  if(_allTracks) delete _allTracks;
-  if(_mainClusterContainer) delete _mainClusterContainer;
-  if(_hitMap) delete _hitMap;
   if(_vertexer) delete _vertexer;
 }
 
@@ -154,13 +151,15 @@ bool RecoConversionEval::vtxTrackRPhiCut(TVector3 recoVertPos, SvtxTrack* track)
 }
 
 bool RecoConversionEval::vtxRadiusCut(TVector3 recoVertPos){
-	return sqrt(recoVertPos.x()*recoVertPos.x()+recoVertPos.y()*recoVertPos.y()) > _kVtxRCut;
+  return sqrt(recoVertPos.x()*recoVertPos.x()+recoVertPos.y()*recoVertPos.y()) > _kVtxRCut;
 }
 
 int RecoConversionEval::End(PHCompositeNode *topNode) {
-  _file->Write();
-  _file->Close();
-	return Fun4AllReturnCodes::EVENT_OK;
+  if(_file){
+    _file->Write();
+    _file->Close();
+  }
+  return Fun4AllReturnCodes::EVENT_OK;
 }
 
 bool RecoConversionEval::approachDistance(SvtxTrack *t1,SvtxTrack* t2)const{
