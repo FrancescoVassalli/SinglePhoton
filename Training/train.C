@@ -42,16 +42,15 @@ void makeFactory(TTree* signalTree, TTree* backTree,std::string outfile,std::str
   factory->AddVariable("track_dlayer",'I');
   factory->AddVariable("track_layer",'I');
   factory->AddVariable("track_pT",'F');
-//  factory->AddVariable("approach_dist",'F');
+  factory->AddVariable("track_dca",'F');
+//  factory->AddVariable("approach_dist",'F'); //idk why this is off
   factory->AddVariable("vtx_radius",'F');
-  //factory->AddVariable("vtx_chi2",'F'); //until reco vtx works this is meaningless
-  factory->AddVariable("vtxTrack_dist",'F');
+  factory->AddVariable("vtx_chi2",'F'); 
+  factory->AddVariable("vtxTrackRZ_dist",'F');
+  factory->AddVariable("vtxTrackRPhi_dist",'F');
   //factory->AddVariable("photon_m",'F');
   //factory->AddVariable("photon_pT",'F');
   factory->AddVariable("cluster_prob",'F');
-
-  factory->AddSpectator("vtx_chi2",'F'); //until reco vtx works this is meaningless
-
 
   string track_pT_cut = "track_pT>0";
   string vtx_radius_cut = "vtx_radius>0";
