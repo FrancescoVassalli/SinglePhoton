@@ -32,7 +32,7 @@ void makeFactory(TTree* signalTree, TTree* backTree,std::string outfile,std::str
   using namespace TMVA;
   TString jobname(factoryname.c_str());
   TFile *targetFile = new TFile(outfile.c_str(),"RECREATE");
-  Factory *factory = new Factory(jobname,targetFile);
+  Factory *factory = new Factory(jobname,targetFile,"Correlations=True");
   DataLoader *loader = new DataLoader();
   loader->AddSignalTree(signalTree,1.0);
   loader->AddBackgroundTree(backTree,1.0);
@@ -43,12 +43,12 @@ void makeFactory(TTree* signalTree, TTree* backTree,std::string outfile,std::str
   /*loader->AddVariable("track_dlayer",'I');
   loader->AddVariable("track_layer",'I');*/
   loader->AddVariable("track_pT",'F');
-  loader->AddVariable("track_dca",'F');
-//  loader->AddVariable("approach_dist",'F'); //idk why this is off
+  //loader->AddVariable("track_dca",'F');
+  loader->AddVariable("approach_dist",'F'); //idk why this is off
   loader->AddVariable("vtx_radius",'F');
   loader->AddVariable("vtx_chi2",'F'); 
   //loader->AddVariable("vtxTrackRZ_dist",'F');
-  loader->AddVariable("abs(vtxTrackRPhi_dist-vtxTrackRZ_dist)",'F',"space diff");
+  //loader->AddVariable("abs(vtxTrackRPhi_dist-vtxTrackRZ_dist)",'F',"space diff");
   //loader->AddVariable("photon_m",'F');
   //loader->AddVariable("photon_pT",'F');
   loader->AddVariable("cluster_prob",'F');
