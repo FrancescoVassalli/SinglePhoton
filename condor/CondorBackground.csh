@@ -1,26 +1,26 @@
 #!/bin/csh 
 @ p = ( ${1} )
-@ p = $p + 100
 #
-set OUT_LOCATION="/sphenix/user/vassalli/gammasample/background/"
-set OUT_FILE=${OUT_LOCATION}fourembededonlineanalysis${p}.root
-set IN_FILE=${OUT_LOCATION}fourembededout${p}.root
-set PYTHIA_FILE="/sphenix/user/vassalli/gammasample/pythiahep.dat"
+set OUT_LOCATION="/sphenix/user/vassalli/gammasample/"
+set OUT_FILE=conversionembededonlineanalysis${p}.root
+set IN_FILE=conversionembededout${p}.root
+#set HI_FILE="/sphenix/user/vassalli/gammasample/pythiahep${p}.dat.dat"
 #
-set SCRATCH_AREA="$_CONDOR_SCRATCH_DIR/fran_photons"                                                                                                              
+set SCRATCH_AREA="$_CONDOR_SCRATCH_DIR/fran_embed_photons${p}"                                                                                                              
 #
 set SOURCE_PHOTONMAKER="/direct/phenix+u/vassalli/sphenix/single/gen/*"
-set BURNER="condor/cluster_burner.C"
+set BURNER="condor/after_embeded.C"
 #
 source /phenix/u/vassalli/.cshrc
 mkdir $SCRATCH_AREA
 cp  $SOURCE_PHOTONMAKER $SCRATCH_AREA
 cp $BURNER $SCRATCH_AREA
+cp truthconversion/* $SCRATCH_AREA
 #
 cd $SCRATCH_AREA
-root -b -q Fun4All_G4_sPHENIX.C\(200,\"$IN_FILE\",\"$PYTHIA_FILE\"\) 
-root -b -q cluster_burner.C\(\"$IN_FILE\",\"$OUT_FILE\",$p\)
-#
-rm -rf $SCRATCH_AREA
+root -b -q Fun4All_G4_sPHENIX.C\(100,\"$IN_FILE\",\"$PYTHIA_FILE\"\) 
+cp -f $IN_FILE $OUT_LOCATION$IN_FILE
+root -b -q after_embeded.C\(\"$IN_FILE\",\"$OUT_FILE\"\)
+cp $OUT_FILE $OUT_LOCATION$OUT_FILE
 #
 exit 0
