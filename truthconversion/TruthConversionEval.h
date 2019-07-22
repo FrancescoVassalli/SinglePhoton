@@ -56,7 +56,7 @@ class TruthConversionEval: public SubsysReco
     const RawClusterContainer* getClusters()const;
 
   private:
-    void doNodePointers(PHCompositeNode* topNode);
+    bool doNodePointers(PHCompositeNode* topNode);
     /** helper function for process_event
      * fills the member fields with information from the conversions 
      * finds the clusters associated with the conversions

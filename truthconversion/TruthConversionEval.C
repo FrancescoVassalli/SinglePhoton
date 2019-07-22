@@ -34,6 +34,8 @@
 #include <GenFit/StateOnPlane.h>
 #include <GenFit/Track.h>
 
+#include <fun4all/Fun4AllReturnCodes.h>
+
 #include <TFile.h>
 #include <TTree.h>
 #include <TLorentzVector.h>
@@ -165,7 +167,8 @@ int TruthConversionEval::InitRun(PHCompositeNode *topNode)
   return 0;
 }
 
-void TruthConversionEval::doNodePointers(PHCompositeNode* topNode){
+bool TruthConversionEval::doNodePointers(PHCompositeNode* topNode){
+  bool goodPointers=true;
   _mainClusterContainer = findNode::getClass<RawClusterContainer>(topNode,"CLUSTER_CEMC");
   _truthinfo = findNode::getClass<PHG4TruthInfoContainer>(topNode,"G4TruthInfo");
   _clusterMap = findNode::getClass<TrkrClusterContainer>(topNode, "TRKR_CLUSTER");
@@ -186,19 +189,18 @@ void TruthConversionEval::doNodePointers(PHCompositeNode* topNode){
       cerr<<"\t SvtxHitMap is bad";
     }*/
     cerr<<endl;
+    goodPointers=false;
   }
+  return goodPointers;
 }
 
 int TruthConversionEval::process_event(PHCompositeNode *topNode)
 {
-  doNodePointers(topNode);
-  cout<<"did nodes"<<endl;
+  if(doNodePointers(topNode)) return Fun4AllReturnCodes::ABORTEVENT;
   _vertexer->InitEvent(topNode);
-  cout<<"made vertexer"<<endl;
   _conversionClusters.Reset(); //clear the list of conversion clusters
   PHG4TruthInfoContainer::Range range = _truthinfo->GetParticleRange(); //look at all truth particles
   SvtxEvalStack *stack = new SvtxEvalStack(topNode); //truth tracking info
-  cout<<"made track eval"<<endl;
   SvtxTrackEval* trackeval = stack->get_track_eval();
   if (!trackeval)
   {
@@ -214,7 +216,6 @@ int TruthConversionEval::process_event(PHCompositeNode *topNode)
   unsigned int hbackmod=0;
   unsigned int ebacki=0;
   unsigned int ebackmod=0;
-  cout<<"enter truth particle loop"<<endl;
   for ( PHG4TruthInfoContainer::ConstIterator iter = range.first; iter != range.second; ++iter ) {
 //    PHG4Particlev2* g4particle = dynamic_cast<PHG4Particlev2*> (iter->second); 
     PHG4Particle* g4particle = iter->second;
@@ -313,7 +314,6 @@ int TruthConversionEval::process_event(PHCompositeNode *topNode)
       }//has track
     }//make tree
   }//truth particle loop
-  cout<<"exit truth loop"<<endl;
   //pass the map to this helper method which fills the fields for the TTree 
   numUnique(&mapConversions,trackeval,_mainClusterContainer);
   //std::queue<std::pair<int,int>> missingChildren= numUnique(&vtxList,&mapConversions,trackeval,mainClusterContainer);
@@ -350,7 +350,6 @@ std::queue<std::pair<int,int>> TruthConversionEval::numUnique(std::map<int,Conve
     temp=i->second.getElectron(); //set the first child 
     tlv_electron.SetPxPyPzE(temp->get_px(),temp->get_py(),temp->get_pz(),temp->get_e());
     if(_kMakeTTree){//fill tree values
-      cout<<"numUnique filling tree"<<endl;
       _b_rVtx[_b_nVtx] = sqrt(vtx->get_x()*vtx->get_x()+vtx->get_y()*vtx->get_y()); //find the radius
       _b_parent_pt[_b_nVtx] =tlv_photon.Pt();
       _b_parent_phi[_b_nVtx]=tlv_photon.Phi();

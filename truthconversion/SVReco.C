@@ -126,13 +126,13 @@ int SVReco::InitEvent(PHCompositeNode *topNode) {
   //the priamry vetex
   _primvertex = _vertexmap->get(0);
   cout<<"starting track loop with vertex:\n";
-  if (_primvertex)
+  /*if (_primvertex)
   {
     _primvertex->identify();
   }
   else{
     cout<<"NULL"<<endl;
-  }
+  }*/
 
   //iterate over all tracks to find priary vertex and make rave/genfit objects
   for (SvtxTrackMap::Iter iter = _trackmap->begin(); iter != _trackmap->end();
@@ -174,7 +174,7 @@ int SVReco::InitEvent(PHCompositeNode *topNode) {
       _main_rf_phgf_tracks.push_back(rf_phgf_track); //to be used by findSecondaryVerticies
     }
   }
-  cout<<"exit track loop ntracks="<<_main_rf_phgf_tracks.size()<<endl;
+  cout<<"exit track loop ntracks="<<_main_rf_phgf_tracks.size()<<'\n';
 
   return Fun4AllReturnCodes::EVENT_OK;
 }
@@ -210,7 +210,6 @@ int SVReco::InitRun(PHCompositeNode *topNode) {
 genfit::GFRaveVertex* SVReco::findSecondaryVertex(SvtxTrack* track1, SvtxTrack* track2) {
   //_vertex_finder->setMethod("avr-smoothing:1");
   _vertex_finder->setMethod("avr");
-  cout<<PHWHERE<<" here"<<endl;
   //_vertex_finder->setMethod("avf-smoothing:1");
   //_vertex_finder->setMethod("kalman");
   vector<genfit::GFRaveVertex*> rave_vertices_conversion;
@@ -223,17 +222,16 @@ genfit::GFRaveVertex* SVReco::findSecondaryVertex(SvtxTrack* track1, SvtxTrack* 
     PHGenFit::Track* rf_phgf_track = _main_rf_phgf_tracks[trk_index];
     rf_gf_tracks_conversion.push_back(rf_phgf_track->getGenFitTrack());
     //check the genfit track is working
-    cout<<"Track Comparison Original:\n";
-    track1->identify();
+    /*cout<<"Track Comparison Original:\n";
+    track1->identify();*/
     printGenFitTrackKinematics(rf_phgf_track);
 
     trk_index = _svtxtrk_gftrk_map[track2->get_id()];
     rf_phgf_track = _main_rf_phgf_tracks[trk_index];
-    track2->identify();
+//    track2->identify();
     printGenFitTrackKinematics(rf_phgf_track);
     rf_gf_tracks_conversion.push_back(rf_phgf_track->getGenFitTrack());
   }
-  cout<<rf_gf_tracks_conversion.size()<<endl;
   if (rf_gf_tracks_conversion.size()>1){
     try{
       _vertex_finder->findVertices(&rave_vertices_conversion, rf_gf_tracks_conversion);
@@ -247,11 +245,11 @@ genfit::GFRaveVertex* SVReco::findSecondaryVertex(SvtxTrack* track1, SvtxTrack* 
             track2->identify();
             cout<<"\n\n\n\n\n";
             }*/
-    return rave_vertices_conversion[0];
-  }
-  else{
-    return NULL;
-  }
+    //if a conversion is found 
+    if(rave_vertices_conversion.size()>0) return rave_vertices_conversion[0];
+    else return NULL;
+  }//more than 1 track 
+  else return NULL;
 }
 
 SVReco::~SVReco(){
