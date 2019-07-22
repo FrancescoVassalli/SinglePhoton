@@ -63,10 +63,10 @@ void makeFactory(TTree* signalTree,std::string outfile,std::string factoryname)
 
 int vtxPredictionTraining(){
   using namespace std;
-  string treePath = "/sphenix/user/vassalli/gammasample/background/fourembededonlineanalysis";
+  string treePath = "/sphenix/user/vassalli/gammasample/conversiononlineanalysis";
   string treeExtension = ".root";
   string outname = "vtxTrain.root";
-  unsigned int nFiles=100;
+  unsigned int nFiles=200;
 
   TChain *signalTree = handleFile(treePath,treeExtension,"vtxingTree",nFiles);
   makeFactory(signalTree,outname,"vtxFactory");

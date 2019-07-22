@@ -86,10 +86,10 @@ void makeFactory(TTree* signalTree, TTree* backTree,std::string outfile,std::str
 
 int train(){
   using namespace std;
-  string treePath = "/sphenix/user/vassalli/gammasample/background/fourembededonlineanalysis";
+  string treePath = "/sphenix/user/vassalli/gammasample/conversiononlineanalysis";
   string treeExtension = ".root";
   string outname = "cutTrainA.root";
-  unsigned int nFiles=100;
+  unsigned int nFiles=200;
 
   TChain *signalTree = handleFile(treePath,treeExtension,"cutTreeSignal",nFiles);
   TChain *backHTree = handleFile(treePath,treeExtension,"cutTreeBackh",nFiles);
