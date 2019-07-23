@@ -37,10 +37,10 @@ void makeFactory(TTree* signalTree,std::string outfile,std::string factoryname)
   loader->AddRegressionTree(signalTree,1.0);
   loader->AddVariable("track1_pt",'F');
   loader->AddVariable("track2_pt",'F');
-  loader->AddVariable("track1_phi",'F');
-  loader->AddVariable("track2_phi",'F');
-  loader->AddVariable("track1_eta",'F');
-  loader->AddVariable("track2_eta",'F');
+  //loader->AddVariable("track1_phi",'F');
+  //loader->AddVariable("track2_phi",'F');
+  //loader->AddVariable("track1_eta",'F');
+  //loader->AddVariable("track2_eta",'F');
   loader->AddVariable("vtx_eta",'F',"#eta");
   loader->AddVariable("vtx_phi",'F',"#phi"); 
   loader->AddTarget("vtx_radius","radius","[cm]");
@@ -51,7 +51,8 @@ void makeFactory(TTree* signalTree,std::string outfile,std::string factoryname)
   string tCutInitializer = "";
   TCut preTraingCuts(tCutInitializer.c_str());
   loader->PrepareTrainingAndTestTree(preTraingCuts,"nTrain_Regression=0:nTest_Regression=0");
-  factory->BookMethod(loader,Types::kMLP,"MLP_ANN","HiddenLayers=5");
+  factory->BookMethod(loader,Types::kMLP,"MLP_ANN","HiddenLayers=2000");
+  factory->BookMethod(loader,Types::kMLP,"MLP_ANN2","HiddenLayers=500,6");
 
   
   factory->TrainAllMethods();
