@@ -29,9 +29,9 @@ TChain* handleFile(string name, string extension, string treename, int filecount
 
 void makeFactory(TTree* signalTree, TTree* backTree,std::string outfile,std::string factoryname, TTree* bgTree2=NULL)
 {
+  TFile *targetFile = new TFile(outfile.c_str(),"RECREATE");
   using namespace TMVA;
   TString jobname(factoryname.c_str());
-  TFile *targetFile = new TFile(outfile.c_str(),"RECREATE");
   Factory *factory = new Factory(jobname,targetFile,"Correlations=True");
   DataLoader *loader = new DataLoader("dataloader");
   loader->AddSignalTree(signalTree,1.0);

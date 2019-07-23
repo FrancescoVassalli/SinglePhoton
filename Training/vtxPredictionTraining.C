@@ -41,8 +41,8 @@ void makeFactory(TTree* signalTree,std::string outfile,std::string factoryname)
   //loader->AddVariable("track2_phi",'F');
   //loader->AddVariable("track1_eta",'F');
   //loader->AddVariable("track2_eta",'F');
-  loader->AddVariable("vtx_eta",'F',"#eta");
-  loader->AddVariable("vtx_phi",'F',"#phi"); 
+  loader->AddVariable("vtx_eta","#eta");
+  loader->AddVariable("vtx_phi","#phi"); 
   loader->AddTarget("vtx_radius","radius","[cm]");
 
   //string track_pT_cut = "track1_pT>0&&track2_pT>0";
