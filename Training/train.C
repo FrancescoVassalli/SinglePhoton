@@ -52,7 +52,7 @@ void makeFactory(TTree* signalTree, TTree* backTree,std::string outfile,std::str
   //factory->AddVariable("photon_pT",'F');
   factory->AddVariable("cluster_prob",'F');
 
-  string track_pT_cut = "track_pT>0";
+  string track_pT_cut = "track_pT>0.4";
   string vtx_radius_cut = "vtx_radius>0";
   string em_prob_cut = "cluster_prob>=0";
   //do I need photon cuts? 
