@@ -20,7 +20,7 @@ int after_embeded( std::string infile = "XjPhi3_pT5_98_dst.root",std::string out
 //  gSystem->Load("libConvertedPhotonReconstructor.so");
  // gSystem->Load("libtreemaker.so");
 
-  int verbosity = 10;
+  int verbosity = 0;
   Fun4AllServer *se = Fun4AllServer::instance();
   se->Verbosity(verbosity);
   //recoConsts *rc = recoConsts::instance();
