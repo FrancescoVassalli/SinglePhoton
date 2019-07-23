@@ -56,7 +56,7 @@ void makeFactory(TTree* signalTree, TTree* backTree,std::string outfile,std::str
   string vtx_radius_cut = "vtx_radius>0";
   string em_prob_cut = "cluster_prob>=0";
   //do I need photon cuts? 
-  string tCutInitializer = em_prob_cut+"&&"+ vtx_radius_cut+"&&"+track_pT_cut+"&&track_dlayer>=0&&track_layer>=0&&approach_dist>0&&vtxTrack_dist>0&&photon_m>0&&photon_pT>0";
+  string tCutInitializer = em_prob_cut+"&&"+ vtx_radius_cut+"&&"+track_pT_cut+"&&track_dlayer>=0&&track_layer>=0&&approach_dist>0&&vtxTrackRZ_dist>0&&photon_m>0&&photon_pT>0";
   TCut preTraingCuts(tCutInitializer.c_str());
 
 
@@ -85,10 +85,10 @@ void makeFactory(TTree* signalTree, TTree* backTree,std::string outfile,std::str
 
 int train(){
   using namespace std;
-  string treePath = "/sphenix/user/vassalli/gammasample/conversiononlineanalysis";
+  string treePath = "/sphenix/user/vassalli/gammasample/conversionembededonlineanalysis";
   string treeExtension = ".root";
   string outname = "cutTrainA.root";
-  unsigned int nFiles=200;
+  unsigned int nFiles=100;
 
   TChain *signalTree = handleFile(treePath,treeExtension,"cutTreeSignal",nFiles);
   TChain *backHTree = handleFile(treePath,treeExtension,"cutTreeBackh",nFiles);
