@@ -56,7 +56,7 @@ void makeFactory(TTree* signalTree, TTree* backTree,std::string outfile,std::str
   string vtx_radius_cut = "vtx_radius>0";
   string em_prob_cut = "cluster_prob>=0";
   //do I need photon cuts? 
-  string tCutInitializer = track_pT_cut+"&&track_layer>=0";
+  string tCutInitializer = track_pT_cut+"&&track_layer>=0&&"+em_prob_cut;
   TCut preTraingCuts(tCutInitializer.c_str());
 
 
