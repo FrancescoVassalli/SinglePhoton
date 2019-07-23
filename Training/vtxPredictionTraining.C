@@ -32,27 +32,25 @@ void makeFactory(TTree* signalTree,std::string outfile,std::string factoryname)
   using namespace TMVA;
   TString jobname(factoryname.c_str());
   TFile *targetFile = new TFile(outfile.c_str(),"RECREATE");
-  Factory *factory = new Factory(jobname,targetFile,"AnalysisType=Regression");
-  DataLoader *loader = new DataLoader();
-  loader->AddRegressionTree(signalTree,1.0);
-  loader->AddVariable("track1_pt",'F');
-  loader->AddVariable("track2_pt",'F');
-  //loader->AddVariable("track1_phi",'F');
-  //loader->AddVariable("track2_phi",'F');
-  //loader->AddVariable("track1_eta",'F');
-  //loader->AddVariable("track2_eta",'F');
-  loader->AddVariable("vtx_eta","#eta");
-  loader->AddVariable("vtx_phi","#phi"); 
-  loader->AddTarget("vtx_radius","radius","[cm]");
+  Factory *factory = new Factory(jobname,targetFile,"AnalysisType:Regression");
+  factory->AddRegressionTree(signalTree,1.0);
+  factory->AddVariable("track1_pt",'F');
+  factory->AddVariable("track2_pt",'F');
+  factory->AddVariable("track1_phi",'F');
+  factory->AddVariable("track1_phi-track2_phi","d#phi");
+  factory->AddVariable("track1_eta",'F');
+  factory->AddVariable("track1_eta-track2_eta","d#eta");
+  factory->AddVariable("vtx_radius","radius","[cm]");
+  factory->AddTarget("tvtx_radius","radius","[cm]");
 
-  //string track_pT_cut = "track1_pT>0&&track2_pT>0";
+  string track_pT_cut = "track1_pT>0&&track2_pT>0";
 
   //string vtx_radius_cut = "vtx_radius>0"; //can I cut based on label?
-  string tCutInitializer = "";
+  string tCutInitializer = track_pT_cut;
   TCut preTraingCuts(tCutInitializer.c_str());
-  loader->PrepareTrainingAndTestTree(preTraingCuts,"nTrain_Regression=0:nTest_Regression=0");
-  factory->BookMethod(loader,Types::kMLP,"MLP_ANN","HiddenLayers=2000");
-  factory->BookMethod(loader,Types::kMLP,"MLP_ANN2","HiddenLayers=500,6");
+  factory->PrepareTrainingAndTestTree(preTraingCuts,"nTrain_Regression=0:nTest_Regression=0");
+  factory->BookMethod(Types::kMLP,"MLP_ANN","HiddenLayers=2000");
+  factory->BookMethod(Types::kMLP,"MLP_ANN2","HiddenLayers=500,6");
 
   
   factory->TrainAllMethods();
@@ -74,5 +72,4 @@ int vtxPredictionTraining(){
   makeFactory(signalTree,outname,"vtxFactory");
 /*  outname="cutTrainE.root";
   makeFactory(signalTree,backETree,outname,"eback");*/
-  return 0;
 }
