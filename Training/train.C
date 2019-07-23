@@ -33,7 +33,7 @@ void makeFactory(TTree* signalTree, TTree* backTree,std::string outfile,std::str
   TString jobname(factoryname.c_str());
   TFile *targetFile = new TFile(outfile.c_str(),"RECREATE");
   Factory *factory = new Factory(jobname,targetFile,"Correlations=True");
-  DataLoader *loader = new DataLoader();
+  DataLoader *loader = new DataLoader("dataloader");
   loader->AddSignalTree(signalTree,1.0);
   loader->AddBackgroundTree(backTree,1.0);
   if(bgTree2){
@@ -82,7 +82,6 @@ void makeFactory(TTree* signalTree, TTree* backTree,std::string outfile,std::str
   factory->TrainAllMethods();
   factory->TestAllMethods();
   factory->EvaluateAllMethods();
-  targetFile->Write();
   targetFile->Close();
 }
 
@@ -92,7 +91,7 @@ int train(){
   string treePath = "/sphenix/user/vassalli/gammasample/conversionembededonlineanalysis";
   string treeExtension = ".root";
   string outname = "cutTrainA.root";
-  unsigned int nFiles=200;
+  unsigned int nFiles=100;
 
   TChain *signalTree = handleFile(treePath,treeExtension,"cutTreeSignal",nFiles);
   TChain *backHTree = handleFile(treePath,treeExtension,"cutTreeBackh",nFiles);
