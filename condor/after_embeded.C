@@ -31,8 +31,8 @@ int after_embeded( std::string infile = "XjPhi3_pT5_98_dst.root",std::string out
   
   TruthConversionEval *truther = new TruthConversionEval(outfile,runNumber,2,3,true);
   se->registerSubsystem(truther);
-  RecoConversionEval *rCE = new RecoConversionEval(outfile);
-  se->registerSubsystem( rCE );
+  /*RecoConversionEval *rCE = new RecoConversionEval(outfile);
+  se->registerSubsystem( rCE );*/
 
   se->run();
   se->End();

@@ -40,17 +40,17 @@ void makeFactory(TTree* signalTree, TTree* backTree,std::string outfile,std::str
     loader->AddBackgroundTree(bgTree2,1.0);
   }
   loader->AddVariable("track_deta",'F');
-  /*loader->AddVariable("track_dlayer",'I');
-  loader->AddVariable("track_layer",'I');*/
+  loader->AddVariable("track_dlayer",'I');
+  loader->AddVariable("track_layer",'I');
   loader->AddVariable("track_pT",'F');
   //loader->AddVariable("track_dca",'F');
   loader->AddVariable("approach_dist",'F'); //idk why this is off
   loader->AddVariable("vtx_radius",'F');
   loader->AddVariable("vtx_chi2",'F'); 
-  //loader->AddVariable("vtxTrackRZ_dist",'F');
+  loader->AddVariable("vtxTrackRZ_dist",'F');
   //loader->AddVariable("abs(vtxTrackRPhi_dist-vtxTrackRZ_dist)",'F',"space diff");
   //loader->AddVariable("photon_m",'F');
-  //loader->AddVariable("photon_pT",'F');
+  loader->AddVariable("photon_pT",'F');
   loader->AddVariable("cluster_prob",'F');
 
   string track_pT_cut = "track_pT>0";
@@ -89,7 +89,7 @@ void makeFactory(TTree* signalTree, TTree* backTree,std::string outfile,std::str
 
 int train(){
   using namespace std;
-  string treePath = "/sphenix/user/vassalli/gammasample/conversiononlineanalysis";
+  string treePath = "/sphenix/user/vassalli/gammasample/conversionembededonlineanalysis";
   string treeExtension = ".root";
   string outname = "cutTrainA.root";
   unsigned int nFiles=200;
