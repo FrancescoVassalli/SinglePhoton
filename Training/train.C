@@ -29,44 +29,40 @@ TChain* handleFile(string name, string extension, string treename, int filecount
 
 void makeFactory(TTree* signalTree, TTree* backTree,std::string outfile,std::string factoryname, TTree* bgTree2=NULL)
 {
-  TFile *targetFile = new TFile(outfile.c_str(),"RECREATE");
   using namespace TMVA;
   TString jobname(factoryname.c_str());
-  Factory *factory = new Factory(jobname,targetFile,"Correlations=True");
-  DataLoader *loader = new DataLoader("dataloader");
-  loader->AddSignalTree(signalTree,1.0);
-  loader->AddBackgroundTree(backTree,1.0);
+  TFile *targetFile = new TFile(outfile.c_str(),"RECREATE");
+  Factory *factory = new Factory(jobname,targetFile);
+  factory->AddSignalTree(signalTree,1.0);
+  factory->AddBackgroundTree(backTree,1.0);
   if(bgTree2){
-    loader->AddBackgroundTree(bgTree2,1.0);
+    factory->AddBackgroundTree(bgTree2,1.0);
   }
-  loader->AddVariable("track_deta",'F');
-  loader->AddVariable("track_dlayer",'I');
-  loader->AddVariable("track_layer",'I');
-  loader->AddVariable("track_pT",'F');
-  //loader->AddVariable("track_dca",'F');
-  loader->AddVariable("approach_dist",'F'); //idk why this is off
-  loader->AddVariable("vtx_radius",'F');
-  loader->AddVariable("vtx_chi2",'F'); 
-  loader->AddVariable("vtxTrackRZ_dist",'F');
-  //loader->AddVariable("abs(vtxTrackRPhi_dist-vtxTrackRZ_dist)",'F',"space diff");
-  //loader->AddVariable("photon_m",'F');
-  loader->AddVariable("photon_pT",'F');
-  loader->AddVariable("cluster_prob",'F');
+  factory->AddVariable("track_deta",'F');
+  factory->AddVariable("track_dlayer",'I');
+  factory->AddVariable("track_layer",'I');
+  factory->AddVariable("track_pT",'F');
+  factory->AddVariable("track_dca",'F');
+//  factory->AddVariable("approach_dist",'F'); //idk why this is off
+  factory->AddVariable("vtx_radius",'F');
+  factory->AddVariable("vtx_chi2",'F'); 
+  factory->AddVariable("vtxTrackRZ_dist",'F');
+  //factory->AddVariable("vtxTrackRPhi_dist",'F');
+  //factory->AddVariable("photon_m",'F');
+  //factory->AddVariable("photon_pT",'F');
+  factory->AddVariable("cluster_prob",'F');
 
   string track_pT_cut = "track_pT>0";
   string vtx_radius_cut = "vtx_radius>0";
   string em_prob_cut = "cluster_prob>=0";
-  //string layer_cuts = "track_dlayer>=0&&track_layer>=0";
-  string dist_cuts = "vtxTrackRZ_dist>=0&&vtxTrackRPhi_dist>=0&&approach_dist>=0";
   //do I need photon cuts? 
-  string tCutInitializer = em_prob_cut+"&&"+ vtx_radius_cut+"&&"+track_pT_cut+"&&"+dist_cuts;
+  string tCutInitializer = em_prob_cut+"&&"+ vtx_radius_cut+"&&"+track_pT_cut+"&&track_dlayer>=0&&track_layer>=0&&approach_dist>0&&vtxTrack_dist>0&&photon_m>0&&photon_pT>0";
   TCut preTraingCuts(tCutInitializer.c_str());
 
 
-  loader->PrepareTrainingAndTestTree(preTraingCuts,"nTrain_Signal=0:nTrain_Background=0:nTest_Signal=0:nTest_Background=0");
-  factory->BookMethod( loader,TMVA::Types::kLikelihood, "LikelihoodD",
-      "!H:!V:!TransformOutput:PDFInterpol=Spline2:NSmoothSig[0]=20:NSmoothBkg[0]=20:NSmooth=5:NAvEvtPerBin=50:VarTransform=Decorrelate" );
-  factory->BookMethod(loader,Types::kCuts,"Cuts","");
+  factory->PrepareTrainingAndTestTree(preTraingCuts,"nTrain_Signal=0:nTrain_Background=0:nTest_Signal=0:nTest_Background=0");
+  //factory->BookMethod( TMVA::Types::kLikelihood, "LikelihoodD","!H:!V:!TransformOutput:PDFInterpol=Spline2:NSmoothSig[0]=20:NSmoothBkg[0]=20:NSmooth=5:NAvEvtPerBin=50:VarTransform=Decorrelate" );
+  factory->BookMethod(Types::kCuts,"Cuts","");
   /*factory->BookMethod( Types::kKNN, "kNN", "" ); //>100k events
   factory->BookMethod( Types::kPDERS, "PDERS", "" );//>100k events*/
   /*factory->BookMethod( Types::kPDEFoam, "PDEFoam", "VolFrac=.0588i:SigBgSeparate=True" );//>10k events
@@ -82,16 +78,17 @@ void makeFactory(TTree* signalTree, TTree* backTree,std::string outfile,std::str
   factory->TrainAllMethods();
   factory->TestAllMethods();
   factory->EvaluateAllMethods();
+  targetFile->Write();
   targetFile->Close();
 }
 
 
 int train(){
   using namespace std;
-  string treePath = "/sphenix/user/vassalli/gammasample/conversionembededonlineanalysis";
+  string treePath = "/sphenix/user/vassalli/gammasample/conversiononlineanalysis";
   string treeExtension = ".root";
   string outname = "cutTrainA.root";
-  unsigned int nFiles=100;
+  unsigned int nFiles=200;
 
   TChain *signalTree = handleFile(treePath,treeExtension,"cutTreeSignal",nFiles);
   TChain *backHTree = handleFile(treePath,treeExtension,"cutTreeBackh",nFiles);
@@ -99,5 +96,4 @@ int train(){
   makeFactory(signalTree,backHTree,outname,"aback",backETree);
 /*  outname="cutTrainE.root";
   makeFactory(signalTree,backETree,outname,"eback");*/
-  return 0;
 }
