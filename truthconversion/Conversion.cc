@@ -287,6 +287,13 @@ int Conversion::trackDLayer(TrkrClusterContainer* clusterMap){
   }
   else return -1;
 }
+int Conversion::trackDLayer(TrkrClusterContainer* clusterMap,SvtxTrack* reco1, SvtxTrack* reco2){
+    TrkrCluster *c1 = clusterMap->findCluster(*(reco1->begin_cluster_keys()));
+    TrkrCluster *c2 = clusterMap->findCluster(*(reco2->begin_cluster_keys()));
+    unsigned l1 = TrkrDefs::getLayer(c1->getClusKey());
+    unsigned l2 = TrkrDefs::getLayer(c2->getClusKey());
+    return abs(l1-l2);
+}
 
 int Conversion::firstLayer(SvtxClusterMap* svtxClusterMap,SvtxHitMap *hitmap){
   switch(recoCount()){
@@ -425,6 +432,41 @@ float Conversion::trackDEta()const{
     return fabs(reco1->get_eta()-reco2->get_eta());
   }
   else return -1.;
+}
+
+double Conversion::approachDistance(SvtxTrack* reco1, SvtxTrack* reco2){
+    static const double eps = 0.000001;
+    TVector3 u(reco1->get_px(),reco1->get_py(),reco1->get_pz());
+    TVector3 v(reco2->get_px(),reco2->get_py(),reco2->get_pz());
+    TVector3 w(reco1->get_x()-reco2->get_x(),reco1->get_x()-reco2->get_y(),reco1->get_x()-reco2->get_z());
+
+    double a = u.Dot(u);
+    double b = u.Dot(v);
+    double c = v.Dot(v);
+    double d = u.Dot(w);
+    double e = v.Dot(w);
+
+    double D = a*c - b*b;
+    double sc, tc;
+    // compute the line parameters of the two closest points
+    if (D < eps) {         // the lines are almost parallel
+      sc = 0.0;
+      tc = (b>c ? d/b : e/c);   // use the largest denominator
+    }
+    else {
+      sc = (b*e - c*d) / D;
+      tc = (a*e - b*d) / D;
+    }
+    // get the difference of the two closest points
+    u*=sc;
+    v*=tc;
+    w+=u;
+    w-=v;
+    return w.Mag();   // return the closest distance 
+}
+
+float Conversion::trackDEta(SvtxTrack* reco1, SvtxTrack* reco2){
+    return fabs(reco1->get_eta()-reco2->get_eta());
 }
 
 float Conversion::minTrackpT(){

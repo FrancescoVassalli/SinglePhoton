@@ -20,6 +20,7 @@ class PHG4Particle;
 class PHG4VtxPoint;
 class Conversion;
 class SvtxTrackEval;
+class SvtxTrack;
 class SvtxHitMap;
 class SvtxHit;
 class SvtxClusterMap;
@@ -68,6 +69,8 @@ class TruthConversionEval: public SubsysReco
     /** @param map should contain Conversion objects which hold background events i.e. not conversions
      * fills the fields for {@link _backgroundCutTree*/
     void processBackground(std::map<int,Conversion>* map,SvtxTrackEval* trackEval,TTree* tree);
+    void processTrackBackground(std::vector<SvtxTrack*>*v,TrkrClusterContainer*);
+    void processPairBackground(std::vector<SvtxTrack*>*,TrkrClusterContainer*);
 
     int get_embed(PHG4Particle* particle, PHG4TruthInfoContainer* truthinfo) const;
     float vtoR(PHG4VtxPoint* vtx)const;
@@ -82,6 +85,8 @@ class TruthConversionEval: public SubsysReco
     TFile *_f=NULL; ///< output file
     TTree *_tree=NULL; ///< stores most of the data about the conversions
     TTree *_signalCutTree=NULL; ///<signal data for making track pair cuts
+    TTree *_trackBackTree=NULL;///< background for all possible single tracks
+    TTree *_pairBackTree=NULL;///< background for all possible track pairs
     TTree *_vtxingTree=NULL; ///<data for training vtxing
     TTree *_h_backgroundCutTree=NULL; ///<hadronic background data for making track pair cuts
     TTree *_e_backgroundCutTree=NULL; ///<EM background data for making track pair cuts

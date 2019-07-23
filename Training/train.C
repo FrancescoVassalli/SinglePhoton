@@ -38,15 +38,15 @@ void makeFactory(TTree* signalTree, TTree* backTree,std::string outfile,std::str
   if(bgTree2){
     factory->AddBackgroundTree(bgTree2,1.0);
   }
-  factory->AddVariable("track_deta",'F');
-  factory->AddVariable("track_dlayer",'I');
+  //factory->AddVariable("track_deta",'F');
+  //factory->AddVariable("track_dlayer",'I');
   factory->AddVariable("track_layer",'I');
   factory->AddVariable("track_pT",'F');
   factory->AddVariable("track_dca",'F');
 //  factory->AddVariable("approach_dist",'F'); //idk why this is off
-  factory->AddVariable("vtx_radius",'F');
-  factory->AddVariable("vtx_chi2",'F'); 
-  factory->AddVariable("vtxTrackRZ_dist",'F');
+  //factory->AddVariable("vtx_radius",'F');
+  //factory->AddVariable("vtx_chi2",'F'); 
+  //factory->AddVariable("vtxTrackRZ_dist",'F');
   //factory->AddVariable("vtxTrackRPhi_dist",'F');
   //factory->AddVariable("photon_m",'F');
   //factory->AddVariable("photon_pT",'F');
@@ -56,7 +56,7 @@ void makeFactory(TTree* signalTree, TTree* backTree,std::string outfile,std::str
   string vtx_radius_cut = "vtx_radius>0";
   string em_prob_cut = "cluster_prob>=0";
   //do I need photon cuts? 
-  string tCutInitializer = em_prob_cut+"&&"+ vtx_radius_cut+"&&"+track_pT_cut+"&&track_dlayer>=0&&track_layer>=0&&approach_dist>0&&vtxTrackRZ_dist>0&&photon_m>0&&photon_pT>0";
+  string tCutInitializer = track_pT_cut+"track_layer>=0";
   TCut preTraingCuts(tCutInitializer.c_str());
 
 

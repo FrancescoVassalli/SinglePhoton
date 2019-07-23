@@ -93,14 +93,18 @@ class Conversion
 		/** Finds the delta eta of the reco tracks.
 		 * @return -1 if reco tracks are not set */
 		float trackDEta()const;
+		static float trackDEta(SvtxTrack* reco1, SvtxTrack* reco2);
 		/** Finds the delta phi of the reco tracks.
 		 * @return -1 if reco tracks are not set */
 		inline float trackDPhi()const{
 			if (recoCount()==2)
 			{
-				return fabs(reco1->get_phi()-reco2->get_phi());
+				return DeltaPhi(reco1->get_phi(),reco2->get_phi());
 			}
 			else return -1.;
+		}
+		inline static float trackDPhi(SvtxTrack* reco1, SvtxTrack* reco2){
+				return DeltaPhi(reco1->get_phi(),reco2->get_phi());
 		}
 		///@return the minimun reco track pT
 		float minTrackpT();
@@ -149,6 +153,7 @@ class Conversion
 		 * @return -1 if reco tracks are not set*/
 		int trackDLayer(SvtxClusterMap* cmap,SvtxHitMap *hitmap);
 		int trackDLayer(TrkrClusterContainer* );
+		static int trackDLayer(TrkrClusterContainer*,SvtxTrack*,SvtxTrack* );
 		///@return the first layer the associated reco clusters hit
 		int firstLayer(SvtxClusterMap* cmap,SvtxHitMap *hitmap);
 		int firstLayer(TrkrClusterContainer* );
@@ -157,6 +162,7 @@ class Conversion
 		/** distance between two closest points on the reco tracks 
 		 * @return -1 if tracks are not set*/
 		double approachDistance()const;
+		static double approachDistance(SvtxTrack*,SvtxTrack*);
 		///@return distance in xyz space between the vertex and the closest track hit
 		double dist(PHG4VtxPoint* vtx, SvtxClusterMap* cmap);
 		double dist(TVector3* vtx, SvtxClusterMap* cmap);
@@ -169,19 +175,42 @@ class Conversion
 		float vtxTrackRZ(TVector3 vertpos);
 
 		float setRecoVtx(SvtxVertex* recovtx,SvtxClusterMap* cmap);
-		TLorentzVector* setRecoPhoton();
+    TLorentzVector* setRecoPhoton();
 
-	private:
-		PHG4Particle* e1=NULL;
-		PHG4Particle* e2=NULL;
-		PHG4Particle* photon=NULL;
-		PHG4VtxPoint* vtx=NULL;
-		SvtxVertex* recoVtx=NULL;
-		SvtxTrack* reco1=NULL;
-		SvtxTrack* reco2=NULL;
-		SvtxTrackEval* trackeval=NULL;
-		SvtxClusterMap* _svtxClusterMap=NULL;                                                                              
-		SvtxVertex *recoVertex=NULL;
+    /**
+     * Returns the equivalent angle in the range 0 to 2pi.
+     */
+    inline static double InTwoPi (double phi) {
+      while (phi < 0 || 2*TMath::Pi() <= phi) {
+        if (phi < 0) phi += 2*TMath::Pi();
+        else phi -= 2*TMath::Pi();
+      }
+      return phi;
+    }
+
+    /**
+     * Returns the difference between two angles in 0 to pi.
+     */
+    inline static double DeltaPhi (double phi1, double phi2) {
+      phi1 = InTwoPi(phi1);
+      phi2 = InTwoPi(phi2);
+      double dphi = abs(phi1 - phi2);
+      while (dphi > TMath::Pi()) dphi = abs (dphi - 2*TMath::Pi());
+      return dphi;
+    }
+
+
+  private:
+    PHG4Particle* e1=NULL;
+    PHG4Particle* e2=NULL;
+    PHG4Particle* photon=NULL;
+    PHG4VtxPoint* vtx=NULL;
+    SvtxVertex* recoVtx=NULL;
+    SvtxTrack* reco1=NULL;
+    SvtxTrack* reco2=NULL;
+    SvtxTrackEval* trackeval=NULL;
+    SvtxClusterMap* _svtxClusterMap=NULL;                                                                              
+    SvtxVertex *recoVertex=NULL;
 		TLorentzVector *recoPhoton=NULL;
 		static const int _kNSiliconLayer =7; ///<hardcoded 
 		int embedID=0;

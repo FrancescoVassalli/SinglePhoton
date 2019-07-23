@@ -21,6 +21,7 @@
 #include <trackbase_historic/SvtxClusterMap.h>
 #include <trackbase_historic/SvtxCluster.h>*/
 #include <trackbase/TrkrClusterContainer.h>
+#include <trackbase/TrkrCluster.h>
 
 #include <g4eval/SvtxEvalStack.h>
 #include <g4eval/SvtxTrackEval.h>
@@ -111,6 +112,20 @@ int TruthConversionEval::InitRun(PHCompositeNode *topNode)
     _vtxingTree->Branch("track2_pt", &_b_track2_pt,"track2_pt");
     _vtxingTree->Branch("track2_eta",& _b_track2_eta,"track2_eta");
     _vtxingTree->Branch("track2_phi",& _b_track2_phi,"track2_phi");
+
+    _trackBackTree = new TTree("_trackBackTree","track background all single tracks");
+    _trackBackTree->SetAutoSave(300);
+    _trackBackTree->Branch("track_dca", &_bb_track_dca);
+    _trackBackTree->Branch("track_pT",  &_bb_track_pT);
+    _trackBackTree->Branch("track_layer", &_bb_track_layer);
+    _trackBackTree->Branch("cluster_prob", &_bb_cluster_prob);
+
+    _pairBackTree = new TTree("_pairBackTree","pair background all possible combinations");
+    _pairBackTree->SetAutoSave(300);
+    _signalCutTree->Branch("track_deta", &_bb_track_deta);
+    _signalCutTree->Branch("track_dphi", &_bb_track_dphi);
+    _signalCutTree->Branch("track_dlayer",&_bb_track_dlayer);
+    _signalCutTree->Branch("approach_dist", &_bb_approach);
 
     _signalCutTree = new TTree("cutTreeSignal","signal data for making track pair cuts");
     _signalCutTree->SetAutoSave(300);
@@ -213,6 +228,7 @@ int TruthConversionEval::process_event(PHCompositeNode *topNode)
   //h is for hadronic e is for EM
   std::map<int,Conversion> hbackgroundMap;
   std::map<int,Conversion> ebackgroundMap;
+  std::vector<SvtxTrack*> backgroundTracks;
   unsigned int hbacki=0;
   unsigned int hbackmod=0;
   unsigned int ebacki=0;
@@ -255,6 +271,7 @@ int TruthConversionEval::process_event(PHCompositeNode *topNode)
       }
       else if(_kMakeTTree){//not a conversion
         SvtxTrack *testTrack = trackeval->best_track_from(g4particle);
+        backgroundTracks.push_back(testTrack);
         if (testTrack) //not a conversion but has a track 
         {
           //get the associated cluster
@@ -287,6 +304,7 @@ int TruthConversionEval::process_event(PHCompositeNode *topNode)
       embedID=get_embed(g4particle,_truthinfo);
       //cout<<"primary particle"<<endl;
       SvtxTrack *testTrack = trackeval->best_track_from(g4particle);
+      backgroundTracks.push_back(testTrack);
       if (testTrack) //has associated track
       {
         //get the associated cluster
@@ -328,6 +346,8 @@ int TruthConversionEval::process_event(PHCompositeNode *topNode)
     _tree->Fill();
     processBackground(&hbackgroundMap,trackeval,_h_backgroundCutTree);
     processBackground(&ebackgroundMap,trackeval,_e_backgroundCutTree);
+    processTrackBackground(&backgroundTracks,_clusterMap);
+    processPairBackground(&backgroundTracks,_clusterMap);
     _b_event++;
   }
   if (Verbosity()>=8)
@@ -521,6 +541,7 @@ void TruthConversionEval::processBackground(std::map<int,Conversion> *mymap,Svtx
       _bb_track_dphi = i->second.trackDPhi();
       _bb_track_dlayer = i->second.trackDLayer(_clusterMap);
       _bb_track_layer = i->second.firstLayer(_clusterMap);
+      _bb_track_dca = i->second.minDca();
       _bb_track_pT = i->second.minTrackpT();
       _bb_approach = i->second.approachDistance();
       _bb_pid = i->second.getElectron()->get_pid();
@@ -550,6 +571,31 @@ void TruthConversionEval::processBackground(std::map<int,Conversion> *mymap,Svtx
   }
 }
 
+//only call if _kMakeTTree is true
+void TruthConversionEval::processTrackBackground(std::vector<SvtxTrack*> *v_tracks,TrkrClusterContainer* clusterMap){
+  for (std::vector<SvtxTrack*>::iterator iTrack = v_tracks->begin(); iTrack != v_tracks->end(); ++iTrack) {
+    _bb_track_layer = TrkrDefs::getLayer((clusterMap->
+          findCluster(*((*iTrack)->begin_cluster_keys())))->getClusKey());
+    _bb_track_dca = (*iTrack)->get_dca();
+    _bb_track_pT = (*iTrack)->get_pt();
+    _bb_cluster_prob= _mainClusterContainer->getCluster((*iTrack)->get_cal_cluster_id(SvtxTrack::CAL_LAYER(1)))->get_prob();
+    _trackBackTree->Fill();
+  }
+}
+
+void TruthConversionEval::processPairBackground(std::vector<SvtxTrack*> *v_tracks,TrkrClusterContainer* clusterMap){
+  Conversion pairMath;
+  for (std::vector<SvtxTrack*>::iterator iTrack = v_tracks->begin(); iTrack != v_tracks->end(); ++iTrack) {
+    for(std::vector<SvtxTrack*>::iterator jTrack =std::next(iTrack,1);jTrack!=v_tracks->end(); ++jTrack){
+      _bb_track_deta = pairMath.trackDEta((*iTrack),(*jTrack));
+      _bb_track_dphi = pairMath.trackDPhi((*iTrack),(*jTrack));
+      _bb_track_dlayer = pairMath.trackDLayer(_clusterMap,(*iTrack),(*jTrack));
+      _bb_approach = pairMath.approachDistance((*iTrack),(*jTrack));
+      _trackBackTree->Fill();
+    }
+  }
+}
+
 void TruthConversionEval::findChildren(std::queue<std::pair<int,int>> missingChildren,PHG4TruthInfoContainer* _truthinfo){
   if (Verbosity()>=6)
   {
@@ -560,7 +606,6 @@ void TruthConversionEval::findChildren(std::queue<std::pair<int,int>> missingChi
           cout<<"Found Child:\n";
           iter->second->identify();
           cout<<"With mother:\n";
-
         }
       }
       missingChildren.pop();
