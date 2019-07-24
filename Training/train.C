@@ -43,7 +43,7 @@ void makeFactory(TTree* signalTree, TTree* backTree,std::string outfile,std::str
   factory->AddSpectator("track_dca",'F');
   factory->AddSpectator("cluster_prob",'F');
   factory->AddVariable("track_deta",'F');
-  factory->AddVariable("abs(track_dlayer)",'I');
+  factory->AddVariable("track_dlayer",'I');
   factory->AddVariable("approach_dist",'F');
   //factory->AddVariable("vtx_radius",'F');
   //factory->AddVariable("vtx_chi2",'F'); 
