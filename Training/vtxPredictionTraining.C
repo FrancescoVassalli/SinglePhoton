@@ -32,18 +32,18 @@ void makeFactory(TTree* signalTree,std::string outfile,std::string factoryname)
   using namespace TMVA;
   TString jobname(factoryname.c_str());
   TFile *targetFile = new TFile(outfile.c_str(),"RECREATE");
-  Factory *factory = new Factory(jobname,targetFile,"AnalysisType:Regression");
+  Factory *factory = new Factory(jobname,targetFile,"AnalysisType=Regression");
   factory->AddRegressionTree(signalTree,1.0);
   factory->AddVariable("track1_pt",'F');
   factory->AddVariable("track2_pt",'F');
   factory->AddVariable("track1_phi",'F');
-  factory->AddVariable("track1_phi-track2_phi","d#phi");
+  factory->AddVariable("track1_phi-track2_phi","d#phi","rad");
   factory->AddVariable("track1_eta",'F');
-  factory->AddVariable("track1_eta-track2_eta","d#eta");
+  factory->AddVariable("track1_eta-track2_eta","d#eta","rad");
   factory->AddVariable("vtx_radius","radius","[cm]");
   factory->AddTarget("tvtx_radius","radius","[cm]");
 
-  string track_pT_cut = "track1_pT>0&&track2_pT>0";
+  string track_pT_cut = "";
 
   //string vtx_radius_cut = "vtx_radius>0"; //can I cut based on label?
   string tCutInitializer = track_pT_cut;
