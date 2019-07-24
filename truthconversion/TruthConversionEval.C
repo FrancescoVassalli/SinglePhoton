@@ -574,7 +574,7 @@ void TruthConversionEval::processBackground(std::map<int,Conversion> *mymap,Svtx
 //only call if _kMakeTTree is true
 void TruthConversionEval::processTrackBackground(std::vector<SvtxTrack*> *v_tracks,TrkrClusterContainer* clusterMap){
   for (std::vector<SvtxTrack*>::iterator iTrack = v_tracks->begin(); iTrack != v_tracks->end(); ++iTrack) {
-    if(!*iTrack)continue;
+    if(!*iTrack||TMath::Abs((*iTrack)->get_eta())>1.1)continue;
     auto temp_key_it=(*iTrack)->begin_cluster_keys();//key iterator to first cluster
     if(temp_key_it!=(*iTrack)->end_cluster_keys()){//if the track has clusters
       TrkrCluster* temp_cluster = clusterMap->findCluster(*temp_key_it);//get the cluster 
