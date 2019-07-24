@@ -38,27 +38,28 @@ void makeFactory(TTree* signalTree, TTree* backTree,std::string outfile,std::str
   if(bgTree2){
     factory->AddBackgroundTree(bgTree2,1.0);
   }
-  //factory->AddVariable("track_deta",'F');
-  //factory->AddVariable("track_dlayer",'I');
-  factory->AddVariable("track_layer",'I');
-  factory->AddVariable("track_pT",'F');
-  factory->AddVariable("track_dca",'F');
-//  factory->AddVariable("approach_dist",'F'); //idk why this is off
+  factory->AddSpectator("track_layer",'I');
+  factory->AddSpectator("track_pT",'F');
+  factory->AddSpectator("track_dca",'F');
+  factory->AddSpectator("cluster_prob",'F');
+  factory->AddVariable("track_deta",'F');
+  factory->AddVariable("track_dlayer",'I');
+  factory->AddVariable("approach_dist",'F');
   //factory->AddVariable("vtx_radius",'F');
   //factory->AddVariable("vtx_chi2",'F'); 
   //factory->AddVariable("vtxTrackRZ_dist",'F');
   //factory->AddVariable("vtxTrackRPhi_dist",'F');
   //factory->AddVariable("photon_m",'F');
   //factory->AddVariable("photon_pT",'F');
-  factory->AddVariable("cluster_prob",'F');
 
-  string track_pT_cut = "track_pT>0.6";
+  string track_pT_cut = "track_pT>=0.84";
+  string track_layer_cut = "track_layer>1";
+  string track_dca_cut = "30>track_dca>0";
   string vtx_radius_cut = "vtx_radius>0";
   string em_prob_cut = "cluster_prob>=0";
   //do I need photon cuts? 
-  string tCutInitializer = track_pT_cut+"&&track_layer>=0&&"+em_prob_cut;
+  string tCutInitializer = track_pT_cut+"&&"+track_layer_cut+"&&"+track_dca_cut+"&&"+em_prob_cut;
   TCut preTraingCuts(tCutInitializer.c_str());
-
 
   factory->PrepareTrainingAndTestTree(preTraingCuts,"nTrain_Signal=0:nTrain_Background=0:nTest_Signal=0:nTest_Background=0");
   //factory->BookMethod( TMVA::Types::kLikelihood, "LikelihoodD","!H:!V:!TransformOutput:PDFInterpol=Spline2:NSmoothSig[0]=20:NSmoothBkg[0]=20:NSmooth=5:NAvEvtPerBin=50:VarTransform=Decorrelate" );
