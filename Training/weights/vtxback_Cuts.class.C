@@ -10,10 +10,10 @@ Method         : Cuts::Cuts
 TMVA Release   : 4.2.0         [262656]
 ROOT Release   : 5.34/38       [336422]
 Creator        : vassalli
-Date           : Thu Jul 25 17:43:33 2019
+Date           : Thu Jul 25 17:50:34 2019
 Host           : Linux cvmfswrite02.sdcc.bnl.gov 3.10.0-693.11.6.el7.x86_64 #1 SMP Wed Jan 3 18:09:42 CST 2018 x86_64 x86_64 x86_64 GNU/Linux
 Dir            : /direct/phenix+u/vassalli/sphenix/single/Training
-Training events: 2199
+Training events: 2237
 Analysis type  : [Classification]
 
 
@@ -30,31 +30,23 @@ IgnoreNegWeightsInTraining: "False" [Events with negative weights are ignored in
 FitMethod: "GA" [Minimisation Method (GA, SA, and MC are the primary methods to be used; the others have been introduced for testing purposes and are depreciated)]
 EffMethod: "EffSel" [Selection Method]
 CutRangeMin[0]: "-1.000000e+00" [Minimum of allowed cut range (set per variable)]
-    CutRangeMin[1]: "-1.000000e+00"
-    CutRangeMin[2]: "-1.000000e+00"
 CutRangeMax[0]: "-1.000000e+00" [Maximum of allowed cut range (set per variable)]
-    CutRangeMax[1]: "-1.000000e+00"
-    CutRangeMax[2]: "-1.000000e+00"
 VarProp[0]: "NotEnforced" [Categorisation of cuts]
-    VarProp[1]: "NotEnforced"
-    VarProp[2]: "NotEnforced"
 ##
 
 
 #VAR -*-*-*-*-*-*-*-*-*-*-*-* variables *-*-*-*-*-*-*-*-*-*-*-*-
 
-NVar 3
-vtx_radius                    vtx_radius                    vtx_radius                    vtx_radius                                                      'F'    [0.845486700535,71.8854598999]
-photon_m                      photon_m                      photon_m                      photon_m                                                        'F'    [1.04468429089,773.544189453]
-photon_pT                     photon_pT                     photon_pT                     photon_pT                                                       'F'    [1.25102925301,19718.5]
+NVar 1
+vtx_radius                    vtx_radius                    vtx_radius                    vtx_radius                                                      'F'    [5.76418764735e-37,96.8296585083]
 NSpec 7
 track_layer                   track_layer                   track_layer                   I                                                               'F'    [0,14]
-track_pT                      track_pT                      track_pT                      F                                                               'F'    [0.602909624577,366.712615967]
-track_dca                     track_dca                     track_dca                     F                                                               'F'    [1.47805176312e-05,64.1147155762]
-cluster_prob                  cluster_prob                  cluster_prob                  F                                                               'F'    [0,0.999042749405]
-track_deta                    track_deta                    track_deta                    F                                                               'F'    [7.30156898499e-07,0.00817441940308]
+track_pT                      track_pT                      track_pT                      F                                                               'F'    [0.600115776062,160.292892456]
+track_dca                     track_dca                     track_dca                     F                                                               'F'    [1.47805176312e-05,45.6750106812]
+cluster_prob                  cluster_prob                  cluster_prob                  F                                                               'F'    [0,0.999049782753]
+track_deta                    track_deta                    track_deta                    F                                                               'F'    [3.57627868652e-07,0.00818812847137]
 abs(track_dlayer)             abs_track_dlayer_             abs(track_dlayer)             I                                                               'F'    [0,2]
-approach_dist                 approach_dist                 approach_dist                 F                                                               'F'    [2.15952713916e-05,38.5060005188]
+approach_dist                 approach_dist                 approach_dist                 F                                                               'F'    [1.98981069843e-05,54.7429046631]
 
 
 ============================================================================ */
@@ -96,11 +88,11 @@ class ReadCuts : public IClassifierReader {
    ReadCuts( std::vector<std::string>& theInputVars ) 
       : IClassifierReader(),
         fClassName( "ReadCuts" ),
-        fNvars( 3 ),
+        fNvars( 1 ),
         fIsNormalised( false )
    {      
       // the training input variables
-      const char* inputVars[] = { "vtx_radius", "photon_m", "photon_pT" };
+      const char* inputVars[] = { "vtx_radius" };
 
       // sanity checks
       if (theInputVars.size() <= 0) {
@@ -126,15 +118,9 @@ class ReadCuts : public IClassifierReader {
       // initialize min and max vectors (for normalisation)
       fVmin[0] = 0;
       fVmax[0] = 0;
-      fVmin[1] = 0;
-      fVmax[1] = 0;
-      fVmin[2] = 0;
-      fVmax[2] = 0;
 
       // initialize input variable types
       fType[0] = 'F';
-      fType[1] = 'F';
-      fType[2] = 'F';
 
       // initialize constants
       Initialize();
@@ -166,15 +152,15 @@ class ReadCuts : public IClassifierReader {
    // normalisation of input variables
    const bool fIsNormalised;
    bool IsNormalised() const { return fIsNormalised; }
-   double fVmin[3];
-   double fVmax[3];
+   double fVmin[1];
+   double fVmax[1];
    double NormVariable( double x, double xmin, double xmax ) const {
       // normalise to output range: [-1, 1]
       return 2*(x - xmin)/(xmax - xmin) - 1.0;
    }
 
    // type of input variable: 'F' or 'I'
-   char   fType[3];
+   char   fType[1];
 
    // initialize internal variables
    void Initialize();
