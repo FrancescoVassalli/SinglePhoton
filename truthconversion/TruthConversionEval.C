@@ -146,6 +146,7 @@ int TruthConversionEval::InitRun(PHCompositeNode *topNode)
     _signalCutTree->Branch("vtxTrackRZ_dist", &_b_vtxTrackRZ_dist);
     _signalCutTree->Branch("vtxTrackRPhi_dist", &_b_vtxTrackRPhi_dist);
     _signalCutTree->Branch("photon_m", &_b_photon_m);
+    _signalCutTree->Branch("tphoton_m", &_b_tphoton_m);
     _signalCutTree->Branch("photon_pT", &_b_photon_pT);
     _signalCutTree->Branch("cluster_prob", &_b_cluster_prob);
 
@@ -446,15 +447,22 @@ std::queue<std::pair<int,int>> TruthConversionEval::numUnique(std::map<int,Conve
                   _b_track2_phi = phisTemp.second;
                   _vtxingTree->Fill();
                 }
-                
-                TLorentzVector* recoPhoton = i->second.setRecoPhoton();
-                if (recoPhoton)
-                {
-                  _b_photon_m=recoPhoton->Dot(*recoPhoton);
-                  _b_photon_pT=recoPhoton->Pt();
+
+                TLorentzVector* recoPhoton = i->second.getRecoPhoton();
+                PHG4Particle* truthphoton = i->second.getTruthPhoton(_truthinfo);
+                TLorentzVector tlv_tphoton;
+                if(truthphoton){
+                  tlv_tphoton.SetPxPyPzE(truthphoton->get_px(),truthphoton->get_py(),truthphoton->get_pz(),truthphoton->get_e());
+                  if (recoPhoton)
+                  {
+                    _b_photon_m=recoPhoton->Dot(*recoPhoton);
+                    _b_tphoton_m=tlv_tphoton.Dot(tlv_tphoton);
+                    _b_photon_pT=recoPhoton->Pt();
+                  }
                 }
                 else{ //photon was not reconstructed
                   _b_photon_m =-1;
+                  _b_tphoton_m =-1;
                   _b_photon_pT=-1;
                 }
                 //reset the values

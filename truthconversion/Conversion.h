@@ -21,6 +21,7 @@
 
 class SvtxTrackEval;
 class PHCompositeNode;
+class PHG4TruthInfoContainer;
 class TLorentzVector;
 class SvtxHitMap;
 
@@ -175,7 +176,9 @@ class Conversion
 		float vtxTrackRZ(TVector3 vertpos);
 
 		float setRecoVtx(SvtxVertex* recovtx,SvtxClusterMap* cmap);
-    TLorentzVector* setRecoPhoton();
+    TLorentzVector* setRecoPhoton();///< constructs a tlv for a photon by adding the tlvs for the reco tracks
+    TLorentzVector* getRecoPhoton();///<@return the constructed tlv
+    PHG4Particle* getTruthPhoton(PHG4TruthInfoContainer*);///<@return NULL if not valid conversion else return photon
 
     /**
      * Returns the equivalent angle in the range 0 to 2pi.

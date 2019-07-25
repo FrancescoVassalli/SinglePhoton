@@ -1,6 +1,7 @@
 #include "Conversion.h"
 #include <phool/PHCompositeNode.h>
 #include <phool/getClass.h>
+#include <g4main/PHG4TruthInfoContainer.h>
 #include <trackbase_historic/SvtxCluster.h>
 #include <trackbase_historic/SvtxHitMap.h>
 #include <trackbase/TrkrClusterContainer.h>
@@ -153,6 +154,15 @@ TLorentzVector* Conversion::setRecoPhoton(){
     recoPhoton= new TLorentzVector(tlv1+tlv2);
   }
   return recoPhoton;
+}
+
+TLorentzVector* Conversion::getRecoPhoton(){
+  return setRecoPhoton();
+}
+
+PHG4Particle* Conversion::getTruthPhoton(PHG4TruthInfoContainer* truthinfo){
+  if(!e1||!e2||e1->get_parent_id()!=e2->get_parent_id()) return NULL; 
+  return truthinfo->GetParticle(e1->get_parent_id());
 }
 
 
