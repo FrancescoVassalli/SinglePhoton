@@ -70,7 +70,6 @@ class TruthConversionEval: public SubsysReco
      * fills the fields for {@link _backgroundCutTree*/
     void processBackground(std::map<int,Conversion>* map,SvtxTrackEval* trackEval,TTree* tree);
     void processTrackBackground(std::vector<SvtxTrack*>*v,TrkrClusterContainer*);
-    void processPairBackground(std::vector<SvtxTrack*>*,TrkrClusterContainer*);
 
     int get_embed(PHG4Particle* particle, PHG4TruthInfoContainer* truthinfo) const;
     float vtoR(PHG4VtxPoint* vtx)const;

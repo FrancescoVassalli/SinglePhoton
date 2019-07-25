@@ -113,19 +113,23 @@ int TruthConversionEval::InitRun(PHCompositeNode *topNode)
     _vtxingTree->Branch("track2_eta",& _b_track2_eta,"track2_eta");
     _vtxingTree->Branch("track2_phi",& _b_track2_phi,"track2_phi");
 
-    _trackBackTree = new TTree("_trackBackTree","track background all single tracks");
+    _trackBackTree = new TTree("trackBackTree","track background all single tracks");
     _trackBackTree->SetAutoSave(300);
     _trackBackTree->Branch("track_dca", &_bb_track_dca);
     _trackBackTree->Branch("track_pT",  &_bb_track_pT);
     _trackBackTree->Branch("track_layer", &_bb_track_layer);
     _trackBackTree->Branch("cluster_prob", &_bb_cluster_prob);
 
-    _pairBackTree = new TTree("_pairBackTree","pair background all possible combinations");
+    _pairBackTree = new TTree("pairBackTree","pair background all possible combinations");
     _pairBackTree->SetAutoSave(300);
     _pairBackTree->Branch("track_deta", &_bb_track_deta);
     _pairBackTree->Branch("track_dphi", &_bb_track_dphi);
     _pairBackTree->Branch("track_dlayer",&_bb_track_dlayer);
     _pairBackTree->Branch("approach_dist", &_bb_approach);
+    _pairBackTree->Branch("track_dca", &_bb_track_dca);
+    _pairBackTree->Branch("track_pT",  &_bb_track_pT);
+    _pairBackTree->Branch("track_layer", &_bb_track_layer);
+    _pairBackTree->Branch("cluster_prob", &_bb_cluster_prob);
 
     _signalCutTree = new TTree("cutTreeSignal","signal data for making track pair cuts");
     _signalCutTree->SetAutoSave(300);
@@ -347,7 +351,6 @@ int TruthConversionEval::process_event(PHCompositeNode *topNode)
     processBackground(&hbackgroundMap,trackeval,_h_backgroundCutTree);
     processBackground(&ebackgroundMap,trackeval,_e_backgroundCutTree);
     processTrackBackground(&backgroundTracks,_clusterMap);
-    processPairBackground(&backgroundTracks,_clusterMap);
     _b_event++;
   }
   if (Verbosity()>=8)
@@ -573,6 +576,7 @@ void TruthConversionEval::processBackground(std::map<int,Conversion> *mymap,Svtx
 
 //only call if _kMakeTTree is true
 void TruthConversionEval::processTrackBackground(std::vector<SvtxTrack*> *v_tracks,TrkrClusterContainer* clusterMap){
+  Conversion pairMath;
   for (std::vector<SvtxTrack*>::iterator iTrack = v_tracks->begin(); iTrack != v_tracks->end(); ++iTrack) {
     if(!*iTrack||TMath::Abs((*iTrack)->get_eta())>1.1)continue;
     auto temp_key_it=(*iTrack)->begin_cluster_keys();//key iterator to first cluster
@@ -586,22 +590,15 @@ void TruthConversionEval::processTrackBackground(std::vector<SvtxTrack*> *v_trac
     auto id = _mainClusterContainer->getCluster((*iTrack)->get_cal_cluster_id(SvtxTrack::CAL_LAYER(1)));
     if(id) _bb_cluster_prob= id->get_prob();
     else _bb_cluster_prob=-1;
-    _trackBackTree->Fill();
-  }
-}
-
-void TruthConversionEval::processPairBackground(std::vector<SvtxTrack*> *v_tracks,TrkrClusterContainer* clusterMap){
-  Conversion pairMath;
-  for (std::vector<SvtxTrack*>::iterator iTrack = v_tracks->begin(); iTrack != v_tracks->end(); ++iTrack) {
-    if(!*iTrack)continue;
-    for(std::vector<SvtxTrack*>::iterator jTrack =std::next(iTrack,1);jTrack!=v_tracks->end(); ++jTrack){
-      if(!*jTrack)continue;
+    for(std::vector<SvtxTrack*>::iterator jTrack =std::next(iTrack,1);jTrack!=v_tracks->end(); ++jTrack){//posible bias by filling the track level variables with iTrack instead of min(iTrack,jTrack)
+    if(!*jTrack||TMath::Abs((*jTrack)->get_eta())>1.1)continue;
       _bb_track_deta = pairMath.trackDEta((*iTrack),(*jTrack));
       _bb_track_dphi = pairMath.trackDPhi((*iTrack),(*jTrack));
       _bb_track_dlayer = pairMath.trackDLayer(_clusterMap,(*iTrack),(*jTrack));
       _bb_approach = pairMath.approachDistance((*iTrack),(*jTrack));
-      _trackBackTree->Fill();
+      _pairBackTree->Fill();
     }
+    _trackBackTree->Fill();
   }
 }
 
