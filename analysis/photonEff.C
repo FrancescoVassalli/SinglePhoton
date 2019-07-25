@@ -33,8 +33,8 @@ void makephotonM(TChain* ttree,TFile* out_file){
   ttree->SetBranchAddress("tphoton_m",&tphoton_m    );
 
   std::vector<TH1F*> plots;
-  plots.push_back(new TH1F("m_{#gamma}_reco","",40,-10,10));
-  plots.push_back(new TH1F("m_{#gamma}_truth","",40,-10,10));
+  plots.push_back(new TH1F("m_{#gamma}_reco","",40,-2,10));
+  plots.push_back(new TH1F("m_{#gamma}_truth","",40,-2,10));
 
   for (int i = 0; i < 2; ++i)
   {
@@ -64,7 +64,7 @@ void makeVtxR(TChain* ttree,TFile* out_file){
   plots.push_back(new TH1F("vtx_reco","",40,0,30));
   plots.push_back(new TH1F("vtx_truth","",40,0,30));
 
-  long float calc=0;
+  double calc=0;
   for (int event = 0; event < ttree->GetEntries(); ++event)
   {
     ttree->GetEvent(event);
