@@ -40,8 +40,8 @@ void makeFactory(TTree* signalTree,std::string outfile,std::string factoryname)
   factory->AddVariable("track1_phi-track2_phi","d#phi","rad");
   factory->AddVariable("track1_eta",'F');
   factory->AddVariable("track1_eta-track2_eta","d#eta","rad");
-  factory->AddVariable("vtx_radius","radius","[cm]");
-  factory->AddTarget("tvtx_radius","radius","[cm]");
+  factory->AddVariable("vtx_radius","radius","cm");
+  factory->AddTarget("tvtx_radius","radius","cm");
 
   string track_pT_cut = "";
 
@@ -49,9 +49,9 @@ void makeFactory(TTree* signalTree,std::string outfile,std::string factoryname)
   string tCutInitializer = track_pT_cut;
   TCut preTraingCuts(tCutInitializer.c_str());
   factory->PrepareTrainingAndTestTree(preTraingCuts,"nTrain_Regression=0:nTest_Regression=0");
-  //factory->BookMethod(Types::kMLP,"MLP_ANN","HiddenLayers=2000");
+  factory->BookMethod(Types::kMLP,"MLP_ANN","HiddenLayers=500");
   //factory->BookMethod(Types::kMLP,"MLP_ANN2","HiddenLayers=500,6");
-  factory->BookMethod(Types::kMLP,"MLP_ANN","HiddenLayers=5");
+  //factory->BookMethod(Types::kMLP,"MLP_ANN","HiddenLayers=5");
 
   
   factory->TrainAllMethods();
