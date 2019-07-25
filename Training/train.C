@@ -38,13 +38,13 @@ void makeFactory(TTree* signalTree, TTree* backTree,std::string outfile,std::str
   if(bgTree2){
     factory->AddBackgroundTree(bgTree2,1.0);
   }
-  factory->AddVariable("track_layer",'I');
-  factory->AddVariable("track_pT",'F');
-  factory->AddVariable("track_dca",'F');
-  factory->AddVariable("cluster_prob",'F');
-  //factory->AddVariable("track_deta",'F');
-  //factory->AddVariable("abs(track_dlayer)",'I');
-  //factory->AddVariable("approach_dist",'F');
+  factory->AddSpectator("track_layer",'I');
+  factory->AddSpectator("track_pT",'F');
+  factory->AddSpectator("track_dca",'F');
+  factory->AddSpectator("cluster_prob",'F');
+  factory->AddVariable("track_deta",'F');
+  factory->AddVariable("abs(track_dlayer)",'I');
+  factory->AddVariable("approach_dist",'F');
   //factory->AddVariable("vtx_radius",'F');
   //factory->AddVariable("vtx_chi2",'F'); 
   //factory->AddVariable("vtxTrackRZ_dist",'F');
@@ -52,23 +52,23 @@ void makeFactory(TTree* signalTree, TTree* backTree,std::string outfile,std::str
   //factory->AddVariable("photon_m",'F');
   //factory->AddVariable("photon_pT",'F');
 
-  string track_layer_cut = "track_layer>=0";
-  string track_pT_cut = "track_pT>=0.84";
-  string track_dca_cut = "30>track_dca>0";
+  string track_layer_cut = "21>=track_layer>0";
+  string track_pT_cut = "track_pT>=0.6";
+  string track_dca_cut = "50>track_dca>0";
   string em_prob_cut = "cluster_prob>=0";
   string track_deta_cut = ".0076>=track_deta>=0";
   string track_dlayer_cut = "3>=abs(track_dlayer)>=0";
   string approach_dist_cut = "21.54>approach_dist>0";
   string vtx_radius_cut = "vtx_radius>0";
   //do I need photon cuts? 
-  string tCutInitializer = "track_pT>=.6&&track_layer>=0&&cluster_prob>=0&&track_dca>=0";
+  string tCutInitializer = track_layer_cut+"&&"+track_pT_cut+"&&"+track_dca_cut+"&&"+em_prob_cut;
   TCut preTraingCuts(tCutInitializer.c_str());
 
   factory->PrepareTrainingAndTestTree(preTraingCuts,"nTrain_Signal=0:nTrain_Background=0:nTest_Signal=0:nTest_Background=0");
   //for track training
-  factory->BookMethod(Types::kCuts,"Cuts");
+  //factory->BookMethod(Types::kCuts,"Cuts");
   //for pair training
-  //factory->BookMethod(Types::kCuts,"Cuts","CutRangeMin[0]=0:CutRangeMax[0]=1:CutRangeMin[1]=-100:CutRangeMax[1]=100:CutRangeMin[2]=0:CutRangeMax[2]=100");
+  factory->BookMethod(Types::kCuts,"Cuts","CutRangeMin[0]=0:CutRangeMax[0]=1:CutRangeMin[1]=-100:CutRangeMax[1]=100:CutRangeMin[2]=0:CutRangeMax[2]=100");
   factory->TrainAllMethods();
   factory->TestAllMethods();
   factory->EvaluateAllMethods();
@@ -87,8 +87,8 @@ int train(){
   TChain *signalTree = handleFile(treePath,treeExtension,"cutTreeSignal",nFiles);
   TChain *backtrackTree = handleFile(treePath,treeExtension,"trackBackTree",nFiles);
   TChain *backpairTree = handleFile(treePath,treeExtension,"pairBackTree",nFiles);
-  makeFactory(signalTree,backtrackTree,outname,"trackback");
-  //makeFactory(signalTree,backpairTree,outname,"pairback");
+  //makeFactory(signalTree,backtrackTree,outname,"trackback");
+  makeFactory(signalTree,backpairTree,outname,"pairback");
 /*  outname="cutTrainE.root";
   makeFactory(signalTree,backETree,outname,"eback");*/
 }
