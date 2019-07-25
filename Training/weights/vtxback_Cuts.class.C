@@ -10,10 +10,10 @@ Method         : Cuts::Cuts
 TMVA Release   : 4.2.0         [262656]
 ROOT Release   : 5.34/38       [336422]
 Creator        : vassalli
-Date           : Thu Jul 25 15:22:07 2019
+Date           : Thu Jul 25 17:43:33 2019
 Host           : Linux cvmfswrite02.sdcc.bnl.gov 3.10.0-693.11.6.el7.x86_64 #1 SMP Wed Jan 3 18:09:42 CST 2018 x86_64 x86_64 x86_64 GNU/Linux
 Dir            : /direct/phenix+u/vassalli/sphenix/single/Training
-Training events: 6074
+Training events: 2199
 Analysis type  : [Classification]
 
 
@@ -44,17 +44,17 @@ VarProp[0]: "NotEnforced" [Categorisation of cuts]
 #VAR -*-*-*-*-*-*-*-*-*-*-*-* variables *-*-*-*-*-*-*-*-*-*-*-*-
 
 NVar 3
-vtx_radius                    vtx_radius                    vtx_radius                    vtx_radius                                                      'F'    [8.96831017168e-44,209.624893188]
-vtxTrackRZ_dist               vtxTrackRZ_dist               vtxTrackRZ_dist               vtxTrackRZ_dist                                                 'F'    [-3412572160,222.081771851]
-abs(vtxTrackRPhi_dist-vtxTrackRZ_dist)   abs_vtxTrackRPhi_dist_M_vtxTrackRZ_dist_ abs(vtxTrackRPhi_dist-vtxTrackRZ_dist)   abs(vtxTrackRPhi_dist-vtxTrackRZ_dist)                                                'F'    [0,3412572160]
+vtx_radius                    vtx_radius                    vtx_radius                    vtx_radius                                                      'F'    [0.845486700535,71.8854598999]
+photon_m                      photon_m                      photon_m                      photon_m                                                        'F'    [1.04468429089,773.544189453]
+photon_pT                     photon_pT                     photon_pT                     photon_pT                                                       'F'    [1.25102925301,19718.5]
 NSpec 7
-track_layer                   track_layer                   track_layer                   I                                                               'F'    [0,20]
-track_pT                      track_pT                      track_pT                      F                                                               'F'    [0.600027859211,85.6118621826]
-track_dca                     track_dca                     track_dca                     F                                                               'F'    [4.58528666059e-06,64.1147155762]
-cluster_prob                  cluster_prob                  cluster_prob                  F                                                               'F'    [-1,0.999049782753]
-track_deta                    track_deta                    track_deta                    F                                                               'F'    [1.19209289551e-07,1.97404646873]
-abs(track_dlayer)             abs_track_dlayer_             abs(track_dlayer)             I                                                               'F'    [0,20]
-approach_dist                 approach_dist                 approach_dist                 F                                                               'F'    [1.18072352961e-06,54.7429046631]
+track_layer                   track_layer                   track_layer                   I                                                               'F'    [0,14]
+track_pT                      track_pT                      track_pT                      F                                                               'F'    [0.602909624577,366.712615967]
+track_dca                     track_dca                     track_dca                     F                                                               'F'    [1.47805176312e-05,64.1147155762]
+cluster_prob                  cluster_prob                  cluster_prob                  F                                                               'F'    [0,0.999042749405]
+track_deta                    track_deta                    track_deta                    F                                                               'F'    [7.30156898499e-07,0.00817441940308]
+abs(track_dlayer)             abs_track_dlayer_             abs(track_dlayer)             I                                                               'F'    [0,2]
+approach_dist                 approach_dist                 approach_dist                 F                                                               'F'    [2.15952713916e-05,38.5060005188]
 
 
 ============================================================================ */
@@ -100,7 +100,7 @@ class ReadCuts : public IClassifierReader {
         fIsNormalised( false )
    {      
       // the training input variables
-      const char* inputVars[] = { "vtx_radius", "vtxTrackRZ_dist", "abs(vtxTrackRPhi_dist-vtxTrackRZ_dist)" };
+      const char* inputVars[] = { "vtx_radius", "photon_m", "photon_pT" };
 
       // sanity checks
       if (theInputVars.size() <= 0) {
