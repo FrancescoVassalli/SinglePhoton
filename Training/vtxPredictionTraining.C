@@ -51,7 +51,7 @@ void makeFactory(TTree* signalTree,std::string outfile,std::string factoryname)
   factory->PrepareTrainingAndTestTree(preTraingCuts,"nTrain_Regression=0:nTest_Regression=0");
   //factory->BookMethod(Types::kMLP,"MLP_ANN","HiddenLayers=2000");
   //factory->BookMethod(Types::kMLP,"MLP_ANN2","HiddenLayers=500,6");
-  factory->BookMethod(Types::kMLP,"MLP_ANN","HiddenLayers=1");
+  factory->BookMethod(Types::kMLP,"MLP_ANN","HiddenLayers=5");
 
   
   factory->TrainAllMethods();
