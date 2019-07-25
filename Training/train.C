@@ -66,7 +66,7 @@ void makeFactory(TTree* signalTree, TTree* backTree,std::string outfile,std::str
 
   factory->PrepareTrainingAndTestTree(preTraingCuts,"nTrain_Signal=0:nTrain_Background=0:nTest_Signal=0:nTest_Background=0");
   //for track training
-  factory->BookMethod(Types::kCuts,"Cuts","CutRangeMin[0]=0:CutRangeMax[0]=26:CutRangeMin[1]=.6:CutRangeMax[1]=100:CutRangeMin[2]=0:CutRangeMax[2]=1000:CutRangeMin[3]=0:CutRangeMax[3]=1");
+  factory->BookMethod(Types::kCuts,"Cuts");
   //for pair training
   //factory->BookMethod(Types::kCuts,"Cuts","CutRangeMin[0]=0:CutRangeMax[0]=1:CutRangeMin[1]=-100:CutRangeMax[1]=100:CutRangeMin[2]=0:CutRangeMax[2]=100");
   factory->TrainAllMethods();
