@@ -85,8 +85,8 @@ int train(){
   unsigned int nFiles=100;
 
   TChain *signalTree = handleFile(treePath,treeExtension,"cutTreeSignal",nFiles);
-  TChain *backtrackTree = handleFile(treePath,treeExtension,"_trackBackTree",nFiles);
-  TChain *backpairTree = handleFile(treePath,treeExtension,"_pairBackTree",nFiles);
+  TChain *backtrackTree = handleFile(treePath,treeExtension,"trackBackTree",nFiles);
+  TChain *backpairTree = handleFile(treePath,treeExtension,"pairBackTree",nFiles);
   makeFactory(signalTree,backtrackTree,outname,"trackback");
   //makeFactory(signalTree,backpairTree,outname,"pairback");
 /*  outname="cutTrainE.root";
