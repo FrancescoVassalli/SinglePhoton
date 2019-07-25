@@ -49,8 +49,9 @@ void makeFactory(TTree* signalTree,std::string outfile,std::string factoryname)
   string tCutInitializer = track_pT_cut;
   TCut preTraingCuts(tCutInitializer.c_str());
   factory->PrepareTrainingAndTestTree(preTraingCuts,"nTrain_Regression=0:nTest_Regression=0");
-  factory->BookMethod(Types::kMLP,"MLP_ANN","HiddenLayers=2000");
-  factory->BookMethod(Types::kMLP,"MLP_ANN2","HiddenLayers=500,6");
+  //factory->BookMethod(Types::kMLP,"MLP_ANN","HiddenLayers=2000");
+  //factory->BookMethod(Types::kMLP,"MLP_ANN2","HiddenLayers=500,6");
+  factory->BookMethod(Types::kMLP,"MLP_ANN","HiddenLayers=1");
 
   
   factory->TrainAllMethods();
@@ -65,7 +66,7 @@ int vtxPredictionTraining(){
   using namespace std;
   string treePath = "/sphenix/user/vassalli/gammasample/conversiononlineanalysis";
   string treeExtension = ".root";
-  string outname = "vtxTrain.root";
+  string outname = "vtxTraintemp.root";
   unsigned int nFiles=200;
 
   TChain *signalTree = handleFile(treePath,treeExtension,"vtxingTree",nFiles);
