@@ -36,6 +36,11 @@ void makephotonM(TChain* ttree,TFile* out_file){
   plots.push_back(new TH1F("m_{#gamma}_reco","",40,-10,10));
   plots.push_back(new TH1F("m_{#gamma}_truth","",40,-10,10));
 
+  for (int i = 0; i < 2; ++i)
+  {
+    plots[i]->Sumw2();
+  }
+
   for (int event = 0; event < ttree->GetEntries(); ++event)
   {
     ttree->GetEvent(event);
@@ -59,18 +64,21 @@ void makeVtxR(TChain* ttree,TFile* out_file){
   plots.push_back(new TH1F("vtx_reco","",40,0,30));
   plots.push_back(new TH1F("vtx_truth","",40,0,30));
 
+  long float calc=0;
   for (int event = 0; event < ttree->GetEntries(); ++event)
   {
     ttree->GetEvent(event);
     plots[0]->Fill(vtxr);
     plots[1]->Fill(tvtxr);
+    calc+=TMath::Abs(vtxr-tvtxr);
   }
+  calc/=ttree->GetEntries();
   for (int i = 0; i < 2; ++i)
   {
     plots[i]->Scale(1./ttree->GetEntries(),"width");
   }
   out_file->Write();
-
+  std::cout<<"mean deviation="<<calc<<std::endl;
 }
 
 void photonEff()
