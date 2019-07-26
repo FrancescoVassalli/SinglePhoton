@@ -98,6 +98,8 @@ int TruthConversionEval::InitRun(PHCompositeNode *topNode)
     _pairBackTree = new TTree("pairBackTree","pair background all possible combinations");
     _pairBackTree->SetAutoSave(300);
     _pairBackTree->Branch("track_deta", &_bb_track_deta);
+    _pairBackTree->Branch("track2_pid", &_bb_track2_pid);
+    _pairBackTree->Branch("track1_pid", &_bb_track1_pid);
     _pairBackTree->Branch("track_dphi", &_bb_track_dphi);
     _pairBackTree->Branch("track_dlayer",&_bb_track_dlayer);
     _pairBackTree->Branch("approach_dist", &_bb_approach);
@@ -112,6 +114,8 @@ int TruthConversionEval::InitRun(PHCompositeNode *topNode)
     _vtxBackTree = new TTree("vtxBackTree","events that pass track pair cuts");
     _vtxBackTree->SetAutoSave(300);
     _vtxBackTree->Branch("track_deta", &_bb_track_deta);
+    _vtxBackTree->Branch("track1_pid", &_bb_track1_pid);
+    _vtxBackTree->Branch("track2_pid", &_bb_track2_pid);
     _vtxBackTree->Branch("track_dphi", &_bb_track_dphi);
     _vtxBackTree->Branch("track_dlayer",&_bb_track_dlayer);
     _vtxBackTree->Branch("approach_dist", &_bb_approach);
@@ -129,6 +133,8 @@ int TruthConversionEval::InitRun(PHCompositeNode *topNode)
     _signalCutTree = new TTree("cutTreeSignal","signal data for making track pair cuts");
     _signalCutTree->SetAutoSave(300);
     _signalCutTree->Branch("track_deta", &_b_track_deta);
+    _signalCutTree->Branch("track1_pid", &_b_track1_pid);
+    _signalCutTree->Branch("track2_pid", &_b_track2_pid);
     _signalCutTree->Branch("track_dca", &_b_track_dca);
     _signalCutTree->Branch("track_dphi", &_b_track_dphi);
     _signalCutTree->Branch("track_dlayer",&_b_track_dlayer);
