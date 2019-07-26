@@ -20,7 +20,7 @@ cp truthconversion/* $SCRATCH_AREA
 cd $SCRATCH_AREA
 #root -b -q Fun4All_G4_sPHENIX.C\(100,\"$IN_FILE\",\"$PYTHIA_FILE\"\) 
 #cp -f $IN_FILE $OUT_LOCATION$IN_FILE
-root -b -q after_embeded.C\(\"$OUT_LOCATION$IN_FILE\",\"$OUT_FILE\"\)
+root -l -b -q after_embeded.C\(\"$OUT_LOCATION$IN_FILE\",\"$OUT_FILE\"\)
 cp $OUT_FILE $OUT_LOCATION$OUT_FILE
 #
 rm -rf $SCRATCH_AREA
