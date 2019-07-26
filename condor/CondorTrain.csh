@@ -6,7 +6,7 @@ mkdir $SCRATCH_AREA
 cp vtxPredictionTraining.C $SCRATCH_AREA
 cd $SCRATCH_AREA
 /cvmfs/sphenix.sdcc.bnl.gov/x8664_sl7/opt/sphenix/core/root-5.34.38/bin/root -b -q vtxPredictionTraining.C\(\)
-cp -rf $SCRATCH_AREA $HOME/sphenix/single/Train/condorout
+cp -rf $SCRATCH_AREA $HOME/sphenix/single/Training/condorout
 rm -rf $SCRATCH_AREA
 #
 exit 0
