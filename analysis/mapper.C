@@ -50,12 +50,12 @@ void makeMaps(TChain* ttree,TFile* out_file){
   out_file->Write();
 }
 
-void photonEff()
+void mapper()
 {
   string treePath = "/sphenix/user/vassalli/gammasample/conversionembededonlineanalysis";
   string treeExtension = ".root";
   unsigned int nFiles=100;
   TFile *out_file = new TFile("maps.root","RECREATE");
   TChain *ttree = handleFile(treePath,treeExtension,"vtxingTree",nFiles);
-  makeRecoMap(ttree,out_file);
+  makeMaps(ttree,out_file);
 }

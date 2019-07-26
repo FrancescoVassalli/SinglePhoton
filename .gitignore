@@ -38,3 +38,6 @@ G4_FGEM_fsPHENIX.C
 G4_Tracking_EIC.C
 *_C.so
 Training/weights/*
+*/srtch/*
+*gcc_test.c
+SVReco/install/*
