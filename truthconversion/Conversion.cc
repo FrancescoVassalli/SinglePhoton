@@ -388,6 +388,21 @@ double Conversion::dist(TVector3 *recovtx,TrkrClusterContainer* clusterMap){
   else return r2;
 }
 
+void Conversion::printTruth(){
+  cout<<"Conversion with truth info:\n";
+  if (e1) e1->identify();
+  if (e2) e2->identify();
+  if (vtx) recoVertex->identify();
+  if (recoPhoton) recoPhoton->identify();
+}
+void Conversion::printReco(){
+  cout<<"Conversion with reco info:\n";
+  if (reco1) reco1->identify();
+  if (reco2) reco2->identify();
+  if (vtx) vtx->identify();
+  if (photon) photon->print();
+}
+
 float Conversion::setRecoVtx(SvtxVertex *recovtx,SvtxClusterMap* svtxClusterMap){
   recoVtx=recovtx;
   SvtxCluster *c1 = svtxClusterMap->get(*(reco1->begin_clusters()));
