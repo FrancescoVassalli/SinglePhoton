@@ -41,3 +41,4 @@ Training/weights/*
 */srtch/*
 *gcc_test.c
 SVReco/install/*
+Training/condorout/training/*.C

@@ -66,7 +66,7 @@ int vtxRS(){
   using namespace std;
   string treePath = "/sphenix/user/vassalli/gammasample/conversiononlineanalysis";
   string treeExtension = ".root";
-  string outname = "vtxTrainRS.root";
+  string outname = "/direct/phenix+u/vassalli/sphenix/single/Training/condorout/vtxTrainRS.root";
   unsigned int nFiles=200;
 
   TChain *signalTree = handleFile(treePath,treeExtension,"vtxingTree",nFiles);
