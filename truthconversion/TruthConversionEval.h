@@ -60,79 +60,53 @@ class TruthConversionEval: public SubsysReco
     bool doNodePointers(PHCompositeNode* topNode);
     /** helper function for process_event
      * fills the member fields with information from the conversions 
-     * finds the clusters associated with the conversions
-     * @return currently will return nothing 
-     * but can easily be changed to return a structure for the converions with only 1 truth associated track*/
-    std::queue<std::pair<int,int>> numUnique(std::map<int,Conversion>* map,SvtxTrackEval* trackEval,RawClusterContainer* mainClusterContainer);
-    /** attempts to find other truth associated tracks for conversions with only 1 truth associated track*/
-    void findChildren(std::queue<std::pair<int,int>> missing,PHG4TruthInfoContainer* truthinfo);
-    /** @param map should contain Conversion objects which hold background events i.e. not conversions
-     * fills the fields for {@link _backgroundCutTree*/
-    void processBackground(std::map<int,Conversion>* map,SvtxTrackEval* trackEval,TTree* tree);
+     * finds the clusters associated with the truth conversions*/
+    void numUnique(std::map<int,Conversion>* map,SvtxTrackEval* trackEval,RawClusterContainer* mainClusterContainer);
+    ///fills the member fields for all the background trees
     void processTrackBackground(std::vector<SvtxTrack*>*v,TrkrClusterContainer*);
 
     int get_embed(PHG4Particle* particle, PHG4TruthInfoContainer* truthinfo) const;
     float vtoR(PHG4VtxPoint* vtx)const;
 
     const static int s_kMAXParticles=200; ///< increase this number if arrays go out of bounds
-    const static int s_kMAXRecoMatch=20; ///< increase this number if arrays go out of bounds
     const unsigned int _kRunNumber;
     const int _kParticleEmbed; ///< primary embedID
     const int _kPythiaEmbed; ///< background event embedID i.e. pythia or AA
     const bool _kMakeTTree;//< if false no TTrees are output
     int _runNumber; ///<for the TTree do not change
     TFile *_f=NULL; ///< output file
-    TTree *_tree=NULL; ///< stores most of the data about the conversions
     TTree *_signalCutTree=NULL; ///<signal data for making track pair cuts
     TTree *_trackBackTree=NULL;///< background for all possible single tracks
     TTree *_pairBackTree=NULL;///< background for all possible track pairs
+    TTree *_vtxBackTree=NULL;///< background that passes existing track pair cuts
     TTree *_vtxingTree=NULL; ///<data for training vtxing
-    TTree *_h_backgroundCutTree=NULL; ///<hadronic background data for making track pair cuts
-    TTree *_e_backgroundCutTree=NULL; ///<EM background data for making track pair cuts
-    RawClusterContainer *_mainClusterContainer; ///< contain 1 cluster associated with each conversion
+    RawClusterContainer *_mainClusterContainer; //< clusters from the node
     PHG4TruthInfoContainer *_truthinfo;
     TrkrClusterContainer* _clusterMap;
     SvtxHitMap *_hitMap;
     std::string _foutname; ///< name of the output file
     SVReco *_vertexer=NULL; ///< for reco vertex finding
-    /** \defgroup mainTreeVars Variables for {@link _tree}
+    
+    /** \defgroup  variables  for the TTrees
       @{*/
-    int _b_event;
-    int _b_nVtx;  ///<total conversions
-    int _b_Tpair; ///<count acceptance e pairs in truth
-    int _b_Rpair; ///<count acceptance e pairs in reco
-    double _b_rVtx[s_kMAXParticles];  ///<truth conversion radius used for the signal tree
-    bool _b_pythia[s_kMAXParticles];  ///<record if the conversion is from pythia or G4 particle
-    float _b_electron_pt[s_kMAXParticles];
-    float _b_positron_pt[s_kMAXParticles];
-    float _b_electron_reco_pt[s_kMAXParticles];
-    float _b_positron_reco_pt[s_kMAXParticles];
-    float _b_e_deta[s_kMAXParticles];
-    float _b_e_dphi[s_kMAXParticles];
-    float _b_parent_pt  [s_kMAXParticles];
-    float _b_parent_eta [s_kMAXParticles];
-    float _b_parent_phi [s_kMAXParticles];
-    int   _b_grandparent_id [s_kMAXParticles]; ///<pid of the source of the photon 0 for prompt
     /** # of clusters associated with each conversion that has 2 reco tracks
      * 1 indicates the reco tracks go to the same cluster ~15% of conversions*/
-    int   _b_nCluster [s_kMAXRecoMatch]; 
-    int   _b_fLayer [s_kMAXRecoMatch]; 
-    float _b_cluster_dphi [s_kMAXRecoMatch];
-    float _b_cluster_deta [s_kMAXRecoMatch];
-    float _b_Mcluster_prob[s_kMAXRecoMatch]; ///<cluster prob for merged clusters
-    float _b_Scluster_prob[s_kMAXRecoMatch]; ///<cluster prob for split clusters
-    /**@}*/
-    /** \defgroup  variables  for {@link _vtxingtree}
-      @{*/
+    int   _b_nCluster; 
+    int _b_track1_pid;
+    int _b_track2_pid;
+    int _bb_track1_pid;
+    int _bb_track2_pid;
+    float _b_cluster_dphi ;
+    float _b_cluster_deta;
+    int   _nb_nCluster; 
+    float _nb_cluster_dphi ;
+    float _nb_cluster_deta;
     float _b_track1_pt;
     float _b_track1_eta;
     float _b_track1_phi;
     float _b_track2_pt;
     float _b_track2_eta;
     float _b_track2_phi;
-    /**@}*/
-    /** \defgroup signalTreeVars Variables for {@link _signalCutTree}
-      @{*/
     float _b_track_deta ;
     int _b_track_layer ;
     int _b_track_dlayer ;
@@ -160,9 +134,6 @@ class TruthConversionEval: public SubsysReco
     float _b_photon_pT;
     float _b_cluster_prob;
     float _b_track_dphi;
-    /**@}*/
-    /** \defgroup backTreeVars Variables for {@link _signalCutTree}
-      @{*/
     //bb stands for background branch
     float _bb_track_deta ;
     float _bb_vtx_radius ;
@@ -181,7 +152,7 @@ class TruthConversionEval: public SubsysReco
     int _bb_pid;
     /**@}*/
     /** RawClusters associated with truth conversions
-     * processed by other modules*/
+     * processed by other modules currently empty*/
     RawClusterContainer _conversionClusters;
 
     const static int s_kTPCRADIUS=21; //in cm there is a way to get this from the simulation I should implement?
