@@ -99,7 +99,7 @@ void closeBackAna()
   string treePath = "/sphenix/user/vassalli/gammasample/conversionembededonlineanalysis";
   string treeExtension = ".root";
   unsigned int nFiles=100;
-  TFile *out_file = new TFile("effplots.root","RECREATE");
+  TFile *out_file = new TFile("backplots.root","RECREATE");
   TChain *ttree = handleFile(treePath,treeExtension,"cutTreeBackh",nFiles);
   //TChain *ttree2 = handleFile(treePath,treeExtension,"vtxingTree",nFiles);
   plotGoodBack(ttree,out_file);
