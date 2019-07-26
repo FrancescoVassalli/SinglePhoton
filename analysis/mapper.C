@@ -45,7 +45,7 @@ void makeMaps(TChain* ttree,TFile* out_file){
   {
     ttree->GetEvent(event);
     map->Fill(vtxX,vtxY);
-    map->Fill(tvtxX,tvtxY);
+    tmap->Fill(tvtxX,tvtxY);
   }
   out_file->Write();
 }
