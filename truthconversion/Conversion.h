@@ -172,8 +172,10 @@ class Conversion
 		float minDca();
 		///@return the RPhi distance between the reco vtx and further track
 		float vtxTrackRPhi(TVector3 vertpos);
+		static float vtxTrackRPhi(TVector3 vertpos,SvtxTrack*,SvtxTrack*);
 		///@return the RZ distance between the reco vtx and further track
 		float vtxTrackRZ(TVector3 vertpos);
+		static float vtxTrackRZ(TVector3 vertpos,SvtxTrack*,SvtxTrack*);
 
 		float setRecoVtx(SvtxVertex* recovtx,SvtxClusterMap* cmap);
     TLorentzVector* setRecoPhoton();///< constructs a tlv for a photon by adding the tlvs for the reco tracks
@@ -202,6 +204,11 @@ class Conversion
       return dphi;
     }
 
+    ///print the truth info calls {@link e1->identify()}, {@link e2->identify()}, {@link vtx->identify()}, {@link photon->identify()}
+    void printTruth();
+    ///print the reco info calls {@link reco1->identify()}, {@link reco2->identify()}, {@link recoVertex->identify()}, {@link recoPhoton->print()}
+    void printReco();
+
 
   private:
     PHG4Particle* e1=NULL;
@@ -214,17 +221,17 @@ class Conversion
     SvtxTrackEval* trackeval=NULL;
     SvtxClusterMap* _svtxClusterMap=NULL;                                                                              
     SvtxVertex *recoVertex=NULL;
-		TLorentzVector *recoPhoton=NULL;
-		static const int _kNSiliconLayer =7; ///<hardcoded 
-		int embedID=0;
-		int verbosity;
-		int sourceId;
-		float _kElectronRestM=.5109989461;
+	TLorentzVector *recoPhoton=NULL;
 
-		///helper function 
-		float vtxTrackRZ(TVector3 recoVertPos,SvtxTrack *track);
-		///helper function 
-		float vtxTrackRPhi(TVector3 recoVertPos,SvtxTrack *track);
+	static const int _kNSiliconLayer =7; ///<hardcoded 
+	int embedID=0;
+	int verbosity;
+	int sourceId;
+	float _kElectronRestM=.5109989461;
+	///helper function 
+	static float vtxTrackRZ(TVector3 recoVertPos,SvtxTrack *track);
+	///helper function 
+	static float vtxTrackRPhi(TVector3 recoVertPos,SvtxTrack *track);
 
 };
 #endif //CONVERSION_H__
