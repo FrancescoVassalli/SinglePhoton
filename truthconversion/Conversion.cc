@@ -250,6 +250,11 @@ float Conversion::vtxTrackRZ(TVector3 vertpos){
   float d2=vtxTrackRZ(vertpos,reco2);
   return d1>d2?d1:d2;
 }
+float Conversion::vtxTrackRZ(TVector3 vertpos,SvtxTrack* reco1,SvtxTrack* reco2){
+  float d1=vtxTrackRZ(vertpos,reco1);
+  float d2=vtxTrackRZ(vertpos,reco2);
+  return d1>d2?d1:d2;
+}
 
 float Conversion::vtxTrackRPhi(TVector3 vertpos){
   float d1=vtxTrackRPhi(vertpos,reco1);
@@ -257,6 +262,11 @@ float Conversion::vtxTrackRPhi(TVector3 vertpos){
   return d1>d2?d1:d2;
 }
 
+float Conversion::vtxTrackRPhi(TVector3 vertpos,SvtxTrack* reco1,SvtxTrack* reco2){
+  float d1=vtxTrackRPhi(vertpos,reco1);
+  float d2=vtxTrackRPhi(vertpos,reco2);
+  return d1>d2?d1:d2;
+}
 float Conversion::vtxTrackRZ(TVector3 recoVertPos,SvtxTrack *track){
   float dR = sqrt(recoVertPos.x()*recoVertPos.x()+recoVertPos.y()*recoVertPos.y())-sqrt(track->get_x()*track->get_x()+track->get_y()*track->get_y());
   float dZ = recoVertPos.z()-track->get_z();
@@ -393,14 +403,14 @@ void Conversion::printTruth(){
   if (e1) e1->identify();
   if (e2) e2->identify();
   if (vtx) recoVertex->identify();
-  if (recoPhoton) recoPhoton->identify();
+  if (recoPhoton) recoPhoton->Print();
 }
 void Conversion::printReco(){
   cout<<"Conversion with reco info:\n";
   if (reco1) reco1->identify();
   if (reco2) reco2->identify();
   if (vtx) vtx->identify();
-  if (photon) photon->print();
+  if (photon) photon->identify();
 }
 
 float Conversion::setRecoVtx(SvtxVertex *recovtx,SvtxClusterMap* svtxClusterMap){

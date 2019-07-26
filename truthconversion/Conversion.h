@@ -172,8 +172,10 @@ class Conversion
 		float minDca();
 		///@return the RPhi distance between the reco vtx and further track
 		float vtxTrackRPhi(TVector3 vertpos);
+		static float vtxTrackRPhi(TVector3 vertpos,SvtxTrack*,SvtxTrack*);
 		///@return the RZ distance between the reco vtx and further track
 		float vtxTrackRZ(TVector3 vertpos);
+		static float vtxTrackRZ(TVector3 vertpos,SvtxTrack*,SvtxTrack*);
 
 		float setRecoVtx(SvtxVertex* recovtx,SvtxClusterMap* cmap);
     TLorentzVector* setRecoPhoton();///< constructs a tlv for a photon by adding the tlvs for the reco tracks
@@ -227,9 +229,9 @@ class Conversion
 	int sourceId;
 	float _kElectronRestM=.5109989461;
 	///helper function 
-	float vtxTrackRZ(TVector3 recoVertPos,SvtxTrack *track);
+	static float vtxTrackRZ(TVector3 recoVertPos,SvtxTrack *track);
 	///helper function 
-	float vtxTrackRPhi(TVector3 recoVertPos,SvtxTrack *track);
+	static float vtxTrackRPhi(TVector3 recoVertPos,SvtxTrack *track);
 
 };
 #endif //CONVERSION_H__

@@ -98,9 +98,9 @@ class TruthConversionEval: public SubsysReco
     int _bb_track2_pid;
     float _b_cluster_dphi ;
     float _b_cluster_deta;
-    int   _nb_nCluster; 
-    float _nb_cluster_dphi ;
-    float _nb_cluster_deta;
+    int   _bb_nCluster; 
+    float _bb_cluster_dphi ;
+    float _bb_cluster_deta;
     float _b_track1_pt;
     float _b_track1_eta;
     float _b_track1_phi;

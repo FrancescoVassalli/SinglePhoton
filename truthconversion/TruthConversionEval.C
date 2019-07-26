@@ -62,7 +62,6 @@ int TruthConversionEval::InitRun(PHCompositeNode *topNode)
   _vertexer = new SVReco();
   _vertexer->InitRun(topNode);
   if(_kMakeTTree){
-    _b_event=0;
     _runNumber=_kRunNumber;
     _f = new TFile( _foutname.c_str(), "RECREATE");
 
@@ -258,7 +257,6 @@ int TruthConversionEval::process_event(PHCompositeNode *topNode)
   if (_kMakeTTree)
   {
     processTrackBackground(&backgroundTracks,_clusterMap);
-    _b_event++;
   }
   delete stack;
   return 0;
@@ -299,7 +297,7 @@ void TruthConversionEval::numUnique(std::map<int,Conversion> *mymap=NULL,SvtxTra
                 {
                   TVector3 recoVertPos = recoVert->getPos();
                   _b_vtx_radius = sqrt(recoVertPos.x()*recoVertPos.x()+recoVertPos.y()*recoVertPos.y());
-                  _b_tvtx_radius = _b_rVtx[_b_nVtx];
+                  _b_tvtx_radius = sqrt(vtx->get_x()*vtx->get_x()+vtx->get_y()*vtx->get_y());
                   _b_vtx_phi = recoVertPos.Phi();
                   _b_vtx_eta = recoVertPos.Eta();
                   _b_vtx_z = recoVertPos.Z();
@@ -374,26 +372,19 @@ void TruthConversionEval::numUnique(std::map<int,Conversion> *mymap=NULL,SvtxTra
                     _b_cluster_deta=fabs(eta1-etaCalc.PseudoRapidity());
                     if (clusterIds.first!=clusterIds.second) //if there are two district clusters
                     {
-                      _b_nCluster[_b_Rpair]=2;
+                      _b_nCluster=2;
                     }
                     else{
-                      _b_nCluster[_b_Rpair]=1;
+                      _b_nCluster=1;
                     }
                   }
                 }
               }
               _signalCutTree->Fill();  
-              _b_Rpair++;
               break;
             }
-          case 1: //there's one reco track
+          case 1: //there's one reco track I am not atempting to recover these at this time
             {
-              int clustidtemp=i->second.get_cluster_id(); //get the cluster id of the current conversion
-              if(mainClusterContainer->getCluster(clustidtemp)){//if thre is matching cluster 
-                RawCluster *clustemp =   dynamic_cast<RawCluster*>(mainClusterContainer->getCluster(clustidtemp)->Clone());
-                //_conversionClusters.AddCluster(clustemp); //add the calo cluster to the container
-              }
-              //cout<<"Matched 1 reco with layer="<<i->second.firstLayer(_clusterMap)<<"pTs:"<<tlv_electron.Pt()<<"-"<<tlv_positron.Pt()<<'\n';
               break;
             }
           case 0: //no reco tracks
@@ -406,11 +397,6 @@ void TruthConversionEval::numUnique(std::map<int,Conversion> *mymap=NULL,SvtxTra
             break;
         }//switch
       }//rapidity cut
-      if (_kMakeTTree)
-      {
-        _b_pythia[_b_nVtx]=i->second.getEmbed()==_kPythiaEmbed;
-        _b_nVtx++; 
-      }
     }// has 2 truth tracks
   }//map loop
 }
@@ -441,10 +427,10 @@ void TruthConversionEval::processTrackBackground(std::vector<SvtxTrack*> *v_trac
       if (cluster2&&cluster1)
       {
         _bb_nCluster = 2;
-        _bb_cluster_dphi=fabs(clustemp->get_phi()-clus2->get_phi());
+        _bb_cluster_dphi=fabs(cluster1->get_phi()-cluster2->get_phi());
         TVector3 etaCalc(cluster1->get_x(),cluster1->get_y(),cluster1->get_z());
         float eta1 = etaCalc.PseudoRapidity();
-        etaCalc.SetXYZ(clus2->get_x(),clus2->get_y(),clus2->get_z());
+        etaCalc.SetXYZ(cluster2->get_x(),cluster2->get_y(),cluster2->get_z());
         _bb_cluster_deta=fabs(eta1-etaCalc.PseudoRapidity());
       }
       else {
@@ -455,9 +441,9 @@ void TruthConversionEval::processTrackBackground(std::vector<SvtxTrack*> *v_trac
       }
       if (_bb_track_layer>0&&_bb_track_pT>.6&&_bb_track_deta<.0082&&TMath::Abs(_bb_track_dlayer)<=2)
       {
-        i->second.printtruth();
-        pair<SvtxTrack*, SvtxTrack*> reco_tracks=i->second.getRecoTracks();
-        genfit::GFRaveVertex* recoVert = _vertexer->findSecondaryVertex(reco_tracks.first,reco_tracks.second);
+        (*iTrack)->identify();
+        (*jTrack)->identify();
+        genfit::GFRaveVertex* recoVert = _vertexer->findSecondaryVertex(*iTrack,*jTrack);
         _bb_vtx_radius = -1;
         _bb_vtx_chi2 = -1;
         _bb_vtxTrackRZ_dist = -1;
@@ -467,8 +453,8 @@ void TruthConversionEval::processTrackBackground(std::vector<SvtxTrack*> *v_trac
           TVector3 recoVertPos = recoVert->getPos();
           _bb_vtx_radius = sqrt(recoVertPos.x()*recoVertPos.x()+recoVertPos.y()*recoVertPos.y());
           _bb_vtx_chi2 = recoVert->getChi2();
-          _bb_vtxTrackRZ_dist = i->second.vtxTrackRZ(recoVertPos);
-          _bb_vtxTrackRPhi_dist = i->second.vtxTrackRPhi(recoVertPos);
+          _bb_vtxTrackRZ_dist = pairMath.vtxTrackRZ(recoVertPos,*iTrack,*jTrack);
+          _bb_vtxTrackRPhi_dist = pairMath.vtxTrackRPhi(recoVertPos,*iTrack,*jTrack);
         }
         _vtxBackTree->Fill();
       }
