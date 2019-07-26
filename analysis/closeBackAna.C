@@ -76,7 +76,7 @@ void plotGoodBack(TChain* ttree,TFile* out_file){
   for (int event = 0; event < ttree->GetEntries(); ++event)
   {
     ttree->GetEvent(event);
-    if (_bb_track_layer>0&&_bb_track_pT>.6&&_bb_track_deta<.0082&&TMath::Abs(_bb_track_dlayer)<=2)
+    if (_bb_track_layer>0&&_bb_track_pT>.6/*&&_bb_track_deta<.0082&&TMath::Abs(_bb_track_dlayer)<=2*/)
     {
       plots[0]->Fill(_bb_photon_m);
       plots[1]->Fill(_bb_photon_pT);
@@ -91,6 +91,7 @@ void plotGoodBack(TChain* ttree,TFile* out_file){
   {
     plots[i]->Scale(1./count,"width");
   }
+  cout<<"Total good back: "<<count<<'\n';
   out_file->Write();
 }
 
@@ -100,7 +101,7 @@ void closeBackAna()
   string treeExtension = ".root";
   unsigned int nFiles=100;
   TFile *out_file = new TFile("backplots.root","RECREATE");
-  TChain *ttree = handleFile(treePath,treeExtension,"cutTreeBackh",nFiles);
+  TChain *ttree = handleFile(treePath,treeExtension,"cutTreeBacke",nFiles);
   //TChain *ttree2 = handleFile(treePath,treeExtension,"vtxingTree",nFiles);
   plotGoodBack(ttree,out_file);
 }
