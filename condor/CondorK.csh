@@ -17,8 +17,8 @@ cp $BURNER $SCRATCH_AREA
 cp truthconversion/* $SCRATCH_AREA
 #
 cd $SCRATCH_AREA
-#root -b -q Fun4All_G4_K.C\(100,\"$IN_FILE\"\) 
-#cp -f $IN_FILE $OUT_LOCATION$IN_FILE
+root -b -q Fun4All_G4_K.C\(100,\"$IN_FILE\"\) 
+cp -f $IN_FILE $OUT_LOCATION$IN_FILE
 root -b -q after_embeded.C\(\"$OUT_LOCATION$IN_FILE\",\"$OUT_FILE\",$p\)
 cp $OUT_FILE $OUT_LOCATION$OUT_FILE
 #
