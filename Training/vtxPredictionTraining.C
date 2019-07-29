@@ -66,11 +66,11 @@ int vtxPredictionTraining(){
   using namespace std;
   string treePath = "/sphenix/user/vassalli/gammasample/conversiononlineanalysis";
   string treeExtension = ".root";
-  string outname = "vtxTraintemp.root";
+  string outname = "/direct/phenix+u/vassalli/sphenix/single/Training/condorout/vtxTrainNN.root";
   unsigned int nFiles=200;
 
   TChain *signalTree = handleFile(treePath,treeExtension,"vtxingTree",nFiles);
-  makeFactory(signalTree,outname,"vtxFactory");
+  makeFactory(signalTree,outname,"vtxFactoryNN");
 /*  outname="cutTrainE.root";
   makeFactory(signalTree,backETree,outname,"eback");*/
 }
