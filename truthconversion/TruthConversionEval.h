@@ -58,6 +58,7 @@ class TruthConversionEval: public SubsysReco
 
   private:
     bool doNodePointers(PHCompositeNode* topNode);
+    int get_track_pid(SvtxTrack* track)const;
     /** helper function for process_event
      * fills the member fields with information from the conversions 
      * finds the clusters associated with the truth conversions*/
@@ -91,9 +92,9 @@ class TruthConversionEval: public SubsysReco
       @{*/
     /** # of clusters associated with each conversion that has 2 reco tracks
      * 1 indicates the reco tracks go to the same cluster ~15% of conversions*/
+
+    float _b_refitdiff;
     int   _b_nCluster; 
-    int _b_track1_pid;
-    int _b_track2_pid;
     int _bb_track1_pid;
     int _bb_track2_pid;
     float _b_cluster_dphi ;
