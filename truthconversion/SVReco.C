@@ -3,6 +3,8 @@
 #include <trackbase_historic/SvtxClusterMap.h>
 #include <trackbase_historic/SvtxHitMap.h>*/
 #include <trackbase_historic/SvtxTrack.h>
+#include <trackbase_historic/SvtxTrack_v1.h>
+#include <trackbase_historic/SvtxTrackState_v1.h>
 #include <trackbase_historic/SvtxVertex.h>
 #include <trackbase_historic/SvtxTrackMap.h>
 #include <trackbase_historic/SvtxVertexMap.h>
@@ -52,6 +54,7 @@
 #include <GenFit/RKTrackRep.h>
 #include <GenFit/StateOnPlane.h>
 #include <GenFit/Track.h>
+#include <GenFit/KalmanFitterInfo.h>
 
 //#include <HFJetTruthGeneration/HFJetDefs.h>
 
@@ -369,7 +372,7 @@ int SVReco::GetNodes(PHCompositeNode * topNode){
 			<< endl;
 		return Fun4AllReturnCodes::ABORTEVENT;
 	}
-	_geom_container_maps = findNode::getClass<PHG4CylinderGeomContainer>(topNode, "CYLINDERGEOM_MVTX")
+	_geom_container_maps = findNode::getClass<PHG4CylinderGeomContainer>(topNode, "CYLINDERGEOM_MVTX");
 		if (!_geom_container_maps)
 		{
 			cout << PHWHERE << "CYLINDERGEOM_MVTX node not found on node tree"
@@ -443,7 +446,7 @@ PHGenFit::Track* SVReco::MakeGenFitTrack(const SvtxTrack* intrack){
 			} 
 			else if (trkrid == TrkrDefs::inttId) {
 				//this may bug but it looks ok for now
-				CylinderGeomIntt* geom = (CylinderGeomIntt*) geom_container_intt->GetLayerGeom(layer);
+				CylinderGeomIntt* geom = (CylinderGeomIntt*) _geom_container_intt->GetLayerGeom(layer);
 				double hit_location[3] = { 0.0, 0.0, 0.0 };
 				geom->find_segment_center(InttDefs::getLadderZId(*iter),InttDefs::getLadderPhiId(*iter), hit_location);
 
@@ -471,115 +474,108 @@ PHGenFit::Track* SVReco::MakeGenFitTrack(const SvtxTrack* intrack){
 
 //inspired by PHG4TrackKalmanFitter
 PHGenFit::Track* SVReco::MakeGenFitTrack(const SvtxTrack* intrack, const SvtxVertex* invertex){
-	if (!intrack){
-		cerr << PHWHERE << " Input SvtxTrack is NULL!" << endl;
-		return NULL;
-	}
+  if (!intrack){
+    cerr << PHWHERE << " Input SvtxTrack is NULL!" << endl;
+    return NULL;
+  }
 
-	if (_use_ladder_geom and !_geom_container_intt and !_geom_container_maps) {
-		cout << PHWHERE << "No PHG4CylinderGeomContainer found!" << endl;
-		return NULL;
-	}
+  if (_use_ladder_geom and !_geom_container_intt and !_geom_container_maps) {
+    cout << PHWHERE << "No PHG4CylinderGeomContainer found!" << endl;
+    return NULL;
+  }
 
-	// Create measurements
-	std::vector<PHGenFit::Measurement*> measurements;
+  // Create measurements
+  std::vector<PHGenFit::Measurement*> measurements;
 
-	//create space point measurement from vtx
-	if (invertex and invertex->size_tracks() > 1
-			and invertex->get_chisq() / invertex->get_ndof()
-			< vertex_chi2_over_dnf_cut) {
-		TVector3 pos(invertex->get_x(), invertex->get_y(), invertex->get_z());
-		TMatrixDSym cov(3);
-		cov.Zero();
-		bool is_vertex_cov_sane = true;
-		for (unsigned int i = 0; i < 3; i++)
-			for (unsigned int j = 0; j < 3; j++) {
+  //create space point measurement from vtx
+  if (invertex and invertex->size_tracks() > 1) {
+    TVector3 pos(invertex->get_x(), invertex->get_y(), invertex->get_z());
+    TMatrixDSym cov(3);
+    cov.Zero();
+    bool is_vertex_cov_sane = true;
+    for (unsigned int i = 0; i < 3; i++)
+      for (unsigned int j = 0; j < 3; j++) {
+        cov(i, j) = invertex->get_error(i, j);
+      }
 
-				cov(i, j) = invertex->get_error(i, j);
+    if (is_vertex_cov_sane) {
+      PHGenFit::Measurement* meas = new PHGenFit::SpacepointMeasurement(
+          pos, cov);
+      measurements.push_back(meas);
+    }
 
-				if (i == j) {
-					if (!(invertex->get_error(i, j) > 0
-								and invertex->get_error(i, j)
-								< vertex_cov_element_cut))
-						is_vertex_cov_sane = false;
-				}
-			}
+    //convert SvtxTrack to matricies
+    TVector3 seed_pos(intrack->get_x(), intrack->get_y(), intrack->get_z());
+    TVector3 seed_mom(intrack->get_px(), intrack->get_py(), intrack->get_pz()); //mom stands for momentum
+    TMatrixDSym seed_cov(6);
+    for (int i=0; i<6; i++){
+      for (int j=0; j<6; j++){
+        seed_cov[i][j] = intrack->get_error(i,j);
+      }
+    }
+    //make measurements from the track clusters
+    for (auto iter = intrack->begin_cluster_keys(); iter != intrack->end_cluster_keys(); ++iter){
+      //    unsigned int cluster_id = *iter;
+      TrkrCluster* cluster = _clustermap->findCluster(*iter);
+      if (!cluster) {
+        LogError("No cluster Found!");
+        continue;
+      }
+      float x = cluster->getPosition(0);
+      float y = cluster->getPosition(1);
+      float radius = sqrt(x*x+y*y);
+      TVector3 pos(cluster->getPosition(0), cluster->getPosition(1), cluster->getPosition(2));
+      seed_mom.SetPhi(pos.Phi());
+      seed_mom.SetTheta(pos.Theta());
 
-		if (is_vertex_cov_sane) {
-			PHGenFit::Measurement* meas = new PHGenFit::SpacepointMeasurement(
-					pos, cov);
-			measurements.push_back(meas);
-		}
+      TVector3 n(cluster->getPosition(0), cluster->getPosition(1), 0);
+      //cout<<"Cluster with {"<<cluster->getPosition(0)<<','<<cluster->getPosition(0)<<"}\n";
 
-		//convert SvtxTrack to matricies
-		TVector3 seed_pos(intrack->get_x(), intrack->get_y(), intrack->get_z());
-		TVector3 seed_mom(intrack->get_px(), intrack->get_py(), intrack->get_pz()); //mom stands for momentum
-		TMatrixDSym seed_cov(6);
-		for (int i=0; i<6; i++){
-			for (int j=0; j<6; j++){
-				seed_cov[i][j] = intrack->get_error(i,j);
-			}
-		}
-		//make measurements from the track clusters
-		for (auto iter = intrack->begin_cluster_keys(); iter != intrack->end_cluster_keys(); ++iter){
-			//    unsigned int cluster_id = *iter;
-			TrkrCluster* cluster = _clustermap->findCluster(*iter);
-			if (!cluster) {
-				LogError("No cluster Found!");
-				continue;
-			}
-			float x = cluster->getPosition(0);
-			float y = cluster->getPosition(1);
-			float radius = sqrt(x*x+y*y);
-			TVector3 pos(cluster->getPosition(0), cluster->getPosition(1), cluster->getPosition(2));
-			seed_mom.SetPhi(pos.Phi());
-			seed_mom.SetTheta(pos.Theta());
+      if (_use_ladder_geom){ //I don't understand this bool
+        unsigned int trkrid = TrkrDefs::getTrkrId(*iter);
+        unsigned int layer = TrkrDefs::getLayer(*iter);
+        if (trkrid == TrkrDefs::mvtxId) {
+          int stave_index = MvtxDefs::getStaveId(*iter);
+          int chip_index = MvtxDefs::getChipId(*iter);
 
-			TVector3 n(cluster->getPosition(0), cluster->getPosition(1), 0);
-			//cout<<"Cluster with {"<<cluster->getPosition(0)<<','<<cluster->getPosition(0)<<"}\n";
+          double ladder_location[3] = { 0.0, 0.0, 0.0 };
+          //not exactly sure where the cylinder geoms are currently objectified. check this 
+          CylinderGeom_Mvtx *geom = (CylinderGeom_Mvtx*) _geom_container_maps->GetLayerGeom(layer);
+          // returns the center of the sensor in world coordinates - used to get the ladder phi location
+          geom->find_sensor_center(stave_index, 0, 0, chip_index, ladder_location);//the mvtx module and half stave are 0
+          n.SetXYZ(ladder_location[0], ladder_location[1], 0);
+          n.RotateZ(geom->get_stave_phi_tilt());
+        } 
+        else if (trkrid == TrkrDefs::inttId) {
+          //this may bug but it looks ok for now
+          CylinderGeomIntt* geom = (CylinderGeomIntt*) _geom_container_intt->GetLayerGeom(layer);
+          double hit_location[3] = { 0.0, 0.0, 0.0 };
+          geom->find_segment_center(InttDefs::getLadderZId(*iter),InttDefs::getLadderPhiId(*iter), hit_location);
 
-			if (_use_ladder_geom){ //I don't understand this bool
-				unsigned int trkrid = TrkrDefs::getTrkrId(*iter);
-				unsigned int layer = TrkrDefs::getLayer(*iter);
-				if (trkrid == TrkrDefs::mvtxId) {
-					int stave_index = MvtxDefs::getStaveId(*iter);
-					int chip_index = MvtxDefs::getChipId(*iter);
+          n.SetXYZ(hit_location[0], hit_location[1], 0);
+          n.RotateZ(geom->get_strip_phi_tilt());
+        }
+      }//if use_ladder_geom
+      PHGenFit::Measurement* meas = new PHGenFit::PlanarMeasurement(pos, n,radius*cluster->getPhiError(), cluster->getZError());
+      measurements.push_back(meas);
+    }//cluster loop
+    genfit::AbsTrackRep* rep = new genfit::RKTrackRep(_primary_pid_guess);
+    PHGenFit::Track* track(new PHGenFit::Track(rep, seed_pos, seed_mom, seed_cov));
+    track->addMeasurements(measurements);
 
-					double ladder_location[3] = { 0.0, 0.0, 0.0 };
-					//not exactly sure where the cylinder geoms are currently objectified. check this 
-					CylinderGeom_Mvtx *geom = (CylinderGeom_Mvtx*) _geom_container_maps->GetLayerGeom(layer);
-					// returns the center of the sensor in world coordinates - used to get the ladder phi location
-					geom->find_sensor_center(stave_index, 0, 0, chip_index, ladder_location);//the mvtx module and half stave are 0
-					n.SetXYZ(ladder_location[0], ladder_location[1], 0);
-					n.RotateZ(geom->get_stave_phi_tilt());
-				} 
-				else if (trkrid == TrkrDefs::inttId) {
-					//this may bug but it looks ok for now
-					CylinderGeomIntt* geom = (CylinderGeomIntt*) geom_container_intt->GetLayerGeom(layer);
-					double hit_location[3] = { 0.0, 0.0, 0.0 };
-					geom->find_segment_center(InttDefs::getLadderZId(*iter),InttDefs::getLadderPhiId(*iter), hit_location);
+    if (_fitter->processTrack(track, false) != 0) {
+      if (_verbosity >= 1)
+        LogWarning("Track fitting failed");
+      return NULL;
+    }
+    track->getGenFitTrack()->setMcTrackId(intrack->get_id());
+    return track;
+  }//valid vtx 
+  else{
+    cerr<<PHWHERE<<": invalid vertex"<<endl;
+    return NULL;
+  }
 
-					n.SetXYZ(hit_location[0], hit_location[1], 0);
-					n.RotateZ(geom->get_strip_phi_tilt());
-				}
-			}//if use_ladder_geom
-			PHGenFit::Measurement* meas = new PHGenFit::PlanarMeasurement(pos, n,radius*cluster->getPhiError(), cluster->getZError());
-			measurements.push_back(meas);
-		}//cluster loop
-		genfit::AbsTrackRep* rep = new genfit::RKTrackRep(_primary_pid_guess);
-		PHGenFit::Track* track(new PHGenFit::Track(rep, seed_pos, seed_mom, seed_cov));
-		track->addMeasurements(measurements);
-
-		if (_fitter->processTrack(track, false) != 0) {
-			if (_verbosity >= 1)
-				LogWarning("Track fitting failed");
-			return NULL;
-		}
-
-		track->getGenFitTrack()->setMcTrackId(intrack->get_id());
-
-		return track;
-	}
 }
 
 /*
@@ -707,8 +703,9 @@ void SVReco::refitTrack(SvtxVertex* vtx, SvtxTrack* svtxtrk){
 	MakeSvtxTrack(svtxtrk,MakeGenFitTrack(svtxtrk,vtx),vtx);
 }
 
+//may need to make the phgf_track pointer shared 
 std::shared_ptr<SvtxTrack> SVReco::MakeSvtxTrack(const SvtxTrack* svtx_track,
-		const std::shared_ptr<PHGenFit::Track>& phgf_track, const SvtxVertex* vertex) {
+		const PHGenFit::Track* phgf_track, const SvtxVertex* vertex) {
 
 	double chi2 = phgf_track->get_chi2();
 	double ndf = phgf_track->get_ndf();
@@ -729,7 +726,7 @@ std::shared_ptr<SvtxTrack> SVReco::MakeSvtxTrack(const SvtxTrack* svtx_track,
 				vertex_cov[i][j] = vertex->get_error(i,j);
 	}
 	else{
-		cerr<<PHWERE<<": No vertex to make SvtxTrack"<<endl;
+		cerr<<PHWHERE<<": No vertex to make SvtxTrack"<<endl;
 	}
 
 	//genfit::MeasuredStateOnPlane* gf_state_beam_line_ca = nullptr;
@@ -738,7 +735,7 @@ std::shared_ptr<SvtxTrack> SVReco::MakeSvtxTrack(const SvtxTrack* svtx_track,
 		gf_state_beam_line_ca = std::shared_ptr<genfit::MeasuredStateOnPlane>(phgf_track->extrapolateToLine(vertex_position,
 					TVector3(0., 0., 1.)));
 	} catch (...) {
-		if (Verbosity() >= 2)
+		if (_verbosity >= 2)
 			LogWarning("extrapolateToLine failed!");
 	}
 	if(!gf_state_beam_line_ca) return nullptr;
@@ -772,7 +769,7 @@ std::shared_ptr<SvtxTrack> SVReco::MakeSvtxTrack(const SvtxTrack* svtx_track,
 		gf_state_vertex_ca = std::shared_ptr < genfit::MeasuredStateOnPlane
 			> (phgf_track->extrapolateToPoint(vertex_position));
 	} catch (...) {
-		if (Verbosity() >= 2)
+		if (_verbosity >= 2)
 			LogWarning("extrapolateToPoint failed!");
 	}
 	if (!gf_state_vertex_ca) {
@@ -891,8 +888,6 @@ std::shared_ptr<SvtxTrack> SVReco::MakeSvtxTrack(const SvtxTrack* svtx_track,
 			}
 		}
 
-		pos_cov_XYZ_to_RZ(vn, pos_in, cov_in, pos_out, cov_out);
-
 		dca3d_xy = pos_out[0][0];
 		dca3d_z  = pos_out[2][0];
 		dca3d_xy_error = sqrt(cov_out[0][0]);
@@ -921,7 +916,7 @@ std::shared_ptr<SvtxTrack> SVReco::MakeSvtxTrack(const SvtxTrack* svtx_track,
 #endif
 
 	} catch (...) {
-		if (Verbosity() > 0)
+		if (_verbosity > 0)
 			LogWarning("DCA calculationfailed!");
 	}
 
@@ -1020,14 +1015,14 @@ std::shared_ptr<SvtxTrack> SVReco::MakeSvtxTrack(const SvtxTrack* svtx_track,
 		genfit::TrackPoint *trpoint = gftrack->getPointWithMeasurementAndFitterInfo(id, gftrack->getCardinalRep());
 
 		if(!trpoint) {
-			if (Verbosity() > 1)
+			if (_verbosity > 1)
 				LogWarning("!trpoint");
 			continue;
 		}
 
 		genfit::KalmanFitterInfo* kfi = static_cast<genfit::KalmanFitterInfo*>( trpoint->getFitterInfo(rep) );
 		if(!kfi) {
-			if (Verbosity() > 1)
+			if (_verbosity > 1)
 				LogWarning("!kfi");
 			continue;
 		}
@@ -1038,11 +1033,11 @@ std::shared_ptr<SvtxTrack> SVReco::MakeSvtxTrack(const SvtxTrack* svtx_track,
 			const genfit::MeasuredStateOnPlane* temp_state = &(kfi->getFittedState(true));
 			gf_state = std::shared_ptr <genfit::MeasuredStateOnPlane> (new genfit::MeasuredStateOnPlane(*temp_state));
 		} catch (...) {
-			if (Verbosity() > 1)
+			if (_verbosity > 1)
 				LogWarning("Exrapolation failed!");
 		}
 		if (!gf_state) {
-			if (Verbosity() > 1)
+			if (_verbosity > 1)
 				LogWarning("Exrapolation failed!");
 			continue;
 		}

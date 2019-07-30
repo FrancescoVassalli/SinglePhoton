@@ -298,10 +298,10 @@ void TruthConversionEval::numUnique(std::map<int,Conversion> *mymap=NULL,SvtxTra
                 {
                   i->second.refitTracks(vtx,_vertexer);
                   pair<TLorentzVector, TLorentzVector> refit_reco_tlvs = i->second.getRecoTlvs();
-                  _b_refitdiff = sqrt((reco_tlvs.first-refit_reco_tlvs.first)->Dot((reco_tlvs.first-refit_reco_tlvs.first))*
-                    (reco_tlvs.first-refit_reco_tlvs.first)->Dot((reco_tlvs.first-refit_reco_tlvs.first))+
-                    (reco_tlvs.second-refit_reco_tlvs.second)->Dot((reco_tlvs.second-refit_reco_tlvs.second))*
-                    (reco_tlvs.second-refit_reco_tlvs.second)->Dot((reco_tlvs.second-refit_reco_tlvs.second)))
+                  _b_refitdiff = sqrt((reco_tlvs.first-refit_reco_tlvs.first).Dot((reco_tlvs.first-refit_reco_tlvs.first))*
+                    (reco_tlvs.first-refit_reco_tlvs.first).Dot((reco_tlvs.first-refit_reco_tlvs.first))+
+                    (reco_tlvs.second-refit_reco_tlvs.second).Dot((reco_tlvs.second-refit_reco_tlvs.second))*
+                    (reco_tlvs.second-refit_reco_tlvs.second).Dot((reco_tlvs.second-refit_reco_tlvs.second)));
                   TVector3 recoVertPos = recoVert->getPos();
                   _b_vtx_radius = sqrt(recoVertPos.x()*recoVertPos.x()+recoVertPos.y()*recoVertPos.y());
                   _b_tvtx_radius = sqrt(vtx->get_x()*vtx->get_x()+vtx->get_y()*vtx->get_y());

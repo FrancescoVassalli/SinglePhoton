@@ -5,6 +5,7 @@
 #include <g4main/PHG4TruthInfoContainer.h>
 #include <trackbase_historic/SvtxCluster.h>
 #include <trackbase_historic/SvtxHitMap.h>
+#include <trackbase_historic/SvtxVertex_v1.h>
 #include <trackbase/TrkrClusterContainer.h>
 #include <trackbase/TrkrClusterv1.h>
 #include <assert.h>
@@ -162,7 +163,7 @@ TLorentzVector* Conversion::getRecoPhoton(){
 }
 
 std::pair<TLorentzVector,TLorentzVector> Conversion::getRecoTlvs(){
-  std::pair<TLorentzVector*,TLorentzVector*> r;
+  std::pair<TLorentzVector,TLorentzVector> r;
   r.first = TLorentzVector (reco1->get_px(),reco1->get_py(),reco1->get_pz(),
         sqrt(_kElectronRestM*_kElectronRestM+reco1->get_p()*reco1->get_p()));
   r.second =   TLorentzVector (reco2->get_px(),reco2->get_py(),reco2->get_pz(),
@@ -579,16 +580,16 @@ std::pair<float,float> Conversion::getTrackPhis(){
 }
 
 void Conversion::refitTracks(PHG4VtxPoint* vtx, SVReco* vertexer){
-  vertexer->refitTracks(PHG4VtxPointToSvtxVertex(vtx),reco1);
-  vertexer->refitTracks(PHG4VtxPointToSvtxVertex(vtx),reco2);
+  vertexer->refitTrack(PHG4VtxPointToSvtxVertex(vtx),reco1);
+  vertexer->refitTrack(PHG4VtxPointToSvtxVertex(vtx),reco2);
 }
 
 SvtxVertex* Conversion::PHG4VtxPointToSvtxVertex(PHG4VtxPoint* truth){
-  SvtxVertex *r = new SvtxVertex();
+  SvtxVertex_v1 *r = new SvtxVertex_v1();
   r->set_x(truth->get_x());
   r->set_y(truth->get_y());
   r->set_z(truth->get_z());
-  r->set_t(truth->get_t());
+  r->set_t0(truth->get_t());
   r->set_chisq(1.);
   r->set_ndof(1);
   for (unsigned i = 0; i < 3; ++i)

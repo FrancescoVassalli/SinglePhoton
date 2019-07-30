@@ -26,6 +26,7 @@ class SvtxVertexMap;
 class SvtxVertex;
 class PHCompositeNode;
 class PHG4TruthInfoContainer;
+class PHG4CylinderGeomContainer;
 //class SvtxClusterMap;
 class TrkrClusterContainer;
 class SvtxEvalStack;
@@ -52,6 +53,8 @@ class SVReco {
 		//!@return a vertex for each track pair
 		genfit::GFRaveVertex* findSecondaryVertex(SvtxTrack* track1, SvtxTrack* track2);
 
+		//Uses \param vtx to refit \param svtxtrk which is directly edited
+		void refitTrack(SvtxVertex* vtx, SvtxTrack* svtxtrk);
 		void reset_eval_variables();
 
 		void set_do_eval(bool doEval){
@@ -132,9 +135,7 @@ class SVReco {
 		PHGenFit::Track* MakeGenFitTrack(const SvtxTrack* intrack, const SvtxVertex* invertex);
 		///From {@link PHG4TrackKalmanFitter} 
 		std::shared_ptr<SvtxTrack> MakeSvtxTrack(const SvtxTrack* svtx_track,
-				const std::shared_ptr<PHGenFit::Track>& phgf_track, const SvtxVertex* vertex);
-		//Uses \param vtx to refit \param svtxtrk which is directly edited
-		void refitTrack(SvtxVertex* vtx, SvtxTrack* svtxtrk);
+				const PHGenFit::Track* phgf_track, const SvtxVertex* vertex);
 		//! Fill SvtxVertexMap from GFRaveVertexes and Tracks
 		void FillVertexMap(
 				const std::vector<genfit::GFRaveVertex*> & rave_vertices,
