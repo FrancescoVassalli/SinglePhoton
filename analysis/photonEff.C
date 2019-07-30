@@ -87,7 +87,7 @@ void makeVtxR(TChain* ttree,TFile* out_file){
 void makeRefitDist(TChain* ttree, TFile *out_file){
   float diff;
   ttree->SetBranchAddress("refitdiff",&diff);
-  TH1F *diffplot= new TH1F("|m_{e0}-m_{e_refit}|","",40,0,10);
+  TH1F *diffplot= new TH1F("|m_{e0}-m_{e_refit}|","",20,-1,1);
 
   diffplot->Sumw2();
 
