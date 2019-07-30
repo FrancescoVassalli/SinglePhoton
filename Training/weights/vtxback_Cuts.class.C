@@ -10,10 +10,10 @@ Method         : Cuts::Cuts
 TMVA Release   : 4.2.0         [262656]
 ROOT Release   : 5.34/38       [336422]
 Creator        : vassalli
-Date           : Tue Jul 30 18:27:29 2019
+Date           : Tue Jul 30 18:49:11 2019
 Host           : Linux cvmfswrite02.sdcc.bnl.gov 3.10.0-693.11.6.el7.x86_64 #1 SMP Wed Jan 3 18:09:42 CST 2018 x86_64 x86_64 x86_64 GNU/Linux
 Dir            : /direct/phenix+u/vassalli/sphenix/single/Training
-Training events: 10385
+Training events: 11413
 Analysis type  : [Classification]
 
 
@@ -32,29 +32,38 @@ EffMethod: "EffSel" [Selection Method]
 CutRangeMin[0]: "-1.000000e+00" [Minimum of allowed cut range (set per variable)]
     CutRangeMin[1]: "-1.000000e+00"
     CutRangeMin[2]: "-1.000000e+00"
+    CutRangeMin[3]: "-1.000000e+00"
+    CutRangeMin[4]: "-1.000000e+00"
+    CutRangeMin[5]: "-1.000000e+00"
 CutRangeMax[0]: "-1.000000e+00" [Maximum of allowed cut range (set per variable)]
     CutRangeMax[1]: "-1.000000e+00"
     CutRangeMax[2]: "-1.000000e+00"
+    CutRangeMax[3]: "-1.000000e+00"
+    CutRangeMax[4]: "-1.000000e+00"
+    CutRangeMax[5]: "-1.000000e+00"
 VarProp[0]: "NotEnforced" [Categorisation of cuts]
     VarProp[1]: "NotEnforced"
     VarProp[2]: "NotEnforced"
+    VarProp[3]: "NotEnforced"
+    VarProp[4]: "NotEnforced"
+    VarProp[5]: "NotEnforced"
 ##
 
 
 #VAR -*-*-*-*-*-*-*-*-*-*-*-* variables *-*-*-*-*-*-*-*-*-*-*-*-
 
-NVar 3
-cluster_deta                  cluster_deta                  cluster_deta                  cluster_deta                                                    'F'    [-1,0.0473219230771]
-cluster_dphi                  cluster_dphi                  cluster_dphi                  cluster_dphi                                                    'F'    [-1,6.24294090271]
-vtx_radius                    vtx_radius                    vtx_radius                    vtx_radius                                                      'F'    [1.84824573994,165.261642456]
-NSpec 7
+NVar 6
+track_deta                    track_deta                    track_deta                    track_deta                                                      'F'    [0,0.670255243778]
+cluster_deta                  cluster_deta                  cluster_deta                  cluster_deta                                                    'F'    [-1,0.67217206955]
+cluster_dphi                  cluster_dphi                  cluster_dphi                  cluster_dphi                                                    'F'    [-1,6.24406814575]
+abs(track_dlayer)             abs_track_dlayer_             abs(track_dlayer)             abs(track_dlayer)                                               'I'    [0,13]
+approach_dist                 approach_dist                 approach_dist                 approach_dist                                                   'F'    [3.08318594762e-05,88.587638855]
+vtx_radius                    vtx_radius                    vtx_radius                    vtx_radius                                                      'F'    [-1,287.19519043]
+NSpec 4
 track_layer                   track_layer                   track_layer                   I                                                               'F'    [0,20]
-track_pT                      track_pT                      track_pT                      F                                                               'F'    [0.600010812283,7141.45507812]
-track_dca                     track_dca                     track_dca                     F                                                               'F'    [6.28600332675e-07,39.4758415222]
-cluster_prob                  cluster_prob                  cluster_prob                  F                                                               'F'    [0,0.999079287052]
-track_deta                    track_deta                    track_deta                    F                                                               'F'    [0,0.00819420814514]
-abs(track_dlayer)             abs_track_dlayer_             abs(track_dlayer)             I                                                               'F'    [0,2]
-approach_dist                 approach_dist                 approach_dist                 F                                                               'F'    [5.06407900502e-07,81.9423599243]
+track_pT                      track_pT                      track_pT                      F                                                               'F'    [0.600010812283,62119.8007812]
+track_dca                     track_dca                     track_dca                     F                                                               'F'    [2.25663001174e-07,91.8196792603]
+cluster_prob                  cluster_prob                  cluster_prob                  F                                                               'F'    [0,0.999862730503]
 
 
 ============================================================================ */
@@ -96,11 +105,11 @@ class ReadCuts : public IClassifierReader {
    ReadCuts( std::vector<std::string>& theInputVars ) 
       : IClassifierReader(),
         fClassName( "ReadCuts" ),
-        fNvars( 3 ),
+        fNvars( 6 ),
         fIsNormalised( false )
    {      
       // the training input variables
-      const char* inputVars[] = { "cluster_deta", "cluster_dphi", "vtx_radius" };
+      const char* inputVars[] = { "track_deta", "cluster_deta", "cluster_dphi", "abs(track_dlayer)", "approach_dist", "vtx_radius" };
 
       // sanity checks
       if (theInputVars.size() <= 0) {
@@ -130,11 +139,20 @@ class ReadCuts : public IClassifierReader {
       fVmax[1] = 0;
       fVmin[2] = 0;
       fVmax[2] = 0;
+      fVmin[3] = 0;
+      fVmax[3] = 0;
+      fVmin[4] = 0;
+      fVmax[4] = 0;
+      fVmin[5] = 0;
+      fVmax[5] = 0;
 
       // initialize input variable types
       fType[0] = 'F';
       fType[1] = 'F';
       fType[2] = 'F';
+      fType[3] = 'I';
+      fType[4] = 'F';
+      fType[5] = 'F';
 
       // initialize constants
       Initialize();
@@ -166,15 +184,15 @@ class ReadCuts : public IClassifierReader {
    // normalisation of input variables
    const bool fIsNormalised;
    bool IsNormalised() const { return fIsNormalised; }
-   double fVmin[3];
-   double fVmax[3];
+   double fVmin[6];
+   double fVmax[6];
    double NormVariable( double x, double xmin, double xmax ) const {
       // normalise to output range: [-1, 1]
       return 2*(x - xmin)/(xmax - xmin) - 1.0;
    }
 
    // type of input variable: 'F' or 'I'
-   char   fType[3];
+   char   fType[6];
 
    // initialize internal variables
    void Initialize();
