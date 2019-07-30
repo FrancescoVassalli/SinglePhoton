@@ -599,7 +599,7 @@ void Conversion::PHG4VtxPointToSvtxVertex(){
   truthSvtxVtx->set_ndof(1);
   for (unsigned i = 0; i < 3; ++i)
   {
-    truthSvtxVtx->set_error(i,i,1.);
+    truthSvtxVtx->set_error(i,i,1e-5);
     for (unsigned j = i+1; j < 3; ++j)
     {
       truthSvtxVtx->set_error(i,j,1e-5);
