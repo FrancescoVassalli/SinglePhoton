@@ -578,6 +578,32 @@ PHGenFit::Track* SVReco::MakeGenFitTrack(const SvtxTrack* intrack, const SvtxVer
 
 }
 
+//From PHG4TrackKalmanFitter
+SvtxVertex* SVReco::GFRVVtxToSvtxVertex(genfit::GFRaveVertex* rave_vtx)const {
+  SvtxVertex* svtx_vtx= new SvtxVertex_v1();
+
+    svtx_vtx->set_chisq(rave_vtx->getChi2());
+    svtx_vtx->set_ndof(rave_vtx->getNdf());
+    svtx_vtx->set_position(0, rave_vtx->getPos().X());
+    svtx_vtx->set_position(1, rave_vtx->getPos().Y());
+    svtx_vtx->set_position(2, rave_vtx->getPos().Z());
+
+    for (int i = 0; i < 3; i++)
+      for (int j = 0; j < 3; j++)
+        svtx_vtx->set_error(i, j, rave_vtx->getCov()[i][j]);
+
+    for (unsigned int i = 0; i < rave_vtx->getNTracks(); i++) {
+      //TODO Assume id's are sync'ed between _trackmap_refit and gf_tracks, need to change?
+      const genfit::Track* rave_track =
+          rave_vtx->getParameters(i)->getTrack();
+      for (unsigned int j = 0; j < gf_tracks.size(); j++) {
+        if (rave_track == gf_tracks[j])
+          svtx_vtx->insert_track(j);
+      }
+    }
+    return svtx_vtx;
+}
+
 /*
  * Fill SvtxVertexMap from GFRaveVertexes and Tracks
  */

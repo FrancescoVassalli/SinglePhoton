@@ -298,7 +298,8 @@ void TruthConversionEval::numUnique(std::map<int,Conversion> *mymap=NULL,SvtxTra
                 genfit::GFRaveVertex* recoVert = _vertexer->findSecondaryVertex(reco_tracks.first,reco_tracks.second);
                 if (recoVert)
                 {
-                  i->second.refitTracks(vtx,_vertexer);
+                  SvtxVertex*  svtxRecoVert = _vertexer->GFRVVtxToSvtxVertex(recoVert);
+                  i->second.refitTracks(svtxRecoVert,_vertexer);
                   pair<TLorentzVector, TLorentzVector> refit_reco_tlvs = i->second.getRecoTlvs();
                   _b_refitdiff = sqrt((reco_tlvs.first-refit_reco_tlvs.first).Dot((reco_tlvs.first-refit_reco_tlvs.first))*
                     (reco_tlvs.first-refit_reco_tlvs.first).Dot((reco_tlvs.first-refit_reco_tlvs.first))+
@@ -486,7 +487,6 @@ void TruthConversionEval::processTrackBackground(std::vector<SvtxTrack*> *v_trac
     _trackBackTree->Fill();
   }//iTrack loop
   cout<<"Null track count ="<<nNullTrack<<'\n';
->>>>>>> master
 }
 
 const RawClusterContainer* TruthConversionEval::getClusters()const {return &_conversionClusters;} 

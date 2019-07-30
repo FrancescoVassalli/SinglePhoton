@@ -52,6 +52,8 @@ class SVReco {
 
 		//!@return a vertex for each track pair
 		genfit::GFRaveVertex* findSecondaryVertex(SvtxTrack* track1, SvtxTrack* track2);
+		///@return a new SvtxVertex from the rave_vtx ownership is returned
+		static SvtxVertex* GFRVVtxToSvtxVertex(genfit::GFRaveVertex* rave_vtx)const;
 
 		//Uses \param vtx to refit \param svtxtrk which is directly edited
 		void refitTrack(SvtxVertex* vtx, SvtxTrack* svtxtrk);
