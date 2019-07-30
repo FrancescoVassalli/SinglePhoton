@@ -144,13 +144,16 @@ int TruthConversionEval::InitRun(PHCompositeNode *topNode)
     _signalCutTree->Branch("vtxTrackRZ_dist", &_b_vtxTrackRZ_dist);
     _signalCutTree->Branch("vtxTrackRPhi_dist", &_b_vtxTrackRPhi_dist);
     _signalCutTree->Branch("photon_m", &_b_photon_m);
+    _signalCutTree->Branch("rephoton_m", &_b_rephoton_m);
     _signalCutTree->Branch("tphoton_m", &_b_tphoton_m);
     _signalCutTree->Branch("photon_pT", &_b_photon_pT);
     _signalCutTree->Branch("cluster_prob", &_b_cluster_prob);
     _signalCutTree->Branch("nCluster", &_b_nCluster);
     _signalCutTree->Branch("cluster_dphi", &_b_cluster_dphi);
     _signalCutTree->Branch("cluster_deta", &_b_cluster_deta);
-    _signalCutTree->Branch("refitdiff",&_b_refitdiff);
+    _signalCutTree->Branch("refitdiffx",&_b_refitdiffx);
+    _signalCutTree->Branch("refitdiffy",&_b_refitdiffy);
+    _signalCutTree->Branch("refitdiffz",&_b_refitdiffz);
   }
   return 0;
 }
@@ -290,6 +293,23 @@ void TruthConversionEval::numUnique(std::map<int,Conversion> *mymap=NULL,SvtxTra
                 else _b_ttrack_pT = tlv_electron.Pt();
                 _b_approach = i->second.approachDistance();
                 _b_track_dca = i->second.minDca();
+                TLorentzVector* recoPhoton = i->second.getRecoPhoton();
+                PHG4Particle* truthphoton = i->second.getTruthPhoton(_truthinfo);
+                TLorentzVector tlv_tphoton;
+                if(truthphoton){
+                  tlv_tphoton.SetPxPyPzE(truthphoton->get_px(),truthphoton->get_py(),truthphoton->get_pz(),truthphoton->get_e());
+                  if (recoPhoton)
+                  {
+                    _b_photon_m=recoPhoton->Dot(*recoPhoton);
+                    _b_tphoton_m=tlv_tphoton.Dot(tlv_tphoton);
+                    _b_photon_pT=recoPhoton->Pt();
+                  }
+                }
+                else{ //photon was not reconstructed
+                  _b_photon_m =-1;
+                  _b_tphoton_m =-1;
+                  _b_photon_pT=-1;
+                }
                 //TODO make Conversion find the reco vertex
                 pair<SvtxTrack*, SvtxTrack*> reco_tracks=i->second.getRecoTracks();
                 pair<TLorentzVector, TLorentzVector> reco_tlvs = i->second.getRecoTlvs();
@@ -298,10 +318,11 @@ void TruthConversionEval::numUnique(std::map<int,Conversion> *mymap=NULL,SvtxTra
                 {
                   i->second.refitTracks(_vertexer);
                   pair<TLorentzVector, TLorentzVector> refit_reco_tlvs = i->second.getRecoTlvs();
-                  _b_refitdiff = sqrt((reco_tlvs.first-refit_reco_tlvs.first).Dot((reco_tlvs.first-refit_reco_tlvs.first))*
-                    (reco_tlvs.first-refit_reco_tlvs.first).Dot((reco_tlvs.first-refit_reco_tlvs.first))+
-                    (reco_tlvs.second-refit_reco_tlvs.second).Dot((reco_tlvs.second-refit_reco_tlvs.second))*
-                    (reco_tlvs.second-refit_reco_tlvs.second).Dot((reco_tlvs.second-refit_reco_tlvs.second)));
+                  _b_refitdiffx = reco_tlvs.first.X()-refit_reco_tlvs.first.X();
+                  _b_refitdiffy = reco_tlvs.first.Y()-refit_reco_tlvs.first.Y();
+                  _b_refitdiffz = reco_tlvs.first.Z()-refit_reco_tlvs.first.Z();
+                  recoPhoton = i->second.getRecoPhoton();
+                  if(recoPhoton) _b_rephoton_m=recoPhoton->Dot(*recoPhoton);
                   TVector3 recoVertPos = recoVert->getPos();
                   _b_vtx_radius = sqrt(recoVertPos.x()*recoVertPos.x()+recoVertPos.y()*recoVertPos.y());
                   _b_tvtx_radius = sqrt(vtx->get_x()*vtx->get_x()+vtx->get_y()*vtx->get_y());
@@ -331,23 +352,7 @@ void TruthConversionEval::numUnique(std::map<int,Conversion> *mymap=NULL,SvtxTra
                   _vtxingTree->Fill();
                 }
 
-                TLorentzVector* recoPhoton = i->second.getRecoPhoton();
-                PHG4Particle* truthphoton = i->second.getTruthPhoton(_truthinfo);
-                TLorentzVector tlv_tphoton;
-                if(truthphoton){
-                  tlv_tphoton.SetPxPyPzE(truthphoton->get_px(),truthphoton->get_py(),truthphoton->get_pz(),truthphoton->get_e());
-                  if (recoPhoton)
-                  {
-                    _b_photon_m=recoPhoton->Dot(*recoPhoton);
-                    _b_tphoton_m=tlv_tphoton.Dot(tlv_tphoton);
-                    _b_photon_pT=recoPhoton->Pt();
-                  }
-                }
-                else{ //photon was not reconstructed
-                  _b_photon_m =-1;
-                  _b_tphoton_m =-1;
-                  _b_photon_pT=-1;
-                }
+                
                 //reset the values
                 _b_cluster_prob=-1;
                 _b_cluster_deta=-1;
