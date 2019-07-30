@@ -29,7 +29,10 @@ void photon_m(TFile* thisFile){
 	tc->SaveAs("plots/gamma_dm_eff.pdf");	
 }
 
+
+
 void plotter(){
-	TFile *thisFile = new TFile("effplots.root","READ");
-	photon_m(thisFile);
+	//TFile *thisFile = new TFile("effplots.root","READ");
+	//photon_m(thisFile);
+	TFile *backFile = new TFile("backplots.root","READ");
 }
