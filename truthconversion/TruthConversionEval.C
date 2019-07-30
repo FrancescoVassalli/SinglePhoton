@@ -296,7 +296,7 @@ void TruthConversionEval::numUnique(std::map<int,Conversion> *mymap=NULL,SvtxTra
                 genfit::GFRaveVertex* recoVert = _vertexer->findSecondaryVertex(reco_tracks.first,reco_tracks.second);
                 if (recoVert)
                 {
-                  i->second.refitTracks(vtx,_vertexer);
+                  i->second.refitTracks(_vertexer);
                   pair<TLorentzVector, TLorentzVector> refit_reco_tlvs = i->second.getRecoTlvs();
                   _b_refitdiff = sqrt((reco_tlvs.first-refit_reco_tlvs.first).Dot((reco_tlvs.first-refit_reco_tlvs.first))*
                     (reco_tlvs.first-refit_reco_tlvs.first).Dot((reco_tlvs.first-refit_reco_tlvs.first))+

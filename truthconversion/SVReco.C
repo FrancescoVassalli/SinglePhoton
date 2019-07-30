@@ -493,11 +493,13 @@ PHGenFit::Track* SVReco::MakeGenFitTrack(const SvtxTrack* intrack, const SvtxVer
     TMatrixDSym cov(3);
     cov.Zero();
     bool is_vertex_cov_sane = true;
+    cout<<"Making covarience for vtx measurement"<<endl;
     for (unsigned int i = 0; i < 3; i++)
       for (unsigned int j = 0; j < 3; j++) {
         cov(i, j) = invertex->get_error(i, j);
       }
 
+    cout<<"Made covarience"<<endl;
     if (is_vertex_cov_sane) {
       PHGenFit::Measurement* meas = new PHGenFit::SpacepointMeasurement(
           pos, cov);
@@ -512,7 +514,8 @@ PHGenFit::Track* SVReco::MakeGenFitTrack(const SvtxTrack* intrack, const SvtxVer
       for (int j=0; j<6; j++){
         seed_cov[i][j] = intrack->get_error(i,j);
       }
-    }
+    } 
+    cout<<"Making track cluster measurments"<<endl;
     //make measurements from the track clusters
     for (auto iter = intrack->begin_cluster_keys(); iter != intrack->end_cluster_keys(); ++iter){
       //    unsigned int cluster_id = *iter;
@@ -700,7 +703,9 @@ void SVReco::FillSVMap(
 }
 
 void SVReco::refitTrack(SvtxVertex* vtx, SvtxTrack* svtxtrk){
-	MakeSvtxTrack(svtxtrk,MakeGenFitTrack(svtxtrk,vtx),vtx);
+  auto gftrk = MakeGenFitTrack(svtxtrk,vtx);
+  cout<<"Made gf track for refit"<<endl;
+	MakeSvtxTrack(svtxtrk,gftrk,vtx);
 }
 
 //may need to make the phgf_track pointer shared 
