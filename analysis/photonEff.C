@@ -63,6 +63,9 @@ void makeVtxR(TChain* ttree,TFile* out_file){
   std::vector<TH1F*> plots;
   plots.push_back(new TH1F("vtx_reco","",40,0,30));
   plots.push_back(new TH1F("vtx_truth","",40,0,30));
+  
+  plots[0]->Sumw2();
+  plots[1]->Sumw2();
 
   double calc=0;
   for (int event = 0; event < ttree->GetEntries(); ++event)
@@ -81,6 +84,21 @@ void makeVtxR(TChain* ttree,TFile* out_file){
   std::cout<<"mean deviation="<<calc<<std::endl;
 }
 
+void makeRefitDist(TChain* ttree, TFile *out_file){
+  float diff;
+  ttree->SetBranchAddress("refitdiff",&diff);
+  TH1F *diffplot= new TH1F("|m_{e0}-m_{e_refit}|","",40,0,10);
+
+  diffplot->Sumw2();
+
+  for (int event = 0; event < ttree->GetEntries(); ++event)
+  {
+    ttree->GetEvent(event);
+    diffplot->Fill(diff);
+  }
+  out_file->Write();
+}
+
 void photonEff()
 {
   string treePath = "/sphenix/user/vassalli/gammasample/conversionembededonlineanalysis";
@@ -90,5 +108,6 @@ void photonEff()
   TChain *ttree = handleFile(treePath,treeExtension,"cutTreeSignal",nFiles);
   TChain *ttree2 = handleFile(treePath,treeExtension,"vtxingTree",nFiles);
   makephotonM(ttree,out_file);
-  makeVtxR(ttree2,out_file);
+  //makeVtxR(ttree2,out_file);
+  makeRefitDist(ttree,out_file);
 }

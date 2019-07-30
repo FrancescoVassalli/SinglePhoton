@@ -182,8 +182,12 @@ class Conversion
 		TLorentzVector* setRecoPhoton();///< constructs a tlv for a photon by adding the tlvs for the reco tracks
 		TLorentzVector* getRecoPhoton();///<@return the constructed tlv
 		PHG4Particle* getTruthPhoton(PHG4TruthInfoContainer*);///<@return NULL if not valid conversion else return photon
-		///Uses the truth vertex and {@link SVReco} to improve the fit of {@link reco1} and {@link reco2}
-		void refitTracks(PHG4VtxPoint* vtx, SVReco* vertexer);
+		///Uses the \param recoVtx vertex and \param vertexer to improve the fit of {@link reco1} and {@link reco2}. Sets {@link recoVertex} to \param recoVtx
+		void refitTracks(SVReco* vertexer, SvtxVertex* recoVtx);
+		///Uses {@link recoVertex} and \param vertexer to improve the fit of {@link reco1} and {@link reco2}.
+		void refitTracks(SVReco* vertexer);
+		///Uses {@link vtx} and \param vertexer to improve the fit of {@link reco1} and {@link reco2}.
+		void refitTracksTruthVtx(SVReco* vertexer)
 
 		std::pair<TLorentzVector,TLorentzVector> getRecoTlvs();
 
@@ -224,7 +228,7 @@ class Conversion
 		PHG4Particle* e2=NULL;
 		PHG4Particle* photon=NULL;
 		PHG4VtxPoint* vtx=NULL;
-		SvtxVertex* recoVtx=NULL;
+    	SvtxVertex* truthSvtxVtx=NULL;
 		SvtxTrack* reco1=NULL;
 		SvtxTrack* reco2=NULL;
 		SvtxTrackEval* trackeval=NULL;
@@ -241,12 +245,11 @@ class Conversion
 		static float vtxTrackRZ(TVector3 recoVertPos,SvtxTrack *track);
 		///helper function 
 		static float vtxTrackRPhi(TVector3 recoVertPos,SvtxTrack *track);
-		/**@return A SvtxVertex with x,y,x,t initialized from the PHGRVtxPoint. 
+		/**Initializes {@link truthSvtxVtx} with x,y,x,t from the PHG4VtxPoint. 
 		 *Chisq and ndof are set to 1. 
 		 *The tracks are set with {@link reco1} and {@link reco2}. 
-		 *The errors are set to 0.
-		 *The returned object is owned by the caller.*/
-		SvtxVertex* PHG4VtxPointToSvtxVertex(PHG4VtxPoint* truth);
+		 *The errors are set to 0.*/
+		void PHG4VtxPointToSvtxVertex();
 
 };
 #endif //CONVERSION_H__

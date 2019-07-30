@@ -27,6 +27,10 @@ Conversion::Conversion(PHG4VtxPoint* vtx,SvtxTrackEval *trackeval,int verbosity)
 Conversion::~Conversion(){
   if(recoVertex) delete recoVertex;
   if(recoPhoton) delete recoPhoton;
+  if(truthSvtxVtx) delete truthSvtxVtx;
+  recoVertex=NULL;
+  recoPhoton=NULL;
+  truthSvtxVtx=NULL;
   //dont delete the points as you are not the owner and did not make your own copies
 }
 void Conversion::setElectron(PHG4Particle* e){
@@ -425,7 +429,7 @@ void Conversion::printReco(){
 }
 
 float Conversion::setRecoVtx(SvtxVertex *recovtx,SvtxClusterMap* svtxClusterMap){
-  recoVtx=recovtx;
+  recoVertex=recovtx;
   SvtxCluster *c1 = svtxClusterMap->get(*(reco1->begin_clusters()));
   SvtxCluster *c2 = svtxClusterMap->get(*(reco2->begin_clusters()));
   float r1 = sqrt(abs(c1->get_x()-recovtx->get_x())+abs(c1->get_y()-recovtx->get_y())+abs(c1->get_z()-recovtx->get_z()));
@@ -579,30 +583,61 @@ std::pair<float,float> Conversion::getTrackPhis(){
   }
 }
 
-void Conversion::refitTracks(PHG4VtxPoint* vtx, SVReco* vertexer){
-  vertexer->refitTrack(PHG4VtxPointToSvtxVertex(vtx),reco1);
-  vertexer->refitTrack(PHG4VtxPointToSvtxVertex(vtx),reco2);
+void Conversion::refitTracksTruthVtx(SVReco* vertexer){
+  PHG4VtxPointToSvtxVertex();
+  vertexer->refitTrack(truthSvtxVtx,reco1);
+  vertexer->refitTrack(truthSvtxVtx,reco2);
+}
+void Conversion::refitTracks(SVReco* vertexer){
+  if (!recoVertex)
+  {
+    cerr<<"WARNING: No vertex to refit tracks"<<endl;
+  }
+  else{
+    vertexer->refitTrack(recoVertex,reco1);
+    vertexer->refitTrack(recoVertex,reco2);
+  }
 }
 
-SvtxVertex* Conversion::PHG4VtxPointToSvtxVertex(PHG4VtxPoint* truth){
-  SvtxVertex_v1 *r = new SvtxVertex_v1();
-  r->set_x(truth->get_x());
-  r->set_y(truth->get_y());
-  r->set_z(truth->get_z());
-  r->set_t0(truth->get_t());
-  r->set_chisq(1.);
-  r->set_ndof(1);
+void Conversion::refitTracks(SVReco* vertexer, SvtxVertex* recoVtx){
+  if (!recoVtx)
+  {
+    cerr<<"WARNING: No vertex to refit tracks"<<endl;
+  }
+  else{
+    recoVertex=recoVtx;
+    vertexer->refitTrack(recoVertex,reco1);
+    vertexer->refitTrack(recoVertex,reco2);
+  }
+}
+
+void Conversion::PHG4VtxPointToSvtxVertex(){
+  truthSvtxVtx = new SvtxVertex_v1();
+  truthSvtxVtx->set_x(vtx->get_x());
+  truthSvtxVtx->set_y(vtx->get_y());
+  truthSvtxVtx->set_z(vtx->get_z());
+  truthSvtxVtx->set_t0(vtx->get_t());
+  truthSvtxVtx->set_chisq(1.);
+  truthSvtxVtx->set_ndof(1);
   for (unsigned i = 0; i < 3; ++i)
   {
-    r->set_error(i,i,0.);
-    for (unsigned j = i+1; j < 3; ++i)
+    truthSvtxVtx->set_error(i,i,1.);
+    for (unsigned j = i+1; j < 3; ++j)
     {
-      r->set_error(i,j,0.);
-      r->set_error(j,i,0.);
+      truthSvtxVtx->set_error(i,j,1e-5);
+      truthSvtxVtx->set_error(j,i,1e-5);
     }
   }
-  r->insert_track(reco1->get_id());
-  r->insert_track(reco2->get_id());
-  return r;
+  switch(recoCount()){
+    case 2:
+      truthSvtxVtx->insert_track(reco1->get_id());
+      truthSvtxVtx->insert_track(reco2->get_id());
+    case 1:
+      if (reco1) return truthSvtxVtx->insert_track(reco1->get_id());
+      else return truthSvtxVtx->insert_track(reco2->get_id());
+      break;
+    default:
+      break;
+  }
 }
 
