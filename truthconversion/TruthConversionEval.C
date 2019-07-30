@@ -412,7 +412,7 @@ void TruthConversionEval::processTrackBackground(std::vector<SvtxTrack*> *v_trac
       nNullTrack++;
       continue;
     }
-    if(TMath::Abs((*iTrack)->get_eta())>1.1||(*iTrack)->get_pt()!=lastpT)continue;
+    if(TMath::Abs((*iTrack)->get_eta())>1.1||(*iTrack)->get_pt()==lastpT)continue;
     lastpT=(*iTrack)->get_pt();
     cout<<"\t pT="<<lastpT<<'\n';
     auto temp_key_it=(*iTrack)->begin_cluster_keys();//key iterator to first cluster

@@ -125,7 +125,7 @@ int SVReco::InitEvent(PHCompositeNode *topNode) {
   _svtxtrk_id.clear();
   //the priamry vetex
   _primvertex = _vertexmap->get(0);
-  cout<<"starting track loop with vertex:\n";
+  //cout<<"starting track loop with vertex:\n";
   /*if (_primvertex)
   {
     _primvertex->identify();
