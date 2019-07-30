@@ -1,4 +1,5 @@
 #include "Conversion.h"
+#include "SVReco.h"
 #include <phool/PHCompositeNode.h>
 #include <phool/getClass.h>
 #include <g4main/PHG4TruthInfoContainer.h>
@@ -158,6 +159,15 @@ TLorentzVector* Conversion::setRecoPhoton(){
 
 TLorentzVector* Conversion::getRecoPhoton(){
   return setRecoPhoton();
+}
+
+std::pair<TLorentzVector,TLorentzVector> Conversion::getRecoTlvs(){
+  std::pair<TLorentzVector*,TLorentzVector*> r;
+  r.first = TLorentzVector (reco1->get_px(),reco1->get_py(),reco1->get_pz(),
+        sqrt(_kElectronRestM*_kElectronRestM+reco1->get_p()*reco1->get_p()));
+  r.second =   TLorentzVector (reco2->get_px(),reco2->get_py(),reco2->get_pz(),
+        sqrt(_kElectronRestM*_kElectronRestM+reco2->get_p()*reco2->get_p()));
+  return r;
 }
 
 PHG4Particle* Conversion::getTruthPhoton(PHG4TruthInfoContainer* truthinfo){
@@ -566,5 +576,32 @@ std::pair<float,float> Conversion::getTrackPhis(){
       return std::pair<float,float>(-1,-1);
       break;
   }
+}
+
+void Conversion::refitTracks(PHG4VtxPoint* vtx, SVReco* vertexer){
+  vertexer->refitTracks(PHG4VtxPointToSvtxVertex(vtx),reco1);
+  vertexer->refitTracks(PHG4VtxPointToSvtxVertex(vtx),reco2);
+}
+
+SvtxVertex* Conversion::PHG4VtxPointToSvtxVertex(PHG4VtxPoint* truth){
+  SvtxVertex *r = new SvtxVertex();
+  r->set_x(truth->get_x());
+  r->set_y(truth->get_y());
+  r->set_z(truth->get_z());
+  r->set_t(truth->get_t());
+  r->set_chisq(1.);
+  r->set_ndof(1);
+  for (unsigned i = 0; i < 3; ++i)
+  {
+    r->set_error(i,i,0.);
+    for (unsigned j = i+1; j < 3; ++i)
+    {
+      r->set_error(i,j,0.);
+      r->set_error(j,i,0.);
+    }
+  }
+  r->insert_track(reco1->get_id());
+  r->insert_track(reco2->get_id());
+  return r;
 }
 

@@ -150,6 +150,7 @@ int TruthConversionEval::InitRun(PHCompositeNode *topNode)
     _signalCutTree->Branch("nCluster", &_b_nCluster);
     _signalCutTree->Branch("cluster_dphi", &_b_cluster_dphi);
     _signalCutTree->Branch("cluster_deta", &_b_cluster_deta);
+    _signalCutTree->Branch("refitdiff",&_b_refitdiff);
   }
   return 0;
 }
@@ -291,9 +292,16 @@ void TruthConversionEval::numUnique(std::map<int,Conversion> *mymap=NULL,SvtxTra
                 _b_track_dca = i->second.minDca();
                 //TODO make Conversion find the reco vertex
                 pair<SvtxTrack*, SvtxTrack*> reco_tracks=i->second.getRecoTracks();
+                pair<TLorentzVector, TLorentzVector> reco_tlvs = i->second.getRecoTlvs();
                 genfit::GFRaveVertex* recoVert = _vertexer->findSecondaryVertex(reco_tracks.first,reco_tracks.second);
                 if (recoVert)
                 {
+                  i->second.refitTracks(vtx,_vertexer);
+                  pair<TLorentzVector, TLorentzVector> refit_reco_tlvs = i->second.getRecoTlvs();
+                  _b_refitdiff = sqrt((reco_tlvs.first-refit_reco_tlvs.first)->Dot((reco_tlvs.first-refit_reco_tlvs.first))*
+                    (reco_tlvs.first-refit_reco_tlvs.first)->Dot((reco_tlvs.first-refit_reco_tlvs.first))+
+                    (reco_tlvs.second-refit_reco_tlvs.second)->Dot((reco_tlvs.second-refit_reco_tlvs.second))*
+                    (reco_tlvs.second-refit_reco_tlvs.second)->Dot((reco_tlvs.second-refit_reco_tlvs.second)))
                   TVector3 recoVertPos = recoVert->getPos();
                   _b_vtx_radius = sqrt(recoVertPos.x()*recoVertPos.x()+recoVertPos.y()*recoVertPos.y());
                   _b_tvtx_radius = sqrt(vtx->get_x()*vtx->get_x()+vtx->get_y()*vtx->get_y());
