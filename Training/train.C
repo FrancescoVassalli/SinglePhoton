@@ -38,17 +38,17 @@ void makeFactory(TTree* signalTree, TTree* backTree,std::string outfile,std::str
   if(bgTree2){
     factory->AddBackgroundTree(bgTree2,1.0);
   }
-  factory->AddVariable("track_layer",'I');
-  factory->AddVariable("track_pT",'F');
-  factory->AddVariable("track_dca",'F');
-  factory->AddVariable("cluster_prob",'F');
-  //factory->AddVariable("track_deta",'F');
-  //factory->AddVariable("cluster_deta",'F');
-  //factory->AddVariable("cluster_dphi",'F');
-  //factory->AddVariable("abs(track_dlayer)",'I');
-  //factory->AddVariable("approach_dist",'F');
-  //factory->AddVariable("vtx_radius",'F');
-  //factory->AddVariable("vtx_chi2",'F'); 
+  //factory->AddVariable("track_layer",'I');
+  //factory->AddVariable("track_pT",'F');
+  //factory->AddVariable("track_dca",'F');
+  //factory->AddVariable("cluster_prob",'F');
+  factory->AddVariable("track_deta",'F');
+  factory->AddVariable("cluster_deta",'F');
+  factory->AddVariable("cluster_dphi",'F');
+  factory->AddVariable("abs(track_dlayer)",'I');
+  factory->AddVariable("approach_dist",'F');
+  factory->AddVariable("vtx_radius",'F');
+//  factory->AddVariable("vtx_chi2",'F'); 
   //factory->AddVariable("vtxTrackRZ_dist",'F');
   //factory->AddVariable("abs(vtxTrackRPhi_dist-vtxTrackRZ_dist)",'F');
   //factory->AddVariable("photon_m",'F');
@@ -63,7 +63,7 @@ void makeFactory(TTree* signalTree, TTree* backTree,std::string outfile,std::str
   string approach_dist_cut = "69.34>approach_dist>0";
   string vtx_radius_cut = "vtx_radius>1.8378";
   //do I need photon cuts? 
-  string tCutInitializer = "";//track_layer_cut+"&&"+track_pT_cut+"&&"+track_dca_cut+"&&"+em_prob_cut+"&&"+track_deta_cut+"&&"+track_dlayer_cut+"&&"+approach_dist_cut+"&&"+vtx_radius_cut;
+  string tCutInitializer = track_layer_cut+"&&"+track_pT_cut+"&&"+track_dca_cut+"&&"+em_prob_cut;//+"&&"+track_deta_cut+"&&"+track_dlayer_cut+"&&"+approach_dist_cut+"&&"+vtx_radius_cut;
   TCut preTraingCuts(tCutInitializer.c_str());
 
   factory->PrepareTrainingAndTestTree(preTraingCuts,"nTrain_Signal=0:nTrain_Background=0:nTest_Signal=0:nTest_Background=0");
@@ -83,7 +83,7 @@ void makeFactory(TTree* signalTree, TTree* backTree,std::string outfile,std::str
 
 int train(){
   using namespace std;
-  string treePath = "/sphenix/user/vassalli/gammasample/conversionembededonlineanalysis";
+  string treePath = "/sphenix/user/vassalli/gammasample/Konlineanalysis";
   string treeExtension = ".root";
   string outname = "cutTrainA.root";
   unsigned int nFiles=100;
@@ -91,11 +91,12 @@ int train(){
   TChain *signalTree = handleFile(treePath,treeExtension,"cutTreeSignal",nFiles);
   TChain *backtrackTree = handleFile(treePath,treeExtension,"trackBackTree",nFiles);
   TChain *backpairTree = handleFile(treePath,treeExtension,"pairBackTree",nFiles);
+  TChain *backVtxTree = handleFile(treePath,treeExtension,"vtxBackTree",nFiles);
   TChain *backHTree = handleFile(treePath,treeExtension,"cutTreeBacke",nFiles);
   TChain *backETree = handleFile(treePath,treeExtension,"cutTreeBackh",nFiles);
   //makeFactory(signalTree,backtrackTree,outname,"trackback");
   //makeFactory(signalTree,backpairTree,outname,"pairback");
-  makeFactory(signalTree,backHTree,outname,"vtxback",backETree);
+  makeFactory(signalTree,backVtxTree,outname,"vtxback");
 /*  outname="cutTrainE.root";
   makeFactory(signalTree,backETree,outname,"eback");*/
 }
