@@ -589,7 +589,7 @@ genfit::GFRaveVertex* Conversion::getSecondaryVertex(SVReco* vertexer){
   else return NULL;
 }
 
-std::pair<PHGenFit::Track*,PHGenFit::Track*> getPHGFTracks(SVReco* vertexer){
+std::pair<PHGenFit::Track*,PHGenFit::Track*> Conversion::getPHGFTracks(SVReco* vertexer){
   std::pair<PHGenFit::Track*,PHGenFit::Track*> r;
   r.first = vertexer->getPHGFTrack(reco1);
   r.second = vertexer->getPHGFTrack(reco2);
@@ -627,7 +627,7 @@ void Conversion::PHG4VtxPointToSvtxVertex(){
   double d = rand.Gaus(0, ae);
   double g = rand.Gaus(0, ae);
   double h = rand.Gaus(0, i);
-  truthSvtxVtx->set_error(0,0,seedVtx->get_error());
+  truthSvtxVtx->set_error(0,0,ae*ae);
   truthSvtxVtx->set_error(1,1,d*d+ae*ae);
   truthSvtxVtx->set_error(2,2,g*g+h*h+i*i);
   truthSvtxVtx->set_error(0,1,ae*d);

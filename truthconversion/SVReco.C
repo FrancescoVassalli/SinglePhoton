@@ -171,7 +171,7 @@ int SVReco::InitEvent(PHCompositeNode *topNode) {
 	return Fun4AllReturnCodes::EVENT_OK;
 }
 
-PHGenFit::Track* getPHGFTrack(SvtxTrack* svtxtrk){
+PHGenFit::Track* SVReco::getPHGFTrack(SvtxTrack* svtxtrk){
  if(svtxtrk)return _main_rf_phgf_tracks[_svtxtrk_gftrk_map[svtxtrk->get_id()]];
  else return NULL;
 }
@@ -718,7 +718,10 @@ PHGenFit::Track*  SVReco::refitTrack(SvtxVertex* vtx, SvtxTrack* svtxtrk){
     MakeSvtxTrack(svtxtrk,gftrk,vtx);
     return gftrk;
   }
-  else cout<<"No refit possible"<<endl;
+  else {
+    cout<<"No refit possible"<<endl;
+    return NULL;
+  }
 }
 
 //may need to make the phgf_track pointer shared 

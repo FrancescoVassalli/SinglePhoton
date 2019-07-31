@@ -15,6 +15,7 @@
 #include <trackbase_historic/SvtxClusterMap.h>
 #include <trackbase_historic/SvtxVertex.h>
 #include <g4eval/SvtxTrackEval.h>
+#include <GenFit/GFRaveVertex.h>
 #include <TLorentzVector.h>
 #include <TVector3.h>
 #include <utility>
@@ -192,7 +193,7 @@ class Conversion
 		///Uses the truth vertex and {@link SVReco} to improve the fit of {@link reco1} and {@link reco2}. Uses @param seedVtx to set the uncertainies on the truth vertex.
 		std::pair<PHGenFit::Track*,PHGenFit::Track*> refitTracks(SVReco* vertexer,SvtxVertex* seedVtx);
 		//get the vertex reconstructed from {@link SVReco} using the reco tracks. @return NULL if {@link recoCount()}!=2
-		genfit::GFRaveVertex* Conversion::getSecondaryVertex(SVReco* vertexer);
+		genfit::GFRaveVertex* getSecondaryVertex(SVReco* vertexer);
 		//get the PHGF version of {@link reco1} and {@link reco2}. If not possible @return NULL for that track.
 		std::pair<PHGenFit::Track*,PHGenFit::Track*> getPHGFTracks(SVReco* vertexer);
 
@@ -258,7 +259,7 @@ class Conversion
 		 *Chisq and ndof are set to 1. 
 		 *The tracks are set with {@link reco1} and {@link reco2}. 
 		 *The errors are set to the errors of the seedVtx. The primary vtx is suggested.*/
-		void PHG4VtxPointToSvtxVertex(SvtxVertex* seedVtx)
+		void PHG4VtxPointToSvtxVertex(SvtxVertex* seedVtx);
 
 };
 #endif //CONVERSION_H__

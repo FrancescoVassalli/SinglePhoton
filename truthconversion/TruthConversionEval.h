@@ -64,7 +64,7 @@ class TruthConversionEval: public SubsysReco
     /** helper function for process_event
      * fills the member fields with information from the conversions 
      * finds the clusters associated with the truth conversions*/
-    void numUnique(std::map<int,Conversion>* map,SvtxTrackEval* trackEval,RawClusterContainer* mainClusterContainer);
+    void numUnique(std::map<int,Conversion>* map,SvtxTrackEval* trackEval,RawClusterContainer* mainClusterContainer,PHCompositeNode *topNode);
     ///fills the member fields for all the background trees
     void processTrackBackground(std::vector<SvtxTrack*>*v,TrkrClusterContainer*);
 

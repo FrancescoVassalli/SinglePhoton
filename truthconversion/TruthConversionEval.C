@@ -190,8 +190,8 @@ bool TruthConversionEval::doNodePointers(PHCompositeNode* topNode){
   return goodPointers;
 }
 
-SvtxVertex* TruthConversionEval::get_primary_vertex(PHCompositeNode *topNode){
-  SvtxVertexMap *vertexMap = findNode::getClass<SvtxTrackMap>(topNode, "SvtxTrackMap");
+SvtxVertex* TruthConversionEval::get_primary_vertex(PHCompositeNode *topNode)const{
+  SvtxVertexMap *vertexMap = findNode::getClass<SvtxVertexMap>(topNode, "SvtxVertexMap");
   return vertexMap->get(0);
 }
 
@@ -261,7 +261,7 @@ int TruthConversionEval::process_event(PHCompositeNode *topNode)
     }//make tree
   }//truth particle loop
   //pass the map to this helper method which fills the fields for the TTree 
-  numUnique(&mapConversions,trackeval,_mainClusterContainer);
+  numUnique(&mapConversions,trackeval,_mainClusterContainer,topNode);
   if (Verbosity()==10)
   {
     cout<<Name()<<"# conversion clusters="<<_conversionClusters.size()<<'\n';
@@ -274,7 +274,7 @@ int TruthConversionEval::process_event(PHCompositeNode *topNode)
   return 0;
 }
 
-void TruthConversionEval::numUnique(std::map<int,Conversion> *mymap=NULL,SvtxTrackEval* trackeval=NULL,RawClusterContainer *mainClusterContainer=NULL){
+void TruthConversionEval::numUnique(std::map<int,Conversion> *mymap=NULL,SvtxTrackEval* trackeval=NULL,RawClusterContainer *mainClusterContainer=NULL,PHCompositeNode *topNode=NULL){
   for (std::map<int,Conversion>::iterator i = mymap->begin(); i != mymap->end(); ++i) {
     PHG4VtxPoint *vtx =i->second.getVtx(); //get the vtx
     PHG4Particle *temp = i->second.getPhoton(); //set the photon
@@ -332,13 +332,15 @@ void TruthConversionEval::numUnique(std::map<int,Conversion> *mymap=NULL,SvtxTra
                   _b_refitdiffz = reco_tlvs.first.Z()-refit_reco_tlvs.first.Z();
                   if (ph_gf_tracks.first&&refit_phgf_tracks.first)
                   {
-                    cout<<"Good Track refit with original:"<<ph_gf_tracks.first->get_mom()->Print()<<"\n\t and refit:"
-                      <<refit_phgf_tracks.first->get_mom()->Print()<<'\n';
+                    cout<<"Good Track refit with original:\n";ph_gf_tracks.first->get_mom().Print();cout<<"\n\t and refit:\n";
+                    refit_phgf_tracks.first->get_mom().Print();
                   }
                   if (ph_gf_tracks.second&&refit_phgf_tracks.second)
                   {
-                    cout<<"Good Track refit with original:"<<ph_gf_tracks.second->get_mom()->Print()<<"\n\t and refit:"
-                      <<refit_phgf_tracks.second->get_mom()->Print()<<'\n';
+                    cout<<"Good Track refit with original:\n"; 
+                    ph_gf_tracks.second->get_mom().Print(); 
+                    cout<<"\n\t and refit:\n";
+                    refit_phgf_tracks.second->get_mom().Print();
                   }
                   recoPhoton = i->second.getRecoPhoton();
                   if(recoPhoton) _b_rephoton_m=recoPhoton->Dot(*recoPhoton);
@@ -371,7 +373,7 @@ void TruthConversionEval::numUnique(std::map<int,Conversion> *mymap=NULL,SvtxTra
                   _vtxingTree->Fill();
                 }
 
-                
+
                 //reset the values
                 _b_cluster_prob=-1;
                 _b_cluster_deta=-1;
