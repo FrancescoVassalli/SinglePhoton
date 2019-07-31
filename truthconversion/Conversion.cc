@@ -591,13 +591,6 @@ void Conversion::refitTracks(SVReco* vertexer){
 }
 
 void Conversion::PHG4VtxPointToSvtxVertex(){
-  TRandom3 rand(0);
-      double dxy = 0.0007;  //7 um
-          double dz = 0.003;//30 um
-          double x = rand.Gaus(0, dxy);
-              double y = rand.Gaus(0, dxy);
-                  double z = rand.Gaus(0, dz);
-
   truthSvtxVtx = new SvtxVertex_v1();
   truthSvtxVtx->set_x(vtx->get_x());
   truthSvtxVtx->set_y(vtx->get_y());
@@ -605,9 +598,22 @@ void Conversion::PHG4VtxPointToSvtxVertex(){
   truthSvtxVtx->set_t0(vtx->get_t());
   truthSvtxVtx->set_chisq(1.);
   truthSvtxVtx->set_ndof(1);
-  truthSvtxVtx->set_error(0,0,x);
-  truthSvtxVtx->set_error(1,1,y);
-  truthSvtxVtx->set_error(2,2,z);
+
+  TRandom3 rand(0);
+  double ae = 0.0007;  //7 um
+  double i = 0.003;//30 um
+  double d = rand.Gaus(0, ae);
+  double g = rand.Gaus(0, ae);
+  double h = rand.Gaus(0, i);
+  truthSvtxVtx->set_error(0,0,ae*ae);
+  truthSvtxVtx->set_error(1,1,d*d+ae*ae);
+  truthSvtxVtx->set_error(2,2,g*g+h*h+i*i);
+  truthSvtxVtx->set_error(0,1,ae*d);
+  truthSvtxVtx->set_error(1,0,ae*d);
+  truthSvtxVtx->set_error(2,0,ae*g);
+  truthSvtxVtx->set_error(0,2,ae*g);
+  truthSvtxVtx->set_error(1,2,d*g+ae*h);
+  truthSvtxVtx->set_error(2,1,d*g+ae*h);
   switch(recoCount()){
     case 2:
       truthSvtxVtx->insert_track(reco1->get_id());

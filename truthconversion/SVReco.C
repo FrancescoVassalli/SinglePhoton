@@ -704,8 +704,11 @@ void SVReco::FillSVMap(
 
 void SVReco::refitTrack(SvtxVertex* vtx, SvtxTrack* svtxtrk){
   auto gftrk = MakeGenFitTrack(svtxtrk,vtx);
-  cout<<"Made gf track for refit"<<endl;
-	MakeSvtxTrack(svtxtrk,gftrk,vtx);
+  if(gftrk) {
+    cout<<"good genfit refit"<<endl;
+    MakeSvtxTrack(svtxtrk,gftrk,vtx);
+  }
+  else cout<<"No refit possible"<<endl;
 }
 
 //may need to make the phgf_track pointer shared 
