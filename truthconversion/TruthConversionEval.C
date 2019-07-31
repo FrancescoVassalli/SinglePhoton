@@ -540,6 +540,7 @@ int TruthConversionEval::get_track_pid(SvtxTrack* track) const{
 int TruthConversionEval::End(PHCompositeNode *topNode)
 {
   if(_kMakeTTree){
+    cout<<"closing"<<endl;
     _signalCutTree->Write();
     _f->Write();
     _f->Close();
