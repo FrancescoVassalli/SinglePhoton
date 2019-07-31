@@ -92,6 +92,8 @@ class TruthConversionEval: public SubsysReco
       @{*/
     /** # of clusters associated with each conversion that has 2 reco tracks
      * 1 indicates the reco tracks go to the same cluster ~15% of conversions*/
+
+    float _b_refitdiff;
     int   _b_nCluster; 
     int _bb_track1_pid;
     int _bb_track2_pid;

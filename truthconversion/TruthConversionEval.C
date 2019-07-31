@@ -150,6 +150,7 @@ int TruthConversionEval::InitRun(PHCompositeNode *topNode)
     _signalCutTree->Branch("nCluster", &_b_nCluster);
     _signalCutTree->Branch("cluster_dphi", &_b_cluster_dphi);
     _signalCutTree->Branch("cluster_deta", &_b_cluster_deta);
+    _signalCutTree->Branch("refitdiff",&_b_refitdiff);
   }
   return 0;
 }
@@ -159,7 +160,7 @@ bool TruthConversionEval::doNodePointers(PHCompositeNode* topNode){
   _mainClusterContainer = findNode::getClass<RawClusterContainer>(topNode,"CLUSTER_CEMC");
   _truthinfo = findNode::getClass<PHG4TruthInfoContainer>(topNode,"G4TruthInfo");
   _clusterMap = findNode::getClass<TrkrClusterContainer>(topNode, "TRKR_CLUSTER");
-//  _hitMap = findNode::getClass<SvtxHitMap>(topNode,"SvtxHitMap");
+  //  _hitMap = findNode::getClass<SvtxHitMap>(topNode,"SvtxHitMap");
   //if(!_mainClusterContainer||!_truthinfo||!_clusterMap||!_hitMap){
   if(!_mainClusterContainer||!_truthinfo||!_clusterMap){
     cerr<<Name()<<": critical error-bad nodes \n";
@@ -174,7 +175,7 @@ bool TruthConversionEval::doNodePointers(PHCompositeNode* topNode){
     }
     /*if(!_hitMap){
       cerr<<"\t SvtxHitMap is bad";
-    }*/
+      }*/
     cerr<<endl;
     goodPointers=false;
   }
@@ -291,9 +292,17 @@ void TruthConversionEval::numUnique(std::map<int,Conversion> *mymap=NULL,SvtxTra
                 _b_track_dca = i->second.minDca();
                 //TODO make Conversion find the reco vertex
                 pair<SvtxTrack*, SvtxTrack*> reco_tracks=i->second.getRecoTracks();
+                pair<TLorentzVector, TLorentzVector> reco_tlvs = i->second.getRecoTlvs();
                 genfit::GFRaveVertex* recoVert = _vertexer->findSecondaryVertex(reco_tracks.first,reco_tracks.second);
                 if (recoVert)
                 {
+                  SvtxVertex*  svtxRecoVert = _vertexer->GFRVVtxToSvtxVertex(recoVert);
+                  i->second.refitTracks(svtxRecoVert,_vertexer);
+                  pair<TLorentzVector, TLorentzVector> refit_reco_tlvs = i->second.getRecoTlvs();
+                  _b_refitdiff = sqrt((reco_tlvs.first-refit_reco_tlvs.first).Dot((reco_tlvs.first-refit_reco_tlvs.first))*
+                    (reco_tlvs.first-refit_reco_tlvs.first).Dot((reco_tlvs.first-refit_reco_tlvs.first))+
+                    (reco_tlvs.second-refit_reco_tlvs.second).Dot((reco_tlvs.second-refit_reco_tlvs.second))*
+                    (reco_tlvs.second-refit_reco_tlvs.second).Dot((reco_tlvs.second-refit_reco_tlvs.second)));
                   TVector3 recoVertPos = recoVert->getPos();
                   _b_vtx_radius = sqrt(recoVertPos.x()*recoVertPos.x()+recoVertPos.y()*recoVertPos.y());
                   _b_tvtx_radius = sqrt(vtx->get_x()*vtx->get_x()+vtx->get_y()*vtx->get_y());
@@ -351,7 +360,8 @@ void TruthConversionEval::numUnique(std::map<int,Conversion> *mymap=NULL,SvtxTra
               if(mainClusterContainer->getCluster(clusterIds.first)){//if there is matching cluster 
                 clustemp =   dynamic_cast<RawCluster*>(mainClusterContainer->getCluster(clusterIds.first)->Clone());
                 //this is for cluster subtraction which will not be implented soon
-               // _conversionClusters.AddCluster(clustemp); //add the calo cluster to the container
+
+                // _conversionClusters.AddCluster(clustemp); //add the calo cluster to the container
                 if (_kMakeTTree)
                 {
                   _b_cluster_prob=clustemp->get_prob();
@@ -404,9 +414,17 @@ void TruthConversionEval::numUnique(std::map<int,Conversion> *mymap=NULL,SvtxTra
 void TruthConversionEval::processTrackBackground(std::vector<SvtxTrack*> *v_tracks,TrkrClusterContainer* clusterMap){
   Conversion pairMath;
   float lastpT=-1.;
+  unsigned nNullTrack=0;
+  cout<<"The total possible background track count is "<<v_tracks->size()<<'\n';
   for (std::vector<SvtxTrack*>::iterator iTrack = v_tracks->begin(); iTrack != v_tracks->end(); ++iTrack) {
-    if(!*iTrack||TMath::Abs((*iTrack)->get_eta())>1.1||(*iTrack)->get_pt()!=lastpT)continue;
+    //if(!*iTrack||TMath::Abs((*iTrack)->get_eta())>1.1||(*iTrack)->get_pt()!=lastpT)continue;
+    if(!*iTrack){
+      nNullTrack++;
+      continue;
+    }
+    if(TMath::Abs((*iTrack)->get_eta())>1.1||(*iTrack)->get_pt()==lastpT)continue;
     lastpT=(*iTrack)->get_pt();
+    cout<<"\t pT="<<lastpT<<'\n';
     auto temp_key_it=(*iTrack)->begin_cluster_keys();//key iterator to first cluster
     if(temp_key_it!=(*iTrack)->end_cluster_keys()){//if the track has clusters
       TrkrCluster* temp_cluster = clusterMap->findCluster(*temp_key_it);//get the cluster 
@@ -419,7 +437,7 @@ void TruthConversionEval::processTrackBackground(std::vector<SvtxTrack*> *v_trac
     if(cluster1) _bb_cluster_prob= cluster1->get_prob();
     else _bb_cluster_prob=-1;
     for(std::vector<SvtxTrack*>::iterator jTrack =std::next(iTrack,1);jTrack!=v_tracks->end(); ++jTrack){//posible bias by filling the track level variables with iTrack instead of min(iTrack,jTrack)
-    if(!*jTrack||TMath::Abs((*jTrack)->get_eta())>1.1)continue;
+      if(!*jTrack||TMath::Abs((*jTrack)->get_eta())>1.1)continue;
       _bb_track_deta = pairMath.trackDEta((*iTrack),(*jTrack));
       _bb_track_dphi = pairMath.trackDPhi((*iTrack),(*jTrack));
       _bb_track_dlayer = pairMath.trackDLayer(_clusterMap,(*iTrack),(*jTrack));
@@ -461,11 +479,12 @@ void TruthConversionEval::processTrackBackground(std::vector<SvtxTrack*> *v_trac
           _bb_vtxTrackRPhi_dist = pairMath.vtxTrackRPhi(recoVertPos,*iTrack,*jTrack);
         }
         _vtxBackTree->Fill();
-      }
+      }//pair cuts
       _pairBackTree->Fill();
-    }
+    }//jTrack loop
     _trackBackTree->Fill();
-  }
+  }//iTrack loop
+  cout<<"Null track count ="<<nNullTrack<<'\n';
 }
 
 const RawClusterContainer* TruthConversionEval::getClusters()const {return &_conversionClusters;} 

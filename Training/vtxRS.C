@@ -43,7 +43,7 @@ void makeFactory(TTree* signalTree,std::string outfile,std::string factoryname)
   factory->AddVariable("vtx_radius","radius","cm");
   factory->AddTarget("tvtx_radius","radius","cm");
 
-  string track_pT_cut = "";
+  string track_pT_cut = "track1_pt>.6&&track2_pt>.6";
 
   //string vtx_radius_cut = "vtx_radius>0"; //can I cut based on label?
   string tCutInitializer = track_pT_cut;

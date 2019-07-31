@@ -234,7 +234,12 @@ using namespace std;
     {
       // toss low multiplicity dummy events
       PHG4SimpleEventGenerator *gen = new PHG4SimpleEventGenerator();
+<<<<<<< HEAD
       gen->add_particles("kaon0L", 15);  // mu+,e+,proton,pi+,Upsilon
+=======
+      gen->add_particles("kaon0L", 25);  // mu+,e+,proton,pi+,Upsilon
+      gen->add_particles("kaon0S", 25);  // mu+,e+,proton,pi+,Upsilon
+>>>>>>> master
       gen->add_particles("gamma", 15);  // mu+,e+,proton,pi+,Upsilon
       //gen->add_particles("pi0", 3);  // mu+,e+,proton,pi+,Upsilon
       //gen->add_particles("pi+",100); // 100 pion option

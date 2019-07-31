@@ -10,10 +10,10 @@ Method         : Cuts::Cuts
 TMVA Release   : 4.2.0         [262656]
 ROOT Release   : 5.34/38       [336422]
 Creator        : vassalli
-Date           : Thu Jul 25 17:59:01 2019
+Date           : Tue Jul 30 11:48:39 2019
 Host           : Linux cvmfswrite02.sdcc.bnl.gov 3.10.0-693.11.6.el7.x86_64 #1 SMP Wed Jan 3 18:09:42 CST 2018 x86_64 x86_64 x86_64 GNU/Linux
 Dir            : /direct/phenix+u/vassalli/sphenix/single/Training
-Training events: 2184
+Training events: 11413
 Analysis type  : [Classification]
 
 
@@ -31,27 +31,35 @@ FitMethod: "GA" [Minimisation Method (GA, SA, and MC are the primary methods to 
 EffMethod: "EffSel" [Selection Method]
 CutRangeMin[0]: "-1.000000e+00" [Minimum of allowed cut range (set per variable)]
     CutRangeMin[1]: "-1.000000e+00"
+    CutRangeMin[2]: "-1.000000e+00"
+    CutRangeMin[3]: "-1.000000e+00"
+    CutRangeMin[4]: "-1.000000e+00"
+    CutRangeMin[5]: "-1.000000e+00"
 CutRangeMax[0]: "-1.000000e+00" [Maximum of allowed cut range (set per variable)]
     CutRangeMax[1]: "-1.000000e+00"
+    CutRangeMax[2]: "-1.000000e+00"
+    CutRangeMax[3]: "-1.000000e+00"
+    CutRangeMax[4]: "-1.000000e+00"
+    CutRangeMax[5]: "-1.000000e+00"
 VarProp[0]: "NotEnforced" [Categorisation of cuts]
     VarProp[1]: "NotEnforced"
+    VarProp[2]: "NotEnforced"
+    VarProp[3]: "NotEnforced"
+    VarProp[4]: "NotEnforced"
+    VarProp[5]: "NotEnforced"
 ##
 
 
 #VAR -*-*-*-*-*-*-*-*-*-*-*-* variables *-*-*-*-*-*-*-*-*-*-*-*-
 
-NVar 2
-photon_m                      photon_m                      photon_m                      photon_m                                                        'F'    [1.04448843002,545.355224609]
-photon_pT                     photon_pT                     photon_pT                     photon_pT                                                       'F'    [1.25250387192,6316.81445312]
-NSpec 8
-track_layer                   track_layer                   track_layer                   I                                                               'F'    [0,14]
-track_pT                      track_pT                      track_pT                      F                                                               'F'    [0.602909624577,366.712615967]
-track_dca                     track_dca                     track_dca                     F                                                               'F'    [2.28725657507e-05,45.6750106812]
-cluster_prob                  cluster_prob                  cluster_prob                  F                                                               'F'    [0,0.99992609024]
-track_deta                    track_deta                    track_deta                    F                                                               'F'    [3.57627868652e-07,0.00817441940308]
-abs(track_dlayer)             abs_track_dlayer_             abs(track_dlayer)             I                                                               'F'    [0,2]
-approach_dist                 approach_dist                 approach_dist                 F                                                               'F'    [1.41833572798e-06,54.7429046631]
-vtx_radius                    vtx_radius                    vtx_radius                    F                                                               'F'    [1.92225289345,71.8854598999]
+NVar 6
+track_deta                    track_deta                    track_deta                    track_deta                                                      'F'    [0,0.670255243778]
+cluster_deta                  cluster_deta                  cluster_deta                  cluster_deta                                                    'F'    [-1,0.67217206955]
+cluster_dphi                  cluster_dphi                  cluster_dphi                  cluster_dphi                                                    'F'    [-1,6.24406814575]
+abs(track_dlayer)             abs_track_dlayer_             abs(track_dlayer)             abs(track_dlayer)                                               'I'    [0,13]
+approach_dist                 approach_dist                 approach_dist                 approach_dist                                                   'F'    [3.08318594762e-05,88.587638855]
+vtx_radius                    vtx_radius                    vtx_radius                    vtx_radius                                                      'F'    [-1,287.19519043]
+NSpec 0
 
 
 ============================================================================ */
@@ -93,11 +101,11 @@ class ReadCuts : public IClassifierReader {
    ReadCuts( std::vector<std::string>& theInputVars ) 
       : IClassifierReader(),
         fClassName( "ReadCuts" ),
-        fNvars( 2 ),
+        fNvars( 6 ),
         fIsNormalised( false )
    {      
       // the training input variables
-      const char* inputVars[] = { "photon_m", "photon_pT" };
+      const char* inputVars[] = { "track_deta", "cluster_deta", "cluster_dphi", "abs(track_dlayer)", "approach_dist", "vtx_radius" };
 
       // sanity checks
       if (theInputVars.size() <= 0) {
@@ -125,10 +133,22 @@ class ReadCuts : public IClassifierReader {
       fVmax[0] = 0;
       fVmin[1] = 0;
       fVmax[1] = 0;
+      fVmin[2] = 0;
+      fVmax[2] = 0;
+      fVmin[3] = 0;
+      fVmax[3] = 0;
+      fVmin[4] = 0;
+      fVmax[4] = 0;
+      fVmin[5] = 0;
+      fVmax[5] = 0;
 
       // initialize input variable types
       fType[0] = 'F';
       fType[1] = 'F';
+      fType[2] = 'F';
+      fType[3] = 'I';
+      fType[4] = 'F';
+      fType[5] = 'F';
 
       // initialize constants
       Initialize();
@@ -160,15 +180,15 @@ class ReadCuts : public IClassifierReader {
    // normalisation of input variables
    const bool fIsNormalised;
    bool IsNormalised() const { return fIsNormalised; }
-   double fVmin[2];
-   double fVmax[2];
+   double fVmin[6];
+   double fVmax[6];
    double NormVariable( double x, double xmin, double xmax ) const {
       // normalise to output range: [-1, 1]
       return 2*(x - xmin)/(xmax - xmin) - 1.0;
    }
 
    // type of input variable: 'F' or 'I'
-   char   fType[2];
+   char   fType[6];
 
    // initialize internal variables
    void Initialize();
