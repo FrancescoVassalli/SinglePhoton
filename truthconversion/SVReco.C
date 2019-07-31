@@ -250,10 +250,12 @@ SVReco::~SVReco(){
 		delete _fitter;
 		_fitter=NULL;
 	}
+	cout<<PHWHERE<<"delete"<<endl;
 	if(_vertex_finder){
 		delete _vertex_finder;
 		_vertex_finder=NULL;
 	}
+	cout<<PHWHERE<<"delete"<<endl;
 	for (std::vector<PHGenFit::Track*>::iterator i = _main_rf_phgf_tracks.begin(); i != _main_rf_phgf_tracks.end(); ++i)
 	{
 		if(*i)
