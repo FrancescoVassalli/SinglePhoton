@@ -327,10 +327,18 @@ void TruthConversionEval::numUnique(std::map<int,Conversion> *mymap=NULL,SvtxTra
                 if (recoVert)
                 {
                   std::pair<PHGenFit::Track*,PHGenFit::Track*> refit_phgf_tracks=i->second.refitTracks(_vertexer,get_primary_vertex(topNode));
+                  cout<<"here"<<endl;
                   pair<TLorentzVector*, TLorentzVector*> refit_reco_tlvs = i->second.getRefitRecoTlvs();
-                  _b_refitdiffx = reco_tlvs.first.X()-refit_reco_tlvs.first.X();
-                  _b_refitdiffy = reco_tlvs.first.Y()-refit_reco_tlvs.first.Y();
-                  _b_refitdiffz = reco_tlvs.first.Z()-refit_reco_tlvs.first.Z();
+                  if(refit_reco_tlvs.first&&refit_reco_tlvs.second){
+                    _b_refitdiffx = reco_tlvs.first->X()-refit_reco_tlvs.first->X();
+                    _b_refitdiffy = reco_tlvs.first->Y()-refit_reco_tlvs.first->Y();
+                    _b_refitdiffz = reco_tlvs.first->Z()-refit_reco_tlvs.first->Z();
+                  }
+                  else{
+                    _b_refitdiffx = -9.;
+                    _b_refitdiffy = -9.;
+                    _b_refitdiffz = -9.;
+                  }
                   if (ph_gf_tracks.first&&refit_phgf_tracks.first)
                   {
                     cout<<"Good Track refit with original:\n";ph_gf_tracks.first->get_mom().Print();cout<<"\n\t and refit:\n";

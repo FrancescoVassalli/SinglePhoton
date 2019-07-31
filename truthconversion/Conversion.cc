@@ -183,9 +183,9 @@ TLorentzVector* Conversion::getRefitRecoPhoton(){
   if (refit_tlvs.first&&refit_tlvs.second)
   {
     if(recoPhoton) delete recoPhoton;
-    recoPhoton= TLorentzVector(refit_tlvs.first+refit_tlvs.second);
+    recoPhoton= new TLorentzVector(*refit_tlvs.first + *refit_tlvs.second);
   }
-  else return NULL;
+  return recoPhoton;
 }
 
 std::pair<TLorentzVector*,TLorentzVector*> Conversion::getRecoTlvs(){
@@ -222,15 +222,13 @@ std::pair<TLorentzVector*,TLorentzVector*> Conversion::getRecoTlvs(){
 }
 
 std::pair<TLorentzVector*,TLorentzVector*> Conversion::getRefitRecoTlvs(){
-  std::pair<TLorentzVector,TLorentzVector> r;
+  std::pair<TLorentzVector*,TLorentzVector*> r;
   if (_refit_phgf_tracks.first&&_refit_phgf_tracks.second)
   {
     r.first = new TLorentzVector();
-    r.first->SetPxPyPzE (_refit_phgf_tracks.first->get_px(),_refit_phgf_tracks.first->get_py(),_refit_phgf_tracks.first->get_pz(),
-        sqrt(_kElectronRestM*_kElectronRestM+_refit_phgf_tracks.first->get_p()*_refit_phgf_tracks.first->get_p()));
+    r.first->SetVectM (_refit_phgf_tracks.first->get_mom(),_kElectronRestM);
     r.second =   new TLorentzVector();
-    r.second->SetPxPyPzE (_refit_phgf_tracks.second->get_px(),_refit_phgf_tracks.second->get_py(),_refit_phgf_tracks.second->get_pz(),
-        sqrt(_kElectronRestM*_kElectronRestM+_refit_phgf_tracks.second->get_p()*_refit_phgf_tracks.second->get_p()));
+    r.second->SetVectM (_refit_phgf_tracks.second->get_mom(),_kElectronRestM);
   }
   else{
     r.first=NULL;
@@ -646,12 +644,19 @@ std::pair<float,float> Conversion::getTrackPhis(){
       break;
   }
 }
-genfit::GFRaveVertex* Conversion::getSecondaryVertex(SVReco* vertexer){
+/*This is the ideal case but I do not have RaveVtx to SvtxVertex matching yet
+ * genfit::GFRaveVertex* Conversion::getSecondaryVertex(SVReco* vertexer){
   if(recoCount()==2){
     if (recoVertex) delete recoVertex;
     recoVertex= vertexer->findSecondaryVertex(reco1,reco2);
   }
   return recoVertex;
+}*/
+genfit::GFRaveVertex* Conversion::getSecondaryVertex(SVReco* vertexer){
+  if(recoCount()==2){
+    return vertexer->findSecondaryVertex(reco1,reco2);
+  }
+  else return NULL;
 }
 
 std::pair<PHGenFit::Track*,PHGenFit::Track*> Conversion::getPHGFTracks(SVReco* vertexer){
@@ -665,14 +670,14 @@ std::pair<PHGenFit::Track*,PHGenFit::Track*> Conversion::refitTracks(SVReco* ver
   PHG4VtxPointToSvtxVertex(seedVtx);
   _refit_phgf_tracks.first=vertexer->refitTrack(truthSvtxVtx,reco1);
   _refit_phgf_tracks.second=vertexer->refitTrack(truthSvtxVtx,reco2);
-  return r;
+  return _refit_phgf_tracks;
 }
 
 std::pair<PHGenFit::Track*,PHGenFit::Track*> Conversion::refitTracks(SVReco* vertexer){
   PHG4VtxPointToSvtxVertex();
   _refit_phgf_tracks.first=vertexer->refitTrack(truthSvtxVtx,reco1);
   _refit_phgf_tracks.second=vertexer->refitTrack(truthSvtxVtx,reco2);
-  return r;
+  return _refit_phgf_tracks;
 }
 
 void Conversion::PHG4VtxPointToSvtxVertex(){

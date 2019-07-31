@@ -28,12 +28,15 @@ TChain* handleFile(string name, string extension, string treename, unsigned int 
 
 void makephotonM(TChain* ttree,TFile* out_file){
   float photon_m;
+  float rephoton_m;
   float tphoton_m;
   ttree->SetBranchAddress("photon_m",     &photon_m   );
+  ttree->SetBranchAddress("rephoton_m",     &rephoton_m   );
   ttree->SetBranchAddress("tphoton_m",&tphoton_m    );
 
   std::vector<TH1F*> plots;
   plots.push_back(new TH1F("m_{#gamma}_reco","",40,-2,10));
+  plots.push_back(new TH1F("m_{#gamma}_recoRefit","",40,-2,10));
   plots.push_back(new TH1F("m_{#gamma}_truth","",40,-2,10));
 
   for (int i = 0; i < 2; ++i)
@@ -45,7 +48,8 @@ void makephotonM(TChain* ttree,TFile* out_file){
   {
     ttree->GetEvent(event);
     plots[0]->Fill(photon_m);
-    plots[1]->Fill(tphoton_m);
+    plots[1]->Fill(rephoton_m);
+    plots[2]->Fill(tphoton_m);
   }
   for (int i = 0; i < 2; ++i)
   {
