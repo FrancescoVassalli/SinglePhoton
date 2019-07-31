@@ -112,6 +112,8 @@ void makeRefitDist(TChain* ttree, TFile *out_file){
   }
   
   diffplotx->Scale(1./ttree->GetEntries(),"width");
+  diffploty->Scale(1./ttree->GetEntries(),"width");
+  diffplotz->Scale(1./ttree->GetEntries(),"width");
 
   out_file->Write();
 }
