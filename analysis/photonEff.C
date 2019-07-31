@@ -85,16 +85,26 @@ void makeVtxR(TChain* ttree,TFile* out_file){
 }
 
 void makeRefitDist(TChain* ttree, TFile *out_file){
-  float diff;
-  ttree->SetBranchAddress("refitdiff",&diff);
-  TH1F *diffplot= new TH1F("|m_{e0}-m_{e_refit}|","",20,-1,1);
+  float diffx;
+  float diffy;
+  float diffz;
+  ttree->SetBranchAddress("refitdiffx",&diffx);
+  ttree->SetBranchAddress("refitdiffz",&diffz);
+  ttree->SetBranchAddress("refitdiffz",&diffz);
+  TH1F *diffplotx= new TH1F("x_{0}-x_{refit}","",20,-1,1);
+  TH1F *diffploty= new TH1F("y_{0}-y_{refit}","",20,-1,1);
+  TH1F *diffplotz= new TH1F("z_{0}-z_{refit}","",20,-1,1);
 
-  diffplot->Sumw2();
+  diffplotx->Sumw2();
+  diffploty->Sumw2();
+  diffplotz->Sumw2();
 
   for (int event = 0; event < ttree->GetEntries(); ++event)
   {
     ttree->GetEvent(event);
-    diffplot->Fill(diff);
+    diffplotx->Fill(diffx);
+    diffploty->Fill(diffy);
+    diffplotz->Fill(diffz);
   }
   out_file->Write();
 }
