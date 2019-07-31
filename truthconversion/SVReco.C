@@ -242,7 +242,8 @@ genfit::GFRaveVertex* SVReco::findSecondaryVertex(SvtxTrack* track1, SvtxTrack* 
 						track2->identify();
 						cout<<"\n\n\n\n\n";
 						}*/
-		//if a vertex is found 
+		//if a vertex is found return ownership 
+    //TODO check rave_verticies_conversion for mem leak
 		if(rave_vertices_conversion.size()>0) return rave_vertices_conversion[0];
 		else return NULL;
 	}//more than 1 track 
@@ -715,7 +716,7 @@ PHGenFit::Track*  SVReco::refitTrack(SvtxVertex* vtx, SvtxTrack* svtxtrk){
   PHGenFit::Track* gftrk = MakeGenFitTrack(svtxtrk,vtx);
   if(gftrk) {
     cout<<"good genfit refit"<<endl;
-    MakeSvtxTrack(svtxtrk,gftrk,vtx);
+    //MakeSvtxTrack(svtxtrk,gftrk,vtx);
     return gftrk;
   }
   else {
@@ -724,7 +725,11 @@ PHGenFit::Track*  SVReco::refitTrack(SvtxVertex* vtx, SvtxTrack* svtxtrk){
   }
 }
 
-//may need to make the phgf_track pointer shared 
+
+/*FIXME this code is broken I have made zero attempt to find out why
+* I decided not to use the SvtxTrack after they are refit
+* may need to make the phgf_track pointer shared 
+*/
 std::shared_ptr<SvtxTrack> SVReco::MakeSvtxTrack(const SvtxTrack* svtx_track,
 		const PHGenFit::Track* phgf_track, const SvtxVertex* vertex) {
 

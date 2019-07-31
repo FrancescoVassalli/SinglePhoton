@@ -320,13 +320,14 @@ void TruthConversionEval::numUnique(std::map<int,Conversion> *mymap=NULL,SvtxTra
                   _b_tphoton_m =-1;
                   _b_photon_pT=-1;
                 }
-                pair<TLorentzVector, TLorentzVector> reco_tlvs = i->second.getRecoTlvs();
+                //TODO check Conversion operations for ownership transfer->memleak due to lack of delete
+                pair<TLorentzVector*, TLorentzVector*> reco_tlvs = i->second.getRecoTlvs();
                 genfit::GFRaveVertex* recoVert = i->second.getSecondaryVertex(_vertexer);
                 std::pair<PHGenFit::Track*,PHGenFit::Track*> ph_gf_tracks = i->second.getPHGFTracks(_vertexer);
                 if (recoVert)
                 {
                   std::pair<PHGenFit::Track*,PHGenFit::Track*> refit_phgf_tracks=i->second.refitTracks(_vertexer,get_primary_vertex(topNode));
-                  pair<TLorentzVector, TLorentzVector> refit_reco_tlvs = i->second.getRecoTlvs();
+                  pair<TLorentzVector*, TLorentzVector*> refit_reco_tlvs = i->second.getRefitRecoTlvs();
                   _b_refitdiffx = reco_tlvs.first.X()-refit_reco_tlvs.first.X();
                   _b_refitdiffy = reco_tlvs.first.Y()-refit_reco_tlvs.first.Y();
                   _b_refitdiffz = reco_tlvs.first.Z()-refit_reco_tlvs.first.Z();
@@ -342,7 +343,7 @@ void TruthConversionEval::numUnique(std::map<int,Conversion> *mymap=NULL,SvtxTra
                     cout<<"\n\t and refit:\n";
                     refit_phgf_tracks.second->get_mom().Print();
                   }
-                  recoPhoton = i->second.getRecoPhoton();
+                  recoPhoton = i->second.getRefitRecoPhoton();
                   if(recoPhoton) _b_rephoton_m=recoPhoton->Dot(*recoPhoton);
                   TVector3 recoVertPos = recoVert->getPos();
                   _b_vtx_radius = sqrt(recoVertPos.x()*recoVertPos.x()+recoVertPos.y()*recoVertPos.y());

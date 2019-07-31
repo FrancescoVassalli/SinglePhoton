@@ -15,21 +15,31 @@
 Conversion::Conversion(SvtxTrackEval* trackeval,int verbosity){
   this->trackeval=trackeval;
   this->verbosity=verbosity;
+  _refit_phgf_tracks.first=NULL;
+  _refit_phgf_tracks.second=NULL;
 }
 Conversion::Conversion(PHG4VtxPoint* vtx,int verbosity){
   this->vtx=vtx;
   this->verbosity=verbosity;
+  _refit_phgf_tracks.first=NULL;
+  _refit_phgf_tracks.second=NULL;
 }
 Conversion::Conversion(PHG4VtxPoint* vtx,SvtxTrackEval *trackeval,int verbosity){
   this->trackeval=trackeval;
   this->vtx=vtx;
   this->verbosity=verbosity;
+  _refit_phgf_tracks.first=NULL;
+  _refit_phgf_tracks.second=NULL;
 }
 
 Conversion::~Conversion(){
   if(recoVertex) delete recoVertex;
   if(recoPhoton) delete recoPhoton;
   if(truthSvtxVtx) delete truthSvtxVtx;
+  if (_refit_phgf_tracks.first) delete _refit_phgf_tracks.first;
+  if (_refit_phgf_tracks.second) delete _refit_phgf_tracks.second;
+  _refit_phgf_tracks.first=NULL;
+  _refit_phgf_tracks.second=NULL;
   recoVertex=NULL;
   recoPhoton=NULL;
   truthSvtxVtx=NULL;
@@ -168,12 +178,64 @@ TLorentzVector* Conversion::getRecoPhoton(){
   return setRecoPhoton();
 }
 
-std::pair<TLorentzVector,TLorentzVector> Conversion::getRecoTlvs(){
-  std::pair<TLorentzVector,TLorentzVector> r;
-  r.first = TLorentzVector (reco1->get_px(),reco1->get_py(),reco1->get_pz(),
+TLorentzVector* Conversion::getRefitRecoPhoton(){
+  std::pair<TLorentzVector*,TLorentzVector*> refit_tlvs =getRefitRecoTlvs();
+  if (refit_tlvs.first&&refit_tlvs.second)
+  {
+    if(recoPhoton) delete recoPhoton;
+    recoPhoton= TLorentzVector(refit_tlvs.first+refit_tlvs.second);
+  }
+  else return NULL;
+}
+
+std::pair<TLorentzVector*,TLorentzVector*> Conversion::getRecoTlvs(){
+  std::pair<TLorentzVector*,TLorentzVector*> r;
+  switch(recoCount()){
+    case 2:
+      r.first = new TLorentzVector();
+      r.first->SetPxPyPzE (reco1->get_px(),reco1->get_py(),reco1->get_pz(),
         sqrt(_kElectronRestM*_kElectronRestM+reco1->get_p()*reco1->get_p()));
-  r.second =   TLorentzVector (reco2->get_px(),reco2->get_py(),reco2->get_pz(),
+      r.second =   new TLorentzVector();
+      r.second->SetPxPyPzE (reco2->get_px(),reco2->get_py(),reco2->get_pz(),
         sqrt(_kElectronRestM*_kElectronRestM+reco2->get_p()*reco2->get_p()));
+      break;
+    case 1:
+      if(reco1){
+        r.first = new TLorentzVector();
+        r.first->SetPxPyPzE (reco1->get_px(),reco1->get_py(),reco1->get_pz(),
+          sqrt(_kElectronRestM*_kElectronRestM+reco1->get_p()*reco1->get_p()));
+        r.second = NULL;
+      }
+      else{
+        r.first = NULL;
+        r.second = new TLorentzVector ();
+        r.second->SetPxPyPzE(reco2->get_px(),reco2->get_py(),reco2->get_pz(),
+          sqrt(_kElectronRestM*_kElectronRestM+reco2->get_p()*reco2->get_p()));
+      }
+      break;
+    default:
+      r.first=NULL;
+      r.second=NULL;
+      break;
+  }
+  return r;
+}
+
+std::pair<TLorentzVector*,TLorentzVector*> Conversion::getRefitRecoTlvs(){
+  std::pair<TLorentzVector,TLorentzVector> r;
+  if (_refit_phgf_tracks.first&&_refit_phgf_tracks.second)
+  {
+    r.first = new TLorentzVector();
+    r.first->SetPxPyPzE (_refit_phgf_tracks.first->get_px(),_refit_phgf_tracks.first->get_py(),_refit_phgf_tracks.first->get_pz(),
+        sqrt(_kElectronRestM*_kElectronRestM+_refit_phgf_tracks.first->get_p()*_refit_phgf_tracks.first->get_p()));
+    r.second =   new TLorentzVector();
+    r.second->SetPxPyPzE (_refit_phgf_tracks.second->get_px(),_refit_phgf_tracks.second->get_py(),_refit_phgf_tracks.second->get_pz(),
+        sqrt(_kElectronRestM*_kElectronRestM+_refit_phgf_tracks.second->get_p()*_refit_phgf_tracks.second->get_p()));
+  }
+  else{
+    r.first=NULL;
+    r.second=NULL;
+  }  
   return r;
 }
 
@@ -585,8 +647,11 @@ std::pair<float,float> Conversion::getTrackPhis(){
   }
 }
 genfit::GFRaveVertex* Conversion::getSecondaryVertex(SVReco* vertexer){
-  if(recoCount()==2)return vertexer->findSecondaryVertex(reco1,reco2);
-  else return NULL;
+  if(recoCount()==2){
+    if (recoVertex) delete recoVertex;
+    recoVertex= vertexer->findSecondaryVertex(reco1,reco2);
+  }
+  return recoVertex;
 }
 
 std::pair<PHGenFit::Track*,PHGenFit::Track*> Conversion::getPHGFTracks(SVReco* vertexer){
@@ -597,18 +662,16 @@ std::pair<PHGenFit::Track*,PHGenFit::Track*> Conversion::getPHGFTracks(SVReco* v
 }
 
 std::pair<PHGenFit::Track*,PHGenFit::Track*> Conversion::refitTracks(SVReco* vertexer,SvtxVertex* seedVtx){
-  std::pair<PHGenFit::Track*,PHGenFit::Track*> r;
   PHG4VtxPointToSvtxVertex(seedVtx);
-  r.first=vertexer->refitTrack(truthSvtxVtx,reco1);
-  r.second=vertexer->refitTrack(truthSvtxVtx,reco2);
+  _refit_phgf_tracks.first=vertexer->refitTrack(truthSvtxVtx,reco1);
+  _refit_phgf_tracks.second=vertexer->refitTrack(truthSvtxVtx,reco2);
   return r;
 }
 
 std::pair<PHGenFit::Track*,PHGenFit::Track*> Conversion::refitTracks(SVReco* vertexer){
-  std::pair<PHGenFit::Track*,PHGenFit::Track*> r;
   PHG4VtxPointToSvtxVertex();
-  r.first=vertexer->refitTrack(truthSvtxVtx,reco1);
-  r.second=vertexer->refitTrack(truthSvtxVtx,reco2);
+  _refit_phgf_tracks.first=vertexer->refitTrack(truthSvtxVtx,reco1);
+  _refit_phgf_tracks.second=vertexer->refitTrack(truthSvtxVtx,reco2);
   return r;
 }
 
