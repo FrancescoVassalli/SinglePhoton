@@ -35,9 +35,9 @@ void makephotonM(TChain* ttree,TFile* out_file){
   ttree->SetBranchAddress("tphoton_m",&tphoton_m    );
 
   std::vector<TH1F*> plots;
-  plots.push_back(new TH1F("m_{#gamma}_reco","",40,-2,10));
-  plots.push_back(new TH1F("m_{#gamma}_recoRefit","",40,-2,10));
-  plots.push_back(new TH1F("m_{#gamma}_truth","",40,-2,10));
+  plots.push_back(new TH1F("m^{#gamma}_{reco}","",40,-2,10));
+  plots.push_back(new TH1F("m^{#gamma}_{recoRefit}","",40,-2,10));
+  plots.push_back(new TH1F("m^{#gamma}_{truth}","",40,-2,10));
 
   for (int i = 0; i < 2; ++i)
   {
