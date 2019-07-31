@@ -45,8 +45,6 @@ void plotGoodBack(TChain* ttree,TFile* out_file){
   float _bb_track_dphi;
   int _bb_pid;
 
-  unsigned goodCount=0;
-
   ttree->Branch("track_deta", &_bb_track_deta);
   ttree->Branch("cluster_deta", &_bb_cluster_deta);
   ttree->Branch("cluster_dphi", &_bb_cluster_dphi);
@@ -82,7 +80,8 @@ void plotGoodBack(TChain* ttree,TFile* out_file){
   for (int event = 0; event < ttree->GetEntries(); ++event)
   {
     ttree->GetEvent(event);
-    if (_bb_track_layer>0&&_bb_track_pT>.6&&_bb_track_dca>0&&-bb_cluster_prob>0&&_bb_track_deta<.3884&&TMath::Abs(_bb_track_dlayer)<=2)
+    if (_bb_track_pT>.6&&_bb_track_dca>0&&_bb_cluster_prob>=0&&TMath::Abs(_bb_track_deta)<.3884
+        &&TMath::Abs(_bb_cluster_deta)<.32&&TMath::Abs(_bb_cluster_dphi)<5.15)
     {
       plots[0]->Fill(_bb_photon_m);
       plots[1]->Fill(_bb_photon_pT);
@@ -90,6 +89,7 @@ void plotGoodBack(TChain* ttree,TFile* out_file){
       plots[3]->Fill(_bb_vtx_chi2);
       plots[4]->Fill(_bb_vtxTrackRPhi_dist);
       plots[5]->Fill(_bb_vtxTrackRZ_dist);
+
       count++;
     }
   }
@@ -97,7 +97,7 @@ void plotGoodBack(TChain* ttree,TFile* out_file){
   {
     plots[i]->Scale(1./count,"width");
   }
-  cout<<"Total good back: "<<count<<'\n';
+  cout<<"Total good back: "<<(float) count/ttree->GetEntries()<<'\n';
   out_file->Write();
 }
 
@@ -107,7 +107,7 @@ void closeBackAna()
   string treeExtension = ".root";
   unsigned int nFiles=100;
   TFile *out_file = new TFile("backplots.root","RECREATE");
-  TChain *ttree = handleFile(treePath,treeExtension,"cutTreeBacke",nFiles);
+  TChain *ttree = handleFile(treePath,treeExtension,"trackBackTree",nFiles);
   //TChain *ttree2 = handleFile(treePath,treeExtension,"vtxingTree",nFiles);
   plotGoodBack(ttree,out_file);
 }
