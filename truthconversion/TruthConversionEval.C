@@ -135,7 +135,7 @@ int TruthConversionEval::InitRun(PHCompositeNode *topNode)
     _vtxBackTree->Branch("cluster_deta", &_bb_cluster_deta);
 
     _signalCutTree = new TTree("cutTreeSignal","signal data for making track pair cuts");
-    _signalCutTree->SetAutoSave(300);
+    _signalCutTree->SetAutoSave(100);
     _signalCutTree->Branch("track_deta", &_b_track_deta);
     _signalCutTree->Branch("track_dca", &_b_track_dca);
     _signalCutTree->Branch("track_dphi", &_b_track_dphi);
@@ -335,9 +335,9 @@ void TruthConversionEval::numUnique(std::map<int,Conversion> *mymap=NULL,SvtxTra
                     _b_refitdiffz = reco_tlvs.first->Z()-refit_reco_tlvs.first->Z();
                   }
                   else{
-                    _b_refitdiffx = -9.;
-                    _b_refitdiffy = -9.;
-                    _b_refitdiffz = -9.;
+                    _b_refitdiffx = -99.;
+                    _b_refitdiffy = -99.;
+                    _b_refitdiffz = -99.;
                   }
                   if (ph_gf_tracks.first&&refit_phgf_tracks.first)
                   {
@@ -540,6 +540,7 @@ int TruthConversionEval::get_track_pid(SvtxTrack* track) const{
 int TruthConversionEval::End(PHCompositeNode *topNode)
 {
   if(_kMakeTTree){
+    _signalCutTree->Write();
     _f->Write();
     _f->Close();
   }
