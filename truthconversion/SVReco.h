@@ -8,15 +8,12 @@
 #include <vector>
 #include <map>
 
-namespace PHGenFit {
-	class Track;
-} /* namespace PHGenFit */
-
 namespace genfit {
 	class GFRaveVertexFactory;
 } /* namespace genfit */
 
 namespace PHGenFit {
+	class Track;
 	class Fitter;
 } /* namespace PHGenFit */
 
@@ -34,7 +31,7 @@ class JetMap;
 class TFile;
 class TTree;
 
-//! \brief		Refit SvtxTracks with PHGenFit.
+//! \brief		Find secondary vertex from track pairs and refit SvtxTracks with PHGenFit.
 class SVReco {
 	public:
 
@@ -53,8 +50,10 @@ class SVReco {
 		//!@return a vertex for each track pair
 		genfit::GFRaveVertex* findSecondaryVertex(SvtxTrack* track1, SvtxTrack* track2);
 
-		//Uses \param vtx to refit \param svtxtrk which is directly edited
-		void refitTrack(SvtxVertex* vtx, SvtxTrack* svtxtrk);
+		//Uses \param vtx to refit \param svtxtrk which is directly edited. @return the PHGenFit version of the track.
+		PHGenFit::Track* refitTrack(SvtxVertex* vtx, SvtxTrack* svtxtrk);
+		//Looks up \param svtxtrk id in {@link _svtxtrk_gftrk_map}. If \param svtxtrk is NULL @return NULL.
+		PHGenFit::Track* getPHGFTrack(SvtxTrack* svtxtrk);		
 		void reset_eval_variables();
 
 		void set_do_eval(bool doEval){

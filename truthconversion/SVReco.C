@@ -171,6 +171,11 @@ int SVReco::InitEvent(PHCompositeNode *topNode) {
 	return Fun4AllReturnCodes::EVENT_OK;
 }
 
+PHGenFit::Track* getPHGFTrack(SvtxTrack* svtxtrk){
+ if(svtxtrk)return _main_rf_phgf_tracks[_svtxtrk_gftrk_map[svtxtrk->get_id()]];
+ else return NULL;
+}
+
 
 int SVReco::InitRun(PHCompositeNode *topNode) {
 
@@ -282,6 +287,8 @@ void SVReco::printGenFitTrackKinematics(PHGenFit::Track* track){
 	cout << "OUT Ex: " << sqrt(cov[0][0]) << ", Ey: " << sqrt(cov[1][1]) << ", Ez: " << sqrt(cov[2][2]) << endl;
 	cout << "OUT Px: " << mom.X() << ", Py: " << mom.Y() << ", Pz: " << mom.Z() << endl; 
 }
+
+
 
 //should be deprecated
 void SVReco::reset_eval_variables(){
@@ -704,11 +711,12 @@ void SVReco::FillSVMap(
 	return;
 }
 
-void SVReco::refitTrack(SvtxVertex* vtx, SvtxTrack* svtxtrk){
-  auto gftrk = MakeGenFitTrack(svtxtrk,vtx);
+PHGenFit::Track*  SVReco::refitTrack(SvtxVertex* vtx, SvtxTrack* svtxtrk){
+  PHGenFit::Track* gftrk = MakeGenFitTrack(svtxtrk,vtx);
   if(gftrk) {
     cout<<"good genfit refit"<<endl;
     MakeSvtxTrack(svtxtrk,gftrk,vtx);
+    return gftrk;
   }
   else cout<<"No refit possible"<<endl;
 }

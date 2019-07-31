@@ -19,6 +19,11 @@
 #include <TVector3.h>
 #include <utility>
 
+ namespace PHGenFit {
+	class Track;
+} /* namespace PHGenFit */
+
+
 class SvtxTrackEval;
 class PHCompositeNode;
 class PHG4TruthInfoContainer;
@@ -183,7 +188,13 @@ class Conversion
 		TLorentzVector* getRecoPhoton();///<@return the constructed tlv
 		PHG4Particle* getTruthPhoton(PHG4TruthInfoContainer*);///<@return NULL if not valid conversion else return photon
 		///Uses the truth vertex and {@link SVReco} to improve the fit of {@link reco1} and {@link reco2}
-		void refitTracks(SVReco* vertexer);
+		std::pair<PHGenFit::Track*,PHGenFit::Track*> refitTracks(SVReco* vertexer);
+		///Uses the truth vertex and {@link SVReco} to improve the fit of {@link reco1} and {@link reco2}. Uses @param seedVtx to set the uncertainies on the truth vertex.
+		std::pair<PHGenFit::Track*,PHGenFit::Track*> refitTracks(SVReco* vertexer,SvtxVertex* seedVtx);
+		//get the vertex reconstructed from {@link SVReco} using the reco tracks. @return NULL if {@link recoCount()}!=2
+		genfit::GFRaveVertex* Conversion::getSecondaryVertex(SVReco* vertexer);
+		//get the PHGF version of {@link reco1} and {@link reco2}. If not possible @return NULL for that track.
+		std::pair<PHGenFit::Track*,PHGenFit::Track*> getPHGFTracks(SVReco* vertexer);
 
 		std::pair<TLorentzVector,TLorentzVector> getRecoTlvs();
 
@@ -241,8 +252,13 @@ class Conversion
 		/**Initializes {@link truthSvtxVtx} with x,y,x,t from the PHG4VtxPoint. 
 		 *Chisq and ndof are set to 1. 
 		 *The tracks are set with {@link reco1} and {@link reco2}. 
-		 *The errors are set to 0.*/
+		 *The errors are set to a randomish positive-definite matrix*/
 		void PHG4VtxPointToSvtxVertex();
+		/**Initializes {@link truthSvtxVtx} with x,y,x,t from the PHG4VtxPoint. 
+		 *Chisq and ndof are set to 1. 
+		 *The tracks are set with {@link reco1} and {@link reco2}. 
+		 *The errors are set to the errors of the seedVtx. The primary vtx is suggested.*/
+		void PHG4VtxPointToSvtxVertex(SvtxVertex* seedVtx)
 
 };
 #endif //CONVERSION_H__

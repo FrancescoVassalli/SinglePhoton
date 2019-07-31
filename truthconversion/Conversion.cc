@@ -2,6 +2,7 @@
 #include "SVReco.h"
 #include <phool/PHCompositeNode.h>
 #include <phool/getClass.h>
+#include <phgenfit/Track.h>
 #include <g4main/PHG4TruthInfoContainer.h>
 #include <trackbase_historic/SvtxCluster.h>
 #include <trackbase_historic/SvtxHitMap.h>
@@ -583,11 +584,32 @@ std::pair<float,float> Conversion::getTrackPhis(){
       break;
   }
 }
+genfit::GFRaveVertex* Conversion::getSecondaryVertex(SVReco* vertexer){
+  if(recoCount()==2)return vertexer->findSecondaryVertex(reco1,reco2);
+  else return NULL;
+}
 
-void Conversion::refitTracks(SVReco* vertexer){
+std::pair<PHGenFit::Track*,PHGenFit::Track*> getPHGFTracks(SVReco* vertexer){
+  std::pair<PHGenFit::Track*,PHGenFit::Track*> r;
+  r.first = vertexer->getPHGFTrack(reco1);
+  r.second = vertexer->getPHGFTrack(reco2);
+  return r;
+}
+
+std::pair<PHGenFit::Track*,PHGenFit::Track*> Conversion::refitTracks(SVReco* vertexer,SvtxVertex* seedVtx){
+  std::pair<PHGenFit::Track*,PHGenFit::Track*> r;
+  PHG4VtxPointToSvtxVertex(seedVtx);
+  r.first=vertexer->refitTrack(truthSvtxVtx,reco1);
+  r.second=vertexer->refitTrack(truthSvtxVtx,reco2);
+  return r;
+}
+
+std::pair<PHGenFit::Track*,PHGenFit::Track*> Conversion::refitTracks(SVReco* vertexer){
+  std::pair<PHGenFit::Track*,PHGenFit::Track*> r;
   PHG4VtxPointToSvtxVertex();
-  vertexer->refitTrack(truthSvtxVtx,reco1);
-  vertexer->refitTrack(truthSvtxVtx,reco2);
+  r.first=vertexer->refitTrack(truthSvtxVtx,reco1);
+  r.second=vertexer->refitTrack(truthSvtxVtx,reco2);
+  return r;
 }
 
 void Conversion::PHG4VtxPointToSvtxVertex(){
@@ -605,7 +627,7 @@ void Conversion::PHG4VtxPointToSvtxVertex(){
   double d = rand.Gaus(0, ae);
   double g = rand.Gaus(0, ae);
   double h = rand.Gaus(0, i);
-  truthSvtxVtx->set_error(0,0,ae*ae);
+  truthSvtxVtx->set_error(0,0,seedVtx->get_error());
   truthSvtxVtx->set_error(1,1,d*d+ae*ae);
   truthSvtxVtx->set_error(2,2,g*g+h*h+i*i);
   truthSvtxVtx->set_error(0,1,ae*d);
@@ -614,6 +636,35 @@ void Conversion::PHG4VtxPointToSvtxVertex(){
   truthSvtxVtx->set_error(0,2,ae*g);
   truthSvtxVtx->set_error(1,2,d*g+ae*h);
   truthSvtxVtx->set_error(2,1,d*g+ae*h);
+  switch(recoCount()){
+    case 2:
+      truthSvtxVtx->insert_track(reco1->get_id());
+      truthSvtxVtx->insert_track(reco2->get_id());
+    case 1:
+      if (reco1) return truthSvtxVtx->insert_track(reco1->get_id());
+      else return truthSvtxVtx->insert_track(reco2->get_id());
+      break;
+    default:
+      break;
+  }
+}
+
+void Conversion::PHG4VtxPointToSvtxVertex(SvtxVertex* seedVtx){
+  truthSvtxVtx = new SvtxVertex_v1();
+  truthSvtxVtx->set_x(vtx->get_x());
+  truthSvtxVtx->set_y(vtx->get_y());
+  truthSvtxVtx->set_z(vtx->get_z());
+  truthSvtxVtx->set_t0(vtx->get_t());
+  truthSvtxVtx->set_chisq(1.);
+  truthSvtxVtx->set_ndof(1);
+
+  for (int i = 0; i < 3; ++i)
+  {
+    for (int j = 0; j < 3; ++j)
+    {
+      truthSvtxVtx->set_error(i,j,seedVtx->get_error(i,j));
+    }
+  }
   switch(recoCount()){
     case 2:
       truthSvtxVtx->insert_track(reco1->get_id());

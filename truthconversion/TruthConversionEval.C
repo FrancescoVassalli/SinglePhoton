@@ -20,6 +20,8 @@
 #include <trackbase_historic/SvtxHit.h>
 #include <trackbase_historic/SvtxClusterMap.h>
 #include <trackbase_historic/SvtxCluster.h>*/
+#include <trackbase_historic/SvtxVertex.h>
+#include <trackbase_historic/SvtxVertexMap.h>
 #include <trackbase/TrkrClusterContainer.h>
 #include <trackbase/TrkrCluster.h>
 
@@ -34,6 +36,9 @@
 #include <GenFit/RKTrackRep.h>
 #include <GenFit/StateOnPlane.h>
 #include <GenFit/Track.h>
+
+#include <phgenfit/Track.h>
+
 
 #include <fun4all/Fun4AllReturnCodes.h>
 
@@ -185,6 +190,11 @@ bool TruthConversionEval::doNodePointers(PHCompositeNode* topNode){
   return goodPointers;
 }
 
+SvtxVertex* TruthConversionEval::get_primary_vertex(PHCompositeNode *topNode){
+  SvtxVertexMap *vertexMap = findNode::getClass<SvtxTrackMap>(topNode, "SvtxTrackMap");
+  return vertexMap->get(0);
+}
+
 int TruthConversionEval::process_event(PHCompositeNode *topNode)
 {
   if(!doNodePointers(topNode)) return Fun4AllReturnCodes::ABORTEVENT;
@@ -310,17 +320,26 @@ void TruthConversionEval::numUnique(std::map<int,Conversion> *mymap=NULL,SvtxTra
                   _b_tphoton_m =-1;
                   _b_photon_pT=-1;
                 }
-                //TODO make Conversion find the reco vertex
-                pair<SvtxTrack*, SvtxTrack*> reco_tracks=i->second.getRecoTracks();
                 pair<TLorentzVector, TLorentzVector> reco_tlvs = i->second.getRecoTlvs();
-                genfit::GFRaveVertex* recoVert = _vertexer->findSecondaryVertex(reco_tracks.first,reco_tracks.second);
+                genfit::GFRaveVertex* recoVert = i->second.getSecondaryVertex(_vertexer);
+                std::pair<PHGenFit::Track*,PHGenFit::Track*> ph_gf_tracks = i->second.getPHGFTracks(_vertexer);
                 if (recoVert)
                 {
-                  i->second.refitTracks(_vertexer);
+                  std::pair<PHGenFit::Track*,PHGenFit::Track*> refit_phgf_tracks=i->second.refitTracks(_vertexer,get_primary_vertex(topNode));
                   pair<TLorentzVector, TLorentzVector> refit_reco_tlvs = i->second.getRecoTlvs();
                   _b_refitdiffx = reco_tlvs.first.X()-refit_reco_tlvs.first.X();
                   _b_refitdiffy = reco_tlvs.first.Y()-refit_reco_tlvs.first.Y();
                   _b_refitdiffz = reco_tlvs.first.Z()-refit_reco_tlvs.first.Z();
+                  if (ph_gf_tracks.first&&refit_phgf_tracks.first)
+                  {
+                    cout<<"Good Track refit with original:"<<ph_gf_tracks.first->get_mom()->Print()<<"\n\t and refit:"
+                      <<refit_phgf_tracks.first->get_mom()->Print()<<'\n';
+                  }
+                  if (ph_gf_tracks.second&&refit_phgf_tracks.second)
+                  {
+                    cout<<"Good Track refit with original:"<<ph_gf_tracks.second->get_mom()->Print()<<"\n\t and refit:"
+                      <<refit_phgf_tracks.second->get_mom()->Print()<<'\n';
+                  }
                   recoPhoton = i->second.getRecoPhoton();
                   if(recoPhoton) _b_rephoton_m=recoPhoton->Dot(*recoPhoton);
                   TVector3 recoVertPos = recoVert->getPos();

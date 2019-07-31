@@ -20,6 +20,7 @@ class PHG4Particle;
 class PHG4VtxPoint;
 class Conversion;
 class SvtxTrackEval;
+class SvtxVertex;
 class SvtxTrack;
 class SvtxHitMap;
 class SvtxHit;
@@ -59,6 +60,7 @@ class TruthConversionEval: public SubsysReco
   private:
     bool doNodePointers(PHCompositeNode* topNode);
     int get_track_pid(SvtxTrack* track)const;
+    SvtxVertex* get_primary_vertex(PHCompositeNode* topNode)const;
     /** helper function for process_event
      * fills the member fields with information from the conversions 
      * finds the clusters associated with the truth conversions*/
