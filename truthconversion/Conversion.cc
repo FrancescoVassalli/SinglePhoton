@@ -664,7 +664,7 @@ genfit::GFRaveVertex* Conversion::getSecondaryVertex(SVReco* vertexer){
 }
 
 genfit::GFRaveVertex* Conversion::correctSecondaryVertex(string methodname,string tmvaPath){
-  //TODO interface with TMVA::Reader
+  //TODO Make a seperate class to hold the regressor 
   if(!recoVertex) {
     cerr<<"WARNING: no vertex to correct"<<endl;
     return NULL;
@@ -688,13 +688,13 @@ genfit::GFRaveVertex* Conversion::correctSecondaryVertex(string methodname,strin
   nextPos.SetMagThetaPhi(reader->EvaluateRegression(methodname.c_str())[0],nextPos.Theta(),nextPos.Phi());
 
   using namespace genfit;
-  GFRaveVertex* temp = recoVertex;
+ // GFRaveVertex* temp = recoVertex;
   std::vector<GFRaveTrackParameters*> tracks;
   for(unsigned i =0; i<recoVertex->getNTracks();i++){
     tracks.push_back(recoVertex->getParameters(i));
   }
   recoVertex = new GFRaveVertex(nextPos,recoVertex->getCov(),tracks,recoVertex->getNdf(),recoVertex->getChi2(),recoVertex->getId());
-  delete temp; //this might cause outside references to seg fault maybe shared_ptr is better 
+//  delete temp; //this might cause outside references to seg fault maybe shared_ptr is better 
   return recoVertex;
 }
 

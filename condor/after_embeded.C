@@ -29,7 +29,9 @@ int after_embeded( std::string infile = "XjPhi3_pT5_98_dst.root",std::string out
   hitsin->fileopen( infile );
   se->registerInputManager(hitsin);
   
-  TruthConversionEval *truther = new TruthConversionEval(outfile,runNumber,2,3,true);
+  string tmvapath="/direct/phenix+u/vassalli/sphenix/single/Training/condorout/training/weights/vtxFactory_PDERS.weights.xml";
+  string tmvaname="PDERS";
+  TruthConversionEval *truther = new TruthConversionEval(outfile,runNumber,2,3,true,tmvaname,tmvapath);
   se->registerSubsystem(truther);
   /*RecoConversionEval *rCE = new RecoConversionEval(outfile);
   se->registerSubsystem( rCE );*/
