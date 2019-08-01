@@ -323,10 +323,13 @@ void TruthConversionEval::numUnique(std::map<int,Conversion> *mymap=NULL,SvtxTra
                 }
                 //TODO check Conversion operations for ownership transfer->memleak due to lack of delete
                 pair<TLorentzVector*, TLorentzVector*> reco_tlvs = i->second.getRecoTlvs();
+                cout<<"vertexing"<<endl;
                 genfit::GFRaveVertex* recoVert = i->second.getSecondaryVertex(_vertexer);
+                cout<<"finding gf_tracks"<<endl;
                 std::pair<PHGenFit::Track*,PHGenFit::Track*> ph_gf_tracks = i->second.getPHGFTracks(_vertexer);
                 if (recoVert)
                 {
+                  cout<<"finding irefit_gf_tracks"<<endl;
                   std::pair<PHGenFit::Track*,PHGenFit::Track*> refit_phgf_tracks=i->second.refitTracks(_vertexer);
                   cout<<"here"<<endl;
                   pair<TLorentzVector*, TLorentzVector*> refit_reco_tlvs = i->second.getRefitRecoTlvs();
