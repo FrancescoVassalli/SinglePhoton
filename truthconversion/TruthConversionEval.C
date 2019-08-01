@@ -51,10 +51,12 @@
 #include <math.h>
 
 TruthConversionEval::TruthConversionEval(const std::string &name, unsigned int runnumber, 
-    int particleEmbed,  int pythiaEmbed,bool makeTTree=true) : SubsysReco("TruthConversionEval"),
+    int particleEmbed,  int pythiaEmbed,bool makeTTree=true,string TMVAName,string TMVAPath) : SubsysReco("TruthConversionEval"),
   _kRunNumber(runnumber),_kParticleEmbed(particleEmbed), _kPythiaEmbed(pythiaEmbed), _kMakeTTree(makeTTree)
 {
   _foutname = name;
+  _TMVAName = TMVAName;
+  _TMVAPath = TMVAPath;
 }
 
 TruthConversionEval::~TruthConversionEval(){
@@ -275,7 +277,7 @@ int TruthConversionEval::process_event(PHCompositeNode *topNode)
   return 0;
 }
 
-void TruthConversionEval::numUnique(std::map<int,Conversion> *mymap=NULL,SvtxTrackEval* trackeval=NULL,RawClusterContainer *mainClusterContainer=NULL,PHCompositeNode *topNode=NULL){
+void TruthConversionEval::numUnique(std::map<int,Conversion> *mymap=NULL,SvtxTrackEval* trackeval=NULL,RawClusterContainer *mainClusterContainer=NULL){
   for (std::map<int,Conversion>::iterator i = mymap->begin(); i != mymap->end(); ++i) {
     PHG4VtxPoint *vtx =i->second.getVtx(); //get the vtx
     PHG4Particle *temp = i->second.getPhoton(); //set the photon
@@ -325,6 +327,7 @@ void TruthConversionEval::numUnique(std::map<int,Conversion> *mymap=NULL,SvtxTra
                 pair<TLorentzVector*, TLorentzVector*> reco_tlvs = i->second.getRecoTlvs();
                 cout<<"vertexing"<<endl;
                 genfit::GFRaveVertex* recoVert = i->second.getSecondaryVertex(_vertexer);
+                recoVert = i->second.correctSecondaryVertex(_TMVAName,_TMVAPath);
                 cout<<"finding gf_tracks"<<endl;
                 std::pair<PHGenFit::Track*,PHGenFit::Track*> ph_gf_tracks = i->second.getPHGFTracks(_vertexer);
                 if (recoVert)

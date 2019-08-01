@@ -45,7 +45,7 @@ class TruthConversionEval: public SubsysReco
      * @param makeTTree true-writes the TTree false-won't make TTree will still find clusters
      */
     TruthConversionEval(const std::string &name,unsigned int runnumber, 
-        int particleEmbed, int pythiaEmbed,bool makeTTree);
+        int particleEmbed, int pythiaEmbed,bool makeTTree,string TMVAName,TMVAPath);
     ~TruthConversionEval();
     int InitRun(PHCompositeNode*);
     /**
@@ -164,6 +164,8 @@ class TruthConversionEval: public SubsysReco
     const static int s_kTPCRADIUS=21; //in cm there is a way to get this from the simulation I should implement?
     ///<TPC radius currently hardcoded
     float _kRAPIDITYACCEPT=1; //<acceptance rapidity currently hard coded to |1|
+    string _TMVAName="";
+    string _TMVAPath="";
 };
 
 

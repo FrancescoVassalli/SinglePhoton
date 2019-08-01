@@ -10,6 +10,7 @@
 #include <trackbase/TrkrClusterContainer.h>
 #include <trackbase/TrkrClusterv1.h>
 #include <TRandom3.h>
+#include <TMVA/Reader.h>
 #include <assert.h>
 
 Conversion::Conversion(SvtxTrackEval* trackeval,int verbosity){
@@ -659,6 +660,37 @@ genfit::GFRaveVertex* Conversion::getSecondaryVertex(SVReco* vertexer){
     if(recoVertex) delete recoVertex;
     recoVertex= vertexer->findSecondaryVertex(reco1,reco2);
   }
+  return recoVertex;
+}
+
+genfit::GFRaveVertex* Conversion::correctSecondaryVertex(string methodname,string tmvaPath){
+  //TODO interface with TMVA::Reader
+  if(!recoVertex) {
+    cerr<<"WARNING: no vertex to correct"<<endl;
+    return NULL;
+  }
+  using namespace TMVA;
+
+  float pt1=reco1->get_pt(),pt2=reco2->get_pt(),phi=reco1->get_phi(),
+    dphi=reco1->get_phi()-reco2->get_phi(),eta=reco1->get_eta(),deta=reco1->get_eta()-reco2->get_eta()
+    ,rin=recoVertex->getPos().Perp();
+  Reader* reader =new Reader();
+  reader->AddVariable("track1_pt",&pt1);
+  reader->AddVariable("track2_pt",&pt2);
+  reader->AddVariable("track1_phi",&phi);
+  reader->AddVariable("track1_phi-track2_phi",&dphi);
+  reader->AddVariable("track1_eta",&eta);
+  reader->AddVariable("track1_eta-track2_eta",&deta);
+  reader->AddVariable("vtx_radius","radius",&rin);
+  reader->BookMVA(methodname.c_str(),tmvaPath.c_str());
+
+  TVector3 nextPos = recoVertex->getPos();
+  nextPos.SetMagThetaPhi(reader->EvaluateRegression(methodname.c_str())[0],nextPos.Theta(),nextPos.Phi());
+
+  using namespace genfit;
+  GFRaveVertex* temp = recoVertex;
+  recoVertex = new GFRaveVertex(nextPos,recoVertex->getCov(),recoVertex->getParameters(),recoVertex->getNdf(),recoVertex->getChi2(),recoVertex->getId());
+  delete temp; //this might cause outside references to seg fault maybe shared_ptr is better 
   return recoVertex;
 }
 

@@ -189,7 +189,7 @@ class Conversion
     //float setRecoVtx(SvtxVertex* recovtx,SvtxClusterMap* cmap);
 		TLorentzVector* setRecoPhoton();///< constructs a tlv for a photon by adding the tlvs for the reco tracks
 		TLorentzVector* getRecoPhoton();///<@return the constructed tlv
-		//Uses the {@link _refit_phgf_tracks} to set {@link recoPhoton}. Will delete any existing {@link recoPhoton}. @return NULL if either {@link _refit_phgf_tracks} are NULL.
+		///Uses the {@link _refit_phgf_tracks} to set {@link recoPhoton}. Will delete any existing {@link recoPhoton}. @return NULL if either {@link _refit_phgf_tracks} are NULL.
 		TLorentzVector* getRefitRecoPhoton();
 		PHG4Particle* getTruthPhoton(PHG4TruthInfoContainer*);///<@return NULL if not valid conversion else return photon
 		///Uses {@link recoVertex} and \param vertexer to make {@link _refit_phgf_tracks}. Sets {@link recoVertex} to \param recoVtx
@@ -204,7 +204,7 @@ class Conversion
 		//TODO Set {@link recoVertex} to the vertex reconstructed from {@link SVReco} using the reco tracks and @return {@link recoVertex}. @return NULL if {@link recoCount()}!=2. Delete any existing {@link recoVertex}
 		///@return the secondary vertex fit with {@link reco1} and {@link reco2}
 		genfit::GFRaveVertex* getSecondaryVertex(SVReco* vertexer);
-		//get the PHGF version of {@link reco1} and {@link reco2}. If not possible @return NULL for that track.
+		///get the PHGF version of {@link reco1} and {@link reco2}. If not possible @return NULL for that track.
 		std::pair<PHGenFit::Track*,PHGenFit::Track*> getPHGFTracks(SVReco* vertexer);
 		/*Convertes {@link reco1} and {@link reco2} into a pair of TLorentzVector* using the electron mass. 
 		 * references {@link recoCount()} to determine which NULL values to @return
@@ -214,6 +214,8 @@ class Conversion
 		 * If either refit track is not defined @return will be a pair of NULL vectors
 		 * Ownership is returned.*/
 		std::pair<TLorentzVector*,TLorentzVector*> getRefitRecoTlvs();
+		///Uses the specified TMVA method to update and @return {@link recoVertex} 
+		genfit::GFRaveVertex* correctSecondaryVertex(string methodname,string tmvaPath);
 		/**
 		 * Returns the equivalent angle in the range 0 to 2pi.
 		 */
