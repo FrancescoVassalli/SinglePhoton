@@ -685,7 +685,7 @@ std::pair<PHGenFit::Track*,PHGenFit::Track*> Conversion::refitTracksTruthVtx(SVR
   _refit_phgf_tracks.second=vertexer->refitTrack(truthSvtxVtx,reco2);
   return _refit_phgf_tracks;
 }
-void Conversion::refitTracks(SVReco* vertexer){
+std::pair<PHGenFit::Track*,PHGenFit::Track*> Conversion::refitTracks(SVReco* vertexer){
   if (!recoVertex) getSecondaryVertex(vertexer);
   if(!recoVertex)
   {
@@ -697,9 +697,10 @@ void Conversion::refitTracks(SVReco* vertexer){
     _refit_phgf_tracks.first=vertexer->refitTrack(recoVertex,reco1);
     _refit_phgf_tracks.second=vertexer->refitTrack(recoVertex,reco2);
   }
+  return _refit_phgf_tracks;
 }
 
-void Conversion::refitTracks(SVReco* vertexer, SvtxVertex* recoVtx){
+std::pair<PHGenFit::Track*,PHGenFit::Track*> Conversion::refitTracks(SVReco* vertexer, SvtxVertex* recoVtx){
   if (!recoVtx)
   {
     cerr<<"WARNING: No vertex to refit tracks"<<endl;
@@ -710,6 +711,7 @@ void Conversion::refitTracks(SVReco* vertexer, SvtxVertex* recoVtx){
     _refit_phgf_tracks.first=vertexer->refitTrack(recoVtx,reco1);
     _refit_phgf_tracks.second=vertexer->refitTrack(recoVtx,reco2);
   }
+  return _refit_phgf_tracks;
 }
 
 void Conversion::PHG4VtxPointToSvtxVertex(){

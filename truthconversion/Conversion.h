@@ -191,10 +191,10 @@ class Conversion
 		//Uses the {@link _refit_phgf_tracks} to set {@link recoPhoton}. Will delete any existing {@link recoPhoton}. @return NULL if either {@link _refit_phgf_tracks} are NULL.
 		TLorentzVector* getRefitRecoPhoton();
 		PHG4Particle* getTruthPhoton(PHG4TruthInfoContainer*);///<@return NULL if not valid conversion else return photon
-		///Uses the \param recoVtx vertex and \param vertexer to improve the fit of {@link reco1} and {@link reco2}. Sets {@link recoVertex} to \param recoVtx
-		void refitTracks(SVReco* vertexer, SvtxVertex* recoVtx);
-		///Uses {@link recoVertex} and \param vertexer to improve the fit of {@link reco1} and {@link reco2}. If {@link recoVertex} is not set call {@link getSecondaryVertex(SVReco* vertexer)}.
-		void refitTracks(SVReco* vertexer);
+		///Uses {@link recoVertex} and \param vertexer to make {@link _refit_phgf_tracks}. Sets {@link recoVertex} to \param recoVtx
+		std::pair<PHGenFit::Track*,PHGenFit::Track*> refitTracks(SVReco* vertexer, SvtxVertex* recoVtx);
+		///Uses {@link recoVertex} and \param vertexer to make {@link _refit_phgf_tracks}. If {@link recoVertex} is not set call {@link getSecondaryVertex(SVReco* vertexer)}.
+		std::pair<PHGenFit::Track*,PHGenFit::Track*> refitTracks(SVReco* vertexer);
 
 		///Uses the truth vertex and {@link SVReco} to improve the fit of {@link reco1} and {@link reco2}
 		std::pair<PHGenFit::Track*,PHGenFit::Track*> refitTracksTruthVtx(SVReco* vertexer);
