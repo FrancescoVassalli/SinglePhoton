@@ -60,6 +60,9 @@ int RecoConversionEval::InitRun(PHCompositeNode *topNode) {
     _tree->Branch("photon_pT",  &_b_photon_pT);
     _tree->Branch("photon_eta", &_b_photon_eta);
     _tree->Branch("photon_phi", &_b_photon_phi);
+    _tree->Branch("tphoton_pT",  &_b_tphoton_pT);
+    _tree->Branch("tphoton_eta", &_b_tphoton_eta);
+    _tree->Branch("tphoton_phi", &_b_tphoton_phi);
     _tree->Branch("fake", &_b_fake);
     
 	return Fun4AllReturnCodes::EVENT_OK;
@@ -118,6 +121,11 @@ int RecoConversionEval::process_event(PHCompositeNode *topNode) {
 								PHG4Particle* parent = _truthinfo->GetParticle(truthparticle->get_parent_id());
 								if(TMath::Abs(truthparticle->get_pid())!=11||!parent||parent->get_pid()!=22){
 									_b_fake=true;
+								}
+								else if(parent&&parent->get_pid()==22){
+									_b_tphoton_phi = parent->get_phi();
+									_b_tphoton_eta = parent->get_eta();
+									_b_tphoton_pT = parent->get_pt();
 								}
 								_tree->Fill();
 							}//vtx cuts
