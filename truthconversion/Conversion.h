@@ -31,6 +31,7 @@ class PHG4TruthInfoContainer;
 class TLorentzVector;
 class SvtxHitMap;
 class SVReco;
+class VtxRegressor;
 
 //TODO check function to see ifthey can be made const
 class Conversion
@@ -215,7 +216,7 @@ class Conversion
 		 * Ownership is returned.*/
 		std::pair<TLorentzVector*,TLorentzVector*> getRefitRecoTlvs();
 		///Uses the specified TMVA method to update and @return {@link recoVertex} 
-		genfit::GFRaveVertex* Conversion::correctSecondaryVertex(VtxRegressor* regressor);
+		genfit::GFRaveVertex* correctSecondaryVertex(VtxRegressor* regressor);
 		/**
 		 * Returns the equivalent angle in the range 0 to 2pi.
 		 */

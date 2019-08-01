@@ -1,5 +1,6 @@
 #include "Conversion.h"
 #include "SVReco.h"
+#include "VtxRegressor.h"
 #include <phool/PHCompositeNode.h>
 #include <phool/getClass.h>
 #include <phgenfit/Track.h>

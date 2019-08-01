@@ -11,6 +11,8 @@
 #include <GenFit/GFRaveVertex.h>
 #include <TMVA/Reader.h>
 
+class SvtxTrack;
+
 class VtxRegressor
 {
 	public:
@@ -20,6 +22,7 @@ class VtxRegressor
 		
 	private:
 		TMVA::Reader* reader=NULL;
+    std::string _method;
 		float pt1,pt2,phi,dphi,eta,deta,rin;
 };
 #endif //VtxRegressor_H__

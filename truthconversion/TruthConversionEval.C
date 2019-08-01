@@ -1,6 +1,7 @@
 #include "TruthConversionEval.h"
 #include "Conversion.h"
 #include "SVReco.h"
+#include "VtxRegressor.h"
 //#include "../PhotonConversion/RaveVertexingAux.h"
 
 #include <phool/PHCompositeNode.h>
@@ -199,7 +200,6 @@ SvtxVertex* TruthConversionEval::get_primary_vertex(PHCompositeNode *topNode)con
 int TruthConversionEval::process_event(PHCompositeNode *topNode)
 {
   if(!doNodePointers(topNode)) return Fun4AllReturnCodes::ABORTEVENT;
-  _f->Write();
   cout<<"init next event"<<endl;
   _vertexer->InitEvent(topNode);
   _conversionClusters.Reset(); //clear the list of conversion clusters

@@ -90,7 +90,7 @@ class TruthConversionEval: public SubsysReco
     SvtxHitMap *_hitMap;
     std::string _foutname; ///< name of the output file
     SVReco *_vertexer=NULL; ///< for reco vertex finding
-    VtxRegressor *_regressor=NULL ///<for reco vertex correction with TMVA
+    VtxRegressor *_regressor=NULL; ///<for reco vertex correction with TMVA
     
     /** \defgroup  variables  for the TTrees
       @{*/
