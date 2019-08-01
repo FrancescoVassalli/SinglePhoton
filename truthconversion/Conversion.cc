@@ -479,7 +479,7 @@ void Conversion::printTruth(){
   cout<<"Conversion with truth info:\n";
   if (e1) e1->identify();
   if (e2) e2->identify();
-  if (vtx) recoVertex->identify();
+  if (vtx) recoVertex->Print();
   if (recoPhoton) recoPhoton->Print();
 }
 void Conversion::printReco(){
@@ -490,7 +490,8 @@ void Conversion::printReco(){
   if (photon) photon->identify();
 }
 
-float Conversion::setRecoVtx(SvtxVertex *recovtx,SvtxClusterMap* svtxClusterMap){
+/*This is deprecated
+ * float Conversion::setRecoVtx(SvtxVertex *recovtx,SvtxClusterMap* svtxClusterMap){
   recoVertex=recovtx;
   SvtxCluster *c1 = svtxClusterMap->get(*(reco1->begin_clusters()));
   SvtxCluster *c2 = svtxClusterMap->get(*(reco2->begin_clusters()));
@@ -501,7 +502,7 @@ float Conversion::setRecoVtx(SvtxVertex *recovtx,SvtxClusterMap* svtxClusterMap)
     return r1;
   }
   else return r2;
-}
+}*/
 
 double Conversion::approachDistance()const{
   if (recoCount()==2)
@@ -658,7 +659,7 @@ genfit::GFRaveVertex* Conversion::getSecondaryVertex(SVReco* vertexer){
     if(recoVertex) delete recoVertex;
     recoVertex= vertexer->findSecondaryVertex(reco1,reco2);
   }
-  else return NULL;
+  return recoVertex;
 }
 
 std::pair<PHGenFit::Track*,PHGenFit::Track*> Conversion::getPHGFTracks(SVReco* vertexer){

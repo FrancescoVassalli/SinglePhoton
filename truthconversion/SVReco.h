@@ -50,10 +50,12 @@ class SVReco {
 		//!@return a vertex for each track pair
 		genfit::GFRaveVertex* findSecondaryVertex(SvtxTrack* track1, SvtxTrack* track2);
 		///@return a new SvtxVertex from the rave_vtx ownership is returned
-		static SvtxVertex* GFRVVtxToSvtxVertex(genfit::GFRaveVertex* rave_vtx);
+		SvtxVertex* GFRVVtxToSvtxVertex(genfit::GFRaveVertex* rave_vtx)const;
 
-		//Uses \param vtx to refit \param svtxtrk which is directly edited. @return the PHGenFit version of the track.
+		//Uses \param vtx to refit \param svtxtrk. @return the PHGenFit version of the track.
 		PHGenFit::Track* refitTrack(SvtxVertex* vtx, SvtxTrack* svtxtrk);
+		//Uses \param vtx to refit \param svtxtrk. @return the PHGenFit version of the track.
+    PHGenFit::Track* refitTrack(genfit::GFRaveVertex* vtx, SvtxTrack* svtxtrk);
 		//Looks up \param svtxtrk id in {@link _svtxtrk_gftrk_map}. If \param svtxtrk is NULL @return NULL.
 		PHGenFit::Track* getPHGFTrack(SvtxTrack* svtxtrk);		
 		void reset_eval_variables();
@@ -134,6 +136,8 @@ class SVReco {
 		PHGenFit::Track* MakeGenFitTrack(const SvtxTrack* intrack);
 		///Uses the tracking clusters and a vertex to fit/refit the track. @return ownership.
 		PHGenFit::Track* MakeGenFitTrack(const SvtxTrack* intrack, const SvtxVertex* invertex);
+		///Uses the tracking clusters and a vertex to fit/refit the track. @return ownership.
+    PHGenFit::Track* MakeGenFitTrack(const SvtxTrack* intrack, const genfit::GFRaveVertex* invertex);
 		///From {@link PHG4TrackKalmanFitter} 
 		std::shared_ptr<SvtxTrack> MakeSvtxTrack(const SvtxTrack* svtx_track,
 				const PHGenFit::Track* phgf_track, const SvtxVertex* vertex);

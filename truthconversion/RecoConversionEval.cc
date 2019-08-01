@@ -98,7 +98,7 @@ int RecoConversionEval::process_event(PHCompositeNode *topNode) {
 								jter->second->identify();
 								PHG4Particle* truthparticle = _truthinfo->GetParticle(thisTrack->get_truth_track_id());
 								PHG4Particle* parent = _truthinfo->GetParticle(truthparticle->get_parent_id());
-								if(TMath:Abs(truthparticle->get_pid())!=11||!parent||parent->get_pid()!=22){
+								if(TMath::Abs(truthparticle->get_pid())!=11||!parent||parent->get_pid()!=22){
 									cout<<"False Conversion!"<<endl;
 								}
 							}

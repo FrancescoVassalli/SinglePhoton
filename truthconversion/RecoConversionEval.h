@@ -12,6 +12,7 @@
 #include <string>
 #include <cmath>
 class PHCompositeNode;
+class PHG4TruthInfoContainer;
 class SvtxEvalStack;
 class SvtxVertex;
 class SvtxTrack;

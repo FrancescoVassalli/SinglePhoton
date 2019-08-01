@@ -185,7 +185,8 @@ class Conversion
 		float vtxTrackRZ(TVector3 vertpos);
 		static float vtxTrackRZ(TVector3 vertpos,SvtxTrack*,SvtxTrack*);
 
-		float setRecoVtx(SvtxVertex* recovtx,SvtxClusterMap* cmap);
+		//Deprecated 
+    //float setRecoVtx(SvtxVertex* recovtx,SvtxClusterMap* cmap);
 		TLorentzVector* setRecoPhoton();///< constructs a tlv for a photon by adding the tlvs for the reco tracks
 		TLorentzVector* getRecoPhoton();///<@return the constructed tlv
 		//Uses the {@link _refit_phgf_tracks} to set {@link recoPhoton}. Will delete any existing {@link recoPhoton}. @return NULL if either {@link _refit_phgf_tracks} are NULL.

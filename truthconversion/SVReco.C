@@ -6,6 +6,7 @@
 #include <trackbase_historic/SvtxTrack_v1.h>
 #include <trackbase_historic/SvtxTrackState_v1.h>
 #include <trackbase_historic/SvtxVertex.h>
+#include <trackbase_historic/SvtxVertex_v1.h>
 #include <trackbase_historic/SvtxTrackMap.h>
 #include <trackbase_historic/SvtxVertexMap.h>
 
@@ -691,7 +692,7 @@ PHGenFit::Track* SVReco::MakeGenFitTrack(const SvtxTrack* intrack, const genfit:
 }
 
 //From PHG4TrackKalmanFitter
-SvtxVertex* SVReco::GFRVVtxToSvtxVertex(genfit::GFRaveVertex* rave_vtx)const {
+SvtxVertex* SVReco::GFRVVtxToSvtxVertex(genfit::GFRaveVertex* rave_vtx)const{
   SvtxVertex* svtx_vtx= new SvtxVertex_v1();
 
     svtx_vtx->set_chisq(rave_vtx->getChi2());
@@ -708,8 +709,8 @@ SvtxVertex* SVReco::GFRVVtxToSvtxVertex(genfit::GFRaveVertex* rave_vtx)const {
       //TODO Assume id's are sync'ed between _trackmap_refit and gf_tracks, need to change?
       const genfit::Track* rave_track =
           rave_vtx->getParameters(i)->getTrack();
-      for (unsigned int j = 0; j < gf_tracks.size(); j++) {
-        if (rave_track == gf_tracks[j])
+      for (unsigned int j = 0; j < _main_rf_phgf_tracks.size(); j++) {
+        if (rave_track == _main_rf_phgf_tracks[j]->getGenFitTrack())
           svtx_vtx->insert_track(j);
       }
     }
