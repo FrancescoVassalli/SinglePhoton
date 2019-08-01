@@ -90,7 +90,7 @@ void makeRefitDist(TChain* ttree, TFile *out_file){
   float diffy;
   float diffz;
   ttree->SetBranchAddress("refitdiffx",&diffx);
-  ttree->SetBranchAddress("refitdiffy",&diffz);
+  ttree->SetBranchAddress("refitdiffy",&diffy);
   ttree->SetBranchAddress("refitdiffz",&diffz);
   TH1F *diffplotx= new TH1F("x_{0}-x_{refit}","",40,-10,10);
   TH1F *diffploty= new TH1F("y_{0}-y_{refit}","",40,-10,10);
