@@ -45,7 +45,7 @@ void recoRefit(TFile* thisFile){
 	for (int i = 0; i < plots.size(); ++i)
 	{
 		plots[i]->SetYTitle("dN/dN");
-		plots[i]->SetXTitle("#Delta");
+		plots[i]->SetXTitle("#Delta#it{p}");
 		if(i==0) plots[i]->Draw("e1");
 		else plots[i]->Draw("e1 same");
 		tl->AddEntry(plots[i],plots[i]->GetName(),"l");
