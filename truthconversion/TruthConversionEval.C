@@ -20,6 +20,8 @@
 #include <trackbase_historic/SvtxHit.h>
 #include <trackbase_historic/SvtxClusterMap.h>
 #include <trackbase_historic/SvtxCluster.h>*/
+#include <trackbase_historic/SvtxVertex.h>
+#include <trackbase_historic/SvtxVertexMap.h>
 #include <trackbase/TrkrClusterContainer.h>
 #include <trackbase/TrkrCluster.h>
 
@@ -34,6 +36,9 @@
 #include <GenFit/RKTrackRep.h>
 #include <GenFit/StateOnPlane.h>
 #include <GenFit/Track.h>
+
+#include <phgenfit/Track.h>
+
 
 #include <fun4all/Fun4AllReturnCodes.h>
 
@@ -130,27 +135,30 @@ int TruthConversionEval::InitRun(PHCompositeNode *topNode)
     _vtxBackTree->Branch("cluster_deta", &_bb_cluster_deta);
 
     _signalCutTree = new TTree("cutTreeSignal","signal data for making track pair cuts");
-    _signalCutTree->SetAutoSave(300);
+    _signalCutTree->SetAutoSave(100);
     _signalCutTree->Branch("track_deta", &_b_track_deta);
     _signalCutTree->Branch("track_dca", &_b_track_dca);
     _signalCutTree->Branch("track_dphi", &_b_track_dphi);
     _signalCutTree->Branch("track_dlayer",&_b_track_dlayer);
     _signalCutTree->Branch("track_layer", &_b_track_layer);
     _signalCutTree->Branch("track_pT", &_b_track_pT);
-    _signalCutTree->Branch("ttrack_pT", &_b_ttrack_pT);
+    //_signalCutTree->Branch("ttrack_pT", &_b_ttrack_pT);
     _signalCutTree->Branch("approach_dist", &_b_approach);
     _signalCutTree->Branch("vtx_radius", &_b_vtx_radius);
     _signalCutTree->Branch("vtx_chi2", &_b_vtx_chi2);
-    _signalCutTree->Branch("vtxTrackRZ_dist", &_b_vtxTrackRZ_dist);
-    _signalCutTree->Branch("vtxTrackRPhi_dist", &_b_vtxTrackRPhi_dist);
+    //_signalCutTree->Branch("vtxTrackRZ_dist", &_b_vtxTrackRZ_dist);
+    //_signalCutTree->Branch("vtxTrackRPhi_dist", &_b_vtxTrackRPhi_dist);
     _signalCutTree->Branch("photon_m", &_b_photon_m);
-    _signalCutTree->Branch("tphoton_m", &_b_tphoton_m);
+    _signalCutTree->Branch("rephoton_m", &_b_rephoton_m);
+    //_signalCutTree->Branch("tphoton_m", &_b_tphoton_m);
     _signalCutTree->Branch("photon_pT", &_b_photon_pT);
     _signalCutTree->Branch("cluster_prob", &_b_cluster_prob);
-    _signalCutTree->Branch("nCluster", &_b_nCluster);
+    //_signalCutTree->Branch("nCluster", &_b_nCluster);
     _signalCutTree->Branch("cluster_dphi", &_b_cluster_dphi);
     _signalCutTree->Branch("cluster_deta", &_b_cluster_deta);
-    _signalCutTree->Branch("refitdiff",&_b_refitdiff);
+    _signalCutTree->Branch("refitdiffx",&_b_refitdiffx);
+    _signalCutTree->Branch("refitdiffy",&_b_refitdiffy);
+    _signalCutTree->Branch("refitdiffz",&_b_refitdiffz);
   }
   return 0;
 }
@@ -180,6 +188,11 @@ bool TruthConversionEval::doNodePointers(PHCompositeNode* topNode){
     goodPointers=false;
   }
   return goodPointers;
+}
+
+SvtxVertex* TruthConversionEval::get_primary_vertex(PHCompositeNode *topNode)const{
+  SvtxVertexMap *vertexMap = findNode::getClass<SvtxVertexMap>(topNode, "SvtxVertexMap");
+  return vertexMap->get(0);
 }
 
 int TruthConversionEval::process_event(PHCompositeNode *topNode)
@@ -248,7 +261,7 @@ int TruthConversionEval::process_event(PHCompositeNode *topNode)
     }//make tree
   }//truth particle loop
   //pass the map to this helper method which fills the fields for the TTree 
-  numUnique(&mapConversions,trackeval,_mainClusterContainer);
+  numUnique(&mapConversions,trackeval,_mainClusterContainer,topNode);
   if (Verbosity()==10)
   {
     cout<<Name()<<"# conversion clusters="<<_conversionClusters.size()<<'\n';
@@ -261,7 +274,7 @@ int TruthConversionEval::process_event(PHCompositeNode *topNode)
   return 0;
 }
 
-void TruthConversionEval::numUnique(std::map<int,Conversion> *mymap=NULL,SvtxTrackEval* trackeval=NULL,RawClusterContainer *mainClusterContainer=NULL){
+void TruthConversionEval::numUnique(std::map<int,Conversion> *mymap=NULL,SvtxTrackEval* trackeval=NULL,RawClusterContainer *mainClusterContainer=NULL,PHCompositeNode *topNode=NULL){
   for (std::map<int,Conversion>::iterator i = mymap->begin(); i != mymap->end(); ++i) {
     PHG4VtxPoint *vtx =i->second.getVtx(); //get the vtx
     PHG4Particle *temp = i->second.getPhoton(); //set the photon
@@ -290,19 +303,56 @@ void TruthConversionEval::numUnique(std::map<int,Conversion> *mymap=NULL,SvtxTra
                 else _b_ttrack_pT = tlv_electron.Pt();
                 _b_approach = i->second.approachDistance();
                 _b_track_dca = i->second.minDca();
-                //TODO make Conversion find the reco vertex
-                pair<SvtxTrack*, SvtxTrack*> reco_tracks=i->second.getRecoTracks();
-                pair<TLorentzVector, TLorentzVector> reco_tlvs = i->second.getRecoTlvs();
-                genfit::GFRaveVertex* recoVert = _vertexer->findSecondaryVertex(reco_tracks.first,reco_tracks.second);
+                TLorentzVector* recoPhoton = i->second.getRecoPhoton();
+                PHG4Particle* truthphoton = i->second.getTruthPhoton(_truthinfo);
+                TLorentzVector tlv_tphoton;
+                if(truthphoton){
+                  tlv_tphoton.SetPxPyPzE(truthphoton->get_px(),truthphoton->get_py(),truthphoton->get_pz(),truthphoton->get_e());
+                  if (recoPhoton)
+                  {
+                    _b_photon_m=recoPhoton->Dot(*recoPhoton);
+                    _b_tphoton_m=tlv_tphoton.Dot(tlv_tphoton);
+                    _b_photon_pT=recoPhoton->Pt();
+                  }
+                }
+                else{ //photon was not reconstructed
+                  _b_photon_m =-1;
+                  _b_tphoton_m =-1;
+                  _b_photon_pT=-1;
+                }
+                //TODO check Conversion operations for ownership transfer->memleak due to lack of delete
+                pair<TLorentzVector*, TLorentzVector*> reco_tlvs = i->second.getRecoTlvs();
+                genfit::GFRaveVertex* recoVert = i->second.getSecondaryVertex(_vertexer);
+                std::pair<PHGenFit::Track*,PHGenFit::Track*> ph_gf_tracks = i->second.getPHGFTracks(_vertexer);
                 if (recoVert)
                 {
-                  SvtxVertex*  svtxRecoVert = _vertexer->GFRVVtxToSvtxVertex(recoVert);
-                  i->second.refitTracks(svtxRecoVert,_vertexer);
-                  pair<TLorentzVector, TLorentzVector> refit_reco_tlvs = i->second.getRecoTlvs();
-                  _b_refitdiff = sqrt((reco_tlvs.first-refit_reco_tlvs.first).Dot((reco_tlvs.first-refit_reco_tlvs.first))*
-                    (reco_tlvs.first-refit_reco_tlvs.first).Dot((reco_tlvs.first-refit_reco_tlvs.first))+
-                    (reco_tlvs.second-refit_reco_tlvs.second).Dot((reco_tlvs.second-refit_reco_tlvs.second))*
-                    (reco_tlvs.second-refit_reco_tlvs.second).Dot((reco_tlvs.second-refit_reco_tlvs.second)));
+                  std::pair<PHGenFit::Track*,PHGenFit::Track*> refit_phgf_tracks=i->second.refitTracks(_vertexer);
+                  cout<<"here"<<endl;
+                  pair<TLorentzVector*, TLorentzVector*> refit_reco_tlvs = i->second.getRefitRecoTlvs();
+                  if(refit_reco_tlvs.first&&refit_reco_tlvs.second){
+                    _b_refitdiffx = reco_tlvs.first->X()-refit_reco_tlvs.first->X();
+                    _b_refitdiffy = reco_tlvs.first->Y()-refit_reco_tlvs.first->Y();
+                    _b_refitdiffz = reco_tlvs.first->Z()-refit_reco_tlvs.first->Z();
+                  }
+                  else{
+                    _b_refitdiffx = -99.;
+                    _b_refitdiffy = -99.;
+                    _b_refitdiffz = -99.;
+                  }
+                  if (ph_gf_tracks.first&&refit_phgf_tracks.first)
+                  {
+                    cout<<"Good Track refit with original:\n";ph_gf_tracks.first->get_mom().Print();cout<<"\n\t and refit:\n";
+                    refit_phgf_tracks.first->get_mom().Print();
+                  }
+                  if (ph_gf_tracks.second&&refit_phgf_tracks.second)
+                  {
+                    cout<<"Good Track refit with original:\n"; 
+                    ph_gf_tracks.second->get_mom().Print(); 
+                    cout<<"\n\t and refit:\n";
+                    refit_phgf_tracks.second->get_mom().Print();
+                  }
+                  recoPhoton = i->second.getRefitRecoPhoton();
+                  if(recoPhoton) _b_rephoton_m=recoPhoton->Dot(*recoPhoton);
                   TVector3 recoVertPos = recoVert->getPos();
                   _b_vtx_radius = sqrt(recoVertPos.x()*recoVertPos.x()+recoVertPos.y()*recoVertPos.y());
                   _b_tvtx_radius = sqrt(vtx->get_x()*vtx->get_x()+vtx->get_y()*vtx->get_y());
@@ -332,23 +382,7 @@ void TruthConversionEval::numUnique(std::map<int,Conversion> *mymap=NULL,SvtxTra
                   _vtxingTree->Fill();
                 }
 
-                TLorentzVector* recoPhoton = i->second.getRecoPhoton();
-                PHG4Particle* truthphoton = i->second.getTruthPhoton(_truthinfo);
-                TLorentzVector tlv_tphoton;
-                if(truthphoton){
-                  tlv_tphoton.SetPxPyPzE(truthphoton->get_px(),truthphoton->get_py(),truthphoton->get_pz(),truthphoton->get_e());
-                  if (recoPhoton)
-                  {
-                    _b_photon_m=recoPhoton->Dot(*recoPhoton);
-                    _b_tphoton_m=tlv_tphoton.Dot(tlv_tphoton);
-                    _b_photon_pT=recoPhoton->Pt();
-                  }
-                }
-                else{ //photon was not reconstructed
-                  _b_photon_m =-1;
-                  _b_tphoton_m =-1;
-                  _b_photon_pT=-1;
-                }
+
                 //reset the values
                 _b_cluster_prob=-1;
                 _b_cluster_deta=-1;
@@ -507,6 +541,8 @@ int TruthConversionEval::get_track_pid(SvtxTrack* track) const{
 int TruthConversionEval::End(PHCompositeNode *topNode)
 {
   if(_kMakeTTree){
+    cout<<"closing"<<endl;
+    _signalCutTree->Write();
     _f->Write();
     _f->Close();
   }

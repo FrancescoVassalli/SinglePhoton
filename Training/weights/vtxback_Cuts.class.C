@@ -10,7 +10,7 @@ Method         : Cuts::Cuts
 TMVA Release   : 4.2.0         [262656]
 ROOT Release   : 5.34/38       [336422]
 Creator        : vassalli
-Date           : Tue Jul 30 11:48:39 2019
+Date           : Wed Jul 31 16:56:00 2019
 Host           : Linux cvmfswrite02.sdcc.bnl.gov 3.10.0-693.11.6.el7.x86_64 #1 SMP Wed Jan 3 18:09:42 CST 2018 x86_64 x86_64 x86_64 GNU/Linux
 Dir            : /direct/phenix+u/vassalli/sphenix/single/Training
 Training events: 11413
@@ -53,13 +53,17 @@ VarProp[0]: "NotEnforced" [Categorisation of cuts]
 #VAR -*-*-*-*-*-*-*-*-*-*-*-* variables *-*-*-*-*-*-*-*-*-*-*-*-
 
 NVar 6
-track_deta                    track_deta                    track_deta                    track_deta                                                      'F'    [0,0.670255243778]
-cluster_deta                  cluster_deta                  cluster_deta                  cluster_deta                                                    'F'    [-1,0.67217206955]
-cluster_dphi                  cluster_dphi                  cluster_dphi                  cluster_dphi                                                    'F'    [-1,6.24406814575]
+abs(track_deta)               abs_track_deta_               abs(track_deta)               abs(track_deta)                                                 'F'    [0,0.670255243778]
+abs(cluster_deta)             abs_cluster_deta_             abs(cluster_deta)             abs(cluster_deta)                                               'F'    [4.71345185105e-13,1]
+abs(cluster_dphi)             abs_cluster_dphi_             abs(cluster_dphi)             abs(cluster_dphi)                                               'F'    [0,6.24406814575]
 abs(track_dlayer)             abs_track_dlayer_             abs(track_dlayer)             abs(track_dlayer)                                               'I'    [0,13]
 approach_dist                 approach_dist                 approach_dist                 approach_dist                                                   'F'    [3.08318594762e-05,88.587638855]
 vtx_radius                    vtx_radius                    vtx_radius                    vtx_radius                                                      'F'    [-1,287.19519043]
-NSpec 0
+NSpec 4
+track_layer                   track_layer                   track_layer                   I                                                               'F'    [0,20]
+track_pT                      track_pT                      track_pT                      F                                                               'F'    [0.600010812283,62119.8007812]
+track_dca                     track_dca                     track_dca                     F                                                               'F'    [2.25663001174e-07,91.8196792603]
+cluster_prob                  cluster_prob                  cluster_prob                  F                                                               'F'    [0,0.999862730503]
 
 
 ============================================================================ */
@@ -105,7 +109,7 @@ class ReadCuts : public IClassifierReader {
         fIsNormalised( false )
    {      
       // the training input variables
-      const char* inputVars[] = { "track_deta", "cluster_deta", "cluster_dphi", "abs(track_dlayer)", "approach_dist", "vtx_radius" };
+      const char* inputVars[] = { "abs(track_deta)", "abs(cluster_deta)", "abs(cluster_dphi)", "abs(track_dlayer)", "approach_dist", "vtx_radius" };
 
       // sanity checks
       if (theInputVars.size() <= 0) {

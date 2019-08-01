@@ -1,7 +1,7 @@
 #!/bin/csh 
 @ p = ( ${1} )
 #
-set OUT_LOCATION="/sphenix/user/vassalli/gammasample/test/"
+set OUT_LOCATION="/sphenix/user/vassalli/gammasample/"
 set OUT_FILE=conversionembededonlineanalysis${p}.root
 set IN_FILE=conversionembededout${p}.root
 set PYTHIA_FILE="/sphenix/user/vassalli/gammasample/pythiahep${p}.dat.dat"

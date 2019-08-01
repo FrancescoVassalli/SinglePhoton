@@ -20,6 +20,7 @@ class PHG4Particle;
 class PHG4VtxPoint;
 class Conversion;
 class SvtxTrackEval;
+class SvtxVertex;
 class SvtxTrack;
 class SvtxHitMap;
 class SvtxHit;
@@ -59,10 +60,11 @@ class TruthConversionEval: public SubsysReco
   private:
     bool doNodePointers(PHCompositeNode* topNode);
     int get_track_pid(SvtxTrack* track)const;
+    SvtxVertex* get_primary_vertex(PHCompositeNode* topNode)const;
     /** helper function for process_event
      * fills the member fields with information from the conversions 
      * finds the clusters associated with the truth conversions*/
-    void numUnique(std::map<int,Conversion>* map,SvtxTrackEval* trackEval,RawClusterContainer* mainClusterContainer);
+    void numUnique(std::map<int,Conversion>* map,SvtxTrackEval* trackEval,RawClusterContainer* mainClusterContainer,PHCompositeNode *topNode);
     ///fills the member fields for all the background trees
     void processTrackBackground(std::vector<SvtxTrack*>*v,TrkrClusterContainer*);
 
@@ -93,7 +95,9 @@ class TruthConversionEval: public SubsysReco
     /** # of clusters associated with each conversion that has 2 reco tracks
      * 1 indicates the reco tracks go to the same cluster ~15% of conversions*/
 
-    float _b_refitdiff;
+    float _b_refitdiffx;
+    float _b_refitdiffy;
+    float _b_refitdiffz;
     int   _b_nCluster; 
     int _bb_track1_pid;
     int _bb_track2_pid;
@@ -131,6 +135,7 @@ class TruthConversionEval: public SubsysReco
     float _b_vtxTrackRPhi_dist;
     float _b_vtx_chi2;
     float _b_photon_m;
+    float _b_rephoton_m;
     float _b_tphoton_m;
     float _b_photon_pT;
     float _b_cluster_prob;
