@@ -681,7 +681,7 @@ genfit::GFRaveVertex* Conversion::correctSecondaryVertex(string methodname,strin
   reader->AddVariable("track1_phi-track2_phi",&dphi);
   reader->AddVariable("track1_eta",&eta);
   reader->AddVariable("track1_eta-track2_eta",&deta);
-  reader->AddVariable("vtx_radius","radius",&rin);
+  reader->AddVariable("vtx_radius",&rin);
   reader->BookMVA(methodname.c_str(),tmvaPath.c_str());
 
   TVector3 nextPos = recoVertex->getPos();
@@ -689,7 +689,11 @@ genfit::GFRaveVertex* Conversion::correctSecondaryVertex(string methodname,strin
 
   using namespace genfit;
   GFRaveVertex* temp = recoVertex;
-  recoVertex = new GFRaveVertex(nextPos,recoVertex->getCov(),recoVertex->getParameters(),recoVertex->getNdf(),recoVertex->getChi2(),recoVertex->getId());
+  std::vector<GFRaveTrackParameters*> tracks;
+  for(unsigned i =0; i<recoVertex->getNTracks();i++){
+    tracks.push_back(recoVertex->getParameters(i));
+  }
+  recoVertex = new GFRaveVertex(nextPos,recoVertex->getCov(),tracks,recoVertex->getNdf(),recoVertex->getChi2(),recoVertex->getId());
   delete temp; //this might cause outside references to seg fault maybe shared_ptr is better 
   return recoVertex;
 }

@@ -51,6 +51,7 @@ libtruthconversion_la_LIBADD = \
 	-lPHGenFit \
 	-lg4tpc \
 	-lg4intt \
+	-lTMVA\
 	-lg4mvtx \
 	-lcalo_util
 

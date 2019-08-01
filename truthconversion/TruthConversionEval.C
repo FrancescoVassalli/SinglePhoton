@@ -51,7 +51,7 @@
 #include <math.h>
 
 TruthConversionEval::TruthConversionEval(const std::string &name, unsigned int runnumber, 
-    int particleEmbed,  int pythiaEmbed,bool makeTTree=true,string TMVAName,string TMVAPath) : SubsysReco("TruthConversionEval"),
+    int particleEmbed,  int pythiaEmbed,bool makeTTree=true,string TMVAName="",string TMVAPath="") : SubsysReco("TruthConversionEval"),
   _kRunNumber(runnumber),_kParticleEmbed(particleEmbed), _kPythiaEmbed(pythiaEmbed), _kMakeTTree(makeTTree)
 {
   _foutname = name;
@@ -264,7 +264,7 @@ int TruthConversionEval::process_event(PHCompositeNode *topNode)
     }//make tree
   }//truth particle loop
   //pass the map to this helper method which fills the fields for the TTree 
-  numUnique(&mapConversions,trackeval,_mainClusterContainer,topNode);
+  numUnique(&mapConversions,trackeval,_mainClusterContainer);
   if (Verbosity()==10)
   {
     cout<<Name()<<"# conversion clusters="<<_conversionClusters.size()<<'\n';

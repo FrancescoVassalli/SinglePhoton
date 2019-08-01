@@ -45,7 +45,7 @@ class TruthConversionEval: public SubsysReco
      * @param makeTTree true-writes the TTree false-won't make TTree will still find clusters
      */
     TruthConversionEval(const std::string &name,unsigned int runnumber, 
-        int particleEmbed, int pythiaEmbed,bool makeTTree,string TMVAName,TMVAPath);
+        int particleEmbed, int pythiaEmbed,bool makeTTree,std::string TMVAName,std::string TMVAPath);
     ~TruthConversionEval();
     int InitRun(PHCompositeNode*);
     /**
@@ -64,7 +64,7 @@ class TruthConversionEval: public SubsysReco
     /** helper function for process_event
      * fills the member fields with information from the conversions 
      * finds the clusters associated with the truth conversions*/
-    void numUnique(std::map<int,Conversion>* map,SvtxTrackEval* trackEval,RawClusterContainer* mainClusterContainer,PHCompositeNode *topNode);
+    void numUnique(std::map<int,Conversion>* map,SvtxTrackEval* trackEval,RawClusterContainer* mainClusterContainer);
     ///fills the member fields for all the background trees
     void processTrackBackground(std::vector<SvtxTrack*>*v,TrkrClusterContainer*);
 
@@ -164,8 +164,8 @@ class TruthConversionEval: public SubsysReco
     const static int s_kTPCRADIUS=21; //in cm there is a way to get this from the simulation I should implement?
     ///<TPC radius currently hardcoded
     float _kRAPIDITYACCEPT=1; //<acceptance rapidity currently hard coded to |1|
-    string _TMVAName="";
-    string _TMVAPath="";
+    std::string _TMVAName="";
+    std::string _TMVAPath="";
 };
 
 
