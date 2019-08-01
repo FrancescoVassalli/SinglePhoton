@@ -62,6 +62,7 @@ TruthConversionEval::TruthConversionEval(const std::string &name, unsigned int r
 TruthConversionEval::~TruthConversionEval(){
   if (_f) delete _f;
   if (_vertexer) delete _vertexer;
+  if(_regressor) delete _regressor;
 }
 
 int TruthConversionEval::InitRun(PHCompositeNode *topNode)
@@ -332,8 +333,9 @@ void TruthConversionEval::numUnique(std::map<int,Conversion> *mymap=NULL,SvtxTra
                 std::pair<PHGenFit::Track*,PHGenFit::Track*> ph_gf_tracks = i->second.getPHGFTracks(_vertexer);
                 if (recoVert)
                 {
-                  cout<<"finding irefit_gf_tracks"<<endl;
+                  cout<<"finding refit_gf_tracks"<<endl;
                   std::pair<PHGenFit::Track*,PHGenFit::Track*> refit_phgf_tracks=i->second.refitTracks(_vertexer);
+                  //TODO check repetive refitting and revterexing 
                   cout<<"here"<<endl;
                   pair<TLorentzVector*, TLorentzVector*> refit_reco_tlvs = i->second.getRefitRecoTlvs();
                   if(refit_reco_tlvs.first&&refit_reco_tlvs.second){

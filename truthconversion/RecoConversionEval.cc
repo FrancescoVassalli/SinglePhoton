@@ -24,6 +24,7 @@
 
 #include <TTree.h>
 #include <TFile.h>
+#include <TLorentzVector.h>
 
 #include <iostream>
 #include <cmath> 
@@ -32,12 +33,15 @@
 
 using namespace std;
 
-RecoConversionEval::RecoConversionEval(const std::string &name) :
+RecoConversionEval::RecoConversionEval(const std::string &name,std::string tmvamethod,std::string tmvapath) :
 	SubsysReco("RecoConversionEval"), _fname(name) 
-{}
+{
+	_regressor = new VtxRegressor(tmvamethod,tmvapath);
+}
 
 RecoConversionEval::~RecoConversionEval(){
 	if(_vertexer) delete _vertexer;
+	if(_regressor) delete _regressor;
 }
 
 int RecoConversionEval::Init(PHCompositeNode *topNode) {
@@ -48,6 +52,16 @@ int RecoConversionEval::InitRun(PHCompositeNode *topNode) {
 	_vertexer = new SVReco();
 	//TODO turn this back into a subsystem and put it on the node tree
 	_vertexer->InitRun(topNode);
+	_file = new TFile( _fname.c_str(), "RECREATE");
+	_tree = new TTree("recoSignal","strong saharah bush");
+	_tree = new TTree("cutTreeSignal","signal data for making track pair cuts");
+    _tree->SetAutoSave(100);
+    _tree->Branch("photon_m",   &_b_photon_m);
+    _tree->Branch("photon_pT",  &_b_photon_pT);
+    _tree->Branch("photon_eta", &_b_photon_eta);
+    _tree->Branch("photon_phi", &_b_photon_phi);
+    _tree->Branch("fake", &_b_fake);
+    
 	return Fun4AllReturnCodes::EVENT_OK;
 }
 
@@ -91,17 +105,22 @@ int RecoConversionEval::process_event(PHCompositeNode *topNode) {
 						//what if no cluster is found?
 						if(nextCluster&&nextCluster->get_prob()>_kEMProbCut&&pairCuts(thisTrack,jter->second)){
 							genfit::GFRaveVertex* vtxCan = _vertexer->findSecondaryVertex(thisTrack,jter->second);
+							vtxCan=correctSecondaryVertex(vtxCan,thisTrack,jter->second);
 							if (vtxCan&&vtxCuts(vtxCan,thisTrack,jter->second))
 							{
-								cout<<"Found Conversion\n";
-								thisTrack->identify();
-								jter->second->identify();
+								_b_fake=false;
+								TLorentzVector *photon = reconstructPhoton(thisTrack,jter->second);
+								_b_photon_m = photon->Dot(*photon);
+								_b_photon_pT = photon->Pt();
+								_b_photon_eta = photon->Eta();
+								_b_photon_phi = photon->Phi();
 								PHG4Particle* truthparticle = _truthinfo->GetParticle(thisTrack->get_truth_track_id());
 								PHG4Particle* parent = _truthinfo->GetParticle(truthparticle->get_parent_id());
 								if(TMath::Abs(truthparticle->get_pid())!=11||!parent||parent->get_pid()!=22){
-									cout<<"False Conversion!"<<endl;
+									_b_fake=true;
 								}
-							}
+								_tree->Fill();
+							}//vtx cuts
 						}
 					}
 				}
@@ -109,6 +128,38 @@ int RecoConversionEval::process_event(PHCompositeNode *topNode) {
 		}
 	}
 	return Fun4AllReturnCodes::EVENT_OK;
+}
+
+genfit::GFRaveVertex* RecoConversionEval::correctSecondaryVertex(genfit::GFRaveVertex* vtx,SvtxTrack* reco1,SvtxTrack* reco2){
+  if(!(recoVertex&&reco1&&reco2)) {
+    return vtx;
+  }
+
+  TVector3 nextPos = recoVertex->getPos();
+  nextPos.SetMagThetaPhi(_regressor->regress(reco1,reco2,recoVertex),nextPos.Theta(),nextPos.Phi());
+
+  using namespace genfit;
+ // GFRaveVertex* temp = recoVertex;
+  std::vector<GFRaveTrackParameters*> tracks;
+  for(unsigned i =0; i<recoVertex->getNTracks();i++){
+    tracks.push_back(recoVertex->getParameters(i));
+  }
+  recoVertex = new GFRaveVertex(nextPos,recoVertex->getCov(),tracks,recoVertex->getNdf(),recoVertex->getChi2(),recoVertex->getId());
+//  delete temp; //this caused outside references to seg fault //TODO shared_ptr is better 
+  return recoVertex;
+}
+
+TLorentzVector* RecoConversionEval::reconstructPhoton(SvtxTrack* reco1,SvtxTrack* reco2){
+if (reco1&&reco2)
+  {
+    TLorentzVector tlv1(reco1->get_px(),reco1->get_py(),reco1->get_pz(),
+        sqrt(_kElectronRestM*_kElectronRestM+reco1->get_p()*reco1->get_p()));
+    TLorentzVector tlv2(reco2->get_px(),reco2->get_py(),reco2->get_pz(),
+        sqrt(_kElectronRestM*_kElectronRestM+reco2->get_p()*reco2->get_p()));
+    if (recoPhoton) delete recoPhoton;
+    return new TLorentzVector(tlv1+tlv2);
+  }
+  else return NULL;
 }
 
 bool RecoConversionEval::pairCuts(SvtxTrack* t1, SvtxTrack* t2)const{
@@ -198,9 +249,5 @@ bool RecoConversionEval::approachDistance(SvtxTrack *t1,SvtxTrack* t2)const{
 	w+=u;
 	w-=v;
 	return w.Mag()<=_kApprochCut;   // return the closest distance 
-}
-
-void RecoConversionEval::process_recoTracks(PHCompositeNode *topNode){
-
 }
 

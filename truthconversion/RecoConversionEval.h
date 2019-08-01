@@ -23,12 +23,13 @@ class RawClusterContainer;
 class TTree;
 class TFile;
 class SVReco;
+class VtxRegressor;
 
 class RecoConversionEval : public SubsysReco {
 
 	public:
 
-		RecoConversionEval(const std::string &name);
+		RecoConversionEval(const std::string &name,std::string tmvamethod, std::string tmvapath);
 		~RecoConversionEval();
 		int Init(PHCompositeNode *topNode);
 		int InitRun(PHCompositeNode *topNode);
@@ -45,13 +46,16 @@ class RecoConversionEval : public SubsysReco {
 		std::string _fname;
 		TFile *_file=NULL;
 		TTree *_tree=NULL;
+		VtxRegressor *_regressor=NULL;
 
     	PHG4TruthInfoContainer *_truthinfo=NULL;
 
 
 		bool hasNodePointers()const;
-		void process_recoTracks(PHCompositeNode *topNode);
-
+		//Uses the TMVA method to correct the vtx radius
+		genfit::GFRaveVertex* correctSecondaryVertex(genfit::GFRaveVertex* vtx,SvtxTrack* reco1,SvtxTrack* reco2);
+		//Adds \param reco1 and \param reco2 as TLorentzVectors
+		TLorentzVector* reconstructPhoton(SvtxTrack* reco1,SvtxTrack* reco2);
 		inline bool detaCut(float eta1, float eta2) const{
 			return (eta1>eta2?eta1-eta2:eta2-eta1)<_kPolarCut;
 		}
@@ -71,6 +75,12 @@ class RecoConversionEval : public SubsysReco {
 		bool vtxRadiusCut(TVector3 recoVertPos);
 		/* cut on the distance between the closest point between the two tracks*/
 		bool approachDistance(SvtxTrack *t1,SvtxTrack* t2)const;
+		
+		float _b_photon_m;
+		float _b_photon_pT;
+		float _b_photon_eta;
+		float _b_photon_phi;
+		bool _b_fake;
 		// I want these to be static constexpr
     // TODO confirm these numbers
 		unsigned int _kNSiliconLayer=7;
