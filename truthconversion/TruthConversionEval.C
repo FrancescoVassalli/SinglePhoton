@@ -111,7 +111,7 @@ int TruthConversionEval::InitRun(PHCompositeNode *topNode)
     _pairBackTree->Branch("track_pT",  &_bb_track_pT);
     _pairBackTree->Branch("track_layer", &_bb_track_layer);
     _pairBackTree->Branch("cluster_prob", &_bb_cluster_prob);
-    _pairBackTree->Branch("nCluster", &_bb_nCluster);
+    //_pairBackTree->Branch("nCluster", &_bb_nCluster);
     _pairBackTree->Branch("cluster_dphi", &_bb_cluster_dphi);
     _pairBackTree->Branch("cluster_deta", &_bb_cluster_deta);
 
@@ -130,7 +130,7 @@ int TruthConversionEval::InitRun(PHCompositeNode *topNode)
     _vtxBackTree->Branch("vtx_radius",&_bb_vtx_radius);
     _vtxBackTree->Branch("photon_m",&_bb_photon_m);
     _vtxBackTree->Branch("photon_pT",&_bb_photon_pT);
-    _vtxBackTree->Branch("nCluster", &_bb_nCluster);
+    //_vtxBackTree->Branch("nCluster", &_bb_nCluster);
     _vtxBackTree->Branch("cluster_dphi", &_bb_cluster_dphi);
     _vtxBackTree->Branch("cluster_deta", &_bb_cluster_deta);
 
@@ -198,6 +198,7 @@ SvtxVertex* TruthConversionEval::get_primary_vertex(PHCompositeNode *topNode)con
 int TruthConversionEval::process_event(PHCompositeNode *topNode)
 {
   if(!doNodePointers(topNode)) return Fun4AllReturnCodes::ABORTEVENT;
+  _f->Write();
   _vertexer->InitEvent(topNode);
   _conversionClusters.Reset(); //clear the list of conversion clusters
   PHG4TruthInfoContainer::Range range = _truthinfo->GetParticleRange(); //look at all truth particles
