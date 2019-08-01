@@ -49,11 +49,11 @@ void makeFactory(TTree* signalTree,std::string outfile,std::string factoryname)
   string tCutInitializer = track_pT_cut;
   TCut preTraingCuts(tCutInitializer.c_str());
   factory->PrepareTrainingAndTestTree(preTraingCuts,"nTrain_Regression=0:nTest_Regression=0");
-  factory->BookMethod( Types::kPDERS, "PDERS", "KernelEstimator=Gauss" );
+  factory->BookMethod( Types::kPDERS, "PDERS", "KernelEstimator=Gauss:VarTransform=G(_V0_,_V1_,_V3_,_V5_)");
   //factory->BookMethod(Types::kMLP,"MLP_ANN2","HiddenLayers=500,6");
   //factory->BookMethod(Types::kMLP,"MLP_ANN","HiddenLayers=5");
 
-  
+
   factory->TrainAllMethods();
   factory->TestAllMethods();
   factory->EvaluateAllMethods();
@@ -71,6 +71,6 @@ int vtxRS(){
 
   TChain *signalTree = handleFile(treePath,treeExtension,"vtxingTree",nFiles);
   makeFactory(signalTree,outname,"vtxFactory");
-/*  outname="cutTrainE.root";
-  makeFactory(signalTree,backETree,outname,"eback");*/
+  /*  outname="cutTrainE.root";
+      makeFactory(signalTree,backETree,outname,"eback");*/
 }
