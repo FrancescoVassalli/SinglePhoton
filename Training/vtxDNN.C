@@ -50,7 +50,7 @@ void makeFactory(TTree* signalTree,std::string outfile,std::string factoryname)
   TCut preTraingCuts(tCutInitializer.c_str());
   factory->PrepareTrainingAndTestTree(preTraingCuts,"nTrain_Regression=0:nTest_Regression=0");
   factory->BookMethod(Types::kMLP,"MLP_ANN","HiddenLayers=10:VarTransform=N:Sampling=.25:SamplingImportance=.5:ConvergenceTests=3:");
-  factory->BookMethod(Types::kKNN,"kNN","HiddenLayers=10:VarTransform=G");
+  factory->BookMethod(Types::kKNN,"kNN","VarTransform=G");
   //factory->BookMethod(Types::kMLP,"MLP_ANN2","HiddenLayers=500,6");
   //factory->BookMethod(Types::kMLP,"MLP_ANN","HiddenLayers=5");
 
