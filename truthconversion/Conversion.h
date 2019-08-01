@@ -20,7 +20,7 @@
 #include <TVector3.h>
 #include <utility>
 
- namespace PHGenFit {
+namespace PHGenFit {
 	class Track;
 } /* namespace PHGenFit */
 
@@ -32,6 +32,7 @@ class TLorentzVector;
 class SvtxHitMap;
 class SVReco;
 
+//TODO check function to see ifthey can be made const
 class Conversion
 {
 	public:
@@ -97,7 +98,7 @@ class Conversion
 		inline void setEmbed(int embedID) {this->embedID=embedID;}
 		inline void setSourceId(int source){sourceId=source;}
 		inline int getSourceId()const{return sourceId;}
-		inline SvtxVertex* getRecoVtx()const{return recoVtx;}
+		inline genfit::GFRaveVertex* getRecoVtx()const{return recoVertex;}
 		/** Finds the delta eta of the reco tracks.
 		 * @return -1 if reco tracks are not set */
 		float trackDEta()const;
@@ -194,24 +195,23 @@ class Conversion
 		void refitTracks(SVReco* vertexer, SvtxVertex* recoVtx);
 		///Uses {@link recoVertex} and \param vertexer to improve the fit of {@link reco1} and {@link reco2}. If {@link recoVertex} is not set call {@link getSecondaryVertex(SVReco* vertexer)}.
 		void refitTracks(SVReco* vertexer);
-		
-		std::pair<TLorentzVector,TLorentzVector> getRecoTlvs();
+
 		///Uses the truth vertex and {@link SVReco} to improve the fit of {@link reco1} and {@link reco2}
 		std::pair<PHGenFit::Track*,PHGenFit::Track*> refitTracksTruthVtx(SVReco* vertexer);
 		///Uses the truth vertex and {@link SVReco} to improve the fit of {@link reco1} and {@link reco2}. Uses @param seedVtx to set the uncertainies on the truth vertex.
 		std::pair<PHGenFit::Track*,PHGenFit::Track*> refitTracksTruthVtx(SVReco* vertexer,SvtxVertex* seedVtx);
 		//TODO Set {@link recoVertex} to the vertex reconstructed from {@link SVReco} using the reco tracks and @return {@link recoVertex}. @return NULL if {@link recoCount()}!=2. Delete any existing {@link recoVertex}
-    	///@return the secondary vertex fit with {@link reco1} and {@link reco2}
+		///@return the secondary vertex fit with {@link reco1} and {@link reco2}
 		genfit::GFRaveVertex* getSecondaryVertex(SVReco* vertexer);
 		//get the PHGF version of {@link reco1} and {@link reco2}. If not possible @return NULL for that track.
 		std::pair<PHGenFit::Track*,PHGenFit::Track*> getPHGFTracks(SVReco* vertexer);
 		/*Convertes {@link reco1} and {@link reco2} into a pair of TLorentzVector* using the electron mass. 
-		* references {@link recoCount()} to determine which NULL values to @return
-		* Ownership is returned.*/
+		 * references {@link recoCount()} to determine which NULL values to @return
+		 * Ownership is returned.*/
 		std::pair<TLorentzVector*,TLorentzVector*> getRecoTlvs();
 		/*Convertes {@link _refit_phgf_tracks} into a pair of TLorentzVector* using the electron mass. 
-		* If either refit track is not defined @return will be a pair of NULL vectors
-		* Ownership is returned.*/
+		 * If either refit track is not defined @return will be a pair of NULL vectors
+		 * Ownership is returned.*/
 		std::pair<TLorentzVector*,TLorentzVector*> getRefitRecoTlvs();
 		/**
 		 * Returns the equivalent angle in the range 0 to 2pi.
@@ -239,18 +239,12 @@ class Conversion
 		void printTruth();
 		///print the reco info calls {@link reco1->identify()}, {@link reco2->identify()}, {@link recoVertex->identify()}, {@link recoPhoton->print()}
 		void printReco();
-
-    ///print the truth info calls {@link e1->identify()}, {@link e2->identify()}, {@link vtx->identify()}, {@link photon->identify()}
-    void printTruth();
-    ///print the reco info calls {@link reco1->identify()}, {@link reco2->identify()}, {@link recoVertex->identify()}, {@link recoPhoton->print()}
-    void printReco();
-
 	private:
 		PHG4Particle* e1=NULL;
 		PHG4Particle* e2=NULL;
 		PHG4Particle* photon=NULL;
 		PHG4VtxPoint* vtx=NULL;
-    	SvtxVertex* truthSvtxVtx=NULL;
+		SvtxVertex* truthSvtxVtx=NULL;
 		SvtxTrack* reco1=NULL;
 		SvtxTrack* reco2=NULL;
 		SvtxTrackEval* trackeval=NULL;
