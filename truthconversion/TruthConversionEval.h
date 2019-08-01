@@ -30,6 +30,7 @@ class RawClusterContainer;
 class TTree;
 class TFile;
 class SVReco;
+class VtxRegressor;
 class TrkrClusterContainer;
 
 class TruthConversionEval: public SubsysReco
@@ -89,6 +90,7 @@ class TruthConversionEval: public SubsysReco
     SvtxHitMap *_hitMap;
     std::string _foutname; ///< name of the output file
     SVReco *_vertexer=NULL; ///< for reco vertex finding
+    VtxRegressor *_regressor=NULL ///<for reco vertex correction with TMVA
     
     /** \defgroup  variables  for the TTrees
       @{*/
@@ -164,8 +166,6 @@ class TruthConversionEval: public SubsysReco
     const static int s_kTPCRADIUS=21; //in cm there is a way to get this from the simulation I should implement?
     ///<TPC radius currently hardcoded
     float _kRAPIDITYACCEPT=1; //<acceptance rapidity currently hard coded to |1|
-    std::string _TMVAName="";
-    std::string _TMVAPath="";
 };
 
 

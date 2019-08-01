@@ -55,8 +55,7 @@ TruthConversionEval::TruthConversionEval(const std::string &name, unsigned int r
   _kRunNumber(runnumber),_kParticleEmbed(particleEmbed), _kPythiaEmbed(pythiaEmbed), _kMakeTTree(makeTTree)
 {
   _foutname = name;
-  _TMVAName = TMVAName;
-  _TMVAPath = TMVAPath;
+  _regressor = new VtxRegressor(TMVAName,TMVAPath);
 }
 
 TruthConversionEval::~TruthConversionEval(){
@@ -328,7 +327,7 @@ void TruthConversionEval::numUnique(std::map<int,Conversion> *mymap=NULL,SvtxTra
                 pair<TLorentzVector*, TLorentzVector*> reco_tlvs = i->second.getRecoTlvs();
                 cout<<"vertexing"<<endl;
                 genfit::GFRaveVertex* recoVert = i->second.getSecondaryVertex(_vertexer);
-                recoVert = i->second.correctSecondaryVertex(_TMVAName,_TMVAPath);
+                recoVert = i->second.correctSecondaryVertex(_regressor);
                 cout<<"finding gf_tracks"<<endl;
                 std::pair<PHGenFit::Track*,PHGenFit::Track*> ph_gf_tracks = i->second.getPHGFTracks(_vertexer);
                 if (recoVert)

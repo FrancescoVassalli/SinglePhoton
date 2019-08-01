@@ -215,7 +215,7 @@ class Conversion
 		 * Ownership is returned.*/
 		std::pair<TLorentzVector*,TLorentzVector*> getRefitRecoTlvs();
 		///Uses the specified TMVA method to update and @return {@link recoVertex} 
-		genfit::GFRaveVertex* correctSecondaryVertex(std::string methodname,std::string tmvaPath);
+		genfit::GFRaveVertex* Conversion::correctSecondaryVertex(VtxRegressor* regressor);
 		/**
 		 * Returns the equivalent angle in the range 0 to 2pi.
 		 */

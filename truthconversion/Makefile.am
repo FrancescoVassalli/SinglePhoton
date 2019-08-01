@@ -27,6 +27,8 @@ pkginclude_HEADERS = \
 	SVRecoLinkDef.h\
 	VtxTest.h\
 	VtxTestLinkDef.h\
+	VtxRegressor.h\
+	VtxRegressorLinkDef.h\
 	RecoConversionEval.h\
 	RecoConversionEvalLinkDef.h
 
@@ -35,6 +37,7 @@ libtruthconversion_la_SOURCES = \
 	TruthConversionEval.C \
 	Conversion.cc \
   SVReco.C\
+	VtxRegressor.C\
 	VtxTest.C\
 	RecoConversionEval.cc
 
