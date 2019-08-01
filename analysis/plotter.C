@@ -10,8 +10,8 @@ void myText(Double_t x,Double_t y,Color_t color, const char *text, Double_t tsiz
 void photon_m(TFile* thisFile){
 	gStyle->SetOptStat(0);
 	std::vector<TH1F*> plots;
-	plots.push_back((TH1F*) thisFile->Get("m^{#gamma}_{reco}"));
 	plots.push_back((TH1F*) thisFile->Get("m^{#gamma}_{recoRefit}"));
+	plots.push_back((TH1F*) thisFile->Get("m^{#gamma}_{reco}"));
 
 	TCanvas* tc = new TCanvas();
 	tc->Draw();
