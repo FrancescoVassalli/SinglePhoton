@@ -8,15 +8,12 @@
 #include <vector>
 #include <map>
 
-namespace PHGenFit {
-	class Track;
-} /* namespace PHGenFit */
-
 namespace genfit {
 	class GFRaveVertexFactory;
 } /* namespace genfit */
 
 namespace PHGenFit {
+	class Track;
 	class Fitter;
 } /* namespace PHGenFit */
 
@@ -34,7 +31,7 @@ class JetMap;
 class TFile;
 class TTree;
 
-//! \brief		Refit SvtxTracks with PHGenFit.
+//! \brief		Find secondary vertex from track pairs and refit SvtxTracks with PHGenFit.
 class SVReco {
 	public:
 
@@ -55,8 +52,10 @@ class SVReco {
 		///@return a new SvtxVertex from the rave_vtx ownership is returned
 		static SvtxVertex* GFRVVtxToSvtxVertex(genfit::GFRaveVertex* rave_vtx)const;
 
-		//Uses \param vtx to refit \param svtxtrk which is directly edited
-		void refitTrack(SvtxVertex* vtx, SvtxTrack* svtxtrk);
+		//Uses \param vtx to refit \param svtxtrk which is directly edited. @return the PHGenFit version of the track.
+		PHGenFit::Track* refitTrack(SvtxVertex* vtx, SvtxTrack* svtxtrk);
+		//Looks up \param svtxtrk id in {@link _svtxtrk_gftrk_map}. If \param svtxtrk is NULL @return NULL.
+		PHGenFit::Track* getPHGFTrack(SvtxTrack* svtxtrk);		
 		void reset_eval_variables();
 
 		void set_do_eval(bool doEval){
@@ -131,9 +130,9 @@ class SVReco {
 		//!Create New nodes
 		int CreateNodes(PHCompositeNode *);
 
-		///Uses the tracking clusters exclusively to make a GFTrack
+		///Uses the tracking clusters exclusively to make a GFTrack. @return ownership.
 		PHGenFit::Track* MakeGenFitTrack(const SvtxTrack* intrack);
-		///Uses the tracking clusters and a vertex to fit/refit the track
+		///Uses the tracking clusters and a vertex to fit/refit the track. @return ownership.
 		PHGenFit::Track* MakeGenFitTrack(const SvtxTrack* intrack, const SvtxVertex* invertex);
 		///From {@link PHG4TrackKalmanFitter} 
 		std::shared_ptr<SvtxTrack> MakeSvtxTrack(const SvtxTrack* svtx_track,

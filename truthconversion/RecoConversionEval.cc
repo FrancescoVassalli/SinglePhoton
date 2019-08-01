@@ -37,7 +37,7 @@ RecoConversionEval::RecoConversionEval(const std::string &name) :
 {}
 
 RecoConversionEval::~RecoConversionEval(){
-  if(_vertexer) delete _vertexer;
+	if(_vertexer) delete _vertexer;
 }
 
 int RecoConversionEval::Init(PHCompositeNode *topNode) {
@@ -55,11 +55,14 @@ void RecoConversionEval::doNodePointers(PHCompositeNode *topNode){
 	_allTracks = findNode::getClass<SvtxTrackMap>(topNode,"SvtxTrackMap");
 	_mainClusterContainer = findNode::getClass<RawClusterContainer>(topNode,"CLUSTER_CEMC");
 	/*These are deprecated
-   * _svtxClusterMap = findNode::getClass<SvtxClusterMap>(topNode,"SvtxClusterMap");
-	_hitMap = findNode::getClass<SvtxHitMap>(topNode,"SvtxHitMap");*/
-  //new version
-  _clusterMap = findNode::getClass<TrkrClusterContainer>(topNode, "TRKR_CLUSTER");
+	 * _svtxClusterMap = findNode::getClass<SvtxClusterMap>(topNode,"SvtxClusterMap");
+	 _hitMap = findNode::getClass<SvtxHitMap>(topNode,"SvtxHitMap");*/
+	//new version
+	_clusterMap = findNode::getClass<TrkrClusterContainer>(topNode, "TRKR_CLUSTER");
 	_vertexer->InitEvent(topNode);
+	//to check if the id is correct
+ 	_truthinfo = findNode::getClass<PHG4TruthInfoContainer>(topNode,"G4TruthInfo");
+
 }
 
 bool RecoConversionEval::hasNodePointers()const{
@@ -90,10 +93,14 @@ int RecoConversionEval::process_event(PHCompositeNode *topNode) {
 							genfit::GFRaveVertex* vtxCan = _vertexer->findSecondaryVertex(thisTrack,jter->second);
 							if (vtxCan&&vtxCuts(vtxCan,thisTrack,jter->second))
 							{
-								cout<<"Found conversion\n";
+								cout<<"Found Conversion\n";
 								thisTrack->identify();
 								jter->second->identify();
-								//vtxCan->print();
+								PHG4Particle* truthparticle = _truthinfo->GetParticle(thisTrack->get_truth_track_id());
+								PHG4Particle* parent = _truthinfo->GetParticle(truthparticle->get_parent_id());
+								if(TMath:Abs(truthparticle->get_pid())!=11||!parent||parent->get_pid()!=22){
+									cout<<"False Conversion!"<<endl;
+								}
 							}
 						}
 					}
@@ -110,9 +117,9 @@ bool RecoConversionEval::pairCuts(SvtxTrack* t1, SvtxTrack* t2)const{
 
 bool RecoConversionEval::hitCuts(SvtxTrack* reco1, SvtxTrack* reco2)const {
 	TrkrCluster *c1 = _clusterMap->findCluster(*(reco1->begin_cluster_keys()));
-    TrkrCluster *c2 = _clusterMap->findCluster(*(reco2->begin_cluster_keys()));
-    unsigned l1 = TrkrDefs::getLayer(c1->getClusKey());
-    unsigned l2 = TrkrDefs::getLayer(c2->getClusKey());
+	TrkrCluster *c2 = _clusterMap->findCluster(*(reco2->begin_cluster_keys()));
+	unsigned l1 = TrkrDefs::getLayer(c1->getClusKey());
+	unsigned l2 = TrkrDefs::getLayer(c2->getClusKey());
 	//check that the first hits are close enough
 	if (l1>_kNSiliconLayer&&l1>_kNSiliconLayer)
 	{
@@ -151,15 +158,15 @@ bool RecoConversionEval::vtxTrackRPhiCut(TVector3 recoVertPos, SvtxTrack* track)
 }
 
 bool RecoConversionEval::vtxRadiusCut(TVector3 recoVertPos){
-  return sqrt(recoVertPos.x()*recoVertPos.x()+recoVertPos.y()*recoVertPos.y()) > _kVtxRCut;
+	return sqrt(recoVertPos.x()*recoVertPos.x()+recoVertPos.y()*recoVertPos.y()) > _kVtxRCut;
 }
 
 int RecoConversionEval::End(PHCompositeNode *topNode) {
-  if(_file){
-    _file->Write();
-    _file->Close();
-  }
-  return Fun4AllReturnCodes::EVENT_OK;
+	if(_file){
+		_file->Write();
+		_file->Close();
+	}
+	return Fun4AllReturnCodes::EVENT_OK;
 }
 
 bool RecoConversionEval::approachDistance(SvtxTrack *t1,SvtxTrack* t2)const{

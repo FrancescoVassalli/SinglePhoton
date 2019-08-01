@@ -15,9 +15,15 @@
 #include <trackbase_historic/SvtxClusterMap.h>
 #include <trackbase_historic/SvtxVertex.h>
 #include <g4eval/SvtxTrackEval.h>
+#include <GenFit/GFRaveVertex.h>
 #include <TLorentzVector.h>
 #include <TVector3.h>
 #include <utility>
+
+ namespace PHGenFit {
+	class Track;
+} /* namespace PHGenFit */
+
 
 class SvtxTrackEval;
 class PHCompositeNode;
@@ -181,16 +187,32 @@ class Conversion
 		float setRecoVtx(SvtxVertex* recovtx,SvtxClusterMap* cmap);
 		TLorentzVector* setRecoPhoton();///< constructs a tlv for a photon by adding the tlvs for the reco tracks
 		TLorentzVector* getRecoPhoton();///<@return the constructed tlv
+		//Uses the {@link _refit_phgf_tracks} to set {@link recoPhoton}. Will delete any existing {@link recoPhoton}. @return NULL if either {@link _refit_phgf_tracks} are NULL.
+		TLorentzVector* getRefitRecoPhoton();
 		PHG4Particle* getTruthPhoton(PHG4TruthInfoContainer*);///<@return NULL if not valid conversion else return photon
 		///Uses the \param recoVtx vertex and \param vertexer to improve the fit of {@link reco1} and {@link reco2}. Sets {@link recoVertex} to \param recoVtx
 		void refitTracks(SVReco* vertexer, SvtxVertex* recoVtx);
-		///Uses {@link recoVertex} and \param vertexer to improve the fit of {@link reco1} and {@link reco2}.
+		///Uses {@link recoVertex} and \param vertexer to improve the fit of {@link reco1} and {@link reco2}. If {@link recoVertex} is not set call {@link getSecondaryVertex(SVReco* vertexer)}.
 		void refitTracks(SVReco* vertexer);
-		///Uses {@link vtx} and \param vertexer to improve the fit of {@link reco1} and {@link reco2}.
-		void refitTracksTruthVtx(SVReco* vertexer)
-
+		
 		std::pair<TLorentzVector,TLorentzVector> getRecoTlvs();
-
+		///Uses the truth vertex and {@link SVReco} to improve the fit of {@link reco1} and {@link reco2}
+		std::pair<PHGenFit::Track*,PHGenFit::Track*> refitTracksTruthVtx(SVReco* vertexer);
+		///Uses the truth vertex and {@link SVReco} to improve the fit of {@link reco1} and {@link reco2}. Uses @param seedVtx to set the uncertainies on the truth vertex.
+		std::pair<PHGenFit::Track*,PHGenFit::Track*> refitTracksTruthVtx(SVReco* vertexer,SvtxVertex* seedVtx);
+		//TODO Set {@link recoVertex} to the vertex reconstructed from {@link SVReco} using the reco tracks and @return {@link recoVertex}. @return NULL if {@link recoCount()}!=2. Delete any existing {@link recoVertex}
+    	///@return the secondary vertex fit with {@link reco1} and {@link reco2}
+		genfit::GFRaveVertex* getSecondaryVertex(SVReco* vertexer);
+		//get the PHGF version of {@link reco1} and {@link reco2}. If not possible @return NULL for that track.
+		std::pair<PHGenFit::Track*,PHGenFit::Track*> getPHGFTracks(SVReco* vertexer);
+		/*Convertes {@link reco1} and {@link reco2} into a pair of TLorentzVector* using the electron mass. 
+		* references {@link recoCount()} to determine which NULL values to @return
+		* Ownership is returned.*/
+		std::pair<TLorentzVector*,TLorentzVector*> getRecoTlvs();
+		/*Convertes {@link _refit_phgf_tracks} into a pair of TLorentzVector* using the electron mass. 
+		* If either refit track is not defined @return will be a pair of NULL vectors
+		* Ownership is returned.*/
+		std::pair<TLorentzVector*,TLorentzVector*> getRefitRecoTlvs();
 		/**
 		 * Returns the equivalent angle in the range 0 to 2pi.
 		 */
@@ -233,8 +255,9 @@ class Conversion
 		SvtxTrack* reco2=NULL;
 		SvtxTrackEval* trackeval=NULL;
 		SvtxClusterMap* _svtxClusterMap=NULL;                                                                              
-		SvtxVertex *recoVertex=NULL;
+		genfit::GFRaveVertex *recoVertex=NULL;
 		TLorentzVector *recoPhoton=NULL;
+		std::pair<PHGenFit::Track*,PHGenFit::Track*> _refit_phgf_tracks;
 
 		static const int _kNSiliconLayer =7; ///<hardcoded 
 		int embedID=0;
@@ -248,8 +271,13 @@ class Conversion
 		/**Initializes {@link truthSvtxVtx} with x,y,x,t from the PHG4VtxPoint. 
 		 *Chisq and ndof are set to 1. 
 		 *The tracks are set with {@link reco1} and {@link reco2}. 
-		 *The errors are set to 0.*/
+		 *The errors are set to a randomish positive-definite matrix*/
 		void PHG4VtxPointToSvtxVertex();
+		/**Initializes {@link truthSvtxVtx} with x,y,x,t from the PHG4VtxPoint. 
+		 *Chisq and ndof are set to 1. 
+		 *The tracks are set with {@link reco1} and {@link reco2}. 
+		 *The errors are set to the errors of the seedVtx. The primary vtx is suggested.*/
+		void PHG4VtxPointToSvtxVertex(SvtxVertex* seedVtx);
 
 };
 #endif //CONVERSION_H__

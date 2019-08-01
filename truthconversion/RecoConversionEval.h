@@ -45,6 +45,9 @@ class RecoConversionEval : public SubsysReco {
 		TFile *_file=NULL;
 		TTree *_tree=NULL;
 
+    	PHG4TruthInfoContainer *_truthinfo=NULL;
+
+
 		bool hasNodePointers()const;
 		void process_recoTracks(PHCompositeNode *topNode);
 

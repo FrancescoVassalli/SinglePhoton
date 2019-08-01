@@ -171,6 +171,11 @@ int SVReco::InitEvent(PHCompositeNode *topNode) {
 	return Fun4AllReturnCodes::EVENT_OK;
 }
 
+PHGenFit::Track* SVReco::getPHGFTrack(SvtxTrack* svtxtrk){
+ if(svtxtrk)return _main_rf_phgf_tracks[_svtxtrk_gftrk_map[svtxtrk->get_id()]];
+ else return NULL;
+}
+
 
 int SVReco::InitRun(PHCompositeNode *topNode) {
 
@@ -237,7 +242,8 @@ genfit::GFRaveVertex* SVReco::findSecondaryVertex(SvtxTrack* track1, SvtxTrack* 
 						track2->identify();
 						cout<<"\n\n\n\n\n";
 						}*/
-		//if a vertex is found 
+		//if a vertex is found return ownership 
+    //TODO check rave_verticies_conversion for mem leak
 		if(rave_vertices_conversion.size()>0) return rave_vertices_conversion[0];
 		else return NULL;
 	}//more than 1 track 
@@ -250,10 +256,12 @@ SVReco::~SVReco(){
 		delete _fitter;
 		_fitter=NULL;
 	}
+	cout<<PHWHERE<<"delete"<<endl;
 	if(_vertex_finder){
 		delete _vertex_finder;
 		_vertex_finder=NULL;
 	}
+	cout<<PHWHERE<<"delete"<<endl;
 	for (std::vector<PHGenFit::Track*>::iterator i = _main_rf_phgf_tracks.begin(); i != _main_rf_phgf_tracks.end(); ++i)
 	{
 		if(*i)
@@ -280,6 +288,8 @@ void SVReco::printGenFitTrackKinematics(PHGenFit::Track* track){
 	cout << "OUT Ex: " << sqrt(cov[0][0]) << ", Ey: " << sqrt(cov[1][1]) << ", Ez: " << sqrt(cov[2][2]) << endl;
 	cout << "OUT Px: " << mom.X() << ", Py: " << mom.Y() << ", Pz: " << mom.Z() << endl; 
 }
+
+
 
 //should be deprecated
 void SVReco::reset_eval_variables(){
@@ -581,6 +591,105 @@ PHGenFit::Track* SVReco::MakeGenFitTrack(const SvtxTrack* intrack, const SvtxVer
 
 }
 
+//inspired by PHG4TrackKalmanFitter
+PHGenFit::Track* SVReco::MakeGenFitTrack(const SvtxTrack* intrack, const genfit::GFRaveVertex* invertex){
+  if (!intrack){
+    cerr << PHWHERE << " Input SvtxTrack is NULL!" << endl;
+    return NULL;
+  }
+
+  if (_use_ladder_geom and !_geom_container_intt and !_geom_container_maps) {
+    cout << PHWHERE << "No PHG4CylinderGeomContainer found!" << endl;
+    return NULL;
+  }
+
+  // Create measurements
+  std::vector<PHGenFit::Measurement*> measurements;
+
+  //create space point measurement from vtx
+  //TODO check that getNTracks is properly initialized 
+  if (invertex and invertex->getNTracks() > 1) {
+    TVector3 pos=invertex->getPos();
+    TMatrixDSym cov = invertex->getCov();
+    PHGenFit::Measurement* meas = new PHGenFit::SpacepointMeasurement(
+          pos, cov);
+    measurements.push_back(meas);
+
+    //convert SvtxTrack to matricies
+    TVector3 seed_pos(intrack->get_x(), intrack->get_y(), intrack->get_z());
+    TVector3 seed_mom(intrack->get_px(), intrack->get_py(), intrack->get_pz()); //mom stands for momentum
+    TMatrixDSym seed_cov(6);
+    for (int i=0; i<6; i++){
+      for (int j=0; j<6; j++){
+        seed_cov[i][j] = intrack->get_error(i,j);
+      }
+    } 
+    cout<<"Making track cluster measurments"<<endl;
+    //make measurements from the track clusters
+    for (auto iter = intrack->begin_cluster_keys(); iter != intrack->end_cluster_keys(); ++iter){
+      //    unsigned int cluster_id = *iter;
+      TrkrCluster* cluster = _clustermap->findCluster(*iter);
+      if (!cluster) {
+        LogError("No cluster Found!");
+        continue;
+      }
+      float x = cluster->getPosition(0);
+      float y = cluster->getPosition(1);
+      float radius = sqrt(x*x+y*y);
+      TVector3 pos(cluster->getPosition(0), cluster->getPosition(1), cluster->getPosition(2));
+      seed_mom.SetPhi(pos.Phi());
+      seed_mom.SetTheta(pos.Theta());
+
+      TVector3 n(cluster->getPosition(0), cluster->getPosition(1), 0);
+      //cout<<"Cluster with {"<<cluster->getPosition(0)<<','<<cluster->getPosition(0)<<"}\n";
+
+      if (_use_ladder_geom){ //I don't understand this bool
+        unsigned int trkrid = TrkrDefs::getTrkrId(*iter);
+        unsigned int layer = TrkrDefs::getLayer(*iter);
+        if (trkrid == TrkrDefs::mvtxId) {
+          int stave_index = MvtxDefs::getStaveId(*iter);
+          int chip_index = MvtxDefs::getChipId(*iter);
+
+          double ladder_location[3] = { 0.0, 0.0, 0.0 };
+          //not exactly sure where the cylinder geoms are currently objectified. check this 
+          CylinderGeom_Mvtx *geom = (CylinderGeom_Mvtx*) _geom_container_maps->GetLayerGeom(layer);
+          // returns the center of the sensor in world coordinates - used to get the ladder phi location
+          geom->find_sensor_center(stave_index, 0, 0, chip_index, ladder_location);//the mvtx module and half stave are 0
+          n.SetXYZ(ladder_location[0], ladder_location[1], 0);
+          n.RotateZ(geom->get_stave_phi_tilt());
+        } 
+        else if (trkrid == TrkrDefs::inttId) {
+          //this may bug but it looks ok for now
+          CylinderGeomIntt* geom = (CylinderGeomIntt*) _geom_container_intt->GetLayerGeom(layer);
+          double hit_location[3] = { 0.0, 0.0, 0.0 };
+          geom->find_segment_center(InttDefs::getLadderZId(*iter),InttDefs::getLadderPhiId(*iter), hit_location);
+
+          n.SetXYZ(hit_location[0], hit_location[1], 0);
+          n.RotateZ(geom->get_strip_phi_tilt());
+        }
+      }//if use_ladder_geom
+      PHGenFit::Measurement* meas = new PHGenFit::PlanarMeasurement(pos, n,radius*cluster->getPhiError(), cluster->getZError());
+      measurements.push_back(meas);
+    }//cluster loop
+    genfit::AbsTrackRep* rep = new genfit::RKTrackRep(_primary_pid_guess);
+    PHGenFit::Track* track(new PHGenFit::Track(rep, seed_pos, seed_mom, seed_cov));
+    track->addMeasurements(measurements);
+
+    if (_fitter->processTrack(track, false) != 0) {
+      if (_verbosity >= 1)
+        LogWarning("Track fitting failed");
+      return NULL;
+    }
+    track->getGenFitTrack()->setMcTrackId(intrack->get_id());
+    return track;
+  }//valid vtx 
+  else{
+    cerr<<PHWHERE<<": invalid vertex"<<endl;
+    return NULL;
+  }
+
+}
+
 //From PHG4TrackKalmanFitter
 SvtxVertex* SVReco::GFRVVtxToSvtxVertex(genfit::GFRaveVertex* rave_vtx)const {
   SvtxVertex* svtx_vtx= new SvtxVertex_v1();
@@ -728,13 +837,37 @@ void SVReco::FillSVMap(
 	return;
 }
 
-void SVReco::refitTrack(SvtxVertex* vtx, SvtxTrack* svtxtrk){
-  auto gftrk = MakeGenFitTrack(svtxtrk,vtx);
-  cout<<"Made gf track for refit"<<endl;
-	MakeSvtxTrack(svtxtrk,gftrk,vtx);
+PHGenFit::Track*  SVReco::refitTrack(SvtxVertex* vtx, SvtxTrack* svtxtrk){
+  PHGenFit::Track* gftrk = MakeGenFitTrack(svtxtrk,vtx);
+  if(gftrk) {
+    cout<<"good genfit refit"<<endl;
+    //MakeSvtxTrack(svtxtrk,gftrk,vtx);
+    return gftrk;
+  }
+  else {
+    cout<<"No refit possible"<<endl;
+    return NULL;
+  }
 }
 
-//may need to make the phgf_track pointer shared 
+PHGenFit::Track*  SVReco::refitTrack(genfit::GFRaveVertex* vtx, SvtxTrack* svtxtrk){
+  PHGenFit::Track* gftrk = MakeGenFitTrack(svtxtrk,vtx);
+  if(gftrk) {
+    cout<<"good genfit refit"<<endl;
+    //MakeSvtxTrack(svtxtrk,gftrk,vtx);
+    return gftrk;
+  }
+  else {
+    cout<<"No refit possible"<<endl;
+    return NULL;
+  }
+}
+
+
+/*FIXME this code is broken I have made zero attempt to find out why
+* I decided not to use the SvtxTrack after they are refit
+* may need to make the phgf_track pointer shared 
+*/
 std::shared_ptr<SvtxTrack> SVReco::MakeSvtxTrack(const SvtxTrack* svtx_track,
 		const PHGenFit::Track* phgf_track, const SvtxVertex* vertex) {
 

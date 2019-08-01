@@ -12,12 +12,14 @@ void photon_m(TFile* thisFile){
 	std::vector<TH1F*> plots;
 	plots.push_back((TH1F*) thisFile->Get("m_{#gamma}_truth"));
 	plots.push_back((TH1F*) thisFile->Get("m_{#gamma}_reco"));
+	plots.push_back((TH1F*) thisFile->Get("m_{#gamma}_recoRefit"));
 
 	TCanvas* tc = new TCanvas();
 	tc->Draw();
 	TLegend* tl = new TLegend(.7,.7,.9,.9);
 	plots[1]->SetLineColor(kRed);
-	for (int i = 0; i < 2; ++i)
+	plots[2]->SetLineColor(kGreen+2);
+	for (int i = 0; i < plots.size(); ++i)
 	{
 		plots[i]->SetYTitle("#frac{dN}{dm *N_{#gamma}}");
 		plots[i]->SetXTitle("invarient mass GeV/c^{2}");
@@ -29,10 +31,36 @@ void photon_m(TFile* thisFile){
 	tc->SaveAs("plots/gamma_dm_eff.pdf");	
 }
 
+void recoRefit(TFile* thisFile){
+	gStyle->SetOptStat(0);
+	std::vector<TH1F*> plots;
+	plots.push_back((TH1F*) thisFile->Get("x_{0}-x_{refit}"));
+	plots.push_back((TH1F*) thisFile->Get("y_{0}-y_{refit}"));
+	plots.push_back((TH1F*) thisFile->Get("z_{0}-z_{refit}"));
+
+	TCanvas* tc = new TCanvas();
+	tc->Draw();
+	TLegend* tl = new TLegend(.7,.7,.9,.9);
+	plots[1]->SetLineColor(kRed);
+	plots[2]->SetLineColor(kGreen+2);
+	for (int i = 0; i < plots.size(); ++i)
+	{
+		plots[i]->SetYTitle("dN/dN");
+		plots[i]->SetXTitle("#Delta");
+		if(i==0) plots[i]->Draw("e1");
+		else plots[i]->Draw("e1 same");
+		tl->AddEntry(plots[i],plots[i]->GetName(),"l");
+	}
+	tl->Draw();
+	tc->SaveAs("plots/deltaRefit.pdf");	
+}
+
 
 
 void plotter(){
-	//TFile *thisFile = new TFile("effplots.root","READ");
-	//photon_m(thisFile);
-	TFile *backFile = new TFile("backplots.root","READ");
+	TFile *thisFile = new TFile("effplots.root","READ");
+	photon_m(thisFile);
+	recoRefit(thisFile);
+	//TFile *backFile = new TFile("backplots.root","READ");
+
 }
