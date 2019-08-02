@@ -43,5 +43,6 @@ int main(int argc, char const *argv[] )
   string fileOut = string(argv[1]);
   long nEvents =strtol(argv[2],NULL,10);  // 5000000;
   generator(fileOut,nEvents);
+  cout<<"All done"<<endl;
   return 0;
 }

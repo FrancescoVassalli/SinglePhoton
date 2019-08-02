@@ -6,7 +6,7 @@ Universe        = vanilla
 Notification    = Never
 
 # The executable we want to run.
-Executable   =  /phenix/u/vassalli/sphenix/single/condor/CondorPythia.csh
+Executable   =  /phenix/u/vassalli/sphenix/single/condor/CondorEmbeded.csh
 
  # The argument to pass to the executable.
 Arguments       = $(Process)
@@ -24,7 +24,7 @@ Rank		= CPU_Speed
 
 # Jobs with higher numerical priority will run before jobs 
 # with lower numerical priority (-20 to 20).
-Priority        = +19
+Priority        = +15
 
 # Used to give jobs a directory with respect to file input 
 # and output.
@@ -34,19 +34,19 @@ Initialdir   = /phenix/u/vassalli/sphenix/single/
 Input           = /dev/null
 
 # The job's stdout is sent to this file.
-Output       = /direct/phenix+u/vassalli/sphenix/single/condor_logs/out.pythia.$(Process)
+Output       = /direct/phenix+u/vassalli/sphenix/single/condor_logs/out.m.$(Process)
 
 # The job's stderr is sent to this file.
-Error        = /direct/phenix+u/vassalli/sphenix/single/condor_logs/err.pythia.$(Process)
+Error        = /direct/phenix+u/vassalli/sphenix/single/condor_logs/err.m.$(Process)
 
 # The condor log file for this job, useful when debuggin
-Log          = /direct/phenix+u/vassalli/sphenix/single/condor_logs/log.pythia.$(Process)
+Log          = /direct/phenix+u/vassalli/sphenix/single/condor_logs/log.m.$(Process)
 
 # Email address to send notification to.
 Notify_user     = frva5829@colorado.edu
 
-request_memory = 100M
 
+request_memory = 3000M
 # This should be the last command and tells condor to queue the
 # job.  If a number is placed after the command (i.e. Queue 15)
 # then the job will be submitted N times.  Use the $(Process)
