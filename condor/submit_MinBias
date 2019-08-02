@@ -6,7 +6,7 @@ Universe        = vanilla
 Notification    = Never
 
 # The executable we want to run.
-Executable   =  /phenix/u/vassalli/sphenix/single/condor/CondorEmbeded.csh
+Executable   =  /phenix/u/vassalli/sphenix/single/condor/CondorMinBias.csh
 
  # The argument to pass to the executable.
 Arguments       = $(Process)
