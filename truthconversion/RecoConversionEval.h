@@ -8,9 +8,11 @@
 //===============================================
 #include <fun4all/SubsysReco.h>
 #include <GenFit/GFRaveVertex.h>
-#include <TVector3.h>
 #include <string>
 #include <cmath>
+namespace PHGenFit {
+	class Track;
+} /* namespace PHGenFit */
 class PHCompositeNode;
 class PHG4TruthInfoContainer;
 class SvtxEvalStack;
@@ -22,6 +24,7 @@ class TrkrClusterContainer;
 class RawClusterContainer;
 class TTree;
 class TFile;
+class TLorentzVector;
 class SVReco;
 class VtxRegressor;
 
@@ -52,10 +55,14 @@ class RecoConversionEval : public SubsysReco {
 
 
 		bool hasNodePointers()const;
-		//Uses the TMVA method to correct the vtx radius
+		///Uses the TMVA method to correct the vtx radius
 		genfit::GFRaveVertex* correctSecondaryVertex(genfit::GFRaveVertex* vtx,SvtxTrack* reco1,SvtxTrack* reco2);
-		//Adds \param reco1 and \param reco2 as TLorentzVectors
+    ///Uses {@link _vertexer} to refit \param reco1 and \param reco2
+    std::pair<PHGenFit::Track*,PHGenFit::Track*> refitTracks(genfit::GFRaveVertex* vtx,SvtxTrack* reco1,SvtxTrack* reco2);
+		///Adds \param reco1 and \param reco2 as TLorentzVectors
 		TLorentzVector* reconstructPhoton(SvtxTrack* reco1,SvtxTrack* reco2);
+    ///Adds the {@link PHGenFit::Track}s into a TLorentVector
+    TLorentzVector* reconstructPhoton(std::pair<PHGenFit::Track*,PHGenFit::Track*> recos);
 		inline bool detaCut(float eta1, float eta2) const{
 			return (eta1>eta2?eta1-eta2:eta2-eta1)<_kPolarCut;
 		}
@@ -66,7 +73,7 @@ class RecoConversionEval : public SubsysReco {
 		 * also need to check the approach distance
 		 */
 		bool hitCuts(SvtxTrack* t1, SvtxTrack* t2)const ;
-		bool vtxCuts(genfit::GFRaveVertex* vtxCan, SvtxTrack* t1, SvtxTrack *t2);
+		bool vtxCuts(genfit::GFRaveVertex* vtxCan);
 		//!track must be closer in RZ space to the vtx than the cut
 		bool vtxTrackRZCut(TVector3 recoVertPos, SvtxTrack* track);
 		//!track must be closer in RPhi space to the vtx than the cut
@@ -99,8 +106,7 @@ class RecoConversionEval : public SubsysReco {
     float _kVtxRCut=1.;
     float _kVtxRZCut=.4;
     float _kVtxChi2Cut=.4;
-
-
+		float _kElectronRestM=.5109989461;
 };
 
 #endif // __RecoConversionEval_H__

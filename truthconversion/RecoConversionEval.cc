@@ -1,9 +1,11 @@
 #include "RecoConversionEval.h"
 #include "SVReco.h"
+#include "VtxRegressor.h"
 
 #include <fun4all/Fun4AllReturnCodes.h>
 #include <phool/PHCompositeNode.h>
 #include <phool/getClass.h>
+#include <phgenfit/Track.h>
 #include <calobase/RawClusterContainer.h>
 #include <calobase/RawCluster.h>
 #include <trackbase_historic/SvtxTrack.h>
@@ -132,9 +134,11 @@ int RecoConversionEval::process_event(PHCompositeNode *topNode) {
 									_b_fake=true;
 								}
 								else if(parent&&parent->get_pid()==22){
-									_b_tphoton_phi = parent->get_phi();
-									_b_tphoton_eta = parent->get_eta();
-									_b_tphoton_pT = parent->get_pt();
+                  TLorentzVector ptlv;
+                  ptlv.SetPxPyPzE(parent->get_px(),parent->get_py(),parent->get_pz(),parent->get_e());
+									_b_tphoton_phi = ptlv.Phi();
+									_b_tphoton_eta = ptlv.Eta();
+									_b_tphoton_pT =  ptlv.Pt();
 								}
 								_tree->Fill();
 							}//vtx cuts
@@ -147,9 +151,9 @@ int RecoConversionEval::process_event(PHCompositeNode *topNode) {
 	return Fun4AllReturnCodes::EVENT_OK;
 }
 
-genfit::GFRaveVertex* RecoConversionEval::correctSecondaryVertex(genfit::GFRaveVertex* vtx,SvtxTrack* reco1,SvtxTrack* reco2){
+genfit::GFRaveVertex* RecoConversionEval::correctSecondaryVertex(genfit::GFRaveVertex* recoVertex,SvtxTrack* reco1,SvtxTrack* reco2){
   if(!(recoVertex&&reco1&&reco2)) {
-    return vtx;
+    return recoVertex;
   }
 
   TVector3 nextPos = recoVertex->getPos();
@@ -166,13 +170,13 @@ genfit::GFRaveVertex* RecoConversionEval::correctSecondaryVertex(genfit::GFRaveV
   return recoVertex;
 }
 
-TLorentzVector RecoConversionEval::reconstructPhoton(std::pair<PHGenFit::Track*,PHGenFit::Track*> recos){
-if (reco1&&reco2)
+TLorentzVector* RecoConversionEval::reconstructPhoton(std::pair<PHGenFit::Track*,PHGenFit::Track*> recos){
+if (recos.first&&recos.second)
   {
-    TLorentzVector tlv1();
-    tlv1.SetVectM(recos.first->getMom(),_kElectronRestM);
-    TLorentzVector tlv2();
-    tlv2.SetVectM(recos.second->getMom(),_kElectronRestM);
+    TLorentzVector tlv1;
+    tlv1.SetVectM(recos.first->get_mom(),_kElectronRestM);
+    TLorentzVector tlv2;
+    tlv2.SetVectM(recos.second->get_mom(),_kElectronRestM);
     return new TLorentzVector(tlv1+tlv2);
   }
   else return NULL;
@@ -185,7 +189,6 @@ if (reco1&&reco2)
         sqrt(_kElectronRestM*_kElectronRestM+reco1->get_p()*reco1->get_p()));
     TLorentzVector tlv2(reco2->get_px(),reco2->get_py(),reco2->get_pz(),
         sqrt(_kElectronRestM*_kElectronRestM+reco2->get_p()*reco2->get_p()));
-    if (recoPhoton) delete recoPhoton;
     return new TLorentzVector(tlv1+tlv2);
   }
   else return NULL;
@@ -233,11 +236,15 @@ bool RecoConversionEval::hitCuts(SvtxTrack* reco1, SvtxTrack* reco2)const {
 	return true;
 }
 
-bool RecoConversionEval::vtxCuts(genfit::GFRaveVertex* vtxCan, SvtxTrack* t1, SvtxTrack *t2){
+/*bool RecoConversionEval::vtxCuts(genfit::GFRaveVertex* vtxCan, SvtxTrack* t1, SvtxTrack *t2){
 	//TODO program the cuts invariant mass, pT
 	return vtxRadiusCut(vtxCan->getPos());
 	// && vtxTrackRPhiCut(vtxCan->getPos(),t1)&&vtxTrackRPhiCut(vtxCan->getPos(),t2)&& 
 		//vtxTrackRZCut(vtxCan->getPos(),t1)&&vtxTrackRZCut(vtxCan->getPos(),t2)&&vtxCan->getChi2()>_kVtxChi2Cut;
+}*/
+
+bool RecoConversionEval::vtxCuts(genfit::GFRaveVertex* vtxCan){
+	return vtxRadiusCut(vtxCan->getPos());
 }
 
 bool RecoConversionEval::vtxTrackRZCut(TVector3 recoVertPos, SvtxTrack* track){
