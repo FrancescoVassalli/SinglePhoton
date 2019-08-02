@@ -1,6 +1,5 @@
 # All local jobs are part of the vanilla universe.
 Universe        = vanilla
-
 # We want email if the job completed successfully. This can
 # be set to Always, Error, or Never.
 Notification    = Never
@@ -34,13 +33,13 @@ Initialdir   = /phenix/u/vassalli/sphenix/single/Training/
 Input           = /dev/null
 
 # The job's stdout is sent to this file.
-Output       = /direct/phenix+u/vassalli/sphenix/single/condor_logs/out.d.$(Process)
+Output       = /direct/phenix+u/vassalli/sphenix/single/condor_logs/out.t.$(Process)
 
 # The job's stderr is sent to this file.
-Error        = /direct/phenix+u/vassalli/sphenix/single/condor_logs/err.d.$(Process)
+Error        = /direct/phenix+u/vassalli/sphenix/single/condor_logs/err.t.$(Process)
 
 # The condor log file for this job, useful when debuggin
-Log          = /direct/phenix+u/vassalli/sphenix/single/condor_logs/log.d.$(Process)
+Log          = /direct/phenix+u/vassalli/sphenix/single/condor_logs/log.t.$(Process)
 
 # Email address to send notification to.
 Notify_user     = frva5829@colorado.edu

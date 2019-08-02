@@ -1,6 +1,6 @@
 #!/bin/csh 
 source /phenix/u/vassalli/.cshrc
-set TRAINER = "vtxDNN.C"
+set TRAINER = "vtxRS.C"
 set SCRATCH_AREA="$_CONDOR_SCRATCH_DIR/training"
 mkdir $SCRATCH_AREA
 #
