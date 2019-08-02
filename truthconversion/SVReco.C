@@ -691,7 +691,7 @@ PHGenFit::Track* SVReco::MakeGenFitTrack(const SvtxTrack* intrack, const genfit:
 
 }
 
-//inspired by PHG4TrackKalmanFitter
+/*inspired by PHG4TrackKalmanFitter
 PHGenFit::Track* SVReco::MakeGenFitTrack(const PHGenFit::Track* intrack, const genfit::GFRaveVertex* invertex){
   if (!intrack){
     cerr << PHWHERE << " Input PHGenFit::Track is NULL!" << endl;
@@ -716,9 +716,9 @@ PHGenFit::Track* SVReco::MakeGenFitTrack(const PHGenFit::Track* intrack, const g
     measurements.push_back(meas);
 
     //convert SvtxTrack to matricies
-    TVector3 seed_pos = intrack->getPos();
-    TVector3 seed_mom = intrack->getMom(); //mom stands for momentum
-    TMatrixDSym seed_cov = intrack->getCov();
+    TVector3 seed_pos = intrack->getGenFitTrack()->getPos();
+    TVector3 seed_mom = intrack->get_mom(); //mom stands for momentum
+    TMatrixDSym seed_cov = intrack->getGenFitTrack()->getCov();
     
     cout<<"Making track cluster measurments"<<endl;
     //make measurements from the track clusters
@@ -784,7 +784,7 @@ PHGenFit::Track* SVReco::MakeGenFitTrack(const PHGenFit::Track* intrack, const g
     return NULL;
   }
 
-}
+}*/
 
 //From PHG4TrackKalmanFitter
 SvtxVertex* SVReco::GFRVVtxToSvtxVertex(genfit::GFRaveVertex* rave_vtx)const{
@@ -959,7 +959,7 @@ PHGenFit::Track*  SVReco::refitTrack(genfit::GFRaveVertex* vtx, SvtxTrack* svtxt
   }
 }
 
-PHGenFit::Track*  SVReco::refitTrack(genfit::GFRaveVertex* vtx, PHGenFit::Track* phgf_track){
+/*PHGenFit::Track*  SVReco::refitTrack(genfit::GFRaveVertex* vtx, PHGenFit::Track* phgf_track){
   PHGenFit::Track* gftrk = MakeGenFitTrack(phgf_track,vtx);
   if(gftrk) {
     cout<<"good genfit refit"<<endl;
@@ -970,7 +970,7 @@ PHGenFit::Track*  SVReco::refitTrack(genfit::GFRaveVertex* vtx, PHGenFit::Track*
     cout<<"No refit possible"<<endl;
     return NULL;
   }
-}
+}*/
 
 
 /*FIXME this code is broken I have made zero attempt to find out why

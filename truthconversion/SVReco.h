@@ -138,6 +138,8 @@ class SVReco {
 		PHGenFit::Track* MakeGenFitTrack(const SvtxTrack* intrack, const SvtxVertex* invertex);
 		///Uses the tracking clusters and a vertex to fit/refit the track. @return ownership.
     PHGenFit::Track* MakeGenFitTrack(const SvtxTrack* intrack, const genfit::GFRaveVertex* invertex);
+    ///Uses the vertex to remake the track
+//    PHGenFit::Track* MakeGenFitTrack(const PHGenFit::Track* intrack, const genfit::GFRaveVertex* invertex);
 		///From {@link PHG4TrackKalmanFitter} 
 		std::shared_ptr<SvtxTrack> MakeSvtxTrack(const SvtxTrack* svtx_track,
 				const PHGenFit::Track* phgf_track, const SvtxVertex* vertex);
