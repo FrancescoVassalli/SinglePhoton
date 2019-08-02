@@ -42,6 +42,7 @@ RecoConversionEval::RecoConversionEval(const std::string &name,std::string tmvam
 }
 
 RecoConversionEval::~RecoConversionEval(){
+  cout<<"deleting RCE"<<endl;
 	if(_vertexer) delete _vertexer;
 	if(_regressor) delete _regressor;
 }
@@ -270,6 +271,7 @@ int RecoConversionEval::End(PHCompositeNode *topNode) {
 		_file->Write();
 		_file->Close();
 	}
+  cout<<"good end"<<endl;
 	return Fun4AllReturnCodes::EVENT_OK;
 }
 

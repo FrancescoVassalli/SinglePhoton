@@ -34,8 +34,8 @@ int after_Reco(std::string infile = "XjPhi3_pT5_98_dst.root",std::string outfile
 
   se->run();
   se->End();
-  std::cout << "All done" << std::endl;
   delete se;
-
-  gSystem->Exit(0);
+  //gSystem->Exit(0);
+  std::cout << "All done" << std::endl;
+  return 0;
 }
