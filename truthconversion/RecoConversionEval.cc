@@ -60,6 +60,9 @@ int RecoConversionEval::InitRun(PHCompositeNode *topNode) {
     _tree->Branch("photon_pT",  &_b_photon_pT);
     _tree->Branch("photon_eta", &_b_photon_eta);
     _tree->Branch("photon_phi", &_b_photon_phi);
+    _tree->Branch("tphoton_pT",  &_b_tphoton_pT);
+    _tree->Branch("tphoton_eta", &_b_tphoton_eta);
+    _tree->Branch("tphoton_phi", &_b_tphoton_phi);
     _tree->Branch("fake", &_b_fake);
     
 	return Fun4AllReturnCodes::EVENT_OK;
@@ -106,18 +109,32 @@ int RecoConversionEval::process_event(PHCompositeNode *topNode) {
 						if(nextCluster&&nextCluster->get_prob()>_kEMProbCut&&pairCuts(thisTrack,jter->second)){
 							genfit::GFRaveVertex* vtxCan = _vertexer->findSecondaryVertex(thisTrack,jter->second);
 							vtxCan=correctSecondaryVertex(vtxCan,thisTrack,jter->second);
-							if (vtxCan&&vtxCuts(vtxCan,thisTrack,jter->second))
+							if (vtxCan&&vtxCuts(vtxCan))
 							{
 								_b_fake=false;
-								TLorentzVector *photon = reconstructPhoton(thisTrack,jter->second);
+								std::pair<PHGenFit::Track*,PHGenFit::Track*> refit_tracks = refitTracks(vtxCan,thisTrack,jter->second);
+								TLorentzVector* photon;
+								if (refit_tracks.first&&refit_tracks.second)
+								{
+									photon = reconstructPhoton(refit_tracks);
+								}
+								else{
+									photon = reconstructPhoton(thisTrack,jter->second);
+								}
 								_b_photon_m = photon->Dot(*photon);
 								_b_photon_pT = photon->Pt();
 								_b_photon_eta = photon->Eta();
 								_b_photon_phi = photon->Phi();
+								delete photon;
 								PHG4Particle* truthparticle = _truthinfo->GetParticle(thisTrack->get_truth_track_id());
 								PHG4Particle* parent = _truthinfo->GetParticle(truthparticle->get_parent_id());
 								if(TMath::Abs(truthparticle->get_pid())!=11||!parent||parent->get_pid()!=22){
 									_b_fake=true;
+								}
+								else if(parent&&parent->get_pid()==22){
+									_b_tphoton_phi = parent->get_phi();
+									_b_tphoton_eta = parent->get_eta();
+									_b_tphoton_pT = parent->get_pt();
 								}
 								_tree->Fill();
 							}//vtx cuts
@@ -149,6 +166,18 @@ genfit::GFRaveVertex* RecoConversionEval::correctSecondaryVertex(genfit::GFRaveV
   return recoVertex;
 }
 
+TLorentzVector RecoConversionEval::reconstructPhoton(std::pair<PHGenFit::Track*,PHGenFit::Track*> recos){
+if (reco1&&reco2)
+  {
+    TLorentzVector tlv1();
+    tlv1.SetVectM(recos.first->getMom(),_kElectronRestM);
+    TLorentzVector tlv2();
+    tlv2.SetVectM(recos.second->getMom(),_kElectronRestM);
+    return new TLorentzVector(tlv1+tlv2);
+  }
+  else return NULL;
+}
+
 TLorentzVector* RecoConversionEval::reconstructPhoton(SvtxTrack* reco1,SvtxTrack* reco2){
 if (reco1&&reco2)
   {
@@ -160,6 +189,22 @@ if (reco1&&reco2)
     return new TLorentzVector(tlv1+tlv2);
   }
   else return NULL;
+}
+
+std::pair<PHGenFit::Track*,PHGenFit::Track*> RecoConversionEval::refitTracks(genfit::GFRaveVertex* vtx,SvtxTrack* reco1,SvtxTrack* reco2){
+	std::pair<PHGenFit::Track*,PHGenFit::Track*> r;
+  if(!vtx)
+  {
+    cerr<<"WARNING: No vertex to refit tracks"<<endl;
+    r.first=NULL;
+    r.second=NULL;
+
+  }
+  else{
+    r.first=_vertexer->refitTrack(vtx,reco1);
+    r.second=_vertexer->refitTrack(vtx,reco2);
+  }
+  return r;
 }
 
 bool RecoConversionEval::pairCuts(SvtxTrack* t1, SvtxTrack* t2)const{
@@ -190,8 +235,9 @@ bool RecoConversionEval::hitCuts(SvtxTrack* reco1, SvtxTrack* reco2)const {
 
 bool RecoConversionEval::vtxCuts(genfit::GFRaveVertex* vtxCan, SvtxTrack* t1, SvtxTrack *t2){
 	//TODO program the cuts invariant mass, pT
-	return vtxRadiusCut(vtxCan->getPos()) && vtxTrackRPhiCut(vtxCan->getPos(),t1)&&vtxTrackRPhiCut(vtxCan->getPos(),t2)&& 
-		vtxTrackRZCut(vtxCan->getPos(),t1)&&vtxTrackRZCut(vtxCan->getPos(),t2)&&vtxCan->getChi2()>_kVtxChi2Cut;
+	return vtxRadiusCut(vtxCan->getPos());
+	// && vtxTrackRPhiCut(vtxCan->getPos(),t1)&&vtxTrackRPhiCut(vtxCan->getPos(),t2)&& 
+		//vtxTrackRZCut(vtxCan->getPos(),t1)&&vtxTrackRZCut(vtxCan->getPos(),t2)&&vtxCan->getChi2()>_kVtxChi2Cut;
 }
 
 bool RecoConversionEval::vtxTrackRZCut(TVector3 recoVertPos, SvtxTrack* track){

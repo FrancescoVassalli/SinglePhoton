@@ -80,6 +80,10 @@ class RecoConversionEval : public SubsysReco {
 		float _b_photon_pT;
 		float _b_photon_eta;
 		float _b_photon_phi;
+		float _b_tphoton_m;
+		float _b_tphoton_pT;
+		float _b_tphoton_eta;
+		float _b_tphoton_phi;
 		bool _b_fake;
 		// I want these to be static constexpr
     // TODO confirm these numbers
