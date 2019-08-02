@@ -12,12 +12,13 @@ void generator(std::string filename, long nEvents){
   /*pythia set up*/
   Pythia pythiaengine;
   pythiaengine.readString("Beams:eCM = 200.");
-  pythiaengine.readString("promptphoton:all = on");
-  pythiaengine.readString("HardQCD:all = on");
-  pythiaengine.readString("PhaseSpace:pTHatMin = 3.");
+  pythiaengine.readString("SoftQCD:nonDiffractive = on");
+  pythiaengine.readString("SoftQCD:singleDiffractive = on");
+  pythiaengine.readString("SoftQCD:doubleDiffractive = on");
+  pythiaengine.readString("PhaseSpace:pTHatMin = 2.");
   pythiaengine.readString("Random::setSeed = on");
   pythiaengine.readString("Random::seed =0");
-  pythiaengine.readString("111:onMode = off"); ///pi0 won't decay
+  //pythiaengine.readString("111:onMode = off"); ///pi0 won't decay
   pythiaengine.init();
 
   for (int iEvent = 0; iEvent < nEvents; ++iEvent)

@@ -1,13 +1,12 @@
 #!/bin/csh 
 @ p = ( ${1} )
 #
-set OUT_LOCATION="/sphenix/user/vassalli/gammasample/"
-set PYTHIA_FILE=${OUT_LOCATION}pythiahep${p}.dat
+set OUT_LOCATION="/sphenix/user/vassalli/minBiasPythia/"
+set PYTHIA_FILE=${OUT_LOCATION}pythiaMinBiasHep${p}.dat
 #
-set SCRATCH_AREA="$_CONDOR_SCRATCH_DIR"                                                                                                              
+set SCRATCH_AREA="$_CONDOR_SCRATCH_DIR"                                                                                               
 #
 set SOURCE_PHOTONMAKER="/direct/phenix+u/vassalli/sphenix/single/pythia/generator"
-set BURNER="condor/after_DST.C"
 #
 source /phenix/u/vassalli/.cshrc
 mkdir $SCRATCH_AREA/fran_single_photons
