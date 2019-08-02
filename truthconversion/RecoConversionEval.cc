@@ -119,7 +119,7 @@ int RecoConversionEval::process_event(PHCompositeNode *topNode) {
 									photon = reconstructPhoton(refit_tracks);
 								}
 								else{
-									photon = reconstructPhoton(thisTrack,jter->second);
+									photon = reconstructPhoton(thisTrack,jter->second);	
 								}
 								_b_photon_m = photon->Dot(*photon);
 								_b_photon_pT = photon->Pt();
