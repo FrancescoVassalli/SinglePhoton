@@ -49,8 +49,8 @@ void makeFactory(TTree* signalTree,std::string outfile,std::string factoryname)
   string tCutInitializer = track_pT_cut;
   TCut preTraingCuts(tCutInitializer.c_str());
   factory->PrepareTrainingAndTestTree(preTraingCuts,"nTrain_Regression=0:nTest_Regression=0");
-  factory->BookMethod(Types::kKNN,"kNN16","VarTransform=G:nkNN=16");
-  factory->BookMethod(Types::kKNN,"kNN8","VarTransform=G:nkNN=8");
+  factory->BookMethod(Types::kKNN,"kNN14","VarTransform=G:nkNN=16");
+  factory->BookMethod(Types::kKNN,"kNN12","VarTransform=G:nkNN=8");
   //factory->BookMethod( Types::kPDERS, "PDERS", "KernelEstimator=Teepee:NEventsMin=120:NEventsMax=210:VarTransform=G(_V0_,_V1_,_V3_,_V5_)");
   //factory->BookMethod(Types::kMLP,"MLP_ANN2","HiddenLayers=500,6");
   //factory->BookMethod(Types::kMLP,"MLP_ANN","HiddenLayers=5");
