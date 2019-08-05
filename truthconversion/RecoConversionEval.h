@@ -64,7 +64,7 @@ class RecoConversionEval : public SubsysReco {
     ///Adds the {@link PHGenFit::Track}s into a TLorentVector
     TLorentzVector* reconstructPhoton(std::pair<PHGenFit::Track*,PHGenFit::Track*> recos);
 		inline bool detaCut(float eta1, float eta2) const{
-			return (eta1>eta2?eta1-eta2:eta2-eta1)<_kPolarCut;
+			return (eta1>eta2?eta1-eta2:eta2-eta1)<_kDetaCut;
 		}
 
 		bool pairCuts(SvtxTrack* t1, SvtxTrack* t2)const;
@@ -92,18 +92,21 @@ class RecoConversionEval : public SubsysReco {
 		float _b_tphoton_eta;
 		float _b_tphoton_phi;
 		bool _b_fake;
+    bool _b_refit;
 		// I want these to be static constexpr
     // TODO confirm these numbers
 		unsigned int _kNSiliconLayer=7;
-		float _kEMProbCut=.5;
-		float _kPolarCut=.1;
-		float _kFirstHit=3;
+
+		float _kTrackPtCut=.6; 
+		float _kEMProbCut=.0;
+		float _kDetaCut=.008;
+    //TODO adjust first hit cuts
+		float _kFirstHit=1;
 		float _kFirstHitStrict=1;
-		float _kTrackPtCut=.4; //MeV
-		double _kApprochCut=.2;
+		double _kApprochCut=30;
     //these are guesses 
     float _kVtxRPhiCut=.4;
-    float _kVtxRCut=1.;
+    float _kVtxRCut=1.8;
     float _kVtxRZCut=.4;
     float _kVtxChi2Cut=.4;
 		float _kElectronRestM=.5109989461;
