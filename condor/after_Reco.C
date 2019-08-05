@@ -27,8 +27,8 @@ int after_Reco(std::string infile = "XjPhi3_pT5_98_dst.root",std::string outfile
   hitsin->fileopen( infile );
   se->registerInputManager(hitsin);
  
-  string tmvapath="/direct/phenix+u/vassalli/sphenix/single/Training/condorout/training/weights/vtxFactory_PDERS.weights.xml";
-  string tmvaname="PDERS";
+  string tmvapath="/direct/phenix+u/vassalli/sphenix/single/Training/condorout/training/weights/vtxFactory_kNN14.weights.xml";
+  string tmvaname="kNN14";
   RecoConversionEval *rCE = new RecoConversionEval(outfile,tmvaname,tmvapath);
   se->registerSubsystem( rCE );
 
