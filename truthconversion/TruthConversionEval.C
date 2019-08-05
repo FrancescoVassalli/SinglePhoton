@@ -148,20 +148,17 @@ int TruthConversionEval::InitRun(PHCompositeNode *topNode)
     //_signalCutTree->Branch("ttrack_pT", &_b_ttrack_pT);
     _signalCutTree->Branch("approach_dist", &_b_approach);
     _signalCutTree->Branch("vtx_radius", &_b_vtx_radius);
+    _signalCutTree->Branch("tvtx_radius", &_b_tvtx_radius);
     _signalCutTree->Branch("vtx_chi2", &_b_vtx_chi2);
     //_signalCutTree->Branch("vtxTrackRZ_dist", &_b_vtxTrackRZ_dist);
     //_signalCutTree->Branch("vtxTrackRPhi_dist", &_b_vtxTrackRPhi_dist);
     _signalCutTree->Branch("photon_m", &_b_photon_m);
-    _signalCutTree->Branch("rephoton_m", &_b_rephoton_m);
-    //_signalCutTree->Branch("tphoton_m", &_b_tphoton_m);
     _signalCutTree->Branch("photon_pT", &_b_photon_pT);
+    _signalCutTree->Branch("tphoton_pT", &_b_tphoton_pT);
     _signalCutTree->Branch("cluster_prob", &_b_cluster_prob);
     //_signalCutTree->Branch("nCluster", &_b_nCluster);
     _signalCutTree->Branch("cluster_dphi", &_b_cluster_dphi);
     _signalCutTree->Branch("cluster_deta", &_b_cluster_deta);
-    _signalCutTree->Branch("refitdiffx",&_b_refitdiffx);
-    _signalCutTree->Branch("refitdiffy",&_b_refitdiffy);
-    _signalCutTree->Branch("refitdiffz",&_b_refitdiffz);
   }
   return 0;
 }
@@ -298,34 +295,38 @@ void TruthConversionEval::numUnique(std::map<int,Conversion> *mymap=NULL,SvtxTra
           case 2: //there are 2 reco tracks
             {
               if(_kMakeTTree){
+                //record pair variavles
                 _b_track_deta = i->second.trackDEta();
                 _b_track_dphi = i->second.trackDPhi();
                 _b_track_dlayer = i->second.trackDLayer(_clusterMap);
                 _b_track_layer = i->second.firstLayer(_clusterMap);
+                _b_approach = i->second.approachDistance();
+                _b_track_dca = i->second.minDca();
+                //record pT info
                 _b_track_pT = i->second.minTrackpT();
                 if(tlv_electron.Pt()>tlv_positron.Pt()) _b_ttrack_pT = tlv_positron.Pt();
                 else _b_ttrack_pT = tlv_electron.Pt();
-                _b_approach = i->second.approachDistance();
-                _b_track_dca = i->second.minDca();
+                //record initial photon info
                 TLorentzVector* recoPhoton = i->second.getRecoPhoton();
-                PHG4Particle* truthphoton = i->second.getTruthPhoton(_truthinfo);
-                TLorentzVector tlv_tphoton;
-                if(truthphoton){
-                  tlv_tphoton.SetPxPyPzE(truthphoton->get_px(),truthphoton->get_py(),truthphoton->get_pz(),truthphoton->get_e());
-                  if (recoPhoton)
-                  {
-                    _b_photon_m=recoPhoton->Dot(*recoPhoton);
-                    _b_tphoton_m=tlv_tphoton.Dot(tlv_tphoton);
-                    _b_photon_pT=recoPhoton->Pt();
-                  }
+                if (recoPhoton)
+                {
+                  _b_photon_m=recoPhoton->Dot(*recoPhoton);
+                  _b_photon_pT=recoPhoton->Pt();
                 }
-                else{ //photon was not reconstructed
+                else{//photon was not reconstructed
                   _b_photon_m =-1;
-                  _b_tphoton_m =-1;
                   _b_photon_pT=-1;
                 }
+                PHG4Particle* truthphoton = i->second.getTruthPhoton(_truthinfo);
+                if(truthphoton){
+                  TLorentzVector tlv_tphoton;
+                  tlv_tphoton.SetPxPyPzE(truthphoton->get_px(),truthphoton->get_py(),truthphoton->get_pz(),truthphoton->get_e());
+                  _b_tphoton_pT=tlv_tphoton.Pt();
+                }
+                else{//no truth matched photon
+                  _b_tphoton_pT =-1;
+                }
                 //TODO check Conversion operations for ownership transfer->memleak due to lack of delete
-                pair<TLorentzVector*, TLorentzVector*> reco_tlvs = i->second.getRecoTlvs();
                 cout<<"vertexing"<<endl;
                 genfit::GFRaveVertex* recoVert = i->second.getSecondaryVertex(_vertexer);
                 recoVert = i->second.correctSecondaryVertex(_regressor);
@@ -335,19 +336,7 @@ void TruthConversionEval::numUnique(std::map<int,Conversion> *mymap=NULL,SvtxTra
                 {
                   cout<<"finding refit_gf_tracks"<<endl;
                   std::pair<PHGenFit::Track*,PHGenFit::Track*> refit_phgf_tracks=i->second.refitTracks(_vertexer);
-                  //TODO check repetive refitting and revterexing 
-                  cout<<"here"<<endl;
-                  pair<TLorentzVector*, TLorentzVector*> refit_reco_tlvs = i->second.getRefitRecoTlvs();
-                  if(refit_reco_tlvs.first&&refit_reco_tlvs.second){
-                    _b_refitdiffx = reco_tlvs.first->X()-refit_reco_tlvs.first->X();
-                    _b_refitdiffy = reco_tlvs.first->Y()-refit_reco_tlvs.first->Y();
-                    _b_refitdiffz = reco_tlvs.first->Z()-refit_reco_tlvs.first->Z();
-                  }
-                  else{
-                    _b_refitdiffx = -99.;
-                    _b_refitdiffy = -99.;
-                    _b_refitdiffz = -99.;
-                  }
+                  //TODO check repetive refitting and revterexing this is issue #23
                   if (ph_gf_tracks.first&&refit_phgf_tracks.first)
                   {
                     cout<<"Good Track refit with original:\n";ph_gf_tracks.first->get_mom().Print();cout<<"\n\t and refit:\n";
@@ -361,7 +350,7 @@ void TruthConversionEval::numUnique(std::map<int,Conversion> *mymap=NULL,SvtxTra
                     refit_phgf_tracks.second->get_mom().Print();
                   }
                   recoPhoton = i->second.getRefitRecoPhoton();
-                  if(recoPhoton) _b_rephoton_m=recoPhoton->Dot(*recoPhoton);
+                  if(recoPhoton) _b_photon_pT=recoPhoton->Pt();
                   TVector3 recoVertPos = recoVert->getPos();
                   _b_vtx_radius = sqrt(recoVertPos.x()*recoVertPos.x()+recoVertPos.y()*recoVertPos.y());
                   _b_tvtx_radius = sqrt(vtx->get_x()*vtx->get_x()+vtx->get_y()*vtx->get_y());

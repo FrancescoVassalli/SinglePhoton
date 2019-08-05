@@ -137,8 +137,7 @@ class TruthConversionEval: public SubsysReco
     float _b_vtxTrackRPhi_dist;
     float _b_vtx_chi2;
     float _b_photon_m;
-    float _b_rephoton_m;
-    float _b_tphoton_m;
+    float _b_tphoton_pT;
     float _b_photon_pT;
     float _b_cluster_prob;
     float _b_track_dphi;
