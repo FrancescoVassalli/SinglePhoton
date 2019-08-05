@@ -46,7 +46,7 @@ Log          = /direct/phenix+u/vassalli/sphenix/single/condor_logs/log.m.$(Proc
 Notify_user     = frva5829@colorado.edu
 
 
-request_memory = 3000M
+request_memory = 2000M
 # This should be the last command and tells condor to queue the
 # job.  If a number is placed after the command (i.e. Queue 15)
 # then the job will be submitted N times.  Use the $(Process)
