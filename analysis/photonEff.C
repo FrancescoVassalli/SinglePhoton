@@ -125,7 +125,7 @@ void testCuts(TChain* ttree,TFile* out_file){
   ttree->SetBranchAddress("cluster_prob",&prob);
   ttree->SetBranchAddress("track_layer",&layer);
   
-  TH1F *layerDist = new TH1F("track_layer","",31,-.5,30.5);
+  TH1F *layerDist = new TH1F("layer","",31,-.5,30.5);
   TH1F *probDist = new TH1F("clust_prob","",30,-.5,1.);
   layerDist->Sumw2();
   probDist->Sumw2();
@@ -139,8 +139,9 @@ void testCuts(TChain* ttree,TFile* out_file){
     if(dphi<0)badClusCount++;
     layerDist->Fill(layer);
     probDist->Fill(prob);
+    cout<<layer<<'\n';
   }
-  layerDist->Scale(1./ttree->GetEntries());
+  //layerDist->Scale(1./ttree->GetEntries());
   cout<<"Signal rejection through layer cut= "<<(float)badLayCount/ttree->GetEntries()<<endl;
   cout<<"error= "<<sqrt((float)badLayCount)/ttree->GetEntries()<<endl;
   cout<<"Signal rejection through clus cut= "<<(float)badClusCount/ttree->GetEntries()<<endl;
@@ -187,7 +188,7 @@ void photonEff()
   cout<<"Total events= "<<ttree->GetEntries()<<'\n';
   TChain *ttree2 = handleFile(treePath,treeExtension,"vtxingTree",nFiles);
   //makephotonM(ttree,out_file);
-  makepTEff(ttree,out_file);
+//  makepTEff(ttree,out_file);
   testCuts(ttree,out_file);
   //makeVtxR(ttree2,out_file);
   //makeRefitDist(ttree,out_file);
