@@ -94,7 +94,7 @@ int RecoConversionEval::process_event(PHCompositeNode *topNode) {
 	/*the is not optimized but is just a nlogn process*/
 	for ( SvtxTrackMap::Iter iter = _allTracks->begin(); iter != _allTracks->end(); ++iter) {
 		//I want to now only check e tracks so check the clusters of the |charge|=1 tracks
-		if (abs(iter->second->get_charge())==1&&iter->second->get_pt()>_kTrackPtCut) //TODO dca cut
+		if (abs(iter->second->get_charge())==1&&iter->second->get_pt()>_kTrackPtCut) //TODO layer cut
 		{
 			SvtxTrack* thisTrack = iter->second;
 			RawCluster* bestCluster= _mainClusterContainer->getCluster(thisTrack->get_cal_cluster_id(SvtxTrack::CAL_LAYER(1)));
