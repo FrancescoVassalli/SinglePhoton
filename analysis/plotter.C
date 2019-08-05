@@ -30,6 +30,16 @@ void photon_m(TFile* thisFile){
 	tc->SaveAs("plots/gamma_dm_eff.pdf");	
 }
 
+void pTEff(TFile *thisFile){
+	gStyle->SetOptStat(0);
+	TH1F *plot  = (TH1F*) thisFile->Get("#frac{#Delta#it{p}^{T}}{#it{p}_{#it{truth}}^{T}}");
+	TCanvas* tc = new TCanvas();
+	tc->Draw();
+	plot->SetXTitle(plot->GetName());
+	plot->SetYTitle("dN/dN #frac{#Delta#it{p}^{T}}{#it{p}_{#it{truth}}^{T}}");
+	plot->Draw("e1");
+}
+
 void recoRefit(TFile* thisFile){
 	gStyle->SetOptStat(0);
 	std::vector<TH1F*> plots;
@@ -58,8 +68,9 @@ void recoRefit(TFile* thisFile){
 
 void plotter(){
 	TFile *thisFile = new TFile("effplots.root","READ");
-	photon_m(thisFile);
-	recoRefit(thisFile);
+	//photon_m(thisFile);
+	//recoRefit(thisFile);
+	pTEff(thisFile);
 	//TFile *backFile = new TFile("backplots.root","READ");
 
 }
