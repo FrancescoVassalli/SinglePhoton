@@ -91,7 +91,7 @@ void makepTEff(TChain* ttree,TFile* out_file){
   ttree->SetBranchAddress("photon_pT",&pT);
   ttree->SetBranchAddress("tphoton_pT",&tpT);
   
-  TH1F *pTeffPlot = new TH1F("#frac{#Delta#it{p}^{T}}{#it{p}_{#it{truth}}^{T}}","",40,-10,10);
+  TH1F *pTeffPlot = new TH1F("#frac{#Delta#it{p}^{T}}{#it{p}_{#it{truth}}^{T}}","",40,-2,2);
   pTeffPlot->Sumw2();
 
   for (int event = 0; event < ttree->GetEntries(); ++event)
