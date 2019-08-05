@@ -60,7 +60,6 @@ class TruthConversionEval: public SubsysReco
 
   private:
     bool doNodePointers(PHCompositeNode* topNode);
-    int get_track_pid(SvtxTrack* track)const;
     SvtxVertex* get_primary_vertex(PHCompositeNode* topNode)const;
     /** helper function for process_event
      * fills the member fields with information from the conversions 
@@ -103,6 +102,7 @@ class TruthConversionEval: public SubsysReco
     int   _b_nCluster; 
     int _bb_track1_pid;
     int _bb_track2_pid;
+    int _bb_parent_pid;
     float _b_cluster_dphi ;
     float _b_cluster_deta;
     int   _bb_nCluster; 
