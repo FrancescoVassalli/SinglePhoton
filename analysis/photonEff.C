@@ -120,32 +120,49 @@ void makepTEff(TChain* ttree,TFile* out_file){
 void testCuts(TChain* ttree,TFile* out_file){
   float dphi;
   float prob;
+  float track_pT;
+  float deta;
   int layer;
+  int dlayer;
   ttree->SetBranchAddress("cluster_dphi",&dphi);
   ttree->SetBranchAddress("cluster_prob",&prob);
   ttree->SetBranchAddress("track_layer",&layer);
+  ttree->SetBranchAddress("track_dlayer",&dlayer);
+  ttree->SetBranchAddress("track_pT",&track_pT);
+  ttree->SetBranchAddress("track_deta",&deta);
   
   TH1F *layerDist = new TH1F("layer","",16,-.5,15.5);
   TH1F *probDist = new TH1F("clust_prob","",30,-.5,1.);
+  TH1F *deta_plot = new TH1F("deta","",30,-.5,.1);
+  TH1F *dlayer_plot = new TH1F("dlayer","",11,-.5,10.5);
   layerDist->Sumw2();
   probDist->Sumw2();
   unsigned badLayCount=0;
   unsigned badClusCount=0;
+  unsigned bigDetaCount=0;
 
   for (int event = 0; event < ttree->GetEntries(); ++event)
   {
     ttree->GetEvent(event);
     if(layer==0)badLayCount++;
-    if(dphi<0)badClusCount++;
-    layerDist->Fill(layer);
-    probDist->Fill(prob);
-    cout<<layer<<'\n';
+    if(dphi<0&&track_pT>.6){
+      badClusCount++;
+    }
+    if(track_pT>.6&&dphi>=0){
+      layerDist->Fill(layer);
+      probDist->Fill(prob);
+      deta_plot->Fill(deta);
+      dlayer_plot->Fill(TMath::Abs(dlayer));
+      if(deta>.0082)bigDetaCount++;
+    }
   }
   layerDist->Scale(1./ttree->GetEntries());
   cout<<"Signal rejection through layer cut= "<<(float)badLayCount/ttree->GetEntries()<<endl;
   cout<<"error= "<<sqrt((float)badLayCount)/ttree->GetEntries()<<endl;
   cout<<"Signal rejection through clus cut= "<<(float)badClusCount/ttree->GetEntries()<<endl;
   cout<<"error= "<<sqrt((float)badClusCount)/ttree->GetEntries()<<endl;
+  cout<<"Signal rejection through deta cut= "<<(float)bigDetaCount/ttree->GetEntries()<<endl;
+  cout<<"error= "<<sqrt((float)bigDetaCount)/ttree->GetEntries()<<endl;
   out_file->Write();
 }
 void makeRefitDist(TChain* ttree, TFile *out_file){
