@@ -2,6 +2,7 @@
 using namespace std;
 
 #include "TFile.h"
+#include "Scalar.h"
 #include "TTree.h"
 #include "TChain.h"
 #include "TLegend.h"
@@ -88,21 +89,62 @@ void makeVtxR(TChain* ttree,TFile* out_file){
 void makepTEff(TChain* ttree,TFile* out_file){
   float pT;
   float tpT;
+  float track_pT;
   ttree->SetBranchAddress("photon_pT",&pT);
   ttree->SetBranchAddress("tphoton_pT",&tpT);
+  ttree->SetBranchAddress("track_pT",&track_pT);
   
   TH1F *pTeffPlot = new TH1F("#frac{#Delta#it{p}^{T}}{#it{p}_{#it{truth}}^{T}}","",40,-2,2);
   TH2F *pTefffuncPlot = new TH2F("pT_resolution_to_truthpt","",40,1,35,40,-1.5,1.5);
+  TH1F *trackpTDist = new TH1F("truthpt","",40,0,35);
   pTeffPlot->Sumw2();
+  pTefffuncPlot->Sumw2();
+  trackpTDist->Sumw2();
+  unsigned lowpTCount=0;
 
   for (int event = 0; event < ttree->GetEntries(); ++event)
   {
     ttree->GetEvent(event);
     pTeffPlot->Fill((pT-tpT)/tpT);
     pTefffuncPlot->Fill(tpT,(pT-tpT)/tpT);
+    trackpTDist->Fill(track_pT); 
+    if(tpT<.6)lowpTCount++;
   }
   pTeffPlot->Scale(1./ttree->GetEntries(),"width");
   pTefffuncPlot->Scale(1./ttree->GetEntries(),"width");
+  trackpTDist->Scale(1./ttree->GetEntries(),"width");
+  cout<<"Signal rejection through pT cut= "<<(float)lowpTCount/ttree->GetEntries()<<endl;
+  cout<<"Signal rejection through pT cut= "<<sqrt((float)lowpTCount)/ttree->GetEntries()<<endl;
+  out_file->Write();
+}
+void testCuts(TChain* ttree,TFile* out_file){
+  float dphi;
+  float prob;
+  int layer;
+  ttree->SetBranchAddress("cluster_dphi",&dphi);
+  ttree->SetBranchAddress("cluster_prob",&prob);
+  ttree->SetBranchAddress("track_layer",&layer);
+  
+  TH1F *layerDist = new TH1F("track_layer","",31,-.5,30.5);
+  TH1F *probDist = new TH1F("clust_prob","",30,-.5,1.);
+  layerDist->Sumw2();
+  probDist->Sumw2();
+  unsigned badLayCount=0;
+  unsigned badClusCount=0;
+
+  for (int event = 0; event < ttree->GetEntries(); ++event)
+  {
+    ttree->GetEvent(event);
+    if(layer==0)badLayCount++;
+    if(dphi<0)badClusCount++;
+    layerDist->Fill(layer);
+    probDist->Fill(prob);
+  }
+  layerDist->Scale(1./ttree->GetEntries());
+  cout<<"Signal rejection through layer cut= "<<(float)badLayCount/ttree->GetEntries()<<endl;
+  cout<<"error= "<<sqrt((float)badLayCount)/ttree->GetEntries()<<endl;
+  cout<<"Signal rejection through clus cut= "<<(float)badClusCount/ttree->GetEntries()<<endl;
+  cout<<"error= "<<sqrt((float)badClusCount)/ttree->GetEntries()<<endl;
   out_file->Write();
 }
 void makeRefitDist(TChain* ttree, TFile *out_file){
@@ -142,9 +184,11 @@ void photonEff()
   unsigned int nFiles=100;
   TFile *out_file = new TFile("effplots.root","RECREATE");
   TChain *ttree = handleFile(treePath,treeExtension,"cutTreeSignal",nFiles);
+  cout<<"Total events= "<<ttree->GetEntries()<<'\n';
   TChain *ttree2 = handleFile(treePath,treeExtension,"vtxingTree",nFiles);
   //makephotonM(ttree,out_file);
   makepTEff(ttree,out_file);
+  testCuts(ttree,out_file);
   //makeVtxR(ttree2,out_file);
   //makeRefitDist(ttree,out_file);
 }
