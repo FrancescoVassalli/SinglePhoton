@@ -92,7 +92,7 @@ void makepTEff(TChain* ttree,TFile* out_file){
   ttree->SetBranchAddress("tphoton_pT",&tpT);
   
   TH1F *pTeffPlot = new TH1F("#frac{#Delta#it{p}^{T}}{#it{p}_{#it{truth}}^{T}}","",40,-2,2);
-  TH2F *pTefffuncPlot = new TH2F("pT_resolution_to_truthpt","",40,-1.5,1.5,40,1,35);
+  TH2F *pTefffuncPlot = new TH2F("pT_resolution_to_truthpt","",40,1,35,40,-1.5,1.5);
   pTeffPlot->Sumw2();
 
   for (int event = 0; event < ttree->GetEntries(); ++event)

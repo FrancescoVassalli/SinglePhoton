@@ -40,6 +40,17 @@ void pTEff(TFile *thisFile){
 	plot->Draw("e1");
 }
 
+void pTEff2D(TFile *thisFile){
+	gStyle->SetOptStat(0);
+	TH2F *plot  = (TH2F*) thisFile->Get("pT_resolution_to_truthpt");
+	TCanvas* tc = new TCanvas();
+	tc->Draw();
+	plot->SetXTitle("#{p}^{T}_{#it{truth}}");
+	plot->SetYTitle("#frac{#Delta#it{p}^{T}}{#it{p}_{#it{truth}}^{T}}");
+	plot->SetZTitle("dN/dN #Delta#it{p}^{T}");
+	plot->Draw("colz");
+}
+
 void recoRefit(TFile* thisFile){
 	gStyle->SetOptStat(0);
 	std::vector<TH1F*> plots;
@@ -71,6 +82,7 @@ void plotter(){
 	//photon_m(thisFile);
 	//recoRefit(thisFile);
 	pTEff(thisFile);
+	pTEff2D(thisFile);
 	//TFile *backFile = new TFile("backplots.root","READ");
 
 }
