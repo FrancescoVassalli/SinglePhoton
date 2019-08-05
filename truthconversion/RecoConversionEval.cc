@@ -99,7 +99,7 @@ int RecoConversionEval::process_event(PHCompositeNode *topNode) {
 			SvtxTrack* thisTrack = iter->second;
 			RawCluster* bestCluster= _mainClusterContainer->getCluster(thisTrack->get_cal_cluster_id(SvtxTrack::CAL_LAYER(1)));
 			//TODO what if no cluster is found?
-			if(bestCluster&&bestCluster->get_prob()>_kEMProbCut){
+			if(bestCluster&&bestCluster->get_prob()>=_kEMProbCut){
 				//loop over the following tracks
 				for (SvtxTrackMap::Iter jter = iter; jter != _allTracks->end(); ++jter)
 				{
@@ -108,7 +108,7 @@ int RecoConversionEval::process_event(PHCompositeNode *topNode) {
 					{
 						RawCluster* nextCluster= _mainClusterContainer->getCluster(jter->second->get_cal_cluster_id(SvtxTrack::CAL_LAYER(1)));
 						//what if no cluster is found?
-						if(nextCluster&&nextCluster->get_prob()>_kEMProbCut&&pairCuts(thisTrack,jter->second)){
+						if(nextCluster&&nextCluster->get_prob()>=_kEMProbCut&&pairCuts(thisTrack,jter->second)){
 							genfit::GFRaveVertex* vtxCan = _vertexer->findSecondaryVertex(thisTrack,jter->second);
 							vtxCan=correctSecondaryVertex(vtxCan,thisTrack,jter->second);
 							if (vtxCan&&vtxCuts(vtxCan))

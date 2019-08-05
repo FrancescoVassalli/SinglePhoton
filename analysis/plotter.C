@@ -51,6 +51,36 @@ void pTEff2D(TFile *thisFile){
 	plot->Draw("colz");
 }
 
+void layer(TFile *thisFile){
+	gStyle->SetOptStat(0);
+	TH1F *plot  = (TH1F*) thisFile->Get("layer");
+	TCanvas* tc = new TCanvas();
+	tc->Draw();
+	plot->SetXTitle("Index of First Tracking Layer");
+	plot->SetYTitle("dN/dN");
+	plot->Draw("e1");
+}
+
+void deta(TFile *thisFile){
+	gStyle->SetOptStat(0);
+	TH1F *plot  = (TH1F*) thisFile->Get("deta");
+	TCanvas* tc = new TCanvas();
+	tc->Draw();
+	plot->SetXTitle("#DeltaEta");
+	plot->SetYTitle("dN/dN");
+	plot->Draw("e1");
+}
+
+void dlayer(TFile *thisFile){
+	gStyle->SetOptStat(0);
+	TH1F *plot  = (TH1F*) thisFile->Get("dlayer");
+	TCanvas* tc = new TCanvas();
+	tc->Draw();
+	plot->SetXTitle("Index of First Tracking Layer");
+	plot->SetYTitle("dN/dN");
+	plot->Draw("e1");
+}
+
 void recoRefit(TFile* thisFile){
 	gStyle->SetOptStat(0);
 	std::vector<TH1F*> plots;
@@ -81,8 +111,9 @@ void plotter(){
 	TFile *thisFile = new TFile("effplots.root","READ");
 	//photon_m(thisFile);
 	//recoRefit(thisFile);
-	pTEff(thisFile);
-	pTEff2D(thisFile);
+	//pTEff(thisFile);
+	//pTEff2D(thisFile);
+	layer(thisFile);
 	//TFile *backFile = new TFile("backplots.root","READ");
 
 }
