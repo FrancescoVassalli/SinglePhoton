@@ -141,7 +141,7 @@ void testCuts(TChain* ttree,TFile* out_file){
     probDist->Fill(prob);
     cout<<layer<<'\n';
   }
-  //layerDist->Scale(1./ttree->GetEntries());
+  layerDist->Scale(1./ttree->GetEntries());
   cout<<"Signal rejection through layer cut= "<<(float)badLayCount/ttree->GetEntries()<<endl;
   cout<<"error= "<<sqrt((float)badLayCount)/ttree->GetEntries()<<endl;
   cout<<"Signal rejection through clus cut= "<<(float)badClusCount/ttree->GetEntries()<<endl;
