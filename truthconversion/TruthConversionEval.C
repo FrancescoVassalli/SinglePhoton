@@ -107,6 +107,7 @@ int TruthConversionEval::InitRun(PHCompositeNode *topNode)
     _pairBackTree->Branch("track_deta", &_bb_track_deta);
     _pairBackTree->Branch("track2_pid", &_bb_track2_pid);
     _pairBackTree->Branch("track1_pid", &_bb_track1_pid);
+    _pairBackTree->Branch("parent_pid", &_bb_parent_pid);
     _pairBackTree->Branch("track_dphi", &_bb_track_dphi);
     _pairBackTree->Branch("track_dlayer",&_bb_track_dlayer);
     _pairBackTree->Branch("approach_dist", &_bb_approach);
@@ -214,7 +215,7 @@ int TruthConversionEval::process_event(PHCompositeNode *topNode)
   //h is for hadronic e is for EM
   std::map<int,Conversion> hbackgroundMap;
   std::map<int,Conversion> ebackgroundMap;
-  std::vector<SvtxTrack*> backgroundTracks;
+  std::vector<PHG4Particle*> backgroundTracks;
   for ( PHG4TruthInfoContainer::ConstIterator iter = range.first; iter != range.second; ++iter ) {
     PHG4Particle* g4particle = iter->second;
     PHG4Particle* parent =_truthinfo->GetParticle(g4particle->get_parent_id());
@@ -250,15 +251,13 @@ int TruthConversionEval::process_event(PHCompositeNode *topNode)
         else (mapConversions[vtx->get_id()]).setSourceId(0);//or it is from the G4 generator?
       }
       else if(_kMakeTTree){//not a conversion
-        SvtxTrack *testTrack = trackeval->best_track_from(g4particle);
-        backgroundTracks.push_back(testTrack);
+        backgroundTracks.push_back(g4particle);
       }//make tree
     }// not primary 
     else if(_kMakeTTree){ //is primary therefore not a conversion 
       embedID=get_embed(g4particle,_truthinfo);
       //cout<<"primary particle"<<endl;
-      SvtxTrack *testTrack = trackeval->best_track_from(g4particle);
-      backgroundTracks.push_back(testTrack);
+      backgroundTracks.push_back(g4particle);
     }//make tree
   }//truth particle loop
   //pass the map to this helper method which fills the fields for the TTree 
@@ -443,65 +442,86 @@ void TruthConversionEval::numUnique(std::map<int,Conversion> *mymap=NULL,SvtxTra
 }
 
 //only call if _kMakeTTree is true
-void TruthConversionEval::processTrackBackground(std::vector<SvtxTrack*> *v_tracks,TrkrClusterContainer* clusterMap){
+void TruthConversionEval::processTrackBackground(std::vector<PHG4Particle*> *v_tracks,SvtxTrackEval* trackeval){
   Conversion pairMath;
   float lastpT=-1.;
   unsigned nNullTrack=0;
   cout<<"The total possible background track count is "<<v_tracks->size()<<'\n';
-  for (std::vector<SvtxTrack*>::iterator iTrack = v_tracks->begin(); iTrack != v_tracks->end(); ++iTrack) {
-    //if(!*iTrack||TMath::Abs((*iTrack)->get_eta())>1.1||(*iTrack)->get_pt()!=lastpT)continue;
+  for (std::vector<PHG4Particle*>::iterator iTruthTrack = v_tracks->begin(); iTruthTrack != v_tracks->end(); ++iTruthTrack) {
+    //get the SvtxTrack it must not be NULL
+      nNullTrack++;
+      continue;
+    }
+    SvtxTrack* iTrack = trackeval->best_track_from(iTruthTrack);
     if(!*iTrack){
       nNullTrack++;
       continue;
     }
-    if(TMath::Abs((*iTrack)->get_eta())>1.1||(*iTrack)->get_pt()==lastpT)continue;
+
+    if(TMath::Abs((*iTrack)->get_eta())>1.1||(*iTrack)->get_pt()==lastpT)continue; //TODO this skips duplicate tracks but why are they there in the first place?
     lastpT=(*iTrack)->get_pt();
     cout<<"\t pT="<<lastpT<<'\n';
+
     auto temp_key_it=(*iTrack)->begin_cluster_keys();//key iterator to first cluster
     if(temp_key_it!=(*iTrack)->end_cluster_keys()){//if the track has clusters
-      TrkrCluster* temp_cluster = clusterMap->findCluster(*temp_key_it);//get the cluster 
+      TrkrCluster* temp_cluster = _clusterMap->findCluster(*temp_key_it);//get the cluster 
       if(temp_cluster) _bb_track_layer = TrkrDefs::getLayer(temp_cluster->getClusKey());//if there is a cluster record its layer
       else _bb_track_layer=-1;
     }
+    //record track info
     _bb_track_dca = (*iTrack)->get_dca();
     _bb_track_pT = (*iTrack)->get_pt();
+    //record the EMCal cluster info
     auto cluster1 = _mainClusterContainer->getCluster((*iTrack)->get_cal_cluster_id(SvtxTrack::CAL_LAYER(1)));
     if(cluster1) _bb_cluster_prob= cluster1->get_prob();
     else _bb_cluster_prob=-1;
-    for(std::vector<SvtxTrack*>::iterator jTrack =std::next(iTrack,1);jTrack!=v_tracks->end(); ++jTrack){//posible bias by filling the track level variables with iTrack instead of min(iTrack,jTrack)
+    //pair with other tracks
+    for(std::vector<PHG4Particle*>::iterator jTruthTrack =std::next(iTruthTrack,1);jTrack!=v_tracks->end(); ++jTruthTrack){//posible bias by filling the track level variables with iTrack instead of min(iTrack,jTrack)
+      if(!*jTruthTrack) continue;
+      SvtxTrack* jTrack = trackeval->best_track_from(jTruthTrack);
       if(!*jTrack||TMath::Abs((*jTrack)->get_eta())>1.1)continue;
+      //record pair geometry
       _bb_track_deta = pairMath.trackDEta((*iTrack),(*jTrack));
       _bb_track_dphi = pairMath.trackDPhi((*iTrack),(*jTrack));
       _bb_track_dlayer = pairMath.trackDLayer(_clusterMap,(*iTrack),(*jTrack));
       _bb_approach = pairMath.approachDistance((*iTrack),(*jTrack));
+      //record second EMCal cluster
       auto cluster2 = _mainClusterContainer->getCluster((*iTrack)->get_cal_cluster_id(SvtxTrack::CAL_LAYER(1)));
+      //if the EMCal clusters can be found record their pair geometry 
       if (cluster2&&cluster1)
       {
-        if(cluster2->get_id()!=cluster1->get_id())_bb_nCluster = 2;
-        else _bb_nCluster = 1;
-        _bb_cluster_dphi=fabs(cluster1->get_phi()-cluster2->get_phi());
-        TVector3 etaCalc(cluster1->get_x(),cluster1->get_y(),cluster1->get_z());
-        float eta1 = etaCalc.PseudoRapidity();
-        etaCalc.SetXYZ(cluster2->get_x(),cluster2->get_y(),cluster2->get_z());
-        _bb_cluster_deta=fabs(eta1-etaCalc.PseudoRapidity());
-        _bb_track1_pid = get_track_pid(*iTrack);
-        _bb_track2_pid = get_track_pid(*jTrack);
+        //if the two clusters are unique calculate the values 
+        if(cluster2->get_id()!=cluster1->get_id())
+          {
+            _bb_nCluster = 2;
+            _bb_cluster_dphi=fabs(cluster1->get_phi()-cluster2->get_phi());
+            TVector3 etaCalc(cluster1->get_x(),cluster1->get_y(),cluster1->get_z());
+            float eta1 = etaCalc.PseudoRapidity();
+            etaCalc.SetXYZ(cluster2->get_x(),cluster2->get_y(),cluster2->get_z());
+            _bb_cluster_deta=fabs(eta1-etaCalc.PseudoRapidity());
+          }
+        else{ //if they are not unique then they are 0
+          _bb_nCluster = 1;
+          _bb_cluster_dphi=0;
+          _bb_cluster_deta=0;
+        } 
       }
-      else {
-        if(cluster1||cluster2) _bb_nCluster = 1;
+      else{ //clusters were not found
         else _bb_nCluster=0;
         _bb_cluster_deta=-1;
         _bb_cluster_dphi=-1;
       }
+      _bb_track1_pid = iTruthTrack->get_pid();
+      _bb_track2_pid = jTruthTrack->get_pid();
+      PHG4Particle* parent  = _truthinfo->GetParticle(iTruthTrack->get_parent_id());
+      if(parent) _bb_parent_pid = parent->get_pid();
+      else _bb_parent_pid=0;
+
       if (_bb_track_layer>0&&_bb_track_pT>.6&&_bb_track_deta<.0082&&TMath::Abs(_bb_track_dlayer)<=2)
       {
         (*iTrack)->identify();
         (*jTrack)->identify();
         genfit::GFRaveVertex* recoVert = _vertexer->findSecondaryVertex(*iTrack,*jTrack);
-        _bb_vtx_radius = -1;
-        _bb_vtx_chi2 = -1;
-        _bb_vtxTrackRZ_dist = -1;
-        _bb_vtxTrackRPhi_dist = -1;
         if (recoVert)
         {
           TVector3 recoVertPos = recoVert->getPos();
@@ -509,6 +529,12 @@ void TruthConversionEval::processTrackBackground(std::vector<SvtxTrack*> *v_trac
           _bb_vtx_chi2 = recoVert->getChi2();
           _bb_vtxTrackRZ_dist = pairMath.vtxTrackRZ(recoVertPos,*iTrack,*jTrack);
           _bb_vtxTrackRPhi_dist = pairMath.vtxTrackRPhi(recoVertPos,*iTrack,*jTrack);
+        }
+        else{
+          _bb_vtx_radius = -1;
+          _bb_vtx_chi2 = -1;
+          _bb_vtxTrackRZ_dist = -1;
+          _bb_vtxTrackRPhi_dist = -1;
         }
         _vtxBackTree->Fill();
       }//pair cuts
@@ -528,13 +554,6 @@ int TruthConversionEval::get_embed(PHG4Particle* particle, PHG4TruthInfoContaine
 float TruthConversionEval::vtoR(PHG4VtxPoint* vtx)const{
   return (float) sqrt(vtx->get_x()*vtx->get_x()+vtx->get_y()*vtx->get_y());
 }
-
-int TruthConversionEval::get_track_pid(SvtxTrack* track) const{
-  auto truth =  _truthinfo->GetParticle(track->get_truth_track_id());
-  if(truth) return truth->get_pid();
-  else return 0;
-}
-
 
 int TruthConversionEval::End(PHCompositeNode *topNode)
 {

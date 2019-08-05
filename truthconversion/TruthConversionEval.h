@@ -67,7 +67,7 @@ class TruthConversionEval: public SubsysReco
      * finds the clusters associated with the truth conversions*/
     void numUnique(std::map<int,Conversion>* map,SvtxTrackEval* trackEval,RawClusterContainer* mainClusterContainer);
     ///fills the member fields for all the background trees
-    void processTrackBackground(std::vector<SvtxTrack*>*v,TrkrClusterContainer*);
+    void processTrackBackground(std::vector<PHG4Particle*>*v,SvtxTrackEval*);
 
     int get_embed(PHG4Particle* particle, PHG4TruthInfoContainer* truthinfo) const;
     float vtoR(PHG4VtxPoint* vtx)const;
