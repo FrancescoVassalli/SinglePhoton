@@ -125,7 +125,7 @@ void testCuts(TChain* ttree,TFile* out_file){
   ttree->SetBranchAddress("cluster_prob",&prob);
   ttree->SetBranchAddress("track_layer",&layer);
   
-  TH1F *layerDist = new TH1F("layer","",31,-.5,30.5);
+  TH1F *layerDist = new TH1F("layer","",16,-.5,15.5);
   TH1F *probDist = new TH1F("clust_prob","",30,-.5,1.);
   layerDist->Sumw2();
   probDist->Sumw2();
