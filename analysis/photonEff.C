@@ -85,6 +85,23 @@ void makeVtxR(TChain* ttree,TFile* out_file){
   std::cout<<"mean deviation="<<calc<<std::endl;
 }
 
+void makepTEff(TChain* ttree,TFile* out_file){
+  float pT;
+  float tpT;
+  ttree->SetBranchAddress("photon_pT",&pT);
+  ttree->SetBranchAddress("tphoton_pT",&tpT);
+  
+  TH1F *pTeffPlot = new TH1F("#frac{#Delta#it{p}^{T}}{#it{p}_{#it{truth}}^{T}}","",40,-10,10);
+  pTeffPlot->Sumw2();
+
+  for (int event = 0; event < ttree->GetEntries(); ++event)
+  {
+    ttree->GetEvent(event);
+    pTeffPlot->Fill((pT-tpT)/tpT);
+  }
+  pTeffPlot->Scale(1./ttree->GetEntries(),"width");
+  out_file->Write();
+}
 void makeRefitDist(TChain* ttree, TFile *out_file){
   float diffx;
   float diffy;
@@ -123,7 +140,8 @@ void photonEff()
   TFile *out_file = new TFile("effplots.root","RECREATE");
   TChain *ttree = handleFile(treePath,treeExtension,"cutTreeSignal",nFiles);
   TChain *ttree2 = handleFile(treePath,treeExtension,"vtxingTree",nFiles);
-  makephotonM(ttree,out_file);
+  //makephotonM(ttree,out_file);
+  makepTEff(ttree,out_file);
   //makeVtxR(ttree2,out_file);
-  makeRefitDist(ttree,out_file);
+  //makeRefitDist(ttree,out_file);
 }
