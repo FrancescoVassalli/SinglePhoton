@@ -102,6 +102,7 @@ void makepTEff(TChain* ttree,TFile* out_file){
     pTefffuncPlot->Fill(tpT,(pT-tpT)/tpT);
   }
   pTeffPlot->Scale(1./ttree->GetEntries(),"width");
+  pTefffuncPlot->Scale(1./ttree->GetEntries(),"width");
   out_file->Write();
 }
 void makeRefitDist(TChain* ttree, TFile *out_file){
