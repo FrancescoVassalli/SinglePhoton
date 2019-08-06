@@ -137,6 +137,8 @@ void testCuts(TChain* ttree,TFile* out_file){
   TH1F *dlayer_plot = new TH1F("dlayer","",11,-.5,10.5);
   layerDist->Sumw2();
   probDist->Sumw2();
+  deta_plot->Sumw2();
+  dlayer_plot->Sumw2();
   unsigned badLayCount=0;
   unsigned badClusCount=0;
   unsigned bigDetaCount=0;
