@@ -133,7 +133,7 @@ void testCuts(TChain* ttree,TFile* out_file){
   
   TH1F *layerDist = new TH1F("layer","",16,-.5,15.5);
   TH1F *probDist = new TH1F("clust_prob","",30,-.5,1.);
-  TH1F *deta_plot = new TH1F("deta","",30,-.5,.1);
+  TH1F *deta_plot = new TH1F("deta","",30,-.001,.01);
   TH1F *dlayer_plot = new TH1F("dlayer","",11,-.5,10.5);
   layerDist->Sumw2();
   probDist->Sumw2();
