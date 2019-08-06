@@ -49,9 +49,12 @@ void make(TChain* ttree,TFile* out_file){
 void minBiasRecoAna()
 {
   string treePath = "/sphenix/user/vassalli/minBiasPythia/conversionembededminBiasanalysis";
+  string truthTreePath = "/sphenix/user/vassalli/minBiasPythia/conversionembededminBiasTruthanalysis";
   string treeExtension = ".root";
   unsigned int nFiles=200;
   TFile *out_file = new TFile("minBiasplots.root","RECREATE");
   TChain *ttree = handleFile(treePath,treeExtension,"recoSignal",nFiles);
+  TChain *truth_ttree = handleFile(truthTreePath,treeExtension,"cutTreeSignal",nFiles);
   make(ttree,out_file);
+  make(truth_ttree,out_file);
 }
