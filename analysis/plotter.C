@@ -79,6 +79,14 @@ void dlayer(TFile *thisFile){
 	plot->SetYTitle("dN/dN");
 	plot->Draw("e1");
 }
+void signalVtxR(TFile *thisFile){
+	gStyle->SetOptStat(0);
+	TH1F *plot  = (TH1F*) thisFile->Get("signal_vtx_radius_dist");
+	TCanvas* tc = new TCanvas();
+	tc->Draw();
+	plot->SetYTitle("dN/dN");
+	plot->Draw("e1");
+}
 
 void recoRefit(TFile* thisFile){
 	gStyle->SetOptStat(0);
@@ -113,8 +121,9 @@ void plotter(){
 	//pTEff(thisFile);
 	//pTEff2D(thisFile);
 	//layer(thisFile);
-	dlayer(thisFile);
-	deta(thisFile);
+	//dlayer(thisFile);
+	//deta(thisFile);
+	signalVtxR(thisFile);
 	//TFile *backFile = new TFile("backplots.root","READ");
 
 }
