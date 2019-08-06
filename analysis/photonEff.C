@@ -137,7 +137,7 @@ void testCuts(TChain* ttree,TFile* out_file){
   TH1F *probDist = new TH1F("clust_prob","",30,-.5,1.);
   TH1F *deta_plot = new TH1F("deta","",30,-.001,.01);
   TH1F *dlayer_plot = new TH1F("dlayer","",11,-.5,10.5);
-  TH1F *r_plot = new TH1F("signal_vtx_radius_dist","",21,-.5,20.5);
+  TH1F *r_plot = new TH1F("signal_vtx_radius_dist","",31,-.5,30.5);
   layerDist->Sumw2();
   probDist->Sumw2();
   deta_plot->Sumw2();
