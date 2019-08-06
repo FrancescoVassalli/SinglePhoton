@@ -157,6 +157,8 @@ void testCuts(TChain* ttree,TFile* out_file){
     }
   }
   layerDist->Scale(1./ttree->GetEntries());
+  dlayer_plot->Scale(1./ttree->GetEntries());
+  deta_plot->Scale(1./ttree->GetEntries());
   cout<<"Signal rejection through layer cut= "<<(float)badLayCount/ttree->GetEntries()<<endl;
   cout<<"error= "<<sqrt((float)badLayCount)/ttree->GetEntries()<<endl;
   cout<<"Signal rejection through clus cut= "<<(float)badClusCount/ttree->GetEntries()<<endl;
