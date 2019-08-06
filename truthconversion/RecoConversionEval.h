@@ -51,18 +51,18 @@ class RecoConversionEval : public SubsysReco {
 		TTree *_tree=NULL;
 		VtxRegressor *_regressor=NULL;
 
-    	PHG4TruthInfoContainer *_truthinfo=NULL;
+		PHG4TruthInfoContainer *_truthinfo=NULL;
 
 
 		bool hasNodePointers()const;
 		///Uses the TMVA method to correct the vtx radius
 		genfit::GFRaveVertex* correctSecondaryVertex(genfit::GFRaveVertex* vtx,SvtxTrack* reco1,SvtxTrack* reco2);
-    ///Uses {@link _vertexer} to refit \param reco1 and \param reco2
-    std::pair<PHGenFit::Track*,PHGenFit::Track*> refitTracks(genfit::GFRaveVertex* vtx,SvtxTrack* reco1,SvtxTrack* reco2);
+		///Uses {@link _vertexer} to refit \param reco1 and \param reco2
+		std::pair<PHGenFit::Track*,PHGenFit::Track*> refitTracks(genfit::GFRaveVertex* vtx,SvtxTrack* reco1,SvtxTrack* reco2);
 		///Adds \param reco1 and \param reco2 as TLorentzVectors
 		TLorentzVector* reconstructPhoton(SvtxTrack* reco1,SvtxTrack* reco2);
-    ///Adds the {@link PHGenFit::Track}s into a TLorentVector
-    TLorentzVector* reconstructPhoton(std::pair<PHGenFit::Track*,PHGenFit::Track*> recos);
+		///Adds the {@link PHGenFit::Track}s into a TLorentVector
+		TLorentzVector* reconstructPhoton(std::pair<PHGenFit::Track*,PHGenFit::Track*> recos);
 		inline bool detaCut(float eta1, float eta2) const{
 			return (eta1>eta2?eta1-eta2:eta2-eta1)<_kDetaCut;
 		}
@@ -82,7 +82,7 @@ class RecoConversionEval : public SubsysReco {
 		bool vtxRadiusCut(TVector3 recoVertPos);
 		/* cut on the distance between the closest point between the two tracks*/
 		bool approachDistance(SvtxTrack *t1,SvtxTrack* t2)const;
-		
+
 		float _b_photon_m;
 		float _b_photon_pT;
 		float _b_photon_eta;
@@ -92,23 +92,23 @@ class RecoConversionEval : public SubsysReco {
 		float _b_tphoton_eta;
 		float _b_tphoton_phi;
 		bool _b_fake;
-    bool _b_refit;
+		bool _b_refit;
 		// I want these to be static constexpr
-    // TODO confirm these numbers
+		// TODO confirm these numbers
 		unsigned int _kNSiliconLayer=7;
 
 		float _kTrackPtCut=.6; 
 		float _kEMProbCut=.0;
 		float _kDetaCut=.008;
-    //TODO adjust first hit cuts
+		//TODO adjust first hit cuts
 		float _kFirstHit=1;
 		float _kFirstHitStrict=1;
 		double _kApprochCut=30;
-    //these are guesses 
-    float _kVtxRPhiCut=.4;
-    float _kVtxRCut=1.8;
-    float _kVtxRZCut=.4;
-    float _kVtxChi2Cut=.4;
+		//these are guesses 
+		float _kVtxRPhiCut=.4;
+		float _kVtxRCut=1.84;
+		float _kVtxRZCut=.4;
+		float _kVtxChi2Cut=.4;
 		float _kElectronRestM=.5109989461;
 };
 

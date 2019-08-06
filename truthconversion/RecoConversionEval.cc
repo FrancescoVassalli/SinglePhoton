@@ -42,7 +42,7 @@ RecoConversionEval::RecoConversionEval(const std::string &name,std::string tmvam
 }
 
 RecoConversionEval::~RecoConversionEval(){
-  cout<<"deleting RCE"<<endl;
+	cout<<"deleting RCE"<<endl;
 	if(_vertexer) delete _vertexer;
 	if(_regressor) delete _regressor;
 }
@@ -57,17 +57,17 @@ int RecoConversionEval::InitRun(PHCompositeNode *topNode) {
 	_vertexer->InitRun(topNode);
 	_file = new TFile( _fname.c_str(), "RECREATE");
 	_tree = new TTree("recoSignal","strong saharah bush");
-    _tree->SetAutoSave(100);
-    _tree->Branch("photon_m",   &_b_photon_m);
-    _tree->Branch("photon_pT",  &_b_photon_pT);
-    _tree->Branch("photon_eta", &_b_photon_eta);
-    _tree->Branch("photon_phi", &_b_photon_phi);
-    _tree->Branch("tphoton_pT",  &_b_tphoton_pT);
-    _tree->Branch("tphoton_eta", &_b_tphoton_eta);
-    _tree->Branch("tphoton_phi", &_b_tphoton_phi);
-    _tree->Branch("fake", &_b_fake);
-    _tree->Branch("refit", &_b_refit);
-    
+	_tree->SetAutoSave(100);
+	_tree->Branch("photon_m",   &_b_photon_m);
+	_tree->Branch("photon_pT",  &_b_photon_pT);
+	_tree->Branch("photon_eta", &_b_photon_eta);
+	_tree->Branch("photon_phi", &_b_photon_phi);
+	_tree->Branch("tphoton_pT",  &_b_tphoton_pT);
+	_tree->Branch("tphoton_eta", &_b_tphoton_eta);
+	_tree->Branch("tphoton_phi", &_b_tphoton_phi);
+	_tree->Branch("fake", &_b_fake);
+	_tree->Branch("refit", &_b_refit);
+
 	return Fun4AllReturnCodes::EVENT_OK;
 }
 
@@ -81,7 +81,7 @@ void RecoConversionEval::doNodePointers(PHCompositeNode *topNode){
 	_clusterMap = findNode::getClass<TrkrClusterContainer>(topNode, "TRKR_CLUSTER");
 	_vertexer->InitEvent(topNode);
 	//to check if the id is correct
- 	_truthinfo = findNode::getClass<PHG4TruthInfoContainer>(topNode,"G4TruthInfo");
+	_truthinfo = findNode::getClass<PHG4TruthInfoContainer>(topNode,"G4TruthInfo");
 
 }
 
@@ -94,7 +94,7 @@ int RecoConversionEval::process_event(PHCompositeNode *topNode) {
 	/*the is not optimized but is just a nlogn process*/
 	for ( SvtxTrackMap::Iter iter = _allTracks->begin(); iter != _allTracks->end(); ++iter) {
 		//I want to now only check e tracks so check the clusters of the |charge|=1 tracks
-		if (abs(iter->second->get_charge())==1&&iter->second->get_pt()>_kTrackPtCut) //TODO layer cut
+		if (abs(iter->second->get_charge())==1&&iter->second->get_pt()>_kTrackPtCut) //should i have the layer cut?
 		{
 			SvtxTrack* thisTrack = iter->second;
 			RawCluster* bestCluster= _mainClusterContainer->getCluster(thisTrack->get_cal_cluster_id(SvtxTrack::CAL_LAYER(1)));
@@ -113,68 +113,67 @@ int RecoConversionEval::process_event(PHCompositeNode *topNode) {
 							vtxCan=correctSecondaryVertex(vtxCan,thisTrack,jter->second);
 							if (vtxCan&&vtxCuts(vtxCan))
 							{
-								_b_fake=false;
-                _b_refit=true;
+								_b_refit=true;
 								std::pair<PHGenFit::Track*,PHGenFit::Track*> refit_tracks = refitTracks(vtxCan,thisTrack,jter->second);
-                //attempt to set the photon to the addition of the refit tracks may return NULL
+								//attempt to set the photon to the addition of the refit tracks may return NULL
 								TLorentzVector* photon= reconstructPhoton(refit_tracks);
-                //if photon is null attempt to set it to the addition of the original tracks may return NULL
+								//if photon is null attempt to set it to the addition of the original tracks may return NULL
 								if (!photon)
 								{
 									photon = reconstructPhoton(thisTrack,jter->second);
-                  _b_refit=false;
+									_b_refit=false;
 								}
-                //if the photon is reconstructed record its data 
-                if(photon){
-								  _b_photon_m = photon->Dot(*photon);
-								  _b_photon_pT = photon->Pt();
-								  _b_photon_eta = photon->Eta();
-								  _b_photon_phi = photon->Phi();
-								  delete photon;
-                }
-                else{
-                  _b_photon_m =   -999.;
-                  _b_photon_pT =  -999.;
-                  _b_photon_eta = -999.;
-                  _b_photon_phi = -999.;
-                  cout<<"photon not reconstructed"<<endl;
-                }
-                //FIXME currently this is not a valid way to get the truthparticle because get_truth_track_id returns UINT_MAX
-                PHG4Particle* truthparticle = _truthinfo->GetParticle(jter->second->get_truth_track_id());
-                PHG4Particle* truthparticle2 = _truthinfo->GetParticle(thisTrack->get_truth_track_id());
-                PHG4Particle* parent;
-                if(truthparticle) {
-                  parent = _truthinfo->GetParticle(truthparticle->get_parent_id());
-                  if(TMath::Abs(truthparticle->get_pid())!=11||(parent&&parent->get_pid()!=22)||truthparticle->get_parent_id()!=truthparticle2->get_parent_id()){
-                    _b_fake=true;
-                  }
-                  else if(parent&&parent->get_pid()==22){
-                    TLorentzVector ptlv;
-                    ptlv.SetPxPyPzE(parent->get_px(),parent->get_py(),parent->get_pz(),parent->get_e());
-                    parent->identify();
-                    PHG4Particle* grandparent = _truthinfo->GetParticle(parent->get_parent_id());
-                    if(grandparent) grandparent->identify();
-                    _b_tphoton_phi = ptlv.Phi();
-                    _b_tphoton_eta = ptlv.Eta();
-                    _b_tphoton_pT =  ptlv.Pt();
-                  }
-                  else{
-                    _b_tphoton_phi = -999.;
-                    _b_tphoton_eta = -999.;
-                    _b_tphoton_pT =  -999.;
-                  }
-                }//found truth particle
-                else{
-                  cout<<"no truth particle"<<endl;
-                  _b_tphoton_phi = -999.;
-                  _b_tphoton_eta = -999.;
-                  _b_tphoton_pT =  -999.;
-                }
-                _tree->Fill();
-              }//vtx cuts
-            }
-          }
-        }
+								//if the photon is reconstructed record its data 
+								if(photon){
+									_b_photon_m = photon->Dot(*photon);
+									_b_photon_pT = photon->Pt();
+									_b_photon_eta = photon->Eta();
+									_b_photon_phi = photon->Phi();
+									delete photon;
+								}
+								else{
+									_b_photon_m =   -999.;
+									_b_photon_pT =  -999.;
+									_b_photon_eta = -999.;
+									_b_photon_phi = -999.;
+									cout<<"photon not reconstructed"<<endl;
+								}
+								/*FIXME currently this is not a valid way to get the truthparticle because get_truth_track_id returns UINT_MAX
+								PHG4Particle* truthparticle = _truthinfo->GetParticle(jter->second->get_truth_track_id());
+								PHG4Particle* truthparticle2 = _truthinfo->GetParticle(thisTrack->get_truth_track_id());
+								PHG4Particle* parent;
+								if(truthparticle) {
+									parent = _truthinfo->GetParticle(truthparticle->get_parent_id());
+									if(TMath::Abs(truthparticle->get_pid())!=11||(parent&&parent->get_pid()!=22)||truthparticle->get_parent_id()!=truthparticle2->get_parent_id()){
+										_b_fake=true;
+									}
+									else if(parent&&parent->get_pid()==22){
+										TLorentzVector ptlv;
+										ptlv.SetPxPyPzE(parent->get_px(),parent->get_py(),parent->get_pz(),parent->get_e());
+										parent->identify();
+										PHG4Particle* grandparent = _truthinfo->GetParticle(parent->get_parent_id());
+										if(grandparent) grandparent->identify();
+										_b_tphoton_phi = ptlv.Phi();
+										_b_tphoton_eta = ptlv.Eta();
+										_b_tphoton_pT =  ptlv.Pt();
+									}
+									else{
+										_b_tphoton_phi = -999.;
+										_b_tphoton_eta = -999.;
+										_b_tphoton_pT =  -999.;
+									}
+								}//found truth particle
+								else{
+									cout<<"no truth particle"<<endl;
+									_b_tphoton_phi = -999.;
+									_b_tphoton_eta = -999.;
+									_b_tphoton_pT =  -999.;
+								}*/
+								_tree->Fill();
+							}//vtx cuts
+						}
+					}
+				}
 			}
 		}
 	}
@@ -182,67 +181,67 @@ int RecoConversionEval::process_event(PHCompositeNode *topNode) {
 }
 
 genfit::GFRaveVertex* RecoConversionEval::correctSecondaryVertex(genfit::GFRaveVertex* recoVertex,SvtxTrack* reco1,SvtxTrack* reco2){
-  if(!(recoVertex&&reco1&&reco2)) {
-    return recoVertex;
-  }
-  TVector3 nextPos = recoVertex->getPos();
-  nextPos.SetMagThetaPhi(_regressor->regress(reco1,reco2,recoVertex),nextPos.Theta(),nextPos.Phi());
+	if(!(recoVertex&&reco1&&reco2)) {
+		return recoVertex;
+	}
+	TVector3 nextPos = recoVertex->getPos();
+	nextPos.SetMagThetaPhi(_regressor->regress(reco1,reco2,recoVertex),nextPos.Theta(),nextPos.Phi());
 
-  using namespace genfit;
- // GFRaveVertex* temp = recoVertex;
-  std::vector<GFRaveTrackParameters*> tracks;
-  for(unsigned i =0; i<recoVertex->getNTracks();i++){
-    tracks.push_back(recoVertex->getParameters(i));
-  }
-  recoVertex = new GFRaveVertex(nextPos,recoVertex->getCov(),tracks,recoVertex->getNdf(),recoVertex->getChi2(),recoVertex->getId());
-//  delete temp; //this caused outside references to seg fault //TODO shared_ptr is better 
-  return recoVertex;
+	using namespace genfit;
+	// GFRaveVertex* temp = recoVertex;
+	std::vector<GFRaveTrackParameters*> tracks;
+	for(unsigned i =0; i<recoVertex->getNTracks();i++){
+		tracks.push_back(recoVertex->getParameters(i));
+	}
+	recoVertex = new GFRaveVertex(nextPos,recoVertex->getCov(),tracks,recoVertex->getNdf(),recoVertex->getChi2(),recoVertex->getId());
+	//  delete temp; //this caused outside references to seg fault //TODO shared_ptr is better 
+	return recoVertex;
 }
 
 TLorentzVector* RecoConversionEval::reconstructPhoton(std::pair<PHGenFit::Track*,PHGenFit::Track*> recos){
-if (recos.first&&recos.second)
-  {
-    cout<<"reconstructing photon from refit tracks"<<endl;
-    TLorentzVector tlv1;
-    tlv1.SetVectM(recos.first->get_mom(),_kElectronRestM);
-    TLorentzVector tlv2;
-    tlv2.SetVectM(recos.second->get_mom(),_kElectronRestM);
-    return new TLorentzVector(tlv1+tlv2);
-  }
-  else return NULL;
+	if (recos.first&&recos.second)
+	{
+		cout<<"reconstructing photon from refit tracks"<<endl;
+		TLorentzVector tlv1;
+		tlv1.SetVectM(recos.first->get_mom(),_kElectronRestM);
+		TLorentzVector tlv2;
+		tlv2.SetVectM(recos.second->get_mom(),_kElectronRestM);
+		return new TLorentzVector(tlv1+tlv2);
+	}
+	else return NULL;
 }
 
 TLorentzVector* RecoConversionEval::reconstructPhoton(SvtxTrack* reco1,SvtxTrack* reco2){
-if (reco1&&reco2)
-  {
-    cout<<"reconstructing photon from svtx tracks"<<endl;
-    TLorentzVector tlv1(reco1->get_px(),reco1->get_py(),reco1->get_pz(),
-        sqrt(_kElectronRestM*_kElectronRestM+reco1->get_p()*reco1->get_p()));
-    TLorentzVector tlv2(reco2->get_px(),reco2->get_py(),reco2->get_pz(),
-        sqrt(_kElectronRestM*_kElectronRestM+reco2->get_p()*reco2->get_p()));
-    return new TLorentzVector(tlv1+tlv2);
-  }
-  else return NULL;
+	if (reco1&&reco2)
+	{
+		cout<<"reconstructing photon from svtx tracks"<<endl;
+		TLorentzVector tlv1(reco1->get_px(),reco1->get_py(),reco1->get_pz(),
+				sqrt(_kElectronRestM*_kElectronRestM+reco1->get_p()*reco1->get_p()));
+		TLorentzVector tlv2(reco2->get_px(),reco2->get_py(),reco2->get_pz(),
+				sqrt(_kElectronRestM*_kElectronRestM+reco2->get_p()*reco2->get_p()));
+		return new TLorentzVector(tlv1+tlv2);
+	}
+	else return NULL;
 }
 
 std::pair<PHGenFit::Track*,PHGenFit::Track*> RecoConversionEval::refitTracks(genfit::GFRaveVertex* vtx,SvtxTrack* reco1,SvtxTrack* reco2){
 	std::pair<PHGenFit::Track*,PHGenFit::Track*> r;
-  if(!vtx)
-  {
-    cerr<<"WARNING: No vertex to refit tracks"<<endl;
-    r.first=NULL;
-    r.second=NULL;
+	if(!vtx)
+	{
+		cerr<<"WARNING: No vertex to refit tracks"<<endl;
+		r.first=NULL;
+		r.second=NULL;
 
-  }
-  else{
-    r.first=_vertexer->refitTrack(vtx,reco1);
-    r.second=_vertexer->refitTrack(vtx,reco2);
-  }
-  return r;
+	}
+	else{
+		r.first=_vertexer->refitTrack(vtx,reco1);
+		r.second=_vertexer->refitTrack(vtx,reco2);
+	}
+	return r;
 }
 
 bool RecoConversionEval::pairCuts(SvtxTrack* t1, SvtxTrack* t2)const{
-	return detaCut(t1->get_eta(),t2->get_eta()) && hitCuts(t1,t2); //TODO add approach distance ?
+	return detaCut(t1->get_eta(),t2->get_eta());//only using deta cut && hitCuts(t1,t2); //TODO add approach distance ?
 }
 
 //TODO make this track level
@@ -269,10 +268,10 @@ bool RecoConversionEval::hitCuts(SvtxTrack* reco1, SvtxTrack* reco2)const {
 }
 
 /*bool RecoConversionEval::vtxCuts(genfit::GFRaveVertex* vtxCan, SvtxTrack* t1, SvtxTrack *t2){
-	//TODO program the cuts invariant mass, pT
-	return vtxRadiusCut(vtxCan->getPos());
-	// && vtxTrackRPhiCut(vtxCan->getPos(),t1)&&vtxTrackRPhiCut(vtxCan->getPos(),t2)&& 
-		//vtxTrackRZCut(vtxCan->getPos(),t1)&&vtxTrackRZCut(vtxCan->getPos(),t2)&&vtxCan->getChi2()>_kVtxChi2Cut;
+//TODO program the cuts invariant mass, pT
+return vtxRadiusCut(vtxCan->getPos());
+// && vtxTrackRPhiCut(vtxCan->getPos(),t1)&&vtxTrackRPhiCut(vtxCan->getPos(),t2)&& 
+//vtxTrackRZCut(vtxCan->getPos(),t1)&&vtxTrackRZCut(vtxCan->getPos(),t2)&&vtxCan->getChi2()>_kVtxChi2Cut;
 }*/
 
 bool RecoConversionEval::vtxCuts(genfit::GFRaveVertex* vtxCan){
@@ -302,7 +301,7 @@ int RecoConversionEval::End(PHCompositeNode *topNode) {
 		_file->Write();
 		_file->Close();
 	}
-  cout<<"good end"<<endl;
+	cout<<"good end"<<endl;
 	return Fun4AllReturnCodes::EVENT_OK;
 }
 
