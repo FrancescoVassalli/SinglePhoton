@@ -85,6 +85,7 @@ void signalVtxR(TFile *thisFile){
 	TCanvas* tc = new TCanvas();
 	tc->Draw();
 	plot->SetYTitle("dN/dN");
+	plot->SetXTitle("r_{vtx} [cm]");
 	plot->Draw("e1");
 }
 
