@@ -245,6 +245,7 @@ bool RecoConversionEval::pairCuts(SvtxTrack* t1, SvtxTrack* t2)const{
 	return detaCut(t1->get_eta(),t2->get_eta()) && hitCuts(t1,t2); //TODO add approach distance ?
 }
 
+//TODO make this track level
 bool RecoConversionEval::hitCuts(SvtxTrack* reco1, SvtxTrack* reco2)const {
 	TrkrCluster *c1 = _clusterMap->findCluster(*(reco1->begin_cluster_keys()));
 	TrkrCluster *c2 = _clusterMap->findCluster(*(reco2->begin_cluster_keys()));

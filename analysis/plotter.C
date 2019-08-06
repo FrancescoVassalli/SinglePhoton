@@ -76,7 +76,6 @@ void dlayer(TFile *thisFile){
 	TH1F *plot  = (TH1F*) thisFile->Get("dlayer");
 	TCanvas* tc = new TCanvas();
 	tc->Draw();
-	plot->SetXTitle("Index of First Tracking Layer");
 	plot->SetYTitle("dN/dN");
 	plot->Draw("e1");
 }
@@ -113,7 +112,9 @@ void plotter(){
 	//recoRefit(thisFile);
 	//pTEff(thisFile);
 	//pTEff2D(thisFile);
-	layer(thisFile);
+	//layer(thisFile);
+	dlayer(thisFile);
+	deta(thisFile);
 	//TFile *backFile = new TFile("backplots.root","READ");
 
 }
