@@ -1,12 +1,12 @@
 #!/bin/csh 
 @ p =  ${1}
 #
-set OUT_LOCATION="/sphenix/user/vassalli/minBiasPythia/"
+set OUT_LOCATION= $2
 set OUT_FILE=conversionembededminBiasanalysis${p}.root
 set IN_FILE=minBiasembededout${p}.root
 set PYTHIA_FILE=tempPythiaMinBiasHep${p}.dat
 #
-set SCRATCH_AREA="$_CONDOR_SCRATCH_DIR/fran_minBias${p}"                                             
+set SCRATCH_AREA="$_CONDOR_SCRATCH_DIR$2"                                             
 #
 set SOURCE_FUN4ALL="/direct/phenix+u/vassalli/sphenix/single/gen/*"
 set SOURCE_PYTHIA="/direct/phenix+u/vassalli/sphenix/single/pythia/generator"
