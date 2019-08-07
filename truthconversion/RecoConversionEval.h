@@ -48,7 +48,8 @@ class RecoConversionEval : public SubsysReco {
 		SVReco *_vertexer=NULL;
 		std::string _fname;
 		TFile *_file=NULL;
-		TTree *_tree=NULL;
+		TTree *_treeSignal=NULL;
+		TTree *_treeBackground=NULL;
 		VtxRegressor *_regressor=NULL;
 
 		PHG4TruthInfoContainer *_truthinfo=NULL;

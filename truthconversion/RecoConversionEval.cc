@@ -56,30 +56,38 @@ int RecoConversionEval::InitRun(PHCompositeNode *topNode) {
 	//TODO turn this back into a subsystem and put it on the node tree
 	_vertexer->InitRun(topNode);
 	_file = new TFile( _fname.c_str(), "RECREATE");
-	_tree = new TTree("recoSignal","strong saharah bush");
-	_tree->SetAutoSave(100);
-	_tree->Branch("photon_m",   &_b_photon_m);
-	_tree->Branch("photon_pT",  &_b_photon_pT);
-	_tree->Branch("photon_eta", &_b_photon_eta);
-	_tree->Branch("photon_phi", &_b_photon_phi);
-	_tree->Branch("refit", &_b_refit);
+	_treeSignal = new TTree("recoSignal","strong saharah bush");
+	_treeSignal->SetAutoSave(300);
+	_treeSignal->Branch("photon_m",   &_b_photon_m);
+	_treeSignal->Branch("photon_pT",  &_b_photon_pT);
+	_treeSignal->Branch("photon_eta", &_b_photon_eta);
+	_treeSignal->Branch("photon_phi", &_b_photon_phi);
+	_treeSignal->Branch("refit", &_b_refit);
 
-	return Fun4AllReturnCodes::EVENT_OK;
-}
+	_treeBackground = new TTree("recoBackground","friendly fern");
+	_treeBackground->SetAutoSave(300);
+	_treeBackground->Branch("total",   &totalTracks;
+			_treeBackground->Branch("tracksPEQ",  &passedpTEtaQ);
+			_treeBackground->Branch("tracks_clus", &passedCluster);
+			_treeBackground->Branch("pairs", &passedPair);
+			_treeBackground->Branch("vtx", 	  &passedVtx);
 
-void RecoConversionEval::doNodePointers(PHCompositeNode *topNode){
-	_allTracks = findNode::getClass<SvtxTrackMap>(topNode,"SvtxTrackMap");
-	_mainClusterContainer = findNode::getClass<RawClusterContainer>(topNode,"CLUSTER_CEMC");
-	/*These are deprecated
-	 * _svtxClusterMap = findNode::getClass<SvtxClusterMap>(topNode,"SvtxClusterMap");
-	 _hitMap = findNode::getClass<SvtxHitMap>(topNode,"SvtxHitMap");*/
-	//new version
-	_clusterMap = findNode::getClass<TrkrClusterContainer>(topNode, "TRKR_CLUSTER");
-	_vertexer->InitEvent(topNode);
-	//to check if the id is correct
-	_truthinfo = findNode::getClass<PHG4TruthInfoContainer>(topNode,"G4TruthInfo");
+			return Fun4AllReturnCodes::EVENT_OK;
+			}
 
-}
+			void RecoConversionEval::doNodePointers(PHCompositeNode *topNode){
+			_allTracks = findNode::getClass<SvtxTrackMap>(topNode,"SvtxTrackMap");
+			_mainClusterContainer = findNode::getClass<RawClusterContainer>(topNode,"CLUSTER_CEMC");
+			/*These are deprecated
+			 * _svtxClusterMap = findNode::getClass<SvtxClusterMap>(topNode,"SvtxClusterMap");
+			 _hitMap = findNode::getClass<SvtxHitMap>(topNode,"SvtxHitMap");*/
+			//new version
+			_clusterMap = findNode::getClass<TrkrClusterContainer>(topNode, "TRKR_CLUSTER");
+			_vertexer->InitEvent(topNode);
+			//to check if the id is correct
+			_truthinfo = findNode::getClass<PHG4TruthInfoContainer>(topNode,"G4TruthInfo");
+
+			}
 
 bool RecoConversionEval::hasNodePointers()const{
 	return _allTracks &&_mainClusterContainer && _vertexer;
@@ -140,36 +148,36 @@ int RecoConversionEval::process_event(PHCompositeNode *topNode) {
 									cout<<"photon not reconstructed"<<endl;
 								}
 								/*FIXME currently this is not a valid way to get the truthparticle because get_truth_track_id returns UINT_MAX
-								PHG4Particle* truthparticle = _truthinfo->GetParticle(jter->second->get_truth_track_id());
-								PHG4Particle* truthparticle2 = _truthinfo->GetParticle(thisTrack->get_truth_track_id());
-								PHG4Particle* parent;
-								if(truthparticle) {
+									PHG4Particle* truthparticle = _truthinfo->GetParticle(jter->second->get_truth_track_id());
+									PHG4Particle* truthparticle2 = _truthinfo->GetParticle(thisTrack->get_truth_track_id());
+									PHG4Particle* parent;
+									if(truthparticle) {
 									parent = _truthinfo->GetParticle(truthparticle->get_parent_id());
 									if(TMath::Abs(truthparticle->get_pid())!=11||(parent&&parent->get_pid()!=22)||truthparticle->get_parent_id()!=truthparticle2->get_parent_id()){
-										_b_fake=true;
+									_b_fake=true;
 									}
 									else if(parent&&parent->get_pid()==22){
-										TLorentzVector ptlv;
-										ptlv.SetPxPyPzE(parent->get_px(),parent->get_py(),parent->get_pz(),parent->get_e());
-										parent->identify();
-										PHG4Particle* grandparent = _truthinfo->GetParticle(parent->get_parent_id());
-										if(grandparent) grandparent->identify();
-										_b_tphoton_phi = ptlv.Phi();
-										_b_tphoton_eta = ptlv.Eta();
-										_b_tphoton_pT =  ptlv.Pt();
+									TLorentzVector ptlv;
+									ptlv.SetPxPyPzE(parent->get_px(),parent->get_py(),parent->get_pz(),parent->get_e());
+									parent->identify();
+									PHG4Particle* grandparent = _truthinfo->GetParticle(parent->get_parent_id());
+									if(grandparent) grandparent->identify();
+									_b_tphoton_phi = ptlv.Phi();
+									_b_tphoton_eta = ptlv.Eta();
+									_b_tphoton_pT =  ptlv.Pt();
 									}
 									else{
-										_b_tphoton_phi = -999.;
-										_b_tphoton_eta = -999.;
-										_b_tphoton_pT =  -999.;
+									_b_tphoton_phi = -999.;
+									_b_tphoton_eta = -999.;
+									_b_tphoton_pT =  -999.;
 									}
-								}//found truth particle
-								else{
+									}//found truth particle
+									else{
 									cout<<"no truth particle"<<endl;
 									_b_tphoton_phi = -999.;
 									_b_tphoton_eta = -999.;
 									_b_tphoton_pT =  -999.;
-								}*/
+									}*/
 								_tree->Fill();
 							}//vtx cuts
 						}
@@ -285,15 +293,16 @@ bool RecoConversionEval::vtxRadiusCut(TVector3 recoVertPos){
 }
 
 int RecoConversionEval::End(PHCompositeNode *topNode) {
+	cout<<"Did RecoConversionEval with "<<totalTracks<<" total tracks\n\t";
+	cout<<1-(float)passedpTEtaQ/totalTracks<<"+/-"<<sqrt((float)passedpTEtaQ)/totalTracks<<" of tracks were rejected by pTEtaQ\n\t";
+	cout<<1-(float)passedCluster/passedpTEtaQ<<"+/-"<<sqrt((float)passedCluster)/passedpTEtaQ<<" of remaining tracks were rejected by cluster\n\t";
+	cout<<1-(float)passedPair/passedCluster<<"+/-"<<sqrt((float)passedPair)/passedCluster<<" of pairs were rejected by pair cuts\n\t";
+	cout<<1-(float)passedVtx/passedPair<<"+/-"<<sqrt((float)passedVtx)/passedPair<<" of vtx were rejected by vtx cuts\n\t";
+	_treeBackground->Fill();
 	if(_file){
 		_file->Write();
 		_file->Close();
 	}
-  cout<<"Did RecoConversionEval with "<<totalTracks<<" total tracks\n\t";
-  cout<<1-(float)passedpTEtaQ/totalTracks<<"+/-"<<sqrt((float)passedpTEtaQ)/totalTracks<<" of tracks were rejected by pTEtaQ\n\t";
-  cout<<1-(float)passedCluster/passedpTEtaQ<<"+/-"<<sqrt((float)passedCluster)/passedpTEtaQ<<" of remaining tracks were rejected by cluster\n\t";
-  cout<<1-(float)passedPair/passedCluster<<"+/-"<<sqrt((float)passedPair)/passedCluster<<" of pairs were rejected by pair cuts\n\t";
-  cout<<1-(float)passedVtx/passedPair<<"+/-"<<sqrt((float)passedVtx)/passedPair<<" of vtx were rejected by vtx cuts\n\t";
 	cout<<"good end"<<endl;
 	return Fun4AllReturnCodes::EVENT_OK;
 }
