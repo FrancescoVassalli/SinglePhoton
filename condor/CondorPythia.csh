@@ -4,7 +4,7 @@
 set OUT_LOCATION="/sphenix/user/vassalli/minBiasPythia/"
 set PYTHIA_FILE=${OUT_LOCATION}pythiaMinBiasHep${p}.dat
 #
-set SCRATCH_AREA="$_CONDOR_SCRATCH_DIR"                                                                                               
+set SCRATCH_AREA="$_CONDOR_SCRATCH_DIR"                                                              
 #
 set SOURCE_PHOTONMAKER="/direct/phenix+u/vassalli/sphenix/single/pythia/generator"
 #
