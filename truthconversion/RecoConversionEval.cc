@@ -62,10 +62,6 @@ int RecoConversionEval::InitRun(PHCompositeNode *topNode) {
 	_tree->Branch("photon_pT",  &_b_photon_pT);
 	_tree->Branch("photon_eta", &_b_photon_eta);
 	_tree->Branch("photon_phi", &_b_photon_phi);
-	_tree->Branch("tphoton_pT",  &_b_tphoton_pT);
-	_tree->Branch("tphoton_eta", &_b_tphoton_eta);
-	_tree->Branch("tphoton_phi", &_b_tphoton_phi);
-	_tree->Branch("fake", &_b_fake);
 	_tree->Branch("refit", &_b_refit);
 
 	return Fun4AllReturnCodes::EVENT_OK;
@@ -293,6 +289,11 @@ int RecoConversionEval::End(PHCompositeNode *topNode) {
 		_file->Write();
 		_file->Close();
 	}
+  cout<<"Did RecoConversionEval with "<<totalTracks<<" total tracks\n\t";
+  cout<<1-(float)passedpTEtaQ/totalTracks<<"+/-"<<sqrt((float)passedpTEtaQ)/totalTracks<<" of tracks were rejected by pTEtaQ\n\t";
+  cout<<1-(float)passedCluster/passedpTEtaQ<<"+/-"<<sqrt((float)passedCluster)/passedpTEtaQ<<" of remaining tracks were rejected by cluster\n\t";
+  cout<<1-(float)passedPair/passedCluster<<"+/-"<<sqrt((float)passedPair)/passedCluster<<" of pairs were rejected by pair cuts\n\t";
+  cout<<1-(float)passedVtx/passedPair<<"+/-"<<sqrt((float)passedVtx)/passedPair<<" of vtx were rejected by vtx cuts\n\t";
 	cout<<"good end"<<endl;
 	return Fun4AllReturnCodes::EVENT_OK;
 }
