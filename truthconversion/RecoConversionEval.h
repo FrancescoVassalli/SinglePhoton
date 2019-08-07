@@ -82,33 +82,43 @@ class RecoConversionEval : public SubsysReco {
 		bool vtxRadiusCut(TVector3 recoVertPos);
 		/* cut on the distance between the closest point between the two tracks*/
 		bool approachDistance(SvtxTrack *t1,SvtxTrack* t2)const;
-
+		
+		/** \defgroup variables for the TTree
+      	@{*/
 		float _b_photon_m;
 		float _b_photon_pT;
 		float _b_photon_eta;
 		float _b_photon_phi;
-		float _b_tphoton_m;
-		float _b_tphoton_pT;
-		float _b_tphoton_eta;
-		float _b_tphoton_phi;
-		bool _b_fake;
 		bool _b_refit;
+    	/**@}*/
+		/** \defgroup counts for background rejection rate
+      	@{*/
+		unsigned totalTracks=0;
+		unsigned passedpTEtaQ=0;
+		unsigned passedCluster=0;
+		unsigned passedPair=0;
+		unsigned passedVtx=0;
+    	/**@}*/
+
 		// I want these to be static constexpr
 		// TODO confirm these numbers
 		unsigned int _kNSiliconLayer=7;
-
+		/** \defgroup  consts for the cuts
+      	@{*/
 		float _kTrackPtCut=.6; 
 		float _kEMProbCut=.0;
+		float _kVtxRCut=1.84;
 		float _kDetaCut=.008;
-		//TODO adjust first hit cuts
+		int _kDLayerCut=9;
+    	/**@}*/
+		//these are not useful
 		float _kFirstHit=1;
 		float _kFirstHitStrict=1;
 		double _kApprochCut=30;
-		//these are guesses 
 		float _kVtxRPhiCut=.4;
-		float _kVtxRCut=1.84;
 		float _kVtxRZCut=.4;
 		float _kVtxChi2Cut=.4;
+
 		float _kElectronRestM=.5109989461;
 };
 

@@ -94,25 +94,30 @@ int RecoConversionEval::process_event(PHCompositeNode *topNode) {
 	/*the is not optimized but is just a nlogn process*/
 	for ( SvtxTrackMap::Iter iter = _allTracks->begin(); iter != _allTracks->end(); ++iter) {
 		//I want to now only check e tracks so check the clusters of the |charge|=1 tracks
-		if (abs(iter->second->get_charge())==1&&iter->second->get_pt()>_kTrackPtCut) //should i have the layer cut?
+		totalTracks++;
+		if (abs(iter->second->get_charge())==1&&iter->second->get_pt()>_kTrackPtCut&&abs(iter->second->get_eta())<1.) //should i have the layer cut?
 		{
 			SvtxTrack* thisTrack = iter->second;
+			passedpTEtaQ++;
 			RawCluster* bestCluster= _mainClusterContainer->getCluster(thisTrack->get_cal_cluster_id(SvtxTrack::CAL_LAYER(1)));
 			//TODO what if no cluster is found?
 			if(bestCluster&&bestCluster->get_prob()>=_kEMProbCut){
 				//loop over the following tracks
+				passedCluster++;
 				for (SvtxTrackMap::Iter jter = iter; jter != _allTracks->end(); ++jter)
 				{
 					//check that the next track is an opposite charge electron
-					if (thisTrack->get_charge()*-1==jter->second->get_charge()&&jter->second->get_pt()>_kTrackPtCut)
+					if (thisTrack->get_charge()*-1==jter->second->get_charge()&&jter->second->get_pt()>_kTrackPtCut&&abs(iter->second->get_eta())<1.)
 					{
 						RawCluster* nextCluster= _mainClusterContainer->getCluster(jter->second->get_cal_cluster_id(SvtxTrack::CAL_LAYER(1)));
 						//what if no cluster is found?
 						if(nextCluster&&nextCluster->get_prob()>=_kEMProbCut&&pairCuts(thisTrack,jter->second)){
+							passedPair++;
 							genfit::GFRaveVertex* vtxCan = _vertexer->findSecondaryVertex(thisTrack,jter->second);
 							vtxCan=correctSecondaryVertex(vtxCan,thisTrack,jter->second);
 							if (vtxCan&&vtxCuts(vtxCan))
 							{
+								passedVtx++;
 								_b_refit=true;
 								std::pair<PHGenFit::Track*,PHGenFit::Track*> refit_tracks = refitTracks(vtxCan,thisTrack,jter->second);
 								//attempt to set the photon to the addition of the refit tracks may return NULL
@@ -241,30 +246,17 @@ std::pair<PHGenFit::Track*,PHGenFit::Track*> RecoConversionEval::refitTracks(gen
 }
 
 bool RecoConversionEval::pairCuts(SvtxTrack* t1, SvtxTrack* t2)const{
-	return detaCut(t1->get_eta(),t2->get_eta());//only using deta cut && hitCuts(t1,t2); //TODO add approach distance ?
+	return detaCut(t1->get_eta(),t2->get_eta())&&hitCuts(t1,t2);//TODO add approach distance ?
 }
 
-//TODO make this track level
+
 bool RecoConversionEval::hitCuts(SvtxTrack* reco1, SvtxTrack* reco2)const {
 	TrkrCluster *c1 = _clusterMap->findCluster(*(reco1->begin_cluster_keys()));
 	TrkrCluster *c2 = _clusterMap->findCluster(*(reco2->begin_cluster_keys()));
 	unsigned l1 = TrkrDefs::getLayer(c1->getClusKey());
 	unsigned l2 = TrkrDefs::getLayer(c2->getClusKey());
 	//check that the first hits are close enough
-	if (l1>_kNSiliconLayer&&l1>_kNSiliconLayer)
-	{
-		if (abs(l1-l2)>_kFirstHitStrict)
-		{
-			return false;
-		}
-	}
-	else{
-		if (abs(l1-l2)>_kFirstHit)
-		{
-			return false;
-		}
-	}
-	return true;
+	return abs(l1-l2)<=_kDLayerCut;
 }
 
 /*bool RecoConversionEval::vtxCuts(genfit::GFRaveVertex* vtxCan, SvtxTrack* t1, SvtxTrack *t2){
