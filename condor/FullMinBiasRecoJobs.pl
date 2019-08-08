@@ -1,6 +1,7 @@
 #!/usr/bin/perl -w
 #inspired by @sh-lim
 use Cwd;
+use File::Copy qw(copy);
 
 #$package = "pp200GeV_inelastic";
 #$package = "pp200GeV_hardqcd";
@@ -18,30 +19,30 @@ $rundir = "${maindir}/${package}/grp${groupnum}";
 mkdir $rundir;
 
 for ($irun=0; $irun<100; $irun++){
+  $wait =5+int(rand(60)); 
+  print "Wait=${wait}\n";
+  copy "CondorMinBiasPythia.csh", $wrkdir;
+  sleep $wait;
 
-	sleep 5+int(rand(60));
-
-	$wrkdir = "${rundir}/${irun}";
+	$wrkdir = "${rundir}_${irun}";
 	mkdir $wrkdir;
-
-	chdir $wrkdir;
+  #chdir $wrkdir;
 	open(FILE, ">condor");
 	print FILE "Universe = vanilla\n";
 	print FILE "Notification = Never\n";
-	print FILE "Arguments = \$(Process) ${wrkdir}\n";
+	print FILE "Arguments = \$(Process) ${wrkdir}/\n";
 	print FILE "Requirements = CPU_Speed>=1\n";
 	print FILE "Rank = CPU_Speed\n";
-	print FILE "Priority = +1\n";
-	print FILE "Executable = CondorMinBiasPythia\n";
+	print FILE "Priority = +20\n";
+	print FILE "Executable = CondorMinBiasPythia.csh\n";
 	print FILE "Log = ${logpath}log.auto.\$(Process)\n";
 	print FILE "Output = ${logpath}out.auto.\$(Process)\n";
 	print FILE "Error = ${logpath}err.auto.\$(Process)\n";
 	print FILE "Notify_user = frva5829\@colorado.edu\n";
 #	print FILE "+Experiment = \"phenix\"\n";
 #	print FILE "+Job_Type = \"cas\"\n";
-	print FILE "Queue 400\n";
+	print FILE "Queue 100\n";
 	close(FILE);
-
 	system "condor_submit condor";
 }
 
