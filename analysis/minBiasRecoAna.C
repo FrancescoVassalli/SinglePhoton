@@ -24,8 +24,9 @@ TChain* handleFile(string name, string extension, string treename, unsigned int 
   return all;
 }
 
-void make(TChain* ttree,TFile* out_file){
+int make(TChain* ttree,TFile* out_file){
   cout<<ttree->GetEntries()<<endl;
+  return ttree->GetEntries();
   /*float pT;
   float tpT;
   ttree->SetBranchAddress("photon_pT",&pT);
@@ -40,10 +41,44 @@ void make(TChain* ttree,TFile* out_file){
     ttree->GetEvent(event);
     pTeffPlot->Fill((pT-tpT)/tpT);
     pTefffuncPlot->Fill(tpT,(pT-tpT)/tpT);
+    }
+    pTeffPlot->Scale(1./ttree->GetEntries(),"width");
+    pTefffuncPlot->Scale(1./ttree->GetEntries(),"width");
+    out_file->Write();*/
+}
+
+void reportBackground(TChain* _treeBackground,int signal){
+  unsigned totalTracks;
+  unsigned passedpTEtaQ;
+  unsigned passedCluster;
+  unsigned passedPair;
+  unsigned passedVtx;
+
+  int sum_totalTracks=-1*signal;
+  int sum_passedpTEtaQ=-1*signal;
+  int sum_passedCluster=-1*signal;
+  int sum_passedPair=-1*signal;
+  int sum_passedVtx=-1*signal;
+
+  _treeBackground->SetBranchAddress("total",   &totalTracks);
+  _treeBackground->SetBranchAddress("tracksPEQ",  &passedpTEtaQ);
+  _treeBackground->SetBranchAddress("tracks_clus", &passedCluster);
+  _treeBackground->SetBranchAddress("pairs", &passedPair);
+  _treeBackground->SetBranchAddress("vtx", 	  &passedVtx);
+
+  for(unsigned i=0; i<_treeBackground->GetEntries();i++){
+    _treeBackground->GetEntry(i);
+    sum_totalTracks+=totalTracks;
+    sum_passedpTEtaQ+=passedpTEtaQ;
+    sum_passedCluster+=passedCluster;
+    sum_passedPair+=passedPair;
+    sum_passedVtx+=passedVtx;
   }
-  pTeffPlot->Scale(1./ttree->GetEntries(),"width");
-  pTefffuncPlot->Scale(1./ttree->GetEntries(),"width");
-  out_file->Write();*/
+  cout<<"Did RecoConversionEval with "<<sum_totalTracks<<" total tracks\n\t";
+  cout<<1-(float)sum_passedpTEtaQ/sum_totalTracks<<"+/-"<<sqrt((float)sum_passedpTEtaQ)/sum_totalTracks<<" of tracks were rejected by pTEtaQ\n\t";
+  cout<<1-(float)sum_passedCluster/sum_passedpTEtaQ<<"+/-"<<sqrt((float)sum_passedCluster)/sum_passedpTEtaQ<<" of remaining tracks were rejected by cluster\n\t";
+  cout<<1-(float)sum_passedPair/sum_passedCluster<<"+/-"<<sqrt((float)sum_passedPair)/sum_passedCluster<<" of pairs were rejected by pair cuts\n\t";
+  cout<<1-(float)sum_passedVtx/sum_passedPair<<"+/-"<<sqrt((float)sum_passedVtx)/sum_passedPair<<" of vtx were rejected by vtx cuts\n\t";
 }
 
 void minBiasRecoAna()
@@ -51,10 +86,13 @@ void minBiasRecoAna()
   string treePath = "/sphenix/user/vassalli/minBiasPythia/conversionembededminBiasanalysis";
   string truthTreePath = "/sphenix/user/vassalli/minBiasPythia/conversionembededminBiasTruthanalysis";
   string treeExtension = ".root";
-  unsigned int nFiles=200;
+  unsigned int nFiles=600;
   TFile *out_file = new TFile("minBiasplots.root","RECREATE");
   TChain *ttree = handleFile(treePath,treeExtension,"recoSignal",nFiles);
+  TChain *back_tree = new TChain("recoBackground");
+  string filename = "/sphenix/user/vassalli/minBiasPythia/allRecoMinBias.root";
+  back_tree->Add(filename.c_str());
   TChain *truth_ttree = handleFile(truthTreePath,treeExtension,"cutTreeSignal",nFiles);
-  make(ttree,out_file);
-  make(truth_ttree,out_file);
+  //make(ttree,out_file);
+  reportBackground(back_tree,make(truth_ttree,out_file));
 }
