@@ -27,6 +27,7 @@ for ($irun=0; $irun<100; $irun++){
 	mkdir $wrkdir;
   copy "CondorMinBiasPythia.csh", $wrkdir;
   chdir $wrkdir;
+  chmod "+x CondorMinBiasPythia,csh";
 	open(FILE, ">condor");
 	print FILE "Universe = vanilla\n";
 	print FILE "Notification = Never\n";
