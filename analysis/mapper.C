@@ -51,9 +51,9 @@ void makeMaps(TChain* ttree,TFile* out_file){
 }
 
 void makeDists(TChain *vtxTree, TChain *mainTree, TFile *outf){
-  TH1F *tmap = new TH1F("truthDist","",90,0,30);
-  TH1F *rmap = new TH1F("recoDist","",90,0,30);
-  TH1F *cmap = new TH1F("correctedDist","",90,0,30);
+  TH1F *tmap = new TH1F("truthDist","",60,0,30);
+  TH1F *rmap = new TH1F("recoDist","",60,0,30);
+  TH1F *cmap = new TH1F("correctedDist","",60,0,30);
   tmap->Sumw2();
   rmap->Sumw2();
   cmap->Sumw2();
@@ -72,9 +72,11 @@ void makeDists(TChain *vtxTree, TChain *mainTree, TFile *outf){
   for (int event = 0; event < mainTree->GetEntries(); ++event)
   {
     mainTree->GetEvent(event);
-    tmap->Fill(tvtx);
-    rmap->Fill(rvtx);
+    cmap->Fill(rvtx);
   }
+  cmap->Scale(1./mainTree->GetEntries());
+  tmap->Scale(1./vtxTree->GetEntries());
+  rmap->Scale(1./vtxTree->GetEntries());
   outf->Write();
 }
 
