@@ -327,7 +327,8 @@ void TruthConversionEval::numUnique(std::map<int,Conversion> *mymap=NULL,SvtxTra
                 }
                 //TODO check Conversion operations for ownership transfer->memleak due to lack of delete
                 cout<<"vertexing"<<endl;
-                genfit::GFRaveVertex* recoVert = i->second.getSecondaryVertex(_vertexer);
+                genfit::GFRaveVertex* originalVert, recoVert;
+                originalVert=recoVert = i->second.getSecondaryVertex(_vertexer);
                 recoVert = i->second.correctSecondaryVertex(_regressor);
                 cout<<"finding gf_tracks"<<endl;
                 std::pair<PHGenFit::Track*,PHGenFit::Track*> ph_gf_tracks = i->second.getPHGFTracks(_vertexer);
@@ -350,7 +351,8 @@ void TruthConversionEval::numUnique(std::map<int,Conversion> *mymap=NULL,SvtxTra
                   }
                   recoPhoton = i->second.getRefitRecoPhoton();
                   if(recoPhoton) _b_photon_pT=recoPhoton->Pt();
-                  TVector3 recoVertPos = recoVert->getPos();
+                  //fill the vtxing tree
+                  TVector3 recoVertPos = originalVert->getPos();
                   _b_vtx_radius = sqrt(recoVertPos.x()*recoVertPos.x()+recoVertPos.y()*recoVertPos.y());
                   _b_tvtx_radius = sqrt(vtx->get_x()*vtx->get_x()+vtx->get_y()*vtx->get_y());
                   _b_vtx_phi = recoVertPos.Phi();
@@ -358,6 +360,7 @@ void TruthConversionEval::numUnique(std::map<int,Conversion> *mymap=NULL,SvtxTra
                   _b_vtx_z = recoVertPos.Z();
                   _b_vtx_x = recoVertPos.X();
                   _b_vtx_y = recoVertPos.Y();
+                  //truth vertex info
                   TVector3 tVertPos(vtx->get_x(),vtx->get_y(),vtx->get_z());
                   _b_tvtx_phi = tVertPos.Phi();
                   _b_tvtx_eta = tVertPos.Eta();
@@ -365,9 +368,7 @@ void TruthConversionEval::numUnique(std::map<int,Conversion> *mymap=NULL,SvtxTra
                   _b_tvtx_x = tVertPos.X();
                   _b_tvtx_y = tVertPos.Y();
                   _b_vtx_chi2 = recoVert->getChi2();
-                  _b_vtxTrackRZ_dist = i->second.vtxTrackRZ(recoVertPos);
-                  _b_vtxTrackRPhi_dist = i->second.vtxTrackRPhi(recoVertPos);
-
+                  //track info
                   _b_track1_pt = pTstemp.first;
                   _b_track2_pt = pTstemp.second;
                   pair<float,float> etasTemp = i->second.getTrackEtas();
@@ -377,9 +378,18 @@ void TruthConversionEval::numUnique(std::map<int,Conversion> *mymap=NULL,SvtxTra
                   _b_track1_phi = phisTemp.first;
                   _b_track2_phi = phisTemp.second;
                   _vtxingTree->Fill();
+
+                  //populate the refit vertex values
+                  recoVertPos = recoVert->getPos();
+                  _b_vtx_radius = sqrt(recoVertPos.x()*recoVertPos.x()+recoVertPos.y()*recoVertPos.y());
+                  _b_vtx_phi = recoVertPos.Phi();
+                  _b_vtx_eta = recoVertPos.Eta();
+                  _b_vtx_z = recoVertPos.Z();
+                  _b_vtx_x = recoVertPos.X();
+                  _b_vtx_y = recoVertPos.Y();
+                  _b_vtxTrackRZ_dist = i->second.vtxTrackRZ(recoVertPos);
+                  _b_vtxTrackRPhi_dist = i->second.vtxTrackRPhi(recoVertPos);
                 }
-
-
                 //reset the values
                 _b_cluster_prob=-1;
                 _b_cluster_deta=-1;
