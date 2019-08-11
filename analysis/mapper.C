@@ -50,12 +50,41 @@ void makeMaps(TChain* ttree,TFile* out_file){
   out_file->Write();
 }
 
+void makeDists(TChain *vtxTree, TChain *mainTree, TFile *outf){
+  TH1F *tmap = new TH1F("truthDist","",90,0,30);
+  TH1F *rmap = new TH1F("recoDist","",90,0,30);
+  TH1F *cmap = new TH1F("correctedDist","",90,0,30);
+  tmap->Sumw2();
+  rmap->Sumw2();
+  cmap->Sumw2();
+
+  float tvtx,rvtx,cvtx;
+  vtxTree->SetBranchAddress("vtx_radius",&rvtx);
+  vtxTree->SetBranchAddress("tvtx_radius",&tvtx);
+  mainTree->SetBranchAddress("vtx_radius",&cvtx);
+
+  for (int event = 0; event < vtxTree->GetEntries(); ++event)
+  {
+    vtxTree->GetEvent(event);
+    tmap->Fill(tvtx);
+    rmap->Fill(rvtx);
+  }
+  for (int event = 0; event < mainTree->GetEntries(); ++event)
+  {
+    mainTree->GetEvent(event);
+    tmap->Fill(tvtx);
+    rmap->Fill(rvtx);
+  }
+  outf->Write();
+}
+
 void mapper()
 {
   string treePath = "/sphenix/user/vassalli/gammasample/conversionembededonlineanalysis";
   string treeExtension = ".root";
   unsigned int nFiles=100;
   TFile *out_file = new TFile("maps.root","RECREATE");
-  TChain *ttree = handleFile(treePath,treeExtension,"vtxingTree",nFiles);
-  makeMaps(ttree,out_file);
+  TChain *vtx_tree = handleFile(treePath,treeExtension,"vtxingTree",nFiles);
+  TChain *main_tree = handleFile(treePath,treeExtension,"cutTreeSignal",nFiles);
+  makeMaps(vtx_tree,out_file);
 }

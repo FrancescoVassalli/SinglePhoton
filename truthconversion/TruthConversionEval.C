@@ -327,7 +327,7 @@ void TruthConversionEval::numUnique(std::map<int,Conversion> *mymap=NULL,SvtxTra
                 }
                 //TODO check Conversion operations for ownership transfer->memleak due to lack of delete
                 cout<<"vertexing"<<endl;
-                genfit::GFRaveVertex* originalVert, recoVert;
+                genfit::GFRaveVertex* originalVert, *recoVert;
                 originalVert=recoVert = i->second.getSecondaryVertex(_vertexer);
                 recoVert = i->second.correctSecondaryVertex(_regressor);
                 cout<<"finding gf_tracks"<<endl;
