@@ -86,5 +86,6 @@ void mapper()
   TFile *out_file = new TFile("maps.root","RECREATE");
   TChain *vtx_tree = handleFile(treePath,treeExtension,"vtxingTree",nFiles);
   TChain *main_tree = handleFile(treePath,treeExtension,"cutTreeSignal",nFiles);
-  makeMaps(vtx_tree,out_file);
+  //makeMaps(vtx_tree,out_file);
+  makeDists(vtx_tree,main_tree,out_file);
 }
