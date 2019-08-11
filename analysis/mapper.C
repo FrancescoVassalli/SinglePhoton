@@ -72,7 +72,7 @@ void makeDists(TChain *vtxTree, TChain *mainTree, TFile *outf){
   for (int event = 0; event < mainTree->GetEntries(); ++event)
   {
     mainTree->GetEvent(event);
-    cmap->Fill(rvtx);
+    cmap->Fill(cvtx);
   }
   cmap->Scale(1./mainTree->GetEntries());
   tmap->Scale(1./vtxTree->GetEntries());
