@@ -21,12 +21,12 @@ mkdir $rundir;
 for ($irun=0; $irun<100; $irun++){
   $wait =5+int(rand(60)); 
   print "Wait=${wait}\n";
-  copy "CondorMinBiasPythia.csh", $wrkdir;
   sleep $wait;
 
 	$wrkdir = "${rundir}_${irun}";
 	mkdir $wrkdir;
-  #chdir $wrkdir;
+  copy "CondorMinBiasPythia.csh", $wrkdir;
+  chdir $wrkdir;
 	open(FILE, ">condor");
 	print FILE "Universe = vanilla\n";
 	print FILE "Notification = Never\n";
@@ -38,7 +38,8 @@ for ($irun=0; $irun<100; $irun++){
 	print FILE "Log = ${logpath}log.auto.\$(Process)\n";
 	print FILE "Output = ${logpath}out.auto.\$(Process)\n";
 	print FILE "Error = ${logpath}err.auto.\$(Process)\n";
-	print FILE "Notify_user = frva5829\@colorado.edu\n";
+  print FILE "Notify_user = frva5829\@colorado.edu\n";
+	print FILE "request_memory = 3500M\n";
 #	print FILE "+Experiment = \"phenix\"\n";
 #	print FILE "+Job_Type = \"cas\"\n";
 	print FILE "Queue 100\n";
