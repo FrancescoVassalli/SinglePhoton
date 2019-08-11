@@ -25,7 +25,7 @@ cd $SCRATCH_AREA
 ./generator $PYTHIA_FILE $NEVENTS
 set PYTHIA_FILE = $PYTHIA_FILE".dat"
 #cp -f $PYTHIA_FILE $OUT_LOCATION$PYTHIA_FILE
-root -b -q Fun4All_G4_MinBias.C\($NEVENTS,\"$IN_FILE\",\"$OUT_LOCATION$PYTHIA_FILE\"\) 
+root -b -q Fun4All_G4_MinBias.C\($NEVENTS,\"$IN_FILE\",\"$PYTHIA_FILE\"\) 
 cp -f $IN_FILE $OUT_LOCATION$IN_FILE
 root -l -b -q after_Reco.C\(\"$OUT_LOCATION$IN_FILE\",\"$OUT_FILE\"\)
 cp $OUT_FILE $OUT_LOCATION$OUT_FILE
