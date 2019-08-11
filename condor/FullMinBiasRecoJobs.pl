@@ -27,14 +27,14 @@ for ($irun=0; $irun<100; $irun++){
 	mkdir $wrkdir;
   copy "CondorMinBiasPythia.csh", $wrkdir;
   chdir $wrkdir;
-  chmod "777 CondorMinBiasPythia,csh";
+  chmod 0777, "CondorMinBiasPythia.csh" or die;
 	open(FILE, ">condor");
 	print FILE "Universe = vanilla\n";
 	print FILE "Notification = Never\n";
 	print FILE "Arguments = \$(Process) ${wrkdir}/\n";
 	print FILE "Requirements = CPU_Speed>=1\n";
 	print FILE "Rank = CPU_Speed\n";
-	print FILE "Priority = +20\n";
+	print FILE "Priority = +2\n";
 	print FILE "Executable = CondorMinBiasPythia.csh\n";
 	print FILE "Log = ${logpath}log.auto${irun}.\$(Process)\n";
 	print FILE "Output = ${logpath}out.auto${irun}.\$(Process)\n";
