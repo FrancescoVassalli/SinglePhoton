@@ -89,6 +89,29 @@ void signalVtxR(TFile *thisFile){
 	plot->Draw("e1");
 }
 
+void vtxR(TFile *thisFile){
+	gStyle->SetOptStat(0);
+	TH1F *plotTruth  = (TH1F*) thisFile->Get("truthDist");
+	TH1F *plotReco  = (TH1F*) thisFile->Get("recoDist");
+	TH1F *plotCorr = (TH1F*) thisFile->Get("correctedDist");
+	plotReco->SetLineColor(kRed);
+	plotReco->SetMarkerColor(kRed);
+	plotCorr->SetLineColor(kGreen+2);
+	plotCorr->SetMarkerColor(kGreen+2);
+	TCanvas* tc = new TCanvas();
+	tc->Draw();
+	TLegend *tl = new TLegend(.8,.8,.9,.9);
+	tl->AddEntry(plotTruth,"Truth","l");
+	tl->AddEntry(plotReco,"Reco","l");
+	tl->AddEntry(plotCorr,"Corrected Reco","l");
+	plotTruth->SetYTitle("dN/dN");
+	plotTruth->SetXTitle("r_{vtx} [cm]");
+	plotTruth->Draw("e1");
+	plotReco->Draw("e1 same");
+	plotCorr->Draw("e1 same");
+	tl->Draw();
+}
+
 void recoRefit(TFile* thisFile){
 	gStyle->SetOptStat(0);
 	std::vector<TH1F*> plots;
@@ -117,6 +140,7 @@ void recoRefit(TFile* thisFile){
 
 void plotter(){
 	TFile *thisFile = new TFile("effplots.root","READ");
+	TFile *thisOtherFile = new TFile("maps.root","READ");
 	//photon_m(thisFile);
 	//recoRefit(thisFile);
 	//pTEff(thisFile);
@@ -124,7 +148,8 @@ void plotter(){
 	//layer(thisFile);
 	//dlayer(thisFile);
 	//deta(thisFile);
-	signalVtxR(thisFile);
+	//signalVtxR(thisFile);
+	vtxR(thisOtherFile);
 	//TFile *backFile = new TFile("backplots.root","READ");
 
 }
