@@ -12,13 +12,14 @@ set SCRATCH_AREA="$_CONDOR_SCRATCH_DIR/srcth${p}"
 set SOURCE_FUN4ALL="/direct/phenix+u/vassalli/sphenix/single/gen/*"
 set SOURCE_PYTHIA="/direct/phenix+u/vassalli/sphenix/single/pythia/generator"
 set BURNER="/direct/phenix+u/vassalli/sphenix/single/condor/after_Reco.C"
+set SOURCE_BURNER="/direct/phenix+u/vassalli/sphenix/single/truthconversion/*"
 #
 source /phenix/u/vassalli/.cshrc
 mkdir $SCRATCH_AREA
 cp  $SOURCE_FUN4ALL $SCRATCH_AREA
 cp  $SOURCE_PYTHIA $SCRATCH_AREA
 cp $BURNER $SCRATCH_AREA
-cp ../truthconversion/* $SCRATCH_AREA
+cp $SOURCE_BURNER $SCRATCH_AREA
 #
 cd $SCRATCH_AREA
 @ NEVENTS = 200
