@@ -12,22 +12,23 @@ use File::Copy qw(copy);
 $package = "minBiasConversion";
 $maindir = "/sphenix/user/vassalli";
 $logpath = "/direct/phenix+u/vassalli/sphenix/single/condor_logs/";
+$driver = "CondorMinBiasPythia.csh";
 
-$groupnum = 0;
+$groupnum = 1;
 
 $rundir = "${maindir}/${package}/grp${groupnum}";
 mkdir $rundir;
 
 for ($irun=0; $irun<100; $irun++){
-  $wait =5+int(rand(60)); 
+  $wait =int(rand(55)); 
   print "Wait=${wait}\n";
   sleep $wait;
 
 	$wrkdir = "${rundir}_${irun}";
 	mkdir $wrkdir;
-  copy "CondorMinBiasPythia.csh", $wrkdir;
+  copy $driver, $wrkdir;
   chdir $wrkdir;
-  chmod 0777, "CondorMinBiasPythia.csh" or die;
+  chmod 777, $driver or die;
 	open(FILE, ">condor");
 	print FILE "Universe = vanilla\n";
 	print FILE "Notification = Never\n";
@@ -35,12 +36,12 @@ for ($irun=0; $irun<100; $irun++){
 	print FILE "Requirements = CPU_Speed>=1\n";
 	print FILE "Rank = CPU_Speed\n";
 	print FILE "Priority = +2\n";
-	print FILE "Executable = CondorMinBiasPythia.csh\n";
+	print FILE "Executable = $driver\n";
 	print FILE "Log = ${logpath}log.auto${irun}.\$(Process)\n";
 	print FILE "Output = ${logpath}out.auto${irun}.\$(Process)\n";
 	print FILE "Error = ${logpath}err.auto${irun}.\$(Process)\n";
   print FILE "Notify_user = frva5829\@colorado.edu\n";
-	print FILE "request_memory = 3500M\n";
+	print FILE "request_memory = 5000M\n";
 #	print FILE "+Experiment = \"phenix\"\n";
 #	print FILE "+Job_Type = \"cas\"\n";
 	print FILE "Queue 100\n";
