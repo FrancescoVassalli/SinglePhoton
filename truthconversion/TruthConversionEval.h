@@ -161,7 +161,7 @@ class TruthConversionEval: public SubsysReco
     /** RawClusters associated with truth conversions
      * processed by other modules currently empty*/
     RawClusterContainer _conversionClusters;
-
+    //TODO check TPC radius
     const static int s_kTPCRADIUS=21; //in cm there is a way to get this from the simulation I should implement?
     ///<TPC radius currently hardcoded
     float _kRAPIDITYACCEPT=1; //<acceptance rapidity currently hard coded to |1|

@@ -94,6 +94,8 @@ int TruthConversionEval::InitRun(PHCompositeNode *topNode)
     _vtxingTree->Branch("track2_pt", &_b_track2_pt,"track2_pt");
     _vtxingTree->Branch("track2_eta",& _b_track2_eta,"track2_eta");
     _vtxingTree->Branch("track2_phi",& _b_track2_phi,"track2_phi");
+    _vtxingTree->Branch("track_layer",& _b_track_layer,"track_layer");
+
 
     _trackBackTree = new TTree("trackBackTree","track background all single tracks");
     _trackBackTree->SetAutoSave(300);
