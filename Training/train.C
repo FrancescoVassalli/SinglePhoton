@@ -51,8 +51,8 @@ void makeFactory(TTree* signalTree, TTree* backTree,std::string outfile,std::str
 //  factory->AddVariable("vtx_chi2",'F'); 
   //factory->AddVariable("vtxTrackRZ_dist",'F');
   //factory->AddVariable("abs(vtxTrackRPhi_dist-vtxTrackRZ_dist)",'F');
-  //factory->AddVariable("photon_m",'F');
-  //factory->AddVariable("photon_pT",'F');
+  factory->AddVariable("photon_m",'F');
+  factory->AddVariable("photon_pT",'F');
 
   string track_layer_cut = "21>=track_layer>0";
   string track_pT_cut = "track_pT>=0.6";
@@ -83,17 +83,21 @@ void makeFactory(TTree* signalTree, TTree* backTree,std::string outfile,std::str
 
 int train(){
   using namespace std;
-  string treePath = "/sphenix/user/vassalli/gammasample/Konlineanalysis";
-  string treeExtension = ".root";
+  string treePath = "/sphenix/user/vassalli/minBiasConversion/conversiontruthanaout.root";
+  //string treeExtension = ".root";
   string outname = "cutTrainA.root";
-  unsigned int nFiles=100;
-
-  TChain *signalTree = handleFile(treePath,treeExtension,"cutTreeSignal",nFiles);
-  TChain *backtrackTree = handleFile(treePath,treeExtension,"trackBackTree",nFiles);
-  TChain *backpairTree = handleFile(treePath,treeExtension,"pairBackTree",nFiles);
-  TChain *backVtxTree = handleFile(treePath,treeExtension,"vtxBackTree",nFiles);
-  TChain *backHTree = handleFile(treePath,treeExtension,"cutTreeBacke",nFiles);
-  TChain *backETree = handleFile(treePath,treeExtension,"cutTreeBackh",nFiles);
+  //unsigned int nFiles=100;
+  
+  TChain *backVtxTree = new TChain("vtxBackTree");
+  TChain *signalTree = new TChain("cutTreeSignal");
+  backVtxTree->Add(treePath.c_str());
+  signalTree->Add(treePath.c_str());
+  //TChain *signalTree = handleFile(treePath,treeExtension,"cutTreeSignal",nFiles);
+  //TChain *backtrackTree = handleFile(treePath,treeExtension,"trackBackTree",nFiles);
+  //TChain *backpairTree = handleFile(treePath,treeExtension,"pairBackTree",nFiles);
+  //TChain *backVtxTree = handleFile(treePath,treeExtension,"vtxBackTree",nFiles);
+  //TChain *backHTree = handleFile(treePath,treeExtension,"cutTreeBacke",nFiles);
+  //TChain *backETree = handleFile(treePath,treeExtension,"cutTreeBackh",nFiles);
   //makeFactory(signalTree,backtrackTree,outname,"trackback");
   //makeFactory(signalTree,backpairTree,outname,"pairback");
   makeFactory(signalTree,backVtxTree,outname,"vtxback");
