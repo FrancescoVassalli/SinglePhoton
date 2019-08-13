@@ -95,6 +95,8 @@ int analyzeSignal(TChain* _signalCutTree){
   float _b_vtx_radius ;
   float _b_tvtx_radius ;
   float _b_cluster_prob ;
+  float _b_photon_pT ;
+  float _b_photon_m ;
   _signalCutTree->SetBranchAddress("track_deta", &_b_track_deta);
   _signalCutTree->SetBranchAddress("track_dlayer",&_b_track_dlayer);
   //    _signalCutTree->SetBranchAddress("track_layer", &_b_track_layer);
@@ -104,19 +106,24 @@ int analyzeSignal(TChain* _signalCutTree){
   //_signalCutTree->SetBranchAddress("tvtx_radius", &_b_tvtx_radius);
   // _signalCutTree->SetBranchAddress("vtx_chi2", &_b_vtx_chi2);
   _signalCutTree->SetBranchAddress("cluster_prob", &_b_cluster_prob);
-
-  unsigned pT=0, cluster=0, eta=0, rsignal=0;
+  _signalCutTree->SetBranchAddress("photon_m", &_b_photon_m);
+  _signalCutTree->SetBranchAddress("photon_pT", &_b_photon_pT);
+  unsigned pT=0, cluster=0, eta=0, photon=0,rsignal=0;
 
   for(unsigned i=0; i<_signalCutTree->GetEntries();i++){
     _signalCutTree->GetEntry(i);
     if(_b_track_pT<.6) pT++;
     else if (_b_cluster_prob<0) cluster++;
     else if (_b_track_deta>.0082) eta++;
-    else if (TMath::Abs(_b_track_dlayer)<=9&&_b_vtx_radius>1.84) rsignal++;
+    else if (TMath::Abs(_b_track_dlayer)<=9&&_b_vtx_radius>1.84){
+      rsignal++;
+      if(_b_photon_m<.27||_b_photon_m>8.||_b_photon_pT<.039) photon++;
+    }
   }
   cout<<"pT cut "<<pT<<" events\n";
   cout<<"cluster cut "<<cluster<<" events\n";
   cout<<"eta cut "<<eta<<" events\n";
+  cout<<"photon cut "<<photon<<" events\n";
   return rsignal;
 }
 

@@ -81,6 +81,8 @@ class RecoConversionEval : public SubsysReco {
 		bool vtxTrackRPhiCut(TVector3 recoVertPos, SvtxTrack* track);
 		//! vtx radius must be greater than the cut
 		bool vtxRadiusCut(TVector3 recoVertPos);
+    //! cut on the reconstructed photon mass and pT
+    bool photonCuts(TLorentzVector* photon)const;
 		/* cut on the distance between the closest point between the two tracks*/
 		bool approachDistance(SvtxTrack *t1,SvtxTrack* t2)const;
 		
