@@ -40,7 +40,7 @@ void makeFactory(TTree* signalTree,std::string outfile,std::string factoryname)
   factory->AddVariable("track1_phi-track2_phi","d#phi","rad");
   factory->AddVariable("track1_eta",'F');
   factory->AddVariable("track1_eta-track2_eta","d#eta","rad");
-  factory->AddVariable("track_layer",'F');
+  factory->AddVariable("(vtx_radius)/(track_layer+1)",'F');
   factory->AddVariable("vtx_radius","radius","cm");
   factory->AddTarget("tvtx_radius","radius","cm");
 
