@@ -11,7 +11,7 @@ set SCRATCH_AREA="$_CONDOR_SCRATCH_DIR/srcth${p}"
 #
 set SOURCE_FUN4ALL="/direct/phenix+u/vassalli/sphenix/single/gen/*"
 set SOURCE_PYTHIA="/direct/phenix+u/vassalli/sphenix/single/pythia/generator"
-set BURNERNAME="after_embeded.C"
+set BURNERNAME="after_Reco.C"
 set BURNER="/direct/phenix+u/vassalli/sphenix/single/condor/${BURNERNAME}"
 set SOURCE_BURNER="/direct/phenix+u/vassalli/sphenix/single/truthconversion/*"
 #

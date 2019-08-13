@@ -71,6 +71,7 @@ int RecoConversionEval::InitRun(PHCompositeNode *topNode) {
   _treeBackground->Branch("tracks_clus", &passedCluster);
   _treeBackground->Branch("pairs", &passedPair);
   _treeBackground->Branch("vtx", 	  &passedVtx);
+  _treeBackground->Branch("photon", 	  &passedPhoton);
 
   return Fun4AllReturnCodes::EVENT_OK;
 }
