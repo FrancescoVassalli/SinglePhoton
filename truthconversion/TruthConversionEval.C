@@ -88,13 +88,13 @@ int TruthConversionEval::InitRun(PHCompositeNode *topNode)
     _vtxingTree->Branch("tvtx_z", &_b_tvtx_z);
     _vtxingTree->Branch("tvtx_phi", &_b_tvtx_phi);
     _vtxingTree->Branch("vtx_chi2", &_b_vtx_chi2);
-    _vtxingTree->Branch("track1_pt", &_b_track1_pt,"track1_pt");
-    _vtxingTree->Branch("track1_eta",& _b_track1_eta,"track1_eta");
-    _vtxingTree->Branch("track1_phi",& _b_track1_phi,"track1_phi");
-    _vtxingTree->Branch("track2_pt", &_b_track2_pt,"track2_pt");
-    _vtxingTree->Branch("track2_eta",& _b_track2_eta,"track2_eta");
-    _vtxingTree->Branch("track2_phi",& _b_track2_phi,"track2_phi");
-    _vtxingTree->Branch("track_layer",& _b_track_layer,"track_layer");
+    _vtxingTree->Branch("track1_pt", &_b_track1_pt);
+    _vtxingTree->Branch("track1_eta",& _b_track1_eta);
+    _vtxingTree->Branch("track1_phi",& _b_track1_phi);
+    _vtxingTree->Branch("track2_pt", &_b_track2_pt);
+    _vtxingTree->Branch("track2_eta",& _b_track2_eta);
+    _vtxingTree->Branch("track2_phi",& _b_track2_phi);
+    _vtxingTree->Branch("track_layer",& _b_track_layer);
 
 
     _trackBackTree = new TTree("trackBackTree","track background all single tracks");
