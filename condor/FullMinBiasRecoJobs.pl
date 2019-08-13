@@ -12,14 +12,14 @@ use File::Copy qw(copy);
 $package = "minBiasConversion";
 $maindir = "/sphenix/user/vassalli";
 $logpath = "/direct/phenix+u/vassalli/sphenix/single/condor_logs/";
-$driver = "CondorAfterMinBiasPythia.csh";
+$driver = "CondorMinBiasPythia.csh";
 #
-$groupnum = 0;
+$groupnum = 1;
 #
 $rundir = "${maindir}/${package}/grp${groupnum}";
 mkdir $rundir;
 #
-for ($irun=17; $irun<40; $irun++){
+for ($irun=0; $irun<100; $irun++){
   $wait =int(rand(5)); 
   print "Wait=${wait}\n";
   sleep $wait;
@@ -42,7 +42,7 @@ for ($irun=17; $irun<40; $irun++){
   print FILE "Output = ${logpath}out.auto${irun}.\$(Process)\n";
   print FILE "Error = ${logpath}err.auto${irun}.\$(Process)\n";
   print FILE "Notify_user = frva5829\@colorado.edu\n";
-  print FILE "request_memory = 3000M\n";
+  print FILE "request_memory = 5000M\n";
   # print FILE "+Experiment = \"phenix\"\n";
   # print FILE "+Job_Type = \"cas\"\n";
   print FILE "Queue 100\n";
