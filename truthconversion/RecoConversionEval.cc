@@ -133,11 +133,12 @@ int RecoConversionEval::process_event(PHCompositeNode *topNode) {
                   _b_refit=false;
                 }
                 //if the photon is reconstructed record its data 
-                if(photon){
+                if(photonCuts(photon)){
                   _b_photon_m = photon->Dot(*photon);
                   _b_photon_pT = photon->Pt();
                   _b_photon_eta = photon->Eta();
                   _b_photon_phi = photon->Phi();
+                  passedPhoton++;
                   delete photon;
                 }
                 else{
@@ -251,6 +252,10 @@ std::pair<PHGenFit::Track*,PHGenFit::Track*> RecoConversionEval::refitTracks(gen
 
 bool RecoConversionEval::pairCuts(SvtxTrack* t1, SvtxTrack* t2)const{
   return detaCut(t1->get_eta(),t2->get_eta())&&hitCuts(t1,t2);//TODO add approach distance ?
+}
+
+bool RecoConversionEval::photonCuts(TLorentzVector* photon)const{
+  return photon&&photon->Dot(*photon)>_kPhotonMmin&&photon->Dot(*photon)<_kPhotonMmax&&_kPhotonPTmin<photon->Pt();//TODO add approach distance ?
 }
 
 

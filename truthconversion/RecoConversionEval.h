@@ -99,6 +99,7 @@ class RecoConversionEval : public SubsysReco {
 		unsigned passedCluster=0;
 		unsigned passedPair=0;
 		unsigned passedVtx=0;
+		unsigned passedPhoton=0;
     	/**@}*/
 
 		// I want these to be static constexpr
@@ -110,6 +111,9 @@ class RecoConversionEval : public SubsysReco {
 		float _kEMProbCut=.0;
 		float _kVtxRCut=1.84;
 		float _kDetaCut=.008;
+		float _kPhotonMmin=.27;
+		float _kPhotonMmax=8.;
+		float _kPhotonPTmin=0.039;
 		int _kDLayerCut=9;
     	/**@}*/
 		//these are not useful
