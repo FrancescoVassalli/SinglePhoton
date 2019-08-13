@@ -24,9 +24,13 @@ TChain* handleFile(string name, string extension, string treename, unsigned int 
   return all;
 }
 
-int make(TChain* ttree,TFile* out_file){
-  cout<<ttree->GetEntries()<<endl;
-  return ttree->GetEntries();
+int reportBackground(TChain* truthTree,TChain* recoTree,TFile* out_file){
+  double signal = truthTree->GetEntries();
+  signal*=(1-.012)*(1-.002)*(1-.011);
+  int background = recoTree->GetEntries();
+  background-=(int) signal;
+  cout<<"For "<<truthTree->GetEntries()<<" truth conversions, I found "<<background<<" background events"<<endl;
+  return (int) signal;
   /*float pT;
   float tpT;
   ttree->SetBranchAddress("photon_pT",&pT);
@@ -47,7 +51,7 @@ int make(TChain* ttree,TFile* out_file){
     out_file->Write();*/
 }
 
-void reportBackground(TChain* _treeBackground,int signal){
+void reportCuts(TChain* _treeBackground,int signal){
   unsigned totalTracks;
   unsigned passedpTEtaQ;
   unsigned passedCluster;
@@ -78,7 +82,42 @@ void reportBackground(TChain* _treeBackground,int signal){
   cout<<1-(float)sum_passedpTEtaQ/sum_totalTracks<<"+/-"<<sqrt((float)sum_passedpTEtaQ)/sum_totalTracks<<" of tracks were rejected by pTEtaQ\n\t";
   cout<<1-(float)sum_passedCluster/sum_passedpTEtaQ<<"+/-"<<sqrt((float)sum_passedCluster)/sum_passedpTEtaQ<<" of remaining tracks were rejected by cluster\n\t";
   cout<<1-(float)sum_passedPair/sum_passedCluster<<"+/-"<<sqrt((float)sum_passedPair)/sum_passedCluster<<" of pairs were rejected by pair cuts\n\t";
-  cout<<1-(float)sum_passedVtx/sum_passedPair<<"+/-"<<sqrt((float)sum_passedVtx)/sum_passedPair<<" of vtx were rejected by vtx cuts\n\t";
+  cout<<1-(float)sum_passedVtx/sum_passedPair<<"+/-"<<sqrt((float)sum_passedVtx)/sum_passedPair<<" of vtx were rejected by vtx cuts\n";
+  cout<<sum_passedVtx<<" background events remain with "<<signal<<" signal events\n";
+}
+
+int analyzeSignal(TChain* _signalCutTree){
+  int _b_track_layer ;
+  int _b_track_dlayer ;
+  float _b_track_deta ;
+  float _b_track_pT;
+  float _b_ttrack_pT;
+  float _b_vtx_radius ;
+  float _b_tvtx_radius ;
+  float _b_cluster_prob ;
+  _signalCutTree->SetBranchAddress("track_deta", &_b_track_deta);
+  _signalCutTree->SetBranchAddress("track_dlayer",&_b_track_dlayer);
+  //    _signalCutTree->SetBranchAddress("track_layer", &_b_track_layer);
+  _signalCutTree->SetBranchAddress("track_pT", &_b_track_pT);
+  //_signalCutTree->SetBranchAddress("ttrack_pT", &_b_ttrack_pT);
+   _signalCutTree->SetBranchAddress("vtx_radius", &_b_vtx_radius);
+  //_signalCutTree->SetBranchAddress("tvtx_radius", &_b_tvtx_radius);
+  // _signalCutTree->SetBranchAddress("vtx_chi2", &_b_vtx_chi2);
+  _signalCutTree->SetBranchAddress("cluster_prob", &_b_cluster_prob);
+
+  unsigned pT=0, cluster=0, eta=0, rsignal=0;
+
+  for(unsigned i=0; i<_signalCutTree->GetEntries();i++){
+    _signalCutTree->GetEntry(i);
+    if(_b_track_pT<.6) pT++;
+    else if (_b_cluster_prob<0) cluster++;
+    else if (_b_track_deta>.0082) eta++;
+    else if (TMath::Abs(_b_track_dlayer)<=9&&_b_vtx_radius>1.84) rsignal++;
+  }
+  cout<<"pT cut "<<pT<<" events\n";
+  cout<<"cluster cut "<<cluster<<" events\n";
+  cout<<"eta cut "<<eta<<" events\n";
+  return rsignal;
 }
 
 void minBiasRecoAna()
@@ -89,10 +128,13 @@ void minBiasRecoAna()
   unsigned int nFiles=600;
   TFile *out_file = new TFile("minBiasplots.root","RECREATE");
   TChain *ttree = handleFile(treePath,treeExtension,"recoSignal",nFiles);
-  TChain *back_tree = new TChain("recoBackground");
-  string filename = "/sphenix/user/vassalli/minBiasPythia/allRecoMinBias.root";
+  TChain *cut_tree = new TChain("recoBackground");
+  TChain *back_tree = new TChain("recoSignal");
+  TChain *truth_ttree = new TChain("cutTreeSignal");
+  string filename = "/sphenix/user/vassalli/minBiasConversion/conversionanaout.root";
   back_tree->Add(filename.c_str());
-  TChain *truth_ttree = handleFile(truthTreePath,treeExtension,"cutTreeSignal",nFiles);
-  //make(ttree,out_file);
-  reportBackground(back_tree,make(truth_ttree,out_file));
+  cut_tree->Add(filename.c_str());
+  filename = "/sphenix/user/vassalli/minBiasConversion/conversiontruthanaout.root";
+  truth_ttree->Add(filename.c_str());
+  reportCuts(cut_tree,analyzeSignal(truth_ttree));
 }
