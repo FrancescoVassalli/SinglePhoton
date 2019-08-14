@@ -257,8 +257,6 @@ int TruthConversionEval::process_event(PHCompositeNode *topNode)
       }//make tree
     }// not primary 
     else if(_kMakeTTree){ //is primary therefore not a conversion 
-      embedID=get_embed(g4particle,_truthinfo);
-      //cout<<"primary particle"<<endl;
       backgroundTracks.push_back(g4particle);
     }//make tree
   }//truth particle loop
