@@ -15,7 +15,7 @@ void generator(std::string filename, long nEvents){
   pythiaengine.readString("SoftQCD:nonDiffractive = on");
   pythiaengine.readString("SoftQCD:singleDiffractive = on");
   pythiaengine.readString("SoftQCD:doubleDiffractive = on");
-  pythiaengine.readString("PhaseSpace:pTHatMin = 2.");
+  pythiaengine.readString("PhaseSpace:pTHatMin = 0.");
   pythiaengine.readString("Random::setSeed = on");
   pythiaengine.readString("Random::seed =0");
   //pythiaengine.readString("111:onMode = off"); ///pi0 won't decay
