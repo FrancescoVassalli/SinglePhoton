@@ -38,10 +38,10 @@ void makeFactory(TTree* signalTree, TTree* backTree,std::string outfile,std::str
   if(bgTree2){
     factory->AddBackgroundTree(bgTree2,1.0);
   }
-  factory->AddSpectator("track_layer",'I');
-  factory->AddSpectator("track_pT",'F');
-  factory->AddSpectator("track_dca",'F');
-  factory->AddSpectator("cluster_prob",'F');
+  factory->AddVariable("track_layer",'I');
+  factory->AddVariable("track_pT",'F');
+  //factory->AddSpectator("track_dca",'F');
+  //factory->AddSpectator("cluster_prob",'F');
   factory->AddVariable("abs(track_deta)",'F');
   factory->AddVariable("abs(cluster_deta)",'F');
   factory->AddVariable("abs(cluster_dphi)",'F');
@@ -61,10 +61,10 @@ void makeFactory(TTree* signalTree, TTree* backTree,std::string outfile,std::str
   string track_deta_cut = ".0082>=track_deta";
   string track_dlayer_cut = "2>=abs(track_dlayer)";
   string approach_dist_cut = "69.34>approach_dist>0";
-  string vtx_radius_cut = "vtx_radius>1.8378";
+  string vtx_radius_cut = "vtx_radius>0";
   //do I need photon cuts? 
-  //string tCutInitializer = track_pT_cut+"&&"+track_dca_cut+"&&"+em_prob_cut;//+"&&"+track_deta_cut+"&&"+track_dlayer_cut+"&&"+approach_dist_cut+"&&"+vtx_radius_cut;
-  TCut preTraingCuts("");
+  string tCutInitializer = vtx_radius_cut+"&&"+em_prob_cut;//+"&&"+track_deta_cut+"&&"+track_dlayer_cut+"&&"+approach_dist_cut+"&&"+vtx_radius_cut;
+  TCut preTraingCuts(tCutInitializer.c_str());
 
   factory->PrepareTrainingAndTestTree(preTraingCuts,"nTrain_Signal=0:nTrain_Background=0:nTest_Signal=0:nTest_Background=0");
   //for track training

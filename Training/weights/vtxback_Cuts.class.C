@@ -10,10 +10,10 @@ Method         : Cuts::Cuts
 TMVA Release   : 4.2.0         [262656]
 ROOT Release   : 5.34/38       [336422]
 Creator        : vassalli
-Date           : Wed Aug 14 15:44:58 2019
+Date           : Wed Aug 14 15:50:16 2019
 Host           : Linux cvmfswrite02.sdcc.bnl.gov 3.10.0-693.11.6.el7.x86_64 #1 SMP Wed Jan 3 18:09:42 CST 2018 x86_64 x86_64 x86_64 GNU/Linux
 Dir            : /direct/phenix+u/vassalli/sphenix/single/Training
-Training events: 43725
+Training events: 37690
 Analysis type  : [Classification]
 
 
@@ -37,6 +37,8 @@ CutRangeMin[0]: "-1.000000e+00" [Minimum of allowed cut range (set per variable)
     CutRangeMin[5]: "-1.000000e+00"
     CutRangeMin[6]: "-1.000000e+00"
     CutRangeMin[7]: "-1.000000e+00"
+    CutRangeMin[8]: "-1.000000e+00"
+    CutRangeMin[9]: "-1.000000e+00"
 CutRangeMax[0]: "-1.000000e+00" [Maximum of allowed cut range (set per variable)]
     CutRangeMax[1]: "-1.000000e+00"
     CutRangeMax[2]: "-1.000000e+00"
@@ -45,6 +47,8 @@ CutRangeMax[0]: "-1.000000e+00" [Maximum of allowed cut range (set per variable)
     CutRangeMax[5]: "-1.000000e+00"
     CutRangeMax[6]: "-1.000000e+00"
     CutRangeMax[7]: "-1.000000e+00"
+    CutRangeMax[8]: "-1.000000e+00"
+    CutRangeMax[9]: "-1.000000e+00"
 VarProp[0]: "NotEnforced" [Categorisation of cuts]
     VarProp[1]: "NotEnforced"
     VarProp[2]: "NotEnforced"
@@ -53,25 +57,25 @@ VarProp[0]: "NotEnforced" [Categorisation of cuts]
     VarProp[5]: "NotEnforced"
     VarProp[6]: "NotEnforced"
     VarProp[7]: "NotEnforced"
+    VarProp[8]: "NotEnforced"
+    VarProp[9]: "NotEnforced"
 ##
 
 
 #VAR -*-*-*-*-*-*-*-*-*-*-*-* variables *-*-*-*-*-*-*-*-*-*-*-*-
 
-NVar 8
-abs(track_deta)               abs_track_deta_               abs(track_deta)               abs(track_deta)                                                 'F'    [0,1.18771755695]
+NVar 10
+track_layer                   track_layer                   track_layer                   track_layer                                                     'I'    [0,38]
+track_pT                      track_pT                      track_pT                      track_pT                                                        'F'    [0.206321507692,7.14084815979]
+abs(track_deta)               abs_track_deta_               abs(track_deta)               abs(track_deta)                                                 'F'    [0,1.19192612171]
 abs(cluster_deta)             abs_cluster_deta_             abs(cluster_deta)             abs(cluster_deta)                                               'F'    [0,1.23631501198]
-abs(cluster_dphi)             abs_cluster_dphi_             abs(cluster_dphi)             abs(cluster_dphi)                                               'F'    [0,6.17630195618]
+abs(cluster_dphi)             abs_cluster_dphi_             abs(cluster_dphi)             abs(cluster_dphi)                                               'F'    [0,6.01320457458]
 abs(track_dlayer)             abs_track_dlayer_             abs(track_dlayer)             abs(track_dlayer)                                               'I'    [0,38]
-approach_dist                 approach_dist                 approach_dist                 approach_dist                                                   'F'    [5.56851887268e-07,102.995819092]
-vtx_radius                    vtx_radius                    vtx_radius                    vtx_radius                                                      'F'    [-1,136.025360107]
-photon_m                      photon_m                      photon_m                      photon_m                                                        'F'    [0,40.7564888]
-photon_pT                     photon_pT                     photon_pT                     photon_pT                                                       'F'    [0,25543.2988281]
-NSpec 4
-track_layer                   track_layer                   track_layer                   I                                                               'F'    [0,38]
-track_pT                      track_pT                      track_pT                      F                                                               'F'    [0.156781166792,24.3782310486]
-track_dca                     track_dca                     track_dca                     F                                                               'F'    [2.13139141891e-08,50.9604148865]
-cluster_prob                  cluster_prob                  cluster_prob                  F                                                               'F'    [-1,0.995470285416]
+approach_dist                 approach_dist                 approach_dist                 approach_dist                                                   'F'    [5.56851887268e-07,113.740211487]
+vtx_radius                    vtx_radius                    vtx_radius                    vtx_radius                                                      'F'    [1.27664196629e-35,136.025360107]
+photon_m                      photon_m                      photon_m                      photon_m                                                        'F'    [0,541.151306152]
+photon_pT                     photon_pT                     photon_pT                     photon_pT                                                       'F'    [1.86350050772e-38,25543.2988281]
+NSpec 0
 
 
 ============================================================================ */
@@ -113,11 +117,11 @@ class ReadCuts : public IClassifierReader {
    ReadCuts( std::vector<std::string>& theInputVars ) 
       : IClassifierReader(),
         fClassName( "ReadCuts" ),
-        fNvars( 8 ),
+        fNvars( 10 ),
         fIsNormalised( false )
    {      
       // the training input variables
-      const char* inputVars[] = { "abs(track_deta)", "abs(cluster_deta)", "abs(cluster_dphi)", "abs(track_dlayer)", "approach_dist", "vtx_radius", "photon_m", "photon_pT" };
+      const char* inputVars[] = { "track_layer", "track_pT", "abs(track_deta)", "abs(cluster_deta)", "abs(cluster_dphi)", "abs(track_dlayer)", "approach_dist", "vtx_radius", "photon_m", "photon_pT" };
 
       // sanity checks
       if (theInputVars.size() <= 0) {
@@ -157,16 +161,22 @@ class ReadCuts : public IClassifierReader {
       fVmax[6] = 0;
       fVmin[7] = 0;
       fVmax[7] = 0;
+      fVmin[8] = 0;
+      fVmax[8] = 0;
+      fVmin[9] = 0;
+      fVmax[9] = 0;
 
       // initialize input variable types
-      fType[0] = 'F';
+      fType[0] = 'I';
       fType[1] = 'F';
       fType[2] = 'F';
-      fType[3] = 'I';
+      fType[3] = 'F';
       fType[4] = 'F';
-      fType[5] = 'F';
+      fType[5] = 'I';
       fType[6] = 'F';
       fType[7] = 'F';
+      fType[8] = 'F';
+      fType[9] = 'F';
 
       // initialize constants
       Initialize();
@@ -198,15 +208,15 @@ class ReadCuts : public IClassifierReader {
    // normalisation of input variables
    const bool fIsNormalised;
    bool IsNormalised() const { return fIsNormalised; }
-   double fVmin[8];
-   double fVmax[8];
+   double fVmin[10];
+   double fVmax[10];
    double NormVariable( double x, double xmin, double xmax ) const {
       // normalise to output range: [-1, 1]
       return 2*(x - xmin)/(xmax - xmin) - 1.0;
    }
 
    // type of input variable: 'F' or 'I'
-   char   fType[8];
+   char   fType[10];
 
    // initialize internal variables
    void Initialize();
