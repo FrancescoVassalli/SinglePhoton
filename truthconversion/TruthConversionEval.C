@@ -171,9 +171,10 @@ bool TruthConversionEval::doNodePointers(PHCompositeNode* topNode){
   _mainClusterContainer = findNode::getClass<RawClusterContainer>(topNode,"CLUSTER_CEMC");
   _truthinfo = findNode::getClass<PHG4TruthInfoContainer>(topNode,"G4TruthInfo");
   _clusterMap = findNode::getClass<TrkrClusterContainer>(topNode, "TRKR_CLUSTER");
+  _allTracks = findNode::getClass<SvtxTrackMap>(topNode,"SvtxTrackMap");
   //  _hitMap = findNode::getClass<SvtxHitMap>(topNode,"SvtxHitMap");
   //if(!_mainClusterContainer||!_truthinfo||!_clusterMap||!_hitMap){
-  if(!_mainClusterContainer||!_truthinfo||!_clusterMap){
+  if(!_mainClusterContainer||!_truthinfo||!_clusterMap||!_allTracks){
     cerr<<Name()<<": critical error-bad nodes \n";
     if(!_mainClusterContainer){
       cerr<<"\t RawClusterContainer is bad";
@@ -184,9 +185,9 @@ bool TruthConversionEval::doNodePointers(PHCompositeNode* topNode){
     if(!_clusterMap){
       cerr<<"\t TrkrClusterMap is bad";
     }
-    /*if(!_hitMap){
-      cerr<<"\t SvtxHitMap is bad";
-      }*/
+    if(!_allTracks){
+      cerr<<"\t SvtxTrackMap is bad";
+      }
     cerr<<endl;
     goodPointers=false;
   }
@@ -217,7 +218,8 @@ int TruthConversionEval::process_event(PHCompositeNode *topNode)
   //h is for hadronic e is for EM
   std::map<int,Conversion> hbackgroundMap;
   std::map<int,Conversion> ebackgroundMap;
-  std::vector<PHG4Particle*> backgroundTracks;
+  std::vector<SvtxTrack*> backgroundTracks;
+  std::list<int> signalTracks;
   for ( PHG4TruthInfoContainer::ConstIterator iter = range.first; iter != range.second; ++iter ) {
     PHG4Particle* g4particle = iter->second;
     PHG4Particle* parent =_truthinfo->GetParticle(g4particle->get_parent_id());
@@ -251,17 +253,22 @@ int TruthConversionEval::process_event(PHCompositeNode *topNode)
         PHG4Particle* grand =_truthinfo->GetParticle(parent->get_parent_id()); //grandparent
         if (grand) (mapConversions[vtx->get_id()]).setSourceId(grand->get_pid());//record pid of the photon's source
         else (mapConversions[vtx->get_id()]).setSourceId(0);//or it is from the G4 generator?
+        //build a list of the ids
+        signalTracks.push_back(trackeval->best_track_from(g4particle)->get_id());
       }
-      else if(_kMakeTTree){//not a conversion
-        backgroundTracks.push_back(g4particle);
-      }//make tree
     }// not primary 
-    else if(_kMakeTTree){ //is primary therefore not a conversion 
-      backgroundTracks.push_back(g4particle);
-    }//make tree
   }//truth particle loop
   //pass the map to this helper method which fills the fields for the TTree 
   numUnique(&mapConversions,trackeval,_mainClusterContainer);
+  signalTracks.sort();
+  for ( SvtxTrackMap::Iter iter = _allTracks->begin(); iter != _allTracks->end(); ++iter) {
+    auto inCheck = std::find(signalTracks.begin(),signalTracks.end(),(*iter)->get_id());
+    //if the track is not in the list of signal tracks
+    if (inCheck!=signalTracks.end())
+    {
+      backgroundTracks.push_back(*iter);
+    }
+  }
   if (Verbosity()==10)
   {
     cout<<Name()<<"# conversion clusters="<<_conversionClusters.size()<<'\n';
@@ -273,6 +280,7 @@ int TruthConversionEval::process_event(PHCompositeNode *topNode)
   delete stack;
   return 0;
 }
+
 
 void TruthConversionEval::numUnique(std::map<int,Conversion> *mymap=NULL,SvtxTrackEval* trackeval=NULL,RawClusterContainer *mainClusterContainer=NULL){
   for (std::map<int,Conversion>::iterator i = mymap->begin(); i != mymap->end(); ++i) {
@@ -452,18 +460,14 @@ void TruthConversionEval::numUnique(std::map<int,Conversion> *mymap=NULL,SvtxTra
 }
 
 //only call if _kMakeTTree is true
-void TruthConversionEval::processTrackBackground(std::vector<PHG4Particle*> *v_tracks,SvtxTrackEval* trackeval){
+void TruthConversionEval::processTrackBackground(std::vector<SvtxTrack*> *v_tracks,SvtxTrackEval* trackeval){
   Conversion pairMath;
   float lastpT=-1.;
   unsigned nNullTrack=0;
   cout<<"The total possible background track count is "<<v_tracks->size()<<'\n';
-  for (std::vector<PHG4Particle*>::iterator iTruthTrack = v_tracks->begin(); iTruthTrack != v_tracks->end(); ++iTruthTrack) {
+  for (std::vector<SvtxTrack*>::iterator iter = v_tracks->begin(); iter != v_tracks->end(); ++iter) {
+    SvtxTrack* iTrack = *iter;
     //get the SvtxTrack it must not be NULL
-    if(!*iTruthTrack){
-      nNullTrack++;
-      continue;
-    }
-    SvtxTrack* iTrack = trackeval->best_track_from(*iTruthTrack);
     if(!iTrack){
       nNullTrack++;
       continue;
@@ -487,9 +491,8 @@ void TruthConversionEval::processTrackBackground(std::vector<PHG4Particle*> *v_t
     if(cluster1) _bb_cluster_prob= cluster1->get_prob();
     else _bb_cluster_prob=-1;
     //pair with other tracks
-    for(std::vector<PHG4Particle*>::iterator jTruthTrack =std::next(iTruthTrack,1);jTruthTrack!=v_tracks->end(); ++jTruthTrack){//posible bias by filling the track level variables with iTrack instead of min(iTrack,jTrack)
-      if(!*jTruthTrack) continue;
-      SvtxTrack* jTrack = trackeval->best_track_from(*jTruthTrack);
+    for(std::vector<PHG4Particle*>::iterator jter =std::next(iter,1);jTruthTrack!=v_tracks->end(); ++jter){//posible bias by filling the track level variables with iTrack instead of min(iTrack,jTrack)
+      SvtxTrack* jTrack = *jter;
       if(!jTrack||TMath::Abs(jTrack->get_eta())>1.1)continue;
       //record pair geometry
       _bb_track_deta = pairMath.trackDEta(iTrack,jTrack);

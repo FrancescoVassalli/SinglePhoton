@@ -20,6 +20,7 @@ class PHG4Particle;
 class PHG4VtxPoint;
 class Conversion;
 class SvtxTrackEval;
+class SvtxTrackMap;
 class SvtxVertex;
 class SvtxTrack;
 class SvtxHitMap;
@@ -86,6 +87,7 @@ class TruthConversionEval: public SubsysReco
     RawClusterContainer *_mainClusterContainer; //< clusters from the node
     PHG4TruthInfoContainer *_truthinfo;
     TrkrClusterContainer* _clusterMap;
+    SvtxTrackMap* _allTracks;
     SvtxHitMap *_hitMap;
     std::string _foutname; ///< name of the output file
     SVReco *_vertexer=NULL; ///< for reco vertex finding
