@@ -32,7 +32,9 @@ int after_Combined(std::string infile = "XjPhi3_pT5_98_dst.root",std::string out
   string tmvaname="kNN14";
   RecoConversionEval *rCE = new RecoConversionEval(outfile,tmvaname,tmvapath);
   se->registerSubsystem( rCE );
-  TruthConversionEval *truther = new TruthConversionEval(outfile,runNumber,2,3,true,tmvaname,tmvapath);
+  string truthname = "truth";
+  truthname+=outfile;
+  TruthConversionEval *truther = new TruthConversionEval(truthname,runNumber,2,3,true,tmvaname,tmvapath);
   se->registerSubsystem(truther);
 
   se->run();

@@ -55,7 +55,7 @@ int RecoConversionEval::InitRun(PHCompositeNode *topNode) {
   _vertexer = new SVReco();
   //TODO turn this back into a subsystem and put it on the node tree
   _vertexer->InitRun(topNode);
-  _file = new TFile( _fname.c_str(), "UPDATE");
+  _file = new TFile( _fname.c_str(), "RECREATE");
   _treeSignal = new TTree("recoSignal","strong saharah bush");
   _treeSignal->SetAutoSave(300);
   _treeSignal->Branch("photon_m",   &_b_photon_m);

@@ -23,6 +23,7 @@ cd $SCRATCH_AREA
 #cp -f $IN_FILE $OUT_LOCATION$IN_FILE
 root -l -b -q after_Combined.C\(\"$OUT_LOCATION$IN_FILE\",\"$OUT_FILE\"\)
 cp -f $OUT_FILE $ANA_LOCATION$OUT_FILE
+cp -f "truth"$OUT_FILE $ANA_LOCATION"truth"$OUT_FILE
 #
 rm -rf $SCRATCH_AREA
 #
