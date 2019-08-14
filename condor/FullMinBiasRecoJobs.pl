@@ -14,12 +14,12 @@ $maindir = "/sphenix/user/vassalli";
 $logpath = "/direct/phenix+u/vassalli/sphenix/single/condor_logs/";
 $driver = "CondorMinBiasPythia.csh";
 #
-$groupnum = 1;
+$groupnum = 2;
 #
 $rundir = "${maindir}/${package}/grp${groupnum}";
 mkdir $rundir;
 #
-for ($irun=0; $irun<100; $irun++){
+for ($irun=0; $irun<30; $irun++){
   $wait =int(rand(5)); 
   print "Wait=${wait}\n";
   sleep $wait;
@@ -35,7 +35,7 @@ for ($irun=0; $irun<100; $irun++){
   print FILE "Arguments = \$(Process) ${wrkdir}/\n";
   print FILE "Requirements = CPU_Speed>=1\n";
   print FILE "Rank = CPU_Speed\n";
-  print FILE "Priority = +2\n";
+  print FILE "Priority = +8\n";
   print FILE "run_as_owner = True\n";
   print FILE "Executable = $driver\n";
   print FILE "Log = ${logpath}log.auto.\$(Process)\n";
