@@ -530,7 +530,7 @@ void TruthConversionEval::processTrackBackground(std::vector<PHG4Particle*> *v_t
       if(parent) _bb_parent_pid = parent->get_pid();
       else _bb_parent_pid=0;
 
-      if (_bb_track_layer>0&&_bb_track_pT>.6&&_bb_track_deta<.0082&&TMath::Abs(_bb_track_dlayer)<=2)
+      if (_bb_track_layer>=0&&_bb_track_pT>.6&&_bb_track_deta<.0082&&TMath::Abs(_bb_track_dlayer)<=9)
       {
         iTrack->identify();
         jTrack->identify();

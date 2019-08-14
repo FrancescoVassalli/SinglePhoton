@@ -92,6 +92,8 @@ class RecoConversionEval : public SubsysReco {
 		float _b_photon_pT;
 		float _b_photon_eta;
 		float _b_photon_phi;
+		float _b_track1_pT;
+		float _b_track2_pT;
 		bool _b_refit;
     	/**@}*/
 		/** \defgroup counts for background rejection rate

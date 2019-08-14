@@ -62,6 +62,8 @@ int RecoConversionEval::InitRun(PHCompositeNode *topNode) {
   _treeSignal->Branch("photon_pT",  &_b_photon_pT);
   _treeSignal->Branch("photon_eta", &_b_photon_eta);
   _treeSignal->Branch("photon_phi", &_b_photon_phi);
+  _treeSignal->Branch("track1_pT", &_b_track1_pT);
+  _treeSignal->Branch("track2_pT", &_b_track2_pT);
   _treeSignal->Branch("refit", &_b_refit);
 
   _treeBackground = new TTree("recoBackground","friendly fern");
@@ -139,6 +141,8 @@ int RecoConversionEval::process_event(PHCompositeNode *topNode) {
                   _b_photon_pT = photon->Pt();
                   _b_photon_eta = photon->Eta();
                   _b_photon_phi = photon->Phi();
+                  _b_track1_pT = thisTrack->get_pt();
+                  _b_track2_pT = jter->second->get_pt();
                   passedPhoton++;
                   delete photon;
                 }
@@ -256,7 +260,7 @@ bool RecoConversionEval::pairCuts(SvtxTrack* t1, SvtxTrack* t2)const{
 }
 
 bool RecoConversionEval::photonCuts(TLorentzVector* photon)const{
-  return photon&&photon->Dot(*photon)>_kPhotonMmin&&photon->Dot(*photon)<_kPhotonMmax&&_kPhotonPTmin<photon->Pt();//TODO add approach distance ?
+  return photon&&photon->Dot(*photon)>_kPhotonMmin&&photon->Dot(*photon)<_kPhotonMmax&&_kPhotonPTmin<photon->Pt();
 }
 
 
