@@ -71,7 +71,7 @@ int TruthConversionEval::InitRun(PHCompositeNode *topNode)
   _vertexer->InitRun(topNode);
   if(_kMakeTTree){
     _runNumber=_kRunNumber;
-    _f = new TFile( _foutname.c_str(), "RECREATE");
+    _f = new TFile( _foutname.c_str(), "UPDATE");
 
     _vtxingTree = new TTree("vtxingTree","data predicting vtx from track pair");
     _vtxingTree->SetAutoSave(300);

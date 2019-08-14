@@ -136,10 +136,12 @@ void minBiasRecoAna()
 {
   string treePath = "/sphenix/user/vassalli/minBiasPythia/conversionembededminBiasanalysis";
   string truthTreePath = "/sphenix/user/vassalli/minBiasPythia/conversionembededminBiasTruthanalysis";
+  string embedPath = "/sphenix/user/vassalli/RecoConversionTests/conversionembededonlineanalysis";
   string treeExtension = ".root";
-  unsigned int nFiles=600;
+  unsigned int nFiles=100;
   TFile *out_file = new TFile("minBiasplots.root","RECREATE");
-  TChain *ttree = handleFile(treePath,treeExtension,"recoSignal",nFiles);
+  TChain *embed_truth_ttree = handleFile(embedPath,treeExtension,"cutTreeSignal",nFiles);
+  TChain *embed_reco_ttree = handleFile(embedPath,treeExtension,"recoBackground",nFiles);
   TChain *cut_tree = new TChain("recoBackground");
   TChain *back_tree = new TChain("recoSignal");
   TChain *truth_ttree = new TChain("cutTreeSignal");
@@ -149,4 +151,7 @@ void minBiasRecoAna()
   filename = "/sphenix/user/vassalli/minBiasConversion/conversiontruthanaout.root";
   truth_ttree->Add(filename.c_str());
   reportCuts(cut_tree,analyzeSignal(truth_ttree));
+  cout<<"///////////////////////////////////////////////////////////\n";
+  cout<<"EMBEDED ANALYSIS:\n";
+  reportCuts(embed_reco_ttree,analyzeSignal(embed_truth_ttree));
 }

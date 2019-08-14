@@ -6,7 +6,7 @@
 R__LOAD_LIBRARY(libfun4all.so)
 R__LOAD_LIBRARY(libtruthconversion.so)
 
-int after_Reco(std::string infile = "XjPhi3_pT5_98_dst.root",std::string outfile="embedanalysis.root",int runNumber=0)
+int after_Combined(std::string infile = "XjPhi3_pT5_98_dst.root",std::string outfile="embedanalysis.root",int runNumber=0)
 {
   
   gSystem->Load("libfun4all.so");
