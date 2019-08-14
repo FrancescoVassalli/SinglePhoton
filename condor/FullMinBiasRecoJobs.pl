@@ -11,7 +11,7 @@ use File::Copy qw(copy);
 #$package = "pp13TeV_softqcd";
 $package = "minBiasConversion";
 $maindir = "/sphenix/user/vassalli";
-$logpath = "/direct/phenix+u/vassalli/sphenix/single/condor_logs/";
+$logpath = "/sphenix/user/vassalli/condor_logs/";
 $driver = "CondorMinBiasPythia.csh";
 #
 $groupnum = 2;
@@ -38,9 +38,9 @@ for ($irun=0; $irun<30; $irun++){
   print FILE "Priority = +8\n";
   print FILE "run_as_owner = True\n";
   print FILE "Executable = $driver\n";
-  print FILE "Log = ${logpath}log.auto.\$(Process)\n";
-  print FILE "Output = ${logpath}out.auto.\$(Process)\n";
-  print FILE "Error = ${logpath}err.auto.\$(Process)\n";
+  print FILE "Log = ${logpath}log.auto${groupnum}.\$(Process)\n";
+  print FILE "Output = ${logpath}out.auto${groupnum}.\$(Process)\n";
+  print FILE "Error = ${logpath}err.auto${groupnum}.\$(Process)\n";
   print FILE "Notify_user = frva5829\@colorado.edu\n";
   print FILE "request_memory = 5000M\n";
   # print FILE "+Experiment = \"phenix\"\n";
