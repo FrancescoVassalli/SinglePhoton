@@ -10,10 +10,10 @@ Method         : Cuts::Cuts
 TMVA Release   : 4.2.0         [262656]
 ROOT Release   : 5.34/38       [336422]
 Creator        : vassalli
-Date           : Tue Aug 13 20:21:20 2019
+Date           : Wed Aug 14 15:44:58 2019
 Host           : Linux cvmfswrite02.sdcc.bnl.gov 3.10.0-693.11.6.el7.x86_64 #1 SMP Wed Jan 3 18:09:42 CST 2018 x86_64 x86_64 x86_64 GNU/Linux
 Dir            : /direct/phenix+u/vassalli/sphenix/single/Training
-Training events: 7186
+Training events: 43725
 Analysis type  : [Classification]
 
 
@@ -59,19 +59,19 @@ VarProp[0]: "NotEnforced" [Categorisation of cuts]
 #VAR -*-*-*-*-*-*-*-*-*-*-*-* variables *-*-*-*-*-*-*-*-*-*-*-*-
 
 NVar 8
-abs(track_deta)               abs_track_deta_               abs(track_deta)               abs(track_deta)                                                 'F'    [0,0.896540760994]
-abs(cluster_deta)             abs_cluster_deta_             abs(cluster_deta)             abs(cluster_deta)                                               'F'    [0,1]
-abs(cluster_dphi)             abs_cluster_dphi_             abs(cluster_dphi)             abs(cluster_dphi)                                               'F'    [0,5.90218448639]
-abs(track_dlayer)             abs_track_dlayer_             abs(track_dlayer)             abs(track_dlayer)                                               'I'    [0,11]
-approach_dist                 approach_dist                 approach_dist                 approach_dist                                                   'F'    [6.97253881299e-06,102.995819092]
-vtx_radius                    vtx_radius                    vtx_radius                    vtx_radius                                                      'F'    [-1,85.8330917358]
-photon_m                      photon_m                      photon_m                      photon_m                                                        'F'    [0,6.87355661392]
-photon_pT                     photon_pT                     photon_pT                     photon_pT                                                       'F'    [1.94070420583e-38,20.996515274]
+abs(track_deta)               abs_track_deta_               abs(track_deta)               abs(track_deta)                                                 'F'    [0,1.18771755695]
+abs(cluster_deta)             abs_cluster_deta_             abs(cluster_deta)             abs(cluster_deta)                                               'F'    [0,1.23631501198]
+abs(cluster_dphi)             abs_cluster_dphi_             abs(cluster_dphi)             abs(cluster_dphi)                                               'F'    [0,6.17630195618]
+abs(track_dlayer)             abs_track_dlayer_             abs(track_dlayer)             abs(track_dlayer)                                               'I'    [0,38]
+approach_dist                 approach_dist                 approach_dist                 approach_dist                                                   'F'    [5.56851887268e-07,102.995819092]
+vtx_radius                    vtx_radius                    vtx_radius                    vtx_radius                                                      'F'    [-1,136.025360107]
+photon_m                      photon_m                      photon_m                      photon_m                                                        'F'    [0,40.7564888]
+photon_pT                     photon_pT                     photon_pT                     photon_pT                                                       'F'    [0,25543.2988281]
 NSpec 4
-track_layer                   track_layer                   track_layer                   I                                                               'F'    [0,27]
-track_pT                      track_pT                      track_pT                      F                                                               'F'    [0.600051403046,30.0917396545]
-track_dca                     track_dca                     track_dca                     F                                                               'F'    [2.26176712914e-08,46.3990592957]
-cluster_prob                  cluster_prob                  cluster_prob                  F                                                               'F'    [0,0.995470285416]
+track_layer                   track_layer                   track_layer                   I                                                               'F'    [0,38]
+track_pT                      track_pT                      track_pT                      F                                                               'F'    [0.156781166792,24.3782310486]
+track_dca                     track_dca                     track_dca                     F                                                               'F'    [2.13139141891e-08,50.9604148865]
+cluster_prob                  cluster_prob                  cluster_prob                  F                                                               'F'    [-1,0.995470285416]
 
 
 ============================================================================ */
