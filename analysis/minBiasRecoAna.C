@@ -151,7 +151,8 @@ void minBiasRecoAna()
   filename = "/sphenix/user/vassalli/minBiasConversion/conversiontruthanaout.root";
   truth_ttree->Add(filename.c_str());
   reportCuts(cut_tree,analyzeSignal(truth_ttree));
-  cout<<"///////////////////////////////////////////////////////////\n";
+/*  cout<<"///////////////////////////////////////////////////////////\n";
   cout<<"EMBEDED ANALYSIS:\n";
   reportCuts(embed_reco_ttree,analyzeSignal(embed_truth_ttree));
+*/
 }
