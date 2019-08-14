@@ -23,6 +23,7 @@
 #include <trackbase_historic/SvtxCluster.h>*/
 #include <trackbase_historic/SvtxVertex.h>
 #include <trackbase_historic/SvtxVertexMap.h>
+#include <trackbase_historic/SvtxTrackMap.h>
 #include <trackbase/TrkrClusterContainer.h>
 #include <trackbase/TrkrCluster.h>
 
@@ -40,16 +41,16 @@
 
 #include <phgenfit/Track.h>
 
-
 #include <fun4all/Fun4AllReturnCodes.h>
 
 #include <TFile.h>
 #include <TTree.h>
 #include <TLorentzVector.h>
 
-#include <utility>
-#include <iostream>
 #include <math.h>
+#include <utility>
+#include <list>
+#include <iostream>
 
 TruthConversionEval::TruthConversionEval(const std::string &name, unsigned int runnumber, 
     int particleEmbed,  int pythiaEmbed,bool makeTTree=true,string TMVAName="",string TMVAPath="") : SubsysReco("TruthConversionEval"),
@@ -262,11 +263,11 @@ int TruthConversionEval::process_event(PHCompositeNode *topNode)
   numUnique(&mapConversions,trackeval,_mainClusterContainer);
   signalTracks.sort();
   for ( SvtxTrackMap::Iter iter = _allTracks->begin(); iter != _allTracks->end(); ++iter) {
-    auto inCheck = std::find(signalTracks.begin(),signalTracks.end(),(*iter)->get_id());
+    auto inCheck = std::find(signalTracks.begin(),signalTracks.end(),iter->first);
     //if the track is not in the list of signal tracks
     if (inCheck!=signalTracks.end())
     {
-      backgroundTracks.push_back(*iter);
+      backgroundTracks.push_back(iter->second);
     }
   }
   if (Verbosity()==10)
@@ -491,7 +492,7 @@ void TruthConversionEval::processTrackBackground(std::vector<SvtxTrack*> *v_trac
     if(cluster1) _bb_cluster_prob= cluster1->get_prob();
     else _bb_cluster_prob=-1;
     //pair with other tracks
-    for(std::vector<PHG4Particle*>::iterator jter =std::next(iter,1);jTruthTrack!=v_tracks->end(); ++jter){//posible bias by filling the track level variables with iTrack instead of min(iTrack,jTrack)
+    for(std::vector<SvtxTrack*>::iterator jter =std::next(iter,1);jter!=v_tracks->end(); ++jter){//posible bias by filling the track level variables with iTrack instead of min(iTrack,jTrack)
       SvtxTrack* jTrack = *jter;
       if(!jTrack||TMath::Abs(jTrack->get_eta())>1.1)continue;
       //record pair geometry
@@ -525,11 +526,11 @@ void TruthConversionEval::processTrackBackground(std::vector<SvtxTrack*> *v_trac
         _bb_cluster_deta=-1;
         _bb_cluster_dphi=-1;
       }
-      _bb_track1_pid = (*iTruthTrack)->get_pid();
+      /*_bb_track1_pid = (*iTruthTrack)->get_pid();
       _bb_track2_pid = (*jTruthTrack)->get_pid();
       PHG4Particle* parent  = _truthinfo->GetParticle((*iTruthTrack)->get_parent_id());
       if(parent) _bb_parent_pid = parent->get_pid();
-      else _bb_parent_pid=0;
+      else _bb_parent_pid=0;*/
 
       if (_bb_track_layer>=0&&_bb_track_pT>.6&&_bb_track_deta<.0082&&TMath::Abs(_bb_track_dlayer)<=9)
       {
