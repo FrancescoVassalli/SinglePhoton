@@ -49,8 +49,12 @@ void makeFactory(TTree* signalTree,std::string outfile,std::string factoryname)
   string tCutInitializer = track_pT_cut;
   TCut preTraingCuts(tCutInitializer.c_str());
   factory->PrepareTrainingAndTestTree(preTraingCuts,"nTrain_Regression=0:nTest_Regression=0");
-  factory->BookMethod(Types::kMLP,"MLP_ANN","HiddenLayers=10:VarTransform=N:Sampling=.25:SamplingImportance=.5:ConvergenceTests=3:");
-  factory->BookMethod(Types::kKNN,"kNN","HiddenLayers=10:VarTransform=G");
+  factory->BookMethod(Types::kMLP,"MLP_ANN40L2","HiddenLayers=40,2:VarTransform=N:Sampling=.25:SamplingImportance=.5:ConvergenceTests=1");
+  factory->BookMethod(Types::kMLP,"MLP_ANN80L2","HiddenLayers=80,2:VarTransform=N:Sampling=.25:SamplingImportance=.5:ConvergenceTests=1");
+  factory->BookMethod(Types::kMLP,"MLP_ANN40L2R.2","HiddenLayers=40,2:VarTransform=N:Sampling=.25:SamplingImportance=.5:ConvergenceTests=1:LearningRate=.2");
+  factory->BookMethod(Types::kMLP,"MLP_ANN80L2R.2","HiddenLayers=80,2:VarTransform=N:Sampling=.25:SamplingImportance=.5:ConvergenceTests=1:LearningRate=.2");
+  factory->BookMethod(Types::kMLP,"MLP_ANN40L2R2","HiddenLayers=40,2:VarTransform=N:Sampling=.25:SamplingImportance=.5:ConvergenceTests=1:LearningRate=2");
+  factory->BookMethod(Types::kMLP,"MLP_ANN80L2R2","HiddenLayers=80,2:VarTransform=N:Sampling=.25:SamplingImportance=.5:ConvergenceTests=1:LearningRate=2");
   //factory->BookMethod(Types::kMLP,"MLP_ANN2","HiddenLayers=500,6");
   //factory->BookMethod(Types::kMLP,"MLP_ANN","HiddenLayers=5");
 

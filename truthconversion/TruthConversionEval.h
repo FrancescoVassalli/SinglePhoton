@@ -20,6 +20,7 @@ class PHG4Particle;
 class PHG4VtxPoint;
 class Conversion;
 class SvtxTrackEval;
+class SvtxTrackMap;
 class SvtxVertex;
 class SvtxTrack;
 class SvtxHitMap;
@@ -60,14 +61,13 @@ class TruthConversionEval: public SubsysReco
 
   private:
     bool doNodePointers(PHCompositeNode* topNode);
-    int get_track_pid(SvtxTrack* track)const;
     SvtxVertex* get_primary_vertex(PHCompositeNode* topNode)const;
     /** helper function for process_event
      * fills the member fields with information from the conversions 
      * finds the clusters associated with the truth conversions*/
     void numUnique(std::map<int,Conversion>* map,SvtxTrackEval* trackEval,RawClusterContainer* mainClusterContainer);
     ///fills the member fields for all the background trees
-    void processTrackBackground(std::vector<SvtxTrack*>*v,TrkrClusterContainer*);
+    void processTrackBackground(std::vector<PHG4Particle*>*v,SvtxTrackEval*);
 
     int get_embed(PHG4Particle* particle, PHG4TruthInfoContainer* truthinfo) const;
     float vtoR(PHG4VtxPoint* vtx)const;
@@ -87,6 +87,7 @@ class TruthConversionEval: public SubsysReco
     RawClusterContainer *_mainClusterContainer; //< clusters from the node
     PHG4TruthInfoContainer *_truthinfo;
     TrkrClusterContainer* _clusterMap;
+    SvtxTrackMap* _allTracks;
     SvtxHitMap *_hitMap;
     std::string _foutname; ///< name of the output file
     SVReco *_vertexer=NULL; ///< for reco vertex finding
@@ -103,6 +104,7 @@ class TruthConversionEval: public SubsysReco
     int   _b_nCluster; 
     int _bb_track1_pid;
     int _bb_track2_pid;
+    int _bb_parent_pid;
     float _b_cluster_dphi ;
     float _b_cluster_deta;
     int   _bb_nCluster; 
@@ -137,8 +139,7 @@ class TruthConversionEval: public SubsysReco
     float _b_vtxTrackRPhi_dist;
     float _b_vtx_chi2;
     float _b_photon_m;
-    float _b_rephoton_m;
-    float _b_tphoton_m;
+    float _b_tphoton_pT;
     float _b_photon_pT;
     float _b_cluster_prob;
     float _b_track_dphi;
@@ -162,7 +163,7 @@ class TruthConversionEval: public SubsysReco
     /** RawClusters associated with truth conversions
      * processed by other modules currently empty*/
     RawClusterContainer _conversionClusters;
-
+    //TODO check TPC radius
     const static int s_kTPCRADIUS=21; //in cm there is a way to get this from the simulation I should implement?
     ///<TPC radius currently hardcoded
     float _kRAPIDITYACCEPT=1; //<acceptance rapidity currently hard coded to |1|

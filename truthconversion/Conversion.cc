@@ -664,7 +664,6 @@ genfit::GFRaveVertex* Conversion::getSecondaryVertex(SVReco* vertexer){
 }
 
 genfit::GFRaveVertex* Conversion::correctSecondaryVertex(VtxRegressor* regressor){
-  //TODO Make a seperate class to hold the regressor 
   if(!recoVertex) {
     cerr<<"WARNING: no vertex to correct"<<endl;
     return NULL;

@@ -40,6 +40,7 @@ void makeFactory(TTree* signalTree,std::string outfile,std::string factoryname)
   factory->AddVariable("track1_phi-track2_phi","d#phi","rad");
   factory->AddVariable("track1_eta",'F');
   factory->AddVariable("track1_eta-track2_eta","d#eta","rad");
+  factory->AddVariable("(vtx_radius)/(track_layer+1)",'F');
   factory->AddVariable("vtx_radius","radius","cm");
   factory->AddTarget("tvtx_radius","radius","cm");
 
@@ -49,7 +50,9 @@ void makeFactory(TTree* signalTree,std::string outfile,std::string factoryname)
   string tCutInitializer = track_pT_cut;
   TCut preTraingCuts(tCutInitializer.c_str());
   factory->PrepareTrainingAndTestTree(preTraingCuts,"nTrain_Regression=0:nTest_Regression=0");
-  factory->BookMethod( Types::kPDERS, "PDERS", "KernelEstimator=Teepee:NEventsMin=120:NEventsMax=240:VarTransform=G(_V0_,_V1_,_V3_,_V5_)");
+  factory->BookMethod(Types::kKNN,"kNN14L","VarTransform=G:nkNN=16");
+  factory->BookMethod(Types::kKNN,"kNN12L","VarTransform=G:nkNN=8");
+  //factory->BookMethod( Types::kPDERS, "PDERS", "KernelEstimator=Teepee:NEventsMin=120:NEventsMax=210:VarTransform=G(_V0_,_V1_,_V3_,_V5_)");
   //factory->BookMethod(Types::kMLP,"MLP_ANN2","HiddenLayers=500,6");
   //factory->BookMethod(Types::kMLP,"MLP_ANN","HiddenLayers=5");
 
@@ -64,7 +67,7 @@ void makeFactory(TTree* signalTree,std::string outfile,std::string factoryname)
 
 int vtxRS(){
   using namespace std;
-  string treePath = "/sphenix/user/vassalli/gammasample/conversiononlineanalysis";
+  string treePath = "/sphenix/user/vassalli/gammasample/conversionembededonlineanalysis";
   string treeExtension = ".root";
   string outname = "/direct/phenix+u/vassalli/sphenix/single/Training/condorout/vtxTrainRS.root";
   unsigned int nFiles=200;

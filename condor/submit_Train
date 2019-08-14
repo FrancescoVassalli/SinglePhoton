@@ -1,6 +1,5 @@
 # All local jobs are part of the vanilla universe.
 Universe        = vanilla
-
 # We want email if the job completed successfully. This can
 # be set to Always, Error, or Never.
 Notification    = Never
@@ -24,7 +23,7 @@ Rank		= CPU_Speed
 
 # Jobs with higher numerical priority will run before jobs 
 # with lower numerical priority (-20 to 20).
-Priority        = +12
+Priority        = +18
 
 # Used to give jobs a directory with respect to file input 
 # and output.

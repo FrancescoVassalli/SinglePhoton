@@ -10,8 +10,8 @@ void myText(Double_t x,Double_t y,Color_t color, const char *text, Double_t tsiz
 void photon_m(TFile* thisFile){
 	gStyle->SetOptStat(0);
 	std::vector<TH1F*> plots;
-	plots.push_back((TH1F*) thisFile->Get("m^{#gamma}_{reco}"));
 	plots.push_back((TH1F*) thisFile->Get("m^{#gamma}_{recoRefit}"));
+	plots.push_back((TH1F*) thisFile->Get("m^{#gamma}_{reco}"));
 
 	TCanvas* tc = new TCanvas();
 	tc->Draw();
@@ -28,6 +28,88 @@ void photon_m(TFile* thisFile){
 	}
 	tl->Draw();
 	tc->SaveAs("plots/gamma_dm_eff.pdf");	
+}
+
+void pTEff(TFile *thisFile){
+	gStyle->SetOptStat(0);
+	TH1F *plot  = (TH1F*) thisFile->Get("#frac{#Delta#it{p}^{T}}{#it{p}_{#it{truth}}^{T}}");
+	TCanvas* tc = new TCanvas();
+	tc->Draw();
+	plot->SetXTitle(plot->GetName());
+	plot->SetYTitle("dN/dN #frac{#Delta#it{p}^{T}}{#it{p}_{#it{truth}}^{T}}");
+	plot->Draw("e1");
+}
+
+void pTEff2D(TFile *thisFile){
+	gStyle->SetOptStat(0);
+	TH2F *plot  = (TH2F*) thisFile->Get("pT_resolution_to_truthpt");
+	TCanvas* tc = new TCanvas();
+	tc->Draw();
+	plot->SetXTitle("#{p}^{T}_{#it{truth}}");
+	plot->SetYTitle("#frac{#Delta#it{p}^{T}}{#it{p}_{#it{truth}}^{T}}");
+	plot->SetZTitle("dN/dN #Delta#it{p}^{T}");
+	plot->Draw("colz");
+}
+
+void layer(TFile *thisFile){
+	gStyle->SetOptStat(0);
+	TH1F *plot  = (TH1F*) thisFile->Get("layer");
+	TCanvas* tc = new TCanvas();
+	tc->Draw();
+	plot->SetXTitle("Index of First Tracking Layer");
+	plot->SetYTitle("dN/dN");
+	plot->Draw("e1");
+}
+
+void deta(TFile *thisFile){
+	gStyle->SetOptStat(0);
+	TH1F *plot  = (TH1F*) thisFile->Get("deta");
+	TCanvas* tc = new TCanvas();
+	tc->Draw();
+	plot->SetXTitle("#DeltaEta");
+	plot->SetYTitle("dN/dN");
+	plot->Draw("e1");
+}
+
+void dlayer(TFile *thisFile){
+	gStyle->SetOptStat(0);
+	TH1F *plot  = (TH1F*) thisFile->Get("dlayer");
+	TCanvas* tc = new TCanvas();
+	tc->Draw();
+	plot->SetYTitle("dN/dN");
+	plot->Draw("e1");
+}
+void signalVtxR(TFile *thisFile){
+	gStyle->SetOptStat(0);
+	TH1F *plot  = (TH1F*) thisFile->Get("signal_vtx_radius_dist");
+	TCanvas* tc = new TCanvas();
+	tc->Draw();
+	plot->SetYTitle("dN/dN");
+	plot->SetXTitle("r_{vtx} [cm]");
+	plot->Draw("e1");
+}
+
+void vtxR(TFile *thisFile){
+	gStyle->SetOptStat(0);
+	TH1F *plotTruth  = (TH1F*) thisFile->Get("truthDist");
+	TH1F *plotReco  = (TH1F*) thisFile->Get("recoDist");
+	TH1F *plotCorr = (TH1F*) thisFile->Get("correctedDist");
+	plotReco->SetLineColor(kRed);
+	plotReco->SetMarkerColor(kRed);
+	plotCorr->SetLineColor(kGreen+2);
+	plotCorr->SetMarkerColor(kGreen+2);
+	TCanvas* tc = new TCanvas();
+	tc->Draw();
+	TLegend *tl = new TLegend(.8,.8,.9,.9);
+	tl->AddEntry(plotTruth,"Truth","l");
+	tl->AddEntry(plotReco,"Reco","l");
+	tl->AddEntry(plotCorr,"Corrected Reco","l");
+	plotTruth->SetYTitle("dN/dN");
+	plotTruth->SetXTitle("r_{vtx} [cm]");
+	plotTruth->Draw("e1");
+	plotReco->Draw("e1 same");
+	plotCorr->Draw("e1 same");
+	tl->Draw();
 }
 
 void recoRefit(TFile* thisFile){
@@ -58,8 +140,16 @@ void recoRefit(TFile* thisFile){
 
 void plotter(){
 	TFile *thisFile = new TFile("effplots.root","READ");
-	photon_m(thisFile);
-	recoRefit(thisFile);
+	TFile *thisOtherFile = new TFile("maps.root","READ");
+	//photon_m(thisFile);
+	//recoRefit(thisFile);
+	//pTEff(thisFile);
+	//pTEff2D(thisFile);
+	//layer(thisFile);
+	//dlayer(thisFile);
+	//deta(thisFile);
+	//signalVtxR(thisFile);
+	vtxR(thisOtherFile);
 	//TFile *backFile = new TFile("backplots.root","READ");
 
 }
