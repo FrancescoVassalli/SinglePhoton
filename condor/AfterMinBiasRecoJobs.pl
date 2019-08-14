@@ -50,4 +50,4 @@ for ($irun=0; $irun<40; $irun++){
   system "condor_submit condor";
 }
 chdir "${maindir}/${package}";
-AnaAdder.bash;
+#AnaAdder.bash;
