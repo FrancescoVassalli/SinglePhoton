@@ -35,17 +35,17 @@ for ($irun=0; $irun<1; $irun++){
   print FILE "Arguments = \$(Process) ${wrkdir}/\n";
   print FILE "Requirements = CPU_Speed>=1\n";
   print FILE "Rank = CPU_Speed\n";
-  print FILE "Priority = +8\n";
+  print FILE "Priority = +18\n";
   print FILE "run_as_owner = True\n";
   print FILE "Executable = $driver\n";
-  print FILE "Log = ${logpath}log.auto.\$(Process)\n";
-  print FILE "Output = ${logpath}out.auto.\$(Process)\n";
-  print FILE "Error = ${logpath}err.auto.\$(Process)\n";
+  print FILE "Log = ${logpath}log.after.\$(Process)\n";
+  print FILE "Output = ${logpath}out.after.\$(Process)\n";
+  print FILE "Error = ${logpath}err.after.\$(Process)\n";
   print FILE "Notify_user = frva5829\@colorado.edu\n";
   print FILE "request_memory = 3000M\n";
   # print FILE "+Experiment = \"phenix\"\n";
   # print FILE "+Job_Type = \"cas\"\n";
-  print FILE "Queue 100\n";
+  print FILE "Queue 1\n";
   close(FILE);
   system "condor_submit condor";
 }

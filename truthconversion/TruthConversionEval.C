@@ -203,7 +203,7 @@ SvtxVertex* TruthConversionEval::get_primary_vertex(PHCompositeNode *topNode)con
 int TruthConversionEval::process_event(PHCompositeNode *topNode)
 {
   if(!doNodePointers(topNode)) return Fun4AllReturnCodes::ABORTEVENT;
-  cout<<"init next event"<<endl;
+  cout<<"init vertexer event"<<endl;
   _vertexer->InitEvent(topNode);
   _conversionClusters.Reset(); //clear the list of conversion clusters
   PHG4TruthInfoContainer::Range range = _truthinfo->GetParticleRange(); //look at all truth particles
@@ -221,11 +221,12 @@ int TruthConversionEval::process_event(PHCompositeNode *topNode)
   std::map<int,Conversion> ebackgroundMap;
   std::vector<SvtxTrack*> backgroundTracks;
   std::list<int> signalTracks;
+  cout<<"init truth loop"<<endl;
   for ( PHG4TruthInfoContainer::ConstIterator iter = range.first; iter != range.second; ++iter ) {
     PHG4Particle* g4particle = iter->second;
     PHG4Particle* parent =_truthinfo->GetParticle(g4particle->get_parent_id());
-    //cout<<"partent id:"<<g4particle->get_parent_id()<<endl;
-    //cout<<g4particle->get_track_id()<<endl;
+    cout<<"parent id:"<<g4particle->get_parent_id()<<endl;
+    cout<<g4particle->get_track_id()<<endl;
     PHG4VtxPoint* vtx=_truthinfo->GetVtx(g4particle->get_vtx_id()); //get the vertex
     if(!vtx){
       cout<<"null vtx primaryid="<<g4particle->get_primary_id()<<'\n';
@@ -236,7 +237,6 @@ int TruthConversionEval::process_event(PHCompositeNode *topNode)
     float radius=sqrt(vtx->get_x()*vtx->get_x()+vtx->get_y()*vtx->get_y());
     //if outside the tracker skip this
     if(radius>s_kTPCRADIUS) continue;
-    //cout<<"got vtx with r="<<radius<<endl;
     int embedID;
     if (parent)//if the particle is not primary
     {
@@ -255,13 +255,22 @@ int TruthConversionEval::process_event(PHCompositeNode *topNode)
         if (grand) (mapConversions[vtx->get_id()]).setSourceId(grand->get_pid());//record pid of the photon's source
         else (mapConversions[vtx->get_id()]).setSourceId(0);//or it is from the G4 generator?
         //build a list of the ids
-        signalTracks.push_back(trackeval->best_track_from(g4particle)->get_id());
+        SvtxTrack* recoTrack = trackeval->best_track_from(g4particle);
+        if(recoTrack){
+          signalTracks.push_back(recoTrack->get_id());
+          cerr<<"matched truth track"<<endl;
+        }
+        else{
+          
+          cerr<<"WARNING no matching track for conversion"<<endl;
+        }
       }
     }// not primary 
   }//truth particle loop
   //pass the map to this helper method which fills the fields for the TTree 
   numUnique(&mapConversions,trackeval,_mainClusterContainer);
   signalTracks.sort();
+  cout<<"intit track loop"<<endl;
   for ( SvtxTrackMap::Iter iter = _allTracks->begin(); iter != _allTracks->end(); ++iter) {
     auto inCheck = std::find(signalTracks.begin(),signalTracks.end(),iter->first);
     //if the track is not in the list of signal tracks
@@ -270,12 +279,14 @@ int TruthConversionEval::process_event(PHCompositeNode *topNode)
       backgroundTracks.push_back(iter->second);
     }
   }
-  if (Verbosity()==10)
+  /*Deprecated
+   * if (Verbosity()==10)
   {
     cout<<Name()<<"# conversion clusters="<<_conversionClusters.size()<<'\n';
-  }
+  }*/
   if (_kMakeTTree)
   {
+    cout<<"intit background process"<<endl;
     processTrackBackground(&backgroundTracks,trackeval);
   }
   delete stack;
@@ -574,7 +585,7 @@ int TruthConversionEval::End(PHCompositeNode *topNode)
 {
   if(_kMakeTTree){
     cout<<"closing"<<endl;
-    _signalCutTree->Write();
+    //_signalCutTree->Write();
     _f->Write();
     _f->Close();
   }

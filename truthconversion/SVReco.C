@@ -117,6 +117,7 @@ SVReco::SVReco(const string &name) :
 
 
 int SVReco::InitEvent(PHCompositeNode *topNode) {
+  cout<<"getting SVR nodes"<<endl;
 	GetNodes(topNode);
 	//cout<<"got vertexing nodes"<<endl;
 	//! stands for Refit_GenFit_Tracks
@@ -128,6 +129,7 @@ int SVReco::InitEvent(PHCompositeNode *topNode) {
 	_svtxtrk_id.clear();
 
 	//iterate over all tracks to find priary vertex and make rave/genfit objects
+  cout<<"start SVR track loop"<<endl;
 	for (SvtxTrackMap::Iter iter = _trackmap->begin(); iter != _trackmap->end();
 			++iter) {
 		SvtxTrack* svtx_track = iter->second;
