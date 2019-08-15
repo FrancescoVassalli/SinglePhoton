@@ -21,13 +21,9 @@ source /phenix/u/vassalli/.cshrc
 mkdir $SCRATCH_AREA
 cp  $SOURCE_FUN4ALL $SCRATCH_AREA
 cp  $SOURCE_PYTHIA $SCRATCH_AREA
-echo "here"
 cp $TBURNER $SCRATCH_AREA
-echo "here"
 cp $RBURNER $SCRATCH_AREA
-echo "here"
 cp $SOURCE_BURNER $SCRATCH_AREA
-echo "here"
 #
 cd $SCRATCH_AREA
 #@ NEVENTS = 200
@@ -36,12 +32,9 @@ cd $SCRATCH_AREA
 #cp -f $PYTHIA_FILE $OUT_LOCATION$PYTHIA_FILE
 #root -b -q Fun4All_G4_MinBias.C\($NEVENTS,\"$IN_FILE\",\"$PYTHIA_FILE\"\) 
 #cp -f $IN_FILE $OUT_LOCATION$IN_FILE
-echo "here"
-root -l -b -q $RBURNERNAME\(\"$OUT_LOCATION$IN_FILE\",\"$OUT_FILE\"\)
-echo "here"
-cp $OUT_FILE $OUT_LOCATION$OUT_FILE
+#root -l -b -q $RBURNERNAME\(\"$OUT_LOCATION$IN_FILE\",\"$OUT_FILE\"\)
+#cp $OUT_FILE $OUT_LOCATION$OUT_FILE
 root -l -b -q $TBURNERNAME\(\"$OUT_LOCATION$IN_FILE\",\"$OUT_FILE\"\)
-echo "here"
 cp $OUT_FILE $OUT_LOCATION"truth"$OUT_FILE
 #
 rm -rf $SCRATCH_AREA

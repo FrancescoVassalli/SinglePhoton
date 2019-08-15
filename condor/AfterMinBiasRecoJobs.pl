@@ -14,12 +14,12 @@ $maindir = "/sphenix/user/vassalli";
 $logpath = "/direct/phenix+u/vassalli/sphenix/single/condor_logs/";
 $driver = "CondorAfterMinBiasPythia.csh";
 #
-$groupnum = 0;
+$groupnum = 1;
 #
 $rundir = "${maindir}/${package}/grp${groupnum}";
 mkdir $rundir;
 #
-for ($irun=0; $irun<40; $irun++){
+for ($irun=0; $irun<1; $irun++){
   $wait =int(rand(5)); 
   print "Wait=${wait}\n";
   sleep $wait;
