@@ -220,6 +220,7 @@ int TruthConversionEval::process_event(PHCompositeNode *topNode)
   std::map<int,Conversion> hbackgroundMap;
   std::map<int,Conversion> ebackgroundMap;
   std::vector<SvtxTrack*> backgroundTracks;
+  std::vector<std::pair<SvtxTrack*,SvtxTrack*>> tightbackgroundTrackPairs;
   std::list<int> signalTracks;
   cout<<"init truth loop"<<endl;
   for ( PHG4TruthInfoContainer::ConstIterator iter = range.first; iter != range.second; ++iter ) {
@@ -267,10 +268,9 @@ int TruthConversionEval::process_event(PHCompositeNode *topNode)
       }
     }// not primary 
   }//truth particle loop
-  //pass the map to this helper method which fills the fields for the TTree 
-  numUnique(&mapConversions,trackeval,_mainClusterContainer);
   signalTracks.sort();
   cout<<"intit track loop"<<endl;
+  //build the current backgroundSample
   for ( SvtxTrackMap::Iter iter = _allTracks->begin(); iter != _allTracks->end(); ++iter) {
     auto inCheck = std::find(signalTracks.begin(),signalTracks.end(),iter->first);
     //if the track is not in the list of signal tracks
@@ -278,7 +278,15 @@ int TruthConversionEval::process_event(PHCompositeNode *topNode)
     {
       backgroundTracks.push_back(iter->second);
     }
+    for ( SvtxTrackMap::Iter jter = std::next(iter,1); jter != _allTracks->end()&&iter->second->get_pt()>_kTightPtMin; ++jter){
+      if(jter->second->get_pt()>_kTightPtMin&&TMath::Abs(jter->second->get_eta()-iter->second->get_eta())<_kTightDetaMax&&
+        iter->second->get_charge()==jter->second->get_charge()*-1){
+        tightbackgroundTrackPairs.push_back(std::pair<SvtxTrack*,SvtxTrack*>(iter->second,jter->second));
+      }
+    }
   }
+  //pass the map to this helper method which fills the fields for the TTree 
+  numUnique(&mapConversions,trackeval,_mainClusterContainer,&tightbackgroundTrackPairs);
   /*Deprecated
    * if (Verbosity()==10)
   {
@@ -294,7 +302,8 @@ int TruthConversionEval::process_event(PHCompositeNode *topNode)
 }
 
 
-void TruthConversionEval::numUnique(std::map<int,Conversion> *mymap=NULL,SvtxTrackEval* trackeval=NULL,RawClusterContainer *mainClusterContainer=NULL){
+TruthConversionEval::numUnique(std::map<int,Conversion> *mymap=NULL,SvtxTrackEval* trackeval=NULL,RawClusterContainer *mainClusterContainer=NULL,
+  std::vector<std::pair<SvtxTrack*,SvtxTrack*>>* backgroundTracks=NULL){
   for (std::map<int,Conversion>::iterator i = mymap->begin(); i != mymap->end(); ++i) {
     PHG4VtxPoint *vtx =i->second.getVtx(); //get the vtx
     PHG4Particle *temp = i->second.getPhoton(); //set the photon
@@ -453,11 +462,33 @@ void TruthConversionEval::numUnique(std::map<int,Conversion> *mymap=NULL,SvtxTra
               _signalCutTree->Fill();  
               break;
             }
-          case 1: //there's one reco track I am not atempting to recover these at this time
+          case 1: //there's one reco track try to find the other
             {
+              PHG4Particle *truthe = i->second.getParticleMissingTrack().first;
+              for(auto pair : *backgroundTracks){
+                if ((pair->first->get_charge()>0&&truthe->get_pid()<0)||(pair->first->get_charge()<0&&truthe->get_pid()>0))
+                {
+                  TVector3 truth_tlv(truthe->get_px(),truthe->get_py(),truthe->get_pz());
+                  TVector3 reco_tlv(pair->first->get_px(),pair->first->get_py(),pair->first->get_pz());
+                  if (reco_tlv.DeltaR(truth_tlv)<.1)
+                  {
+                    i->second->setRecoTrack(pair->first);
+                  }
+                }
+                else if ((pair->second->get_charge()>0&&truthe->get_pid()<0)||(pair->second->get_charge()<0&&truthe->get_pid()>0))
+                {
+                  TVector3 truth_tlv(truthe->get_px(),truthe->get_py(),truthe->get_pz());
+                  TVector3 reco_tlv(pair->second->get_px(),pair->second->get_py(),pair->second->get_pz());
+                  if (reco_tlv.DeltaR(truth_tlv)<.1)
+                  {
+                    i->second->setRecoTrack(pair->second);
+                  }
+                }
+              }
               break;
             }
           case 0: //no reco tracks
+            //TODO write 0 track case
             break;
           default:
             if (Verbosity()>1)
@@ -469,6 +500,7 @@ void TruthConversionEval::numUnique(std::map<int,Conversion> *mymap=NULL,SvtxTra
       }//rapidity cut
     }// has 2 truth tracks
   }//map loop
+  return r_unmatchedConversionCount;
 }
 
 //only call if _kMakeTTree is true

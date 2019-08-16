@@ -65,7 +65,7 @@ class TruthConversionEval: public SubsysReco
     /** helper function for process_event
      * fills the member fields with information from the conversions 
      * finds the clusters associated with the truth conversions*/
-    void numUnique(std::map<int,Conversion>* map,SvtxTrackEval* trackEval,RawClusterContainer* mainClusterContainer);
+    int numUnique(std::map<int,Conversion>* map,SvtxTrackEval* trackEval,RawClusterContainer* mainClusterContainer);
     ///fills the member fields for all the background trees
     void processTrackBackground(std::vector<SvtxTrack*>*v,SvtxTrackEval*);
 
@@ -167,6 +167,8 @@ class TruthConversionEval: public SubsysReco
     const static int s_kTPCRADIUS=21; //in cm there is a way to get this from the simulation I should implement?
     ///<TPC radius currently hardcoded
     float _kRAPIDITYACCEPT=1; //<acceptance rapidity currently hard coded to |1|
+    float _kTightPtMin=.6; //< pt cut for making tight background
+    float _kTightDetaMax=.0082;//< deta cut for making tight background
 };
 
 
