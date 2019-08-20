@@ -84,6 +84,7 @@ class TruthConversionEval: public SubsysReco
     TTree *_pairBackTree=NULL;///< background for all possible track pairs
     TTree *_vtxBackTree=NULL;///< background that passes existing track pair cuts
     TTree *_vtxingTree=NULL; ///<data for training vtxing
+    TTree *_observTree=NULL; ///<per event observables
     RawClusterContainer *_mainClusterContainer; //< clusters from the node
     PHG4TruthInfoContainer *_truthinfo;
     TrkrClusterContainer* _clusterMap;
@@ -159,6 +160,10 @@ class TruthConversionEval: public SubsysReco
     float _bb_cluster_prob;
     float _bb_track_dphi;
     int _bb_pid;
+    int  _b_nMatched=0;
+    int _b_nUnmatched=0;
+    std::vector<float> _b_truth_pT;
+    std::vector<float> _b_reco_pT;
     /**@}*/
     /** RawClusters associated with truth conversions
      * processed by other modules currently empty*/

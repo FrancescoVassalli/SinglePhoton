@@ -15,7 +15,7 @@ void generator(std::string filename, long nEvents){
   pythiaengine.readString("SoftQCD:nonDiffractive = on");
   pythiaengine.readString("SoftQCD:singleDiffractive = on");
   pythiaengine.readString("SoftQCD:doubleDiffractive = on");
-  pythiaengine.readString("PhaseSpace:pTHatMin = 0.");
+  pythiaengine.readString("PhaseSpace:pTHatMin = 2.");
   pythiaengine.readString("Random::setSeed = on");
   pythiaengine.readString("Random::seed =0");
   //pythiaengine.readString("111:onMode = off"); ///pi0 won't decay
@@ -32,9 +32,6 @@ void generator(std::string filename, long nEvents){
     ToHepMC.fill_next_event( pythiaengine, hepmcevtfrag ); //convert event from pythia to HepMC
     ascii_io << hepmcevtfrag;//write event to file
     delete hepmcevtfrag; //delete event so it can be redeclared next time
-    if(iEvent%10==0){
-      cout<<iEvent<<'\n';
-    }
   }
 }
 

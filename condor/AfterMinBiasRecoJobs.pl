@@ -11,16 +11,16 @@ use File::Copy qw(copy);
 #$package = "pp13TeV_softqcd";
 $package = "minBiasConversion";
 $maindir = "/sphenix/user/vassalli";
-$logpath = "/direct/phenix+u/vassalli/sphenix/single/condor_logs/";
+$logpath = "/sphenix/user/vassalli/condor_logs/";
 $driver = "CondorAfterMinBiasPythia.csh";
 #
-$groupnum = 1;
+$groupnum = 2;
 #
 $rundir = "${maindir}/${package}/grp${groupnum}";
 mkdir $rundir;
 #
-for ($irun=0; $irun<1; $irun++){
-  $wait =int(rand(5)); 
+for ($irun=0; $irun<30; $irun++){
+  $wait =int(rand(2)); 
   print "Wait=${wait}\n";
   sleep $wait;
   #
@@ -38,14 +38,14 @@ for ($irun=0; $irun<1; $irun++){
   print FILE "Priority = +18\n";
   print FILE "run_as_owner = True\n";
   print FILE "Executable = $driver\n";
-  print FILE "Log = ${logpath}log.after.\$(Process)\n";
-  print FILE "Output = ${logpath}out.after.\$(Process)\n";
-  print FILE "Error = ${logpath}err.after.\$(Process)\n";
+  print FILE "Log = ${logpath}log.auto${groupnum}.\$(Process)\n";
+  print FILE "Output = ${logpath}out.auto${groupnum}.\$(Process)\n";
+  print FILE "Error = ${logpath}err.auto${groupnum}.\$(Process)\n";
   print FILE "Notify_user = frva5829\@colorado.edu\n";
   print FILE "request_memory = 3000M\n";
   # print FILE "+Experiment = \"phenix\"\n";
   # print FILE "+Job_Type = \"cas\"\n";
-  print FILE "Queue 1\n";
+  print FILE "Queue 100\n";
   close(FILE);
   system "condor_submit condor";
 }

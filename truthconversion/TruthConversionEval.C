@@ -73,6 +73,11 @@ int TruthConversionEval::InitRun(PHCompositeNode *topNode)
   if(_kMakeTTree){
     _runNumber=_kRunNumber;
     _f = new TFile( _foutname.c_str(), "RECREATE");
+    _observTree = new TTree("observTree","per event observables");
+    _observTree->Branch("nMatched", &_b_nMatched);
+    _observTree->Branch("nUnmatched", &_b_nUnmatched);
+    _observTree->Branch("truth_pT", &_b_truth_pT);
+    _observTree->Branch("reco_pT", &_b_reco_pT);
 
     _vtxingTree = new TTree("vtxingTree","data predicting vtx from track pair");
     _vtxingTree->SetAutoSave(300);
@@ -225,8 +230,8 @@ int TruthConversionEval::process_event(PHCompositeNode *topNode)
   for ( PHG4TruthInfoContainer::ConstIterator iter = range.first; iter != range.second; ++iter ) {
     PHG4Particle* g4particle = iter->second;
     PHG4Particle* parent =_truthinfo->GetParticle(g4particle->get_parent_id());
-    cout<<"parent id:"<<g4particle->get_parent_id()<<endl;
-    cout<<g4particle->get_track_id()<<endl;
+    //cout<<"parent id:"<<g4particle->get_parent_id()<<endl;
+    //cout<<g4particle->get_track_id()<<endl;
     PHG4VtxPoint* vtx=_truthinfo->GetVtx(g4particle->get_vtx_id()); //get the vertex
     if(!vtx){
       cout<<"null vtx primaryid="<<g4particle->get_primary_id()<<'\n';
@@ -241,7 +246,8 @@ int TruthConversionEval::process_event(PHCompositeNode *topNode)
     if (parent)//if the particle is not primary
     {
       embedID=get_embed(parent,_truthinfo);
-      if(parent->get_pid()==22&&TMath::Abs(g4particle->get_pid())==11){ //conversion check
+      float truthpT = sqrt(g4particle->get_px()*g4particle->get_px()+g4particle->get_py()*g4particle->get_py());
+      if(parent->get_pid()==22&&TMath::Abs(g4particle->get_pid())==11&&truthpT>2.5){ //conversion check
         if (Verbosity()==10)
         {
           std::cout<<"Conversion with radius [cm]:"<<radius<<'\n';
@@ -254,14 +260,17 @@ int TruthConversionEval::process_event(PHCompositeNode *topNode)
         PHG4Particle* grand =_truthinfo->GetParticle(parent->get_parent_id()); //grandparent
         if (grand) (mapConversions[vtx->get_id()]).setSourceId(grand->get_pid());//record pid of the photon's source
         else (mapConversions[vtx->get_id()]).setSourceId(0);//or it is from the G4 generator?
+        _b_truth_pT.push_back(truthpT);
         //build a list of the ids
         SvtxTrack* recoTrack = trackeval->best_track_from(g4particle);
         if(recoTrack){
           signalTracks.push_back(recoTrack->get_id());
+          _b_reco_pT.push_back(recoTrack->get_pt());
           cerr<<"matched truth track"<<endl;
+          _b_nMatched++;
         }
         else{
-          
+          _b_nUnmatched++; 
           cerr<<"WARNING no matching track for conversion"<<endl;
         }
       }
@@ -287,7 +296,12 @@ int TruthConversionEval::process_event(PHCompositeNode *topNode)
   if (_kMakeTTree)
   {
     cout<<"intit background process"<<endl;
+    _observTree->Fill();
     processTrackBackground(&backgroundTracks,trackeval);
+    _b_nMatched=0;
+    _b_nUnmatched=0;
+    _b_truth_pT.clear();
+    _b_reco_pT.clear();
   }
   delete stack;
   return 0;
@@ -543,7 +557,7 @@ void TruthConversionEval::processTrackBackground(std::vector<SvtxTrack*> *v_trac
       if(parent) _bb_parent_pid = parent->get_pid();
       else _bb_parent_pid=0;*/
 
-      if (_bb_track_layer>=0&&_bb_track_pT>.6&&_bb_track_deta<.0082&&TMath::Abs(_bb_track_dlayer)<=9)
+      if (_bb_track_layer>=0&&_bb_track_pT>2.5&&_bb_track_deta<.0082&&TMath::Abs(_bb_track_dlayer)<=9)
       {
         iTrack->identify();
         jTrack->identify();
