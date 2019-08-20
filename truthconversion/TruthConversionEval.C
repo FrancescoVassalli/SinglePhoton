@@ -165,7 +165,6 @@ int TruthConversionEval::InitRun(PHCompositeNode *topNode)
     _signalCutTree->Branch("photon_pT", &_b_photon_pT);
     _signalCutTree->Branch("tphoton_pT", &_b_tphoton_pT);
     _signalCutTree->Branch("cluster_prob", &_b_cluster_prob);
-    _signalCutTree->Branch("cluster_prob", &_b_cluster_pT);
     //_signalCutTree->Branch("nCluster", &_b_nCluster);
     _signalCutTree->Branch("cluster_dphi", &_b_cluster_dphi);
     _signalCutTree->Branch("cluster_deta", &_b_cluster_deta);
@@ -226,6 +225,10 @@ int TruthConversionEval::process_event(PHCompositeNode *topNode)
   std::vector<SvtxTrack*> backgroundTracks;
   std::vector<std::pair<SvtxTrack*,SvtxTrack*>> tightbackgroundTrackPairs; //used to find the pair for unmatched conversion tracks
   std::list<int> signalTracks;
+  _b_nMatched=0;
+  _b_nUnmatched=0;
+  _b_truth_pT.clear();
+  _b_reco_pT.clear();
   cout<<"init truth loop"<<endl;
   for ( PHG4TruthInfoContainer::ConstIterator iter = range.first; iter != range.second; ++iter ) {
     PHG4Particle* g4particle = iter->second;
@@ -301,17 +304,12 @@ int TruthConversionEval::process_event(PHCompositeNode *topNode)
   if (_kMakeTTree)
   {
     cout<<"intit background process"<<endl;
-    _observTree->Fill();
+    if(_b_truth_pT.size()!=0) _observTree->Fill();
     processTrackBackground(&backgroundTracks,trackeval);
-    _b_nMatched=0;
-    _b_nUnmatched=0;
-    _b_truth_pT.clear();
-    _b_reco_pT.clear();
   }
   delete stack;
   return 0;
 }
-
 
 void TruthConversionEval::numUnique(std::map<int,Conversion> *mymap=NULL,SvtxTrackEval* trackeval=NULL,RawClusterContainer *mainClusterContainer=NULL,
     std::vector<std::pair<SvtxTrack*,SvtxTrack*>>* backgroundTracks=NULL){

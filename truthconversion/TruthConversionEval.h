@@ -145,7 +145,6 @@ class TruthConversionEval: public SubsysReco
     float _b_tphoton_pT;
     float _b_photon_pT;
     float _b_cluster_prob;
-    float _b_cluster_pT;
     float _b_track_dphi;
     //bb stands for background branch
     float _bb_track_deta ;
