@@ -68,6 +68,7 @@ class TruthConversionEval: public SubsysReco
     int numUnique(std::map<int,Conversion>* map,SvtxTrackEval* trackEval,RawClusterContainer* mainClusterContainer);
     ///fills the member fields for all the background trees
     void processTrackBackground(std::vector<SvtxTrack*>*v,SvtxTrackEval*);
+    void recordConversion(Conversion *conversion,TLorentzVector *tlv_photon,TLorentzVector *tlv_electron, TLorentzVector *tlv_positron);
 
     int get_embed(PHG4Particle* particle, PHG4TruthInfoContainer* truthinfo) const;
     float vtoR(PHG4VtxPoint* vtx)const;
@@ -143,6 +144,7 @@ class TruthConversionEval: public SubsysReco
     float _b_tphoton_pT;
     float _b_photon_pT;
     float _b_cluster_prob;
+    float _b_cluster_pT;
     float _b_track_dphi;
     //bb stands for background branch
     float _bb_track_deta ;
@@ -172,7 +174,7 @@ class TruthConversionEval: public SubsysReco
     const static int s_kTPCRADIUS=21; //in cm there is a way to get this from the simulation I should implement?
     ///<TPC radius currently hardcoded
     float _kRAPIDITYACCEPT=1; //<acceptance rapidity currently hard coded to |1|
-    float _kTightPtMin=.6; //< pt cut for making tight background
+    float _kTightPtMin=2.5; //< pt cut for making tight background
     float _kTightDetaMax=.0082;//< deta cut for making tight background
 };
 
