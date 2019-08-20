@@ -7,6 +7,7 @@
 #include <g4main/PHG4TruthInfoContainer.h>
 #include <trackbase_historic/SvtxCluster.h>
 #include <trackbase_historic/SvtxHitMap.h>
+#include <trackbase_historic/SvtxTrackMap.h>
 #include <trackbase_historic/SvtxVertex_v1.h>
 #include <trackbase/TrkrClusterContainer.h>
 #include <trackbase/TrkrClusterv1.h>
@@ -55,10 +56,12 @@ void Conversion::setElectron(PHG4Particle* e){
     }
     else{
       e2=e;
+      pairTruthReco2.second=e->get_id();
     }
   }
   else{
     e1=e;
+    pairTruthReco1.second=e->get_id();
   }
 }
 
@@ -109,6 +112,44 @@ PHG4Particle* Conversion::getPositron(){
   }
 }
 
+void Conversion::setRecoTrack(int truthID, SvtxTrack* recoTrack){
+  setElectron();
+  setRecoTracks();
+  if (e1->get_id()==truthID&&!reco1)
+  {
+    reco1=recoTrack;
+    pairTruthReco1.first=e1->get_id();
+    pairTruthReco1.second=recoTrack->get_id();
+  }
+  else if (e2->get_id()==truthID&&!reco2)
+  {
+    reco2=recoTrack;
+    pairTruthReco2.first=e2->get_id();
+    pairTruthReco2.second=recoTrack->get_id();
+  }
+}
+
+std::pair<PHG4Particle*,PHG4Particle*> Conversion::getParticlesMissingTrack(){
+  std::pair<PHG4Particle*,PHG4Particle*> r;
+  switch(setRecoTracks()){
+    case 2:
+      r.first=NULL;
+      r.second=NULL;
+      break;
+    case 1:
+      if (reco1)r.first=e2;
+      else r.first = e1;
+      r.second=NULL;
+      break;
+    case 0:
+      r.first =e1;
+      r.second = e2;
+    default:
+      cerr<<"ERROR in Conversion::getParticlesMissingTrack"<<endl;
+  }
+  return r;
+}
+
 int Conversion::setRecoTracks(SvtxTrackEval* trackeval){	
   this->trackeval=trackeval;
   setElectron();
@@ -127,10 +168,14 @@ int Conversion::setRecoTracks(SvtxTrackEval* trackeval){
   if (reco1)
   {
     r++;
+    pairTruthReco1.first = e1->get_id();
+    pairTruthReco1.second = reco1->get_id();
   }
   if (reco2)
   {
     r++;
+    pairTruthReco2.first = e2->get_id();
+    pairTruthReco2.second = reco2->get_id();
   }
   setRecoPhoton();
   return r;
@@ -153,13 +198,29 @@ int Conversion::setRecoTracks(){
   if (reco1)
   {
     r++;
+    pairTruthReco1.first = e1->get_id();
+    pairTruthReco1.second = reco1->get_id();
   }
   if (reco2)
   {
     r++;
+    pairTruthReco2.first = e2->get_id();
+    pairTruthReco2.second = reco2->get_id();
   }
   setRecoPhoton();
   return r;
+}
+
+SvtxTrack* Conversion::getRecoTrack(int truthID) const{
+  if (pairTruthReco1.second==truthID)
+  {
+    return pairTruthReco1.first;
+  }
+  else if (pairTruthReco2.second==truthID)
+  {
+    return pairTruthReco2.second;
+  }
+  else return NULL;
 }
 
 TLorentzVector* Conversion::setRecoPhoton(){
