@@ -18,7 +18,6 @@ class PHCompositeNode;
 class PHG4TruthInfoContainer;
 class PHG4Particle;
 class PHG4VtxPoint;
-class Conversion;
 class SvtxTrackEval;
 class SvtxTrackMap;
 class SvtxVertex;
@@ -27,12 +26,14 @@ class SvtxHitMap;
 class SvtxHit;
 class SvtxClusterMap;
 class SvtxCluster;
+class TrkrClusterContainer;
 class RawClusterContainer;
-class TTree;
-class TFile;
 class SVReco;
 class VtxRegressor;
-class TrkrClusterContainer;
+class Conversion;
+class TTree;
+class TFile;
+class TLorentzVector;
 
 class TruthConversionEval: public SubsysReco
 {
@@ -65,7 +66,7 @@ class TruthConversionEval: public SubsysReco
     /** helper function for process_event
      * fills the member fields with information from the conversions 
      * finds the clusters associated with the truth conversions*/
-    int numUnique(std::map<int,Conversion>* map,SvtxTrackEval* trackEval,RawClusterContainer* mainClusterContainer);
+    void numUnique(std::map<int,Conversion>* map,SvtxTrackEval* trackEval,RawClusterContainer* mainClusterContainer,std::vector<std::pair<SvtxTrack*,SvtxTrack*>>* tightBackground);
     ///fills the member fields for all the background trees
     void processTrackBackground(std::vector<SvtxTrack*>*v,SvtxTrackEval*);
     void recordConversion(Conversion *conversion,TLorentzVector *tlv_photon,TLorentzVector *tlv_electron, TLorentzVector *tlv_positron);

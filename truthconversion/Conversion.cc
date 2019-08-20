@@ -56,12 +56,12 @@ void Conversion::setElectron(PHG4Particle* e){
     }
     else{
       e2=e;
-      pairTruthReco2.second=e->get_id();
+      pairTruthReco2.second=e->get_track_id();
     }
   }
   else{
     e1=e;
-    pairTruthReco1.second=e->get_id();
+    pairTruthReco1.second=e->get_track_id();
   }
 }
 
@@ -115,16 +115,16 @@ PHG4Particle* Conversion::getPositron(){
 void Conversion::setRecoTrack(int truthID, SvtxTrack* recoTrack){
   setElectron();
   setRecoTracks();
-  if (e1->get_id()==truthID&&!reco1)
+  if (e1->get_track_id()==truthID&&!reco1)
   {
     reco1=recoTrack;
-    pairTruthReco1.first=e1->get_id();
+    pairTruthReco1.first=e1->get_track_id();
     pairTruthReco1.second=recoTrack->get_id();
   }
-  else if (e2->get_id()==truthID&&!reco2)
+  else if (e2->get_track_id()==truthID&&!reco2)
   {
     reco2=recoTrack;
-    pairTruthReco2.first=e2->get_id();
+    pairTruthReco2.first=e2->get_track_id();
     pairTruthReco2.second=recoTrack->get_id();
   }
 }
@@ -168,13 +168,13 @@ int Conversion::setRecoTracks(SvtxTrackEval* trackeval){
   if (reco1)
   {
     r++;
-    pairTruthReco1.first = e1->get_id();
+    pairTruthReco1.first = e1->get_track_id();
     pairTruthReco1.second = reco1->get_id();
   }
   if (reco2)
   {
     r++;
-    pairTruthReco2.first = e2->get_id();
+    pairTruthReco2.first = e2->get_track_id();
     pairTruthReco2.second = reco2->get_id();
   }
   setRecoPhoton();
@@ -198,20 +198,20 @@ int Conversion::setRecoTracks(){
   if (reco1)
   {
     r++;
-    pairTruthReco1.first = e1->get_id();
+    pairTruthReco1.first = e1->get_track_id();
     pairTruthReco1.second = reco1->get_id();
   }
   if (reco2)
   {
     r++;
-    pairTruthReco2.first = e2->get_id();
+    pairTruthReco2.first = e2->get_track_id();
     pairTruthReco2.second = reco2->get_id();
   }
   setRecoPhoton();
   return r;
 }
 
-SvtxTrack* Conversion::getRecoTrack(int truthID) const{
+/*SvtxTrack* Conversion::getRecoTrack(int truthID) const{
   if (pairTruthReco1.second==truthID)
   {
     return pairTruthReco1.first;
@@ -221,7 +221,7 @@ SvtxTrack* Conversion::getRecoTrack(int truthID) const{
     return pairTruthReco2.second;
   }
   else return NULL;
-}
+}*/
 
 TLorentzVector* Conversion::setRecoPhoton(){
   if (reco1&&reco2)
@@ -256,23 +256,23 @@ std::pair<TLorentzVector*,TLorentzVector*> Conversion::getRecoTlvs(){
     case 2:
       r.first = new TLorentzVector();
       r.first->SetPxPyPzE (reco1->get_px(),reco1->get_py(),reco1->get_pz(),
-        sqrt(_kElectronRestM*_kElectronRestM+reco1->get_p()*reco1->get_p()));
+          sqrt(_kElectronRestM*_kElectronRestM+reco1->get_p()*reco1->get_p()));
       r.second =   new TLorentzVector();
       r.second->SetPxPyPzE (reco2->get_px(),reco2->get_py(),reco2->get_pz(),
-        sqrt(_kElectronRestM*_kElectronRestM+reco2->get_p()*reco2->get_p()));
+          sqrt(_kElectronRestM*_kElectronRestM+reco2->get_p()*reco2->get_p()));
       break;
     case 1:
       if(reco1){
         r.first = new TLorentzVector();
         r.first->SetPxPyPzE (reco1->get_px(),reco1->get_py(),reco1->get_pz(),
-          sqrt(_kElectronRestM*_kElectronRestM+reco1->get_p()*reco1->get_p()));
+            sqrt(_kElectronRestM*_kElectronRestM+reco1->get_p()*reco1->get_p()));
         r.second = NULL;
       }
       else{
         r.first = NULL;
         r.second = new TLorentzVector ();
         r.second->SetPxPyPzE(reco2->get_px(),reco2->get_py(),reco2->get_pz(),
-          sqrt(_kElectronRestM*_kElectronRestM+reco2->get_p()*reco2->get_p()));
+            sqrt(_kElectronRestM*_kElectronRestM+reco2->get_p()*reco2->get_p()));
       }
       break;
     default:
@@ -447,11 +447,11 @@ int Conversion::trackDLayer(TrkrClusterContainer* clusterMap){
   else return -1;
 }
 int Conversion::trackDLayer(TrkrClusterContainer* clusterMap,SvtxTrack* reco1, SvtxTrack* reco2){
-    TrkrCluster *c1 = clusterMap->findCluster(*(reco1->begin_cluster_keys()));
-    TrkrCluster *c2 = clusterMap->findCluster(*(reco2->begin_cluster_keys()));
-    unsigned l1 = TrkrDefs::getLayer(c1->getClusKey());
-    unsigned l2 = TrkrDefs::getLayer(c2->getClusKey());
-    return abs(l1-l2);
+  TrkrCluster *c1 = clusterMap->findCluster(*(reco1->begin_cluster_keys()));
+  TrkrCluster *c2 = clusterMap->findCluster(*(reco2->begin_cluster_keys()));
+  unsigned l1 = TrkrDefs::getLayer(c1->getClusKey());
+  unsigned l2 = TrkrDefs::getLayer(c2->getClusKey());
+  return abs(l1-l2);
 }
 
 int Conversion::firstLayer(SvtxClusterMap* svtxClusterMap,SvtxHitMap *hitmap){
@@ -554,17 +554,17 @@ void Conversion::printReco(){
 
 /*This is deprecated
  * float Conversion::setRecoVtx(SvtxVertex *recovtx,SvtxClusterMap* svtxClusterMap){
-  recoVertex=recovtx;
-  SvtxCluster *c1 = svtxClusterMap->get(*(reco1->begin_clusters()));
-  SvtxCluster *c2 = svtxClusterMap->get(*(reco2->begin_clusters()));
-  float r1 = sqrt(abs(c1->get_x()-recovtx->get_x())+abs(c1->get_y()-recovtx->get_y())+abs(c1->get_z()-recovtx->get_z()));
-  float r2 = sqrt(abs(c2->get_x()-recovtx->get_x())+abs(c2->get_y()-recovtx->get_y())+abs(c2->get_z()-recovtx->get_z()));
-  if (r1>r2)
-  {
-    return r1;
-  }
-  else return r2;
-}*/
+ recoVertex=recovtx;
+ SvtxCluster *c1 = svtxClusterMap->get(*(reco1->begin_clusters()));
+ SvtxCluster *c2 = svtxClusterMap->get(*(reco2->begin_clusters()));
+ float r1 = sqrt(abs(c1->get_x()-recovtx->get_x())+abs(c1->get_y()-recovtx->get_y())+abs(c1->get_z()-recovtx->get_z()));
+ float r2 = sqrt(abs(c2->get_x()-recovtx->get_x())+abs(c2->get_y()-recovtx->get_y())+abs(c2->get_z()-recovtx->get_z()));
+ if (r1>r2)
+ {
+ return r1;
+ }
+ else return r2;
+ }*/
 
 double Conversion::approachDistance()const{
   if (recoCount()==2)
@@ -610,38 +610,38 @@ float Conversion::trackDEta()const{
 }
 
 double Conversion::approachDistance(SvtxTrack* reco1, SvtxTrack* reco2){
-    static const double eps = 0.000001;
-    TVector3 u(reco1->get_px(),reco1->get_py(),reco1->get_pz());
-    TVector3 v(reco2->get_px(),reco2->get_py(),reco2->get_pz());
-    TVector3 w(reco1->get_x()-reco2->get_x(),reco1->get_x()-reco2->get_y(),reco1->get_x()-reco2->get_z());
+  static const double eps = 0.000001;
+  TVector3 u(reco1->get_px(),reco1->get_py(),reco1->get_pz());
+  TVector3 v(reco2->get_px(),reco2->get_py(),reco2->get_pz());
+  TVector3 w(reco1->get_x()-reco2->get_x(),reco1->get_x()-reco2->get_y(),reco1->get_x()-reco2->get_z());
 
-    double a = u.Dot(u);
-    double b = u.Dot(v);
-    double c = v.Dot(v);
-    double d = u.Dot(w);
-    double e = v.Dot(w);
+  double a = u.Dot(u);
+  double b = u.Dot(v);
+  double c = v.Dot(v);
+  double d = u.Dot(w);
+  double e = v.Dot(w);
 
-    double D = a*c - b*b;
-    double sc, tc;
-    // compute the line parameters of the two closest points
-    if (D < eps) {         // the lines are almost parallel
-      sc = 0.0;
-      tc = (b>c ? d/b : e/c);   // use the largest denominator
-    }
-    else {
-      sc = (b*e - c*d) / D;
-      tc = (a*e - b*d) / D;
-    }
-    // get the difference of the two closest points
-    u*=sc;
-    v*=tc;
-    w+=u;
-    w-=v;
-    return w.Mag();   // return the closest distance 
+  double D = a*c - b*b;
+  double sc, tc;
+  // compute the line parameters of the two closest points
+  if (D < eps) {         // the lines are almost parallel
+    sc = 0.0;
+    tc = (b>c ? d/b : e/c);   // use the largest denominator
+  }
+  else {
+    sc = (b*e - c*d) / D;
+    tc = (a*e - b*d) / D;
+  }
+  // get the difference of the two closest points
+  u*=sc;
+  v*=tc;
+  w+=u;
+  w-=v;
+  return w.Mag();   // return the closest distance 
 }
 
 float Conversion::trackDEta(SvtxTrack* reco1, SvtxTrack* reco2){
-    return fabs(reco1->get_eta()-reco2->get_eta());
+  return fabs(reco1->get_eta()-reco2->get_eta());
 }
 
 float Conversion::minTrackpT(){
@@ -709,12 +709,12 @@ std::pair<float,float> Conversion::getTrackPhis(){
 }
 /*This is the ideal case but I do not have RaveVtx to SvtxVertex matching yet
  * genfit::GFRaveVertex* Conversion::getSecondaryVertex(SVReco* vertexer){
-  if(recoCount()==2){
-    if (recoVertex) delete recoVertex;
-    recoVertex= vertexer->findSecondaryVertex(reco1,reco2);
-  }
-  return recoVertex;
-}*/
+ if(recoCount()==2){
+ if (recoVertex) delete recoVertex;
+ recoVertex= vertexer->findSecondaryVertex(reco1,reco2);
+ }
+ return recoVertex;
+ }*/
 genfit::GFRaveVertex* Conversion::getSecondaryVertex(SVReco* vertexer){
   if(recoCount()==2){
     //this might seg fault
@@ -739,13 +739,13 @@ genfit::GFRaveVertex* Conversion::correctSecondaryVertex(VtxRegressor* regressor
   nextPos.SetMagThetaPhi(regressor->regress(reco1,reco2,recoVertex),nextPos.Theta(),nextPos.Phi());
 
   using namespace genfit;
- // GFRaveVertex* temp = recoVertex;
+  // GFRaveVertex* temp = recoVertex;
   std::vector<GFRaveTrackParameters*> tracks;
   for(unsigned i =0; i<recoVertex->getNTracks();i++){
     tracks.push_back(recoVertex->getParameters(i));
   }
   recoVertex = new GFRaveVertex(nextPos,recoVertex->getCov(),tracks,recoVertex->getNdf(),recoVertex->getChi2(),recoVertex->getId());
-//  delete temp; //this caused outside references to seg fault //TODO shared_ptr is better 
+  //  delete temp; //this caused outside references to seg fault //TODO shared_ptr is better 
   return recoVertex;
 }
 
