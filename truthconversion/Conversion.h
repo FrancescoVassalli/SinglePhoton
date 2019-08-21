@@ -125,7 +125,7 @@ class Conversion
       return std::pair<SvtxTrack*,SvtxTrack*>(reco1,reco2);
     }
     ///@return the reco track associated with the @param truthID
-    SvtxTrack* getRecoTrack(int truthID) const;
+    SvtxTrack* getRecoTrack(unsigned truthID) const;
     /** set the reco maps used for {@link trackDEta}, {@link trackDLayer},{@link hasSilicon}
      *Note that all use of SvtxClusterMap is now deprecated**/
     inline void setClusterMap(SvtxClusterMap* cmap){
@@ -266,8 +266,8 @@ class Conversion
     genfit::GFRaveVertex *recoVertex=NULL;
     TLorentzVector *recoPhoton=NULL;
     std::pair<PHGenFit::Track*,PHGenFit::Track*> _refit_phgf_tracks;
-    std::pair<int,int> pairTruthReco1;
-    std::pair<int, int> pairTruthReco2;
+    std::pair<unsigned,unsigned> pairTruthReco1;
+    std::pair<unsigned,unsigned> pairTruthReco2;
 
     static const int _kNSiliconLayer =7; ///<hardcoded 
     int embedID=0;

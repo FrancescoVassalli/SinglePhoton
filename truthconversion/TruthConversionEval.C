@@ -267,7 +267,7 @@ int TruthConversionEval::process_event(PHCompositeNode *topNode)
         if(recoTrack){
           signalTracks.push_back(recoTrack->get_id());
           _b_reco_pT.push_back(recoTrack->get_pt());
-          cerr<<"matched truth track"<<endl;
+          cout<<"matched truth track"<<endl;
           _b_nMatched++;
         }
         else{
@@ -313,15 +313,21 @@ int TruthConversionEval::process_event(PHCompositeNode *topNode)
 
 void TruthConversionEval::numUnique(std::map<int,Conversion> *mymap=NULL,SvtxTrackEval* trackeval=NULL,RawClusterContainer *mainClusterContainer=NULL,
     std::vector<std::pair<SvtxTrack*,SvtxTrack*>>* backgroundTracks=NULL){
+  cout<<"start conversion analysis loop"<<endl;
   for (std::map<int,Conversion>::iterator i = mymap->begin(); i != mymap->end(); ++i) {
-    PHG4Particle *temp = i->second.getPhoton(); //set the photon
     TLorentzVector tlv_photon,tlv_electron,tlv_positron; //make tlv for each particle 
-    tlv_photon.SetPxPyPzE(temp->get_px(),temp->get_py(),temp->get_pz(),temp->get_e()); //intialize
-    temp=i->second.getElectron(); //set the first child 
-    tlv_electron.SetPxPyPzE(temp->get_px(),temp->get_py(),temp->get_pz(),temp->get_e());
-    temp=i->second.getPositron();
-    if(temp){ //this will be false for conversions with 1 truth track
-      tlv_positron.SetPxPyPzE(temp->get_px(),temp->get_py(),temp->get_pz(),temp->get_e()); //init the tlv
+    PHG4Particle *photon = i->second.getPhoton(); //set the photon
+
+    if(photon)tlv_photon.SetPxPyPzE(photon->get_px(),photon->get_py(),photon->get_pz(),photon->get_e()); //intialize
+    else cerr<<"No truth photon for conversion"<<endl;
+    PHG4Particle *e1=i->second.getElectron(); //set the first child 
+    if(e1){
+      tlv_electron.SetPxPyPzE(e1->get_px(),e1->get_py(),e1->get_pz(),e1->get_e());
+    }
+    else cerr<<"No truth electron for conversion"<<endl;
+    PHG4Particle *e2=i->second.getPositron();
+    if(e2){ //this will be false for conversions with 1 truth track
+      tlv_positron.SetPxPyPzE(e2->get_px(),e2->get_py(),e2->get_pz(),e2->get_e()); //init the tlv
       if (TMath::Abs(tlv_electron.Eta())<_kRAPIDITYACCEPT&&TMath::Abs(tlv_positron.Eta())<_kRAPIDITYACCEPT)
       {
         unsigned int nRecoTracks = i->second.setRecoTracks(trackeval); //find the reco tracks for this conversion
@@ -335,8 +341,14 @@ void TruthConversionEval::numUnique(std::map<int,Conversion> *mymap=NULL,SvtxTra
           case 1: //there's one reco track try to find the other
             {
               bool foundPair=false;
-              PHG4Particle *truthe = i->second.getParticlesMissingTrack().first;
+              PHG4Particle *truthe;
+              cout<<"here"<<endl;
+              if(!i->second.getRecoTrack(e1->get_track_id()))truthe = e1;
+              else truthe=e2;
+              if(!truthe) cerr<<"critical error"<<endl;
+              cout<<"there"<<endl;
               for(auto pair : *backgroundTracks){
+                if(!pair.first||!pair.second) cerr<<"critical error2"<<endl;
                 if ((pair.first->get_charge()>0&&truthe->get_pid()<0)||(pair.first->get_charge()<0&&truthe->get_pid()>0))
                 {
                   TVector3 truth_tlv(truthe->get_px(),truthe->get_py(),truthe->get_pz());

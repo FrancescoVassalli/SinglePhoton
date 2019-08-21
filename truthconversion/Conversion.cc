@@ -19,12 +19,20 @@ Conversion::Conversion(SvtxTrackEval* trackeval,int verbosity){
   this->verbosity=verbosity;
   _refit_phgf_tracks.first=NULL;
   _refit_phgf_tracks.second=NULL;
+  pairTruthReco1.second=0; 
+  pairTruthReco2.second=0; 
+  pairTruthReco1.first=0; 
+  pairTruthReco2.first=0; 
 }
 Conversion::Conversion(PHG4VtxPoint* vtx,int verbosity){
   this->vtx=vtx;
   this->verbosity=verbosity;
   _refit_phgf_tracks.first=NULL;
   _refit_phgf_tracks.second=NULL;
+  pairTruthReco1.second=0; 
+  pairTruthReco2.second=0; 
+  pairTruthReco1.first=0; 
+  pairTruthReco2.first=0; 
 }
 Conversion::Conversion(PHG4VtxPoint* vtx,SvtxTrackEval *trackeval,int verbosity){
   this->trackeval=trackeval;
@@ -32,6 +40,10 @@ Conversion::Conversion(PHG4VtxPoint* vtx,SvtxTrackEval *trackeval,int verbosity)
   this->verbosity=verbosity;
   _refit_phgf_tracks.first=NULL;
   _refit_phgf_tracks.second=NULL;
+  pairTruthReco1.second=0; 
+  pairTruthReco2.second=0; 
+  pairTruthReco1.first=0; 
+  pairTruthReco2.first=0; 
 }
 
 Conversion::~Conversion(){
@@ -113,41 +125,21 @@ PHG4Particle* Conversion::getPositron(){
 }
 
 void Conversion::setRecoTrack(int truthID, SvtxTrack* recoTrack){
+  if(!recoTrack)return;
   setElectron();
   setRecoTracks();
-  if (e1->get_track_id()==truthID&&!reco1)
+  if (e1&&e1->get_track_id()==truthID&&!reco1)
   {
     reco1=recoTrack;
     pairTruthReco1.first=e1->get_track_id();
     pairTruthReco1.second=recoTrack->get_id();
   }
-  else if (e2->get_track_id()==truthID&&!reco2)
+  else if (e2&&e2->get_track_id()==truthID&&!reco2)
   {
     reco2=recoTrack;
     pairTruthReco2.first=e2->get_track_id();
     pairTruthReco2.second=recoTrack->get_id();
   }
-}
-
-std::pair<PHG4Particle*,PHG4Particle*> Conversion::getParticlesMissingTrack(){
-  std::pair<PHG4Particle*,PHG4Particle*> r;
-  switch(setRecoTracks()){
-    case 2:
-      r.first=NULL;
-      r.second=NULL;
-      break;
-    case 1:
-      if (reco1)r.first=e2;
-      else r.first = e1;
-      r.second=NULL;
-      break;
-    case 0:
-      r.first =e1;
-      r.second = e2;
-    default:
-      cerr<<"ERROR in Conversion::getParticlesMissingTrack"<<endl;
-  }
-  return r;
 }
 
 int Conversion::setRecoTracks(SvtxTrackEval* trackeval){	
@@ -211,17 +203,23 @@ int Conversion::setRecoTracks(){
   return r;
 }
 
-/*SvtxTrack* Conversion::getRecoTrack(int truthID) const{
+SvtxTrack* Conversion::getRecoTrack(unsigned truthID) const{
   if (pairTruthReco1.second==truthID)
   {
-    return pairTruthReco1.first;
+    if(reco1&&reco1->get_id()==pairTruthReco1.first)
+      return reco1;
+    else if(reco2&&reco2->get_id()==pairTruthReco1.first)
+      return reco2;
   }
   else if (pairTruthReco2.second==truthID)
   {
-    return pairTruthReco2.second;
+    if(reco1&&reco1->get_id()==pairTruthReco2.first)
+      return reco1;
+    else if(reco2&&reco2->get_id()==pairTruthReco2.first)
+      return reco2;
   }
-  else return NULL;
-}*/
+  return NULL;
+}
 
 TLorentzVector* Conversion::setRecoPhoton(){
   if (reco1&&reco2)
@@ -300,8 +298,7 @@ std::pair<TLorentzVector*,TLorentzVector*> Conversion::getRefitRecoTlvs(){
 }
 
 PHG4Particle* Conversion::getTruthPhoton(PHG4TruthInfoContainer* truthinfo){
-  if(!e1||!e2||e1->get_parent_id()!=e2->get_parent_id()) return NULL; 
-  return truthinfo->GetParticle(e1->get_parent_id());
+  return photon;
 }
 
 

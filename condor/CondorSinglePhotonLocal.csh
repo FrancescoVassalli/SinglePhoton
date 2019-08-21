@@ -7,10 +7,10 @@ set OUT_FILE=conversionembededonlineanalysis${p}.root
 set IN_FILE=conversionembededout${p}.root
 set PYTHIA_FILE="/sphenix/user/vassalli/gammasample/pythiahep${p}.dat.dat"
 #
-set SCRATCH_AREA="/sphenix/user/vassalli/scratch"                                                                                                              
+set SCRATCH_AREA="/sphenix/user/vassalli/srtch"                                                                                                              
 #
-set SOURCE_PHOTONMAKER="/direct/phenix+u/vassalli/sphenix/single/gen/*"
-set BURNER="./after_Reco.C"
+set SOURCE_PHOTONMAKER="../gen/*"
+set BURNER="./after_*.C"
 #
 source /phenix/u/vassalli/.cshrc
 mkdir $SCRATCH_AREA
@@ -19,11 +19,12 @@ cp $BURNER $SCRATCH_AREA
 cp ../truthconversion/* $SCRATCH_AREA
 #
 cd $SCRATCH_AREA
-#root -b -q Fun4All_G4_sPHENIX.C\(5,\"$IN_FILE\",\"$PYTHIA_FILE\"\) 
+#root -b -q Fun4All_G4_sPHENIX.C\(100,\"$IN_FILE\",\"$PYTHIA_FILE\"\) 
 #cp -f $IN_FILE $OUT_LOCATION$IN_FILE
-#cp $OUT_LOCATION$IN_FILE .
-root -b -q after_Reco.C\(\"$OUT_LOCATION$IN_FILE\",\"$OUT_FILE\"\)
-cp $OUT_FILE $ANA_LOCATION$OUT_FILE
+#root -l -b -q after_Reco.C\(\"$OUT_LOCATION$IN_FILE\",\"$OUT_FILE\"\)
+#cp -f $OUT_FILE $ANA_LOCATION$OUT_FILE
+root -l -b -q after_embeded.C\(\"$OUT_LOCATION$IN_FILE\",\"$OUT_FILE\"\)
+cp -f $OUT_FILE $ANA_LOCATION"truth"$OUT_FILE
 #
 rm -rf $SCRATCH_AREA
 #

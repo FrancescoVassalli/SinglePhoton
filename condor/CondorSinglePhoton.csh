@@ -21,10 +21,10 @@ cp truthconversion/* $SCRATCH_AREA
 cd $SCRATCH_AREA
 #root -b -q Fun4All_G4_sPHENIX.C\(100,\"$IN_FILE\",\"$PYTHIA_FILE\"\) 
 #cp -f $IN_FILE $OUT_LOCATION$IN_FILE
-root -l -b -q after_Reco.C\(\"$OUT_LOCATION$IN_FILE\",\"$OUT_FILE\"\)
-cp -f $OUT_FILE $ANA_LOCATION$OUT_FILE
+#root -l -b -q after_Reco.C\(\"$OUT_LOCATION$IN_FILE\",\"$OUT_FILE\"\)
+#cp -f $OUT_FILE $ANA_LOCATION$OUT_FILE
 root -l -b -q after_embeded.C\(\"$OUT_LOCATION$IN_FILE\",\"$OUT_FILE\"\)
-cp -f "truth"$OUT_FILE $ANA_LOCATION"truth"$OUT_FILE
+cp -f $OUT_FILE $ANA_LOCATION"truth"$OUT_FILE
 #
 rm -rf $SCRATCH_AREA
 #
