@@ -30,25 +30,56 @@ void photon_m(TFile* thisFile){
 	tc->SaveAs("plots/gamma_dm_eff.pdf");	
 }
 
-void pTEff(TFile *thisFile){
+void pTRes(TFile *thisFile){
 	gStyle->SetOptStat(0);
 	TH1F *plot  = (TH1F*) thisFile->Get("#frac{#Delta#it{p}^{T}}{#it{p}_{#it{truth}}^{T}}");
+	//TGraph *graph  = (TH1F*) thisFile->Get("#frac{#Delta#it{p}^{T}}{#it{p}_{#it{truth}}^{T}}");
 	TCanvas* tc = new TCanvas();
 	tc->Draw();
-	plot->SetXTitle(plot->GetName());
-	plot->SetYTitle("dN/dN #frac{#Delta#it{p}^{T}}{#it{p}_{#it{truth}}^{T}}");
+	plot->GetXaxis()->SetTitle(plot->GetName());
+	plot->GetYaxis()->SetTitle("1/N #frac{#Delta#it{p}^{T}}{#it{p}_{#it{truth}}^{T}}");
 	plot->Draw("e1");
 }
 
-void pTEff2D(TFile *thisFile){
+void pTRes2D(TFile *thisFile){
 	gStyle->SetOptStat(0);
 	TH2F *plot  = (TH2F*) thisFile->Get("pT_resolution_to_truthpt");
 	TCanvas* tc = new TCanvas();
 	tc->Draw();
-	plot->SetXTitle("#{p}^{T}_{#it{truth}}");
+	plot->SetXTitle("#it{p}^{T}_{#it{truth}}");
 	plot->SetYTitle("#frac{#Delta#it{p}^{T}}{#it{p}_{#it{truth}}^{T}}");
-	plot->SetZTitle("dN/dN #Delta#it{p}^{T}");
+	plot->SetZTitle("1/N #Delta#it{p}^{T}");
 	plot->Draw("colz");
+}
+
+void vtxRes(TFile *thisFile){
+	gStyle->SetOptStat(0);
+	TH1F *plot  = (TH1F*) thisFile->Get("#frac{#Deltar_{vtx}_^{#it{reco}}}{r_{vtx}^{#it{truth}}}");
+	TCanvas* tc = new TCanvas();
+	tc->Draw();
+	plot->SetXTitle(plot->GetName());
+	//plot->SetYTitle("1/N #frac{#Delta#it{p}^{T}}{#it{p}_{#it{truth}}^{T}}");
+	plot->Draw("e1");
+}
+
+void vtxRes2D(TFile *thisFile){
+	gStyle->SetOptStat(0);
+	TH2F *plot  = (TH2F*) thisFile->Get("vtx_resolution_to_truthvtx");
+	TCanvas* tc = new TCanvas();
+	tc->Draw();
+	plot->SetXTitle("radius_{#it{truth}} [cm]");
+	plot->SetYTitle("conversion vertex radius resolution");
+	//plot->SetZTitle("1/N #Delta#it{p}^{T}");
+	plot->Draw("colz");
+}
+
+void vtxEff(TFile *thisFile){
+	gStyle->SetOptStat(0);
+	TEfficiency *plot  = (TEfficiency*) thisFile->Get("vtxEff");
+	TCanvas* tc = new TCanvas();
+	tc->Draw();
+	plot->SetTitle(";radius_{#it{truth}} [cm];conversion vertex reco efficiency");
+	plot->Draw("");
 }
 
 void layer(TFile *thisFile){
@@ -57,7 +88,7 @@ void layer(TFile *thisFile){
 	TCanvas* tc = new TCanvas();
 	tc->Draw();
 	plot->SetXTitle("Index of First Tracking Layer");
-	plot->SetYTitle("dN/dN");
+	plot->SetYTitle("1/N");
 	plot->Draw("e1");
 }
 
@@ -67,7 +98,7 @@ void deta(TFile *thisFile){
 	TCanvas* tc = new TCanvas();
 	tc->Draw();
 	plot->SetXTitle("#DeltaEta");
-	plot->SetYTitle("dN/dN");
+	plot->SetYTitle("1/N");
 	plot->Draw("e1");
 }
 
@@ -76,7 +107,7 @@ void dlayer(TFile *thisFile){
 	TH1F *plot  = (TH1F*) thisFile->Get("dlayer");
 	TCanvas* tc = new TCanvas();
 	tc->Draw();
-	plot->SetYTitle("dN/dN");
+	plot->SetYTitle("1/N");
 	plot->Draw("e1");
 }
 void signalVtxR(TFile *thisFile){
@@ -84,7 +115,7 @@ void signalVtxR(TFile *thisFile){
 	TH1F *plot  = (TH1F*) thisFile->Get("signal_vtx_radius_dist");
 	TCanvas* tc = new TCanvas();
 	tc->Draw();
-	plot->SetYTitle("dN/dN");
+	plot->SetYTitle("1/N");
 	plot->SetXTitle("r_{vtx} [cm]");
 	plot->Draw("e1");
 }
@@ -104,10 +135,10 @@ void vtxR(TFile *thisFile){
 	tl->AddEntry(plotTruth,"Truth","l");
 	tl->AddEntry(plotReco,"Reco","l");
 	tl->AddEntry(plotCorr,"Corrected Reco","l");
-	plotTruth->SetYTitle("dN/dN");
+	plotTruth->SetYTitle("1/N");
 	plotTruth->SetXTitle("r_{vtx} [cm]");
-	plotTruth->Draw("e1");
-	plotReco->Draw("e1 same");
+	plotReco->Draw("e1 ");
+	plotTruth->Draw("e1 same");
 	plotCorr->Draw("e1 same");
 	tl->Draw();
 }
@@ -126,7 +157,7 @@ void recoRefit(TFile* thisFile){
 	plots[2]->SetLineColor(kGreen+2);
 	for (int i = 0; i < plots.size(); ++i)
 	{
-		plots[i]->SetYTitle("dN/dN");
+		plots[i]->SetYTitle("1/N");
 		plots[i]->SetXTitle("#Delta#it{p}");
 		if(i==0) plots[i]->Draw("e1");
 		else plots[i]->Draw("e1 same");
@@ -143,8 +174,11 @@ void plotter(){
 	TFile *thisOtherFile = new TFile("maps.root","READ");
 	//photon_m(thisFile);
 	//recoRefit(thisFile);
-	//pTEff(thisFile);
-	//pTEff2D(thisFile);
+	pTRes(thisFile);
+	pTRes2D(thisFile);
+	vtxRes(thisFile);
+	vtxRes2D(thisFile);
+	vtxEff(thisFile);
 	//layer(thisFile);
 	//dlayer(thisFile);
 	//deta(thisFile);
