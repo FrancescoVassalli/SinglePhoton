@@ -126,6 +126,7 @@ void makeVtxEff(TChain* ttree,TFile* out_file){
     truthR->Fill(tr);
   }
   vtxEff = new TEfficiency(*recoR,*truthR);
+  vtxEff->SetName("vtxEff");
   vtxEff->Write();
   out_file->Write();
   ttree->ResetBranchAddresses();
