@@ -489,6 +489,8 @@ void TruthConversionEval::processTrackBackground(std::vector<SvtxTrack*> *v_trac
 }
 
 void TruthConversionEval::recordConversion(Conversion *conversion,TLorentzVector *tlv_photon,TLorentzVector *tlv_electron, TLorentzVector *tlv_positron){
+  cout<<"recording"<<endl;
+  if(!(tlv_photon&&tlv_electron&&tlv_positron&&conversion&&conversion->recoCount()==2)) return;
   _b_track_deta = conversion->trackDEta();
   _b_track_dphi = conversion->trackDPhi();
   _b_track_dlayer = conversion->trackDLayer(_clusterMap);
@@ -497,6 +499,7 @@ void TruthConversionEval::recordConversion(Conversion *conversion,TLorentzVector
   _b_track_dca = conversion->minDca();
   //record pT info
   _b_track_pT = conversion->minTrackpT();
+  cout<<"did block1"<<endl;
   if(tlv_electron->Pt()>tlv_positron->Pt()) _b_ttrack_pT = tlv_positron->Pt();
   else _b_ttrack_pT = tlv_electron->Pt();
   //record initial photon info
@@ -510,15 +513,15 @@ void TruthConversionEval::recordConversion(Conversion *conversion,TLorentzVector
     _b_photon_m =-1;
     _b_photon_pT=-1;
   }
-  PHG4Particle* truthphoton = conversion->getTruthPhoton(_truthinfo);
-  if(truthphoton){
-    TLorentzVector tlv_tphoton;
-    tlv_tphoton.SetPxPyPzE(truthphoton->get_px(),truthphoton->get_py(),truthphoton->get_pz(),truthphoton->get_e());
-    _b_tphoton_pT=tlv_tphoton.Pt();
-  }
-  else{//no truth matched photon
-    _b_tphoton_pT =-1;
-  }
+  _b_tphoton_pT=tlv_photon->Pt();
+  //truth vertex info
+  _b_tvtx_radius = sqrt(conversion->getVtx()->get_x()*conversion->getVtx()->get_x()+conversion->getVtx()->get_y()*conversion->getVtx()->get_y());
+  TVector3 tVertPos(conversion->getVtx()->get_x(),conversion->getVtx()->get_y(),conversion->getVtx()->get_z());
+  _b_tvtx_phi = tVertPos.Phi();
+  _b_tvtx_eta = tVertPos.Eta();
+  _b_tvtx_z = tVertPos.Z();
+  _b_tvtx_x = tVertPos.X();
+  _b_tvtx_y = tVertPos.Y();
   //TODO check Conversion operations for ownership transfer->memleak due to lack of delete
   cout<<"vertexing"<<endl;
   genfit::GFRaveVertex* originalVert, *recoVert;
@@ -548,19 +551,11 @@ void TruthConversionEval::recordConversion(Conversion *conversion,TLorentzVector
     //fill the vtxing tree
     TVector3 recoVertPos = originalVert->getPos();
     _b_vtx_radius = sqrt(recoVertPos.x()*recoVertPos.x()+recoVertPos.y()*recoVertPos.y());
-    _b_tvtx_radius = sqrt(conversion->getVtx()->get_x()*conversion->getVtx()->get_x()+conversion->getVtx()->get_y()*conversion->getVtx()->get_y());
     _b_vtx_phi = recoVertPos.Phi();
     _b_vtx_eta = recoVertPos.Eta();
     _b_vtx_z = recoVertPos.Z();
     _b_vtx_x = recoVertPos.X();
     _b_vtx_y = recoVertPos.Y();
-    //truth vertex info
-    TVector3 tVertPos(conversion->getVtx()->get_x(),conversion->getVtx()->get_y(),conversion->getVtx()->get_z());
-    _b_tvtx_phi = tVertPos.Phi();
-    _b_tvtx_eta = tVertPos.Eta();
-    _b_tvtx_z = tVertPos.Z();
-    _b_tvtx_x = tVertPos.X();
-    _b_tvtx_y = tVertPos.Y();
     _b_vtx_chi2 = recoVert->getChi2();
     //track info
     pair<float,float> pTstemp = conversion->getTrackpTs();
@@ -584,6 +579,28 @@ void TruthConversionEval::recordConversion(Conversion *conversion,TLorentzVector
     _b_vtx_y = recoVertPos.Y();
     _b_vtxTrackRZ_dist = conversion->vtxTrackRZ(recoVertPos);
     _b_vtxTrackRPhi_dist = conversion->vtxTrackRPhi(recoVertPos);
+  }
+  else{//vtx not reconstructed
+    _b_vtx_radius = -1.;
+    _b_vtx_phi = -999.;
+    _b_vtx_eta = -999.;
+    _b_vtx_z = -999.;
+    _b_vtx_x = -999.;
+    _b_vtx_y = -999.;
+    _b_vtx_chi2 = -1.;
+    _b_vtxTrackRZ_dist = -1.;
+    _b_vtxTrackRPhi_dist = -1.;
+    //track info
+    pair<float,float> pTstemp = conversion->getTrackpTs();
+    _b_track1_pt = pTstemp.first;
+    _b_track2_pt = pTstemp.second;
+    pair<float,float> etasTemp = conversion->getTrackEtas();
+    _b_track1_eta = etasTemp.first;
+    _b_track2_eta = etasTemp.second;
+    pair<float,float> phisTemp = conversion->getTrackPhis();
+    _b_track1_phi = phisTemp.first;
+    _b_track2_phi = phisTemp.second;
+    _vtxingTree->Fill();
   }
   //reset the values
   _b_cluster_prob=-1;
