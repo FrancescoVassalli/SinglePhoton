@@ -255,6 +255,7 @@ class Conversion
     void printReco();
     ///print the info relating to photon reconstruction
     void PrintPhotonRecoInfo();
+    void PrintPhotonRecoInfo(TLorentzVector *tlv_photon,TLorentzVector *tlv_electron, TLorentzVector *tlv_positron);
   private:
     PHG4Particle* e1=NULL;
     PHG4Particle* e2=NULL;

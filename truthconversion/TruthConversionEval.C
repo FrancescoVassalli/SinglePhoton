@@ -507,7 +507,7 @@ void TruthConversionEval::recordConversion(Conversion *conversion,TLorentzVector
   {
     _b_photon_m=recoPhoton->Dot(*recoPhoton);
     _b_photon_pT=recoPhoton->Pt();
-    conversion->PrintPhotonRecoInfo();
+    conversion->PrintPhotonRecoInfo(tlv_photon,tlv_electron,tlv_positron);
   }
   else{//photon was not reconstructed
     _b_photon_m =-1;
