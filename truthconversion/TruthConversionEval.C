@@ -499,7 +499,6 @@ void TruthConversionEval::recordConversion(Conversion *conversion,TLorentzVector
   _b_track_dca = conversion->minDca();
   //record pT info
   _b_track_pT = conversion->minTrackpT();
-  cout<<"did block1"<<endl;
   if(tlv_electron->Pt()>tlv_positron->Pt()) _b_ttrack_pT = tlv_positron->Pt();
   else _b_ttrack_pT = tlv_electron->Pt();
   //record initial photon info
@@ -508,10 +507,12 @@ void TruthConversionEval::recordConversion(Conversion *conversion,TLorentzVector
   {
     _b_photon_m=recoPhoton->Dot(*recoPhoton);
     _b_photon_pT=recoPhoton->Pt();
+    conversion->PrintPhotonRecoInfo();
   }
   else{//photon was not reconstructed
     _b_photon_m =-1;
     _b_photon_pT=-1;
+    conversion->PrintPhotonRecoInfo();
   }
   _b_tphoton_pT=tlv_photon->Pt();
   //truth vertex info
@@ -523,18 +524,18 @@ void TruthConversionEval::recordConversion(Conversion *conversion,TLorentzVector
   _b_tvtx_x = tVertPos.X();
   _b_tvtx_y = tVertPos.Y();
   //TODO check Conversion operations for ownership transfer->memleak due to lack of delete
-  cout<<"vertexing"<<endl;
+  //cout<<"vertexing"<<endl;
   genfit::GFRaveVertex* originalVert, *recoVert;
   originalVert=recoVert = conversion->getSecondaryVertex(_vertexer);
   recoVert = conversion->correctSecondaryVertex(_regressor);
-  cout<<"finding gf_tracks"<<endl;
-  std::pair<PHGenFit::Track*,PHGenFit::Track*> ph_gf_tracks = conversion->getPHGFTracks(_vertexer);
+  //cout<<"finding gf_tracks"<<endl;
+  //std::pair<PHGenFit::Track*,PHGenFit::Track*> ph_gf_tracks = conversion->getPHGFTracks(_vertexer);
   if (recoVert)
   {
-    cout<<"finding refit_gf_tracks"<<endl;
-    std::pair<PHGenFit::Track*,PHGenFit::Track*> refit_phgf_tracks=conversion->refitTracks(_vertexer);
+    //cout<<"finding refit_gf_tracks"<<endl;
+    //std::pair<PHGenFit::Track*,PHGenFit::Track*> refit_phgf_tracks=conversion->refitTracks(_vertexer);
     //TODO check repetive refitting and revterexing this is issue #23
-    if (ph_gf_tracks.first&&refit_phgf_tracks.first)
+    /*if (ph_gf_tracks.first&&refit_phgf_tracks.first)
     {
       cout<<"Good Track refit with original:\n";ph_gf_tracks.first->get_mom().Print();cout<<"\n\t and refit:\n";
       refit_phgf_tracks.first->get_mom().Print();
@@ -545,7 +546,7 @@ void TruthConversionEval::recordConversion(Conversion *conversion,TLorentzVector
       ph_gf_tracks.second->get_mom().Print(); 
       cout<<"\n\t and refit:\n";
       refit_phgf_tracks.second->get_mom().Print();
-    }
+    }*/
     recoPhoton = conversion->getRefitRecoPhoton();
     if(recoPhoton) _b_photon_pT=recoPhoton->Pt();
     //fill the vtxing tree

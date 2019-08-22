@@ -549,6 +549,18 @@ void Conversion::printReco(){
   if (photon) photon->identify();
 }
 
+void Conversion::PrintPhotonRecoInfo(){
+  if(!recoPhoton) cerr<<"No photon reconstructed"<<endl;
+  else{
+    cout<<"Truth Track: ";e1->identify();
+    cout<<"Reco Track: ";getRecoTrack(e1->get_track_id()); 
+    cout<<"Truth Track: ";e2->identify();
+    cout<<"Reco Track: ";getRecoTrack(e2->get_track_id()); 
+    cout<<"Truth Photon: ";photon->identify();
+    cout<<"Reco Photon: ";recoPhoton->Print();
+  }
+}
+
 /*This is deprecated
  * float Conversion::setRecoVtx(SvtxVertex *recovtx,SvtxClusterMap* svtxClusterMap){
  recoVertex=recovtx;

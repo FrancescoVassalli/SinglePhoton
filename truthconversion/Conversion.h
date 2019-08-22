@@ -253,6 +253,8 @@ class Conversion
     void printTruth();
     ///print the reco info calls {@link reco1->identify()}, {@link reco2->identify()}, {@link recoVertex->identify()}, {@link recoPhoton->print()}
     void printReco();
+    ///print the info relating to photon reconstruction
+    void PrintPhotonRecoInfo();
   private:
     PHG4Particle* e1=NULL;
     PHG4Particle* e2=NULL;
