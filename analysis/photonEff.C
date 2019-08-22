@@ -92,7 +92,7 @@ void makeVtxRes(TChain* ttree,TFile* out_file){
   float tr;
   ttree->SetBranchAddress("vtx_radius",&r);
   ttree->SetBranchAddress("tvtx_radius",&tr);
-  TH1F *vtxeffPlot = new TH1F("#frac{#Deltar_{vtx}_^{#it{reco}}{r_{vtx}^{#it{truth}}}","",40,-2,2);
+  TH1F *vtxeffPlot = new TH1F("#frac{#Deltar_{vtx}_^{#it{reco}}}{r_{vtx}^{#it{truth}}}","",40,-2,2);
   TH2F *vtxefffuncPlot = new TH2F("vtx_resolution_to_truthvtx","",20,0,21,40,-1.5,1.5);
   vtxeffPlot->Sumw2();
   vtxefffuncPlot->Sumw2();
@@ -272,6 +272,7 @@ void makepTCaloGraph(string filename,TFile* outfile){
   yArray=&yData[0];
   TGraph *pTResCaloGraph = new TGraph(xData.size(),xArray,yArray);
   pTResCaloGraph->SetNameTitle("calopTRes","calopTRes");
+  pTResCaloGraph->Sort();
   pTResCaloGraph->Write();
   outfile->Write();
 }
@@ -288,6 +289,7 @@ void photonEff()
   //makephotonM(ttree,out_file);
   makepTRes(ttree,out_file);
   makeVtxRes(ttree,out_file);
+  makeVtxEff(ttree,out_file);
   //testCuts(ttree,out_file);
   makepTCaloGraph("pTcalodata.csv",out_file);
   //makeVtxR(ttree2,out_file);
