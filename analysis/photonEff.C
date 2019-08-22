@@ -1,4 +1,5 @@
 #include <iostream>
+#include <fstream>
 using namespace std;
 
 #include "TFile.h"
@@ -86,7 +87,27 @@ void makeVtxR(TChain* ttree,TFile* out_file){
   std::cout<<"mean deviation="<<calc<<std::endl;
 }
 
-void makepTEff(TChain* ttree,TFile* out_file){
+void makeVtxRes(TChain* ttree,TFile* out_file){
+  float r;
+  float tr;
+  ttree->SetBranchAddress("vtx_radius",&r);
+  ttree->SetBranchAddress("tvtx_radius",&tr);
+  TH1F *vtxeffPlot = new TH1F("#frac{#Deltar_{vtx}_^{#it{reco}}{r_{vtx}^{#it{truth}}}","",40,-2,2);
+  TH2F *vtxefffuncPlot = new TH2F("vtx_resolution_to_truthvtx","",20,0,21,40,-1.5,1.5);
+  vtxeffPlot->Sumw2();
+  vtxefffuncPlot->Sumw2();
+  for (int event = 0; event < ttree->GetEntries(); ++event)
+  {
+    ttree->GetEvent(event);
+    vtxeffPlot->Fill((r-tr)/tr);
+    vtxefffuncPlot->Fill(tr,(r-tr)/tr);
+  }
+  vtxeffPlot->Scale(1./ttree->GetEntries(),"width");
+  vtxefffuncPlot->Scale(1./ttree->GetEntries(),"width");
+  out_file->Write();
+}
+
+void makepTRes(TChain* ttree,TFile* out_file){
   float pT;
   float tpT;
   float track_pT;
@@ -117,6 +138,7 @@ void makepTEff(TChain* ttree,TFile* out_file){
   cout<<"Signal rejection through pT cut= "<<sqrt((float)lowpTCount)/ttree->GetEntries()<<endl;
   out_file->Write();
 }
+
 void testCuts(TChain* ttree,TFile* out_file){
   float dphi;
   float prob;
@@ -212,18 +234,43 @@ void makeRefitDist(TChain* ttree, TFile *out_file){
   out_file->Write();
 }
 
+void makepTCaloGraph(string filename,TFile* outfile){
+  ifstream caloFile;
+  caloFile.open(filename.c_str());
+  double x,y;
+  string s;
+  vector<double> xData, yData;
+  /*if(!(caloFile >>x>>y)){
+    cout<<"file error"<<endl;
+    if(!caloFile.is_open()) cout<<"file not opened"<<endl;
+  }*/
+  while(caloFile >>x>>s>>y){
+    xData.push_back(x);
+    yData.push_back(y);
+  }
+  double *xArray, *yArray;
+  xArray=&xData[0];
+  yArray=&yData[0];
+  TGraph *pTResCaloGraph = new TGraph(xData.size(),xArray,yArray);
+  pTResCaloGraph->SetNameTitle("calopTRes","calopTRes");
+  pTResCaloGraph->Write();
+  outfile->Write();
+}
+
 void photonEff()
 {
-  string treePath = "/sphenix/user/vassalli/gammasample/conversionembededonlineanalysis";
+  TFile *out_file = new TFile("effplots.root","UPDATE");
+  string treePath = "/sphenix/user/vassalli/RecoConversionTests/truthconversionembededonlineanalysis";
   string treeExtension = ".root";
   unsigned int nFiles=100;
-  TFile *out_file = new TFile("effplots.root","RECREATE");
   TChain *ttree = handleFile(treePath,treeExtension,"cutTreeSignal",nFiles);
   cout<<"Total events= "<<ttree->GetEntries()<<'\n';
   TChain *ttree2 = handleFile(treePath,treeExtension,"vtxingTree",nFiles);
   //makephotonM(ttree,out_file);
-//  makepTEff(ttree,out_file);
+  makepTRes(ttree,out_file);
+  makeVtxRes(ttree,out_file);
   testCuts(ttree,out_file);
+  //makepTCaloGraph("pTcalodata.csv",out_file);
   //makeVtxR(ttree2,out_file);
   //makeRefitDist(ttree,out_file);
 }
