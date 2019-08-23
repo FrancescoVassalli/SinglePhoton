@@ -40,8 +40,8 @@ void makeFactory(TTree* signalTree, TTree* backTree,std::string outfile,std::str
   }
   factory->AddVariable("track_layer",'I');
   factory->AddVariable("track_pT",'F');
-  //factory->AddSpectator("track_dca",'F');
-  //factory->AddSpectator("cluster_prob",'F');
+  factory->AddSpectator("track_dca",'F');
+  factory->AddSpectator("cluster_prob",'F');
  /* factory->AddVariable("abs(track_deta)",'F');
   factory->AddVariable("abs(cluster_deta)",'F');
   factory->AddVariable("abs(cluster_dphi)",'F');
