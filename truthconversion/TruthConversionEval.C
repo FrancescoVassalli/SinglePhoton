@@ -462,7 +462,7 @@ void TruthConversionEval::processTrackBackground(std::vector<SvtxTrack*> *v_trac
         if(parent) _bb_parent_pid = parent->get_pid();
         else _bb_parent_pid=0;*/
 
-      if (_bb_track_layer>=0&&_bb_track_pT>_kTightPtMin&&_bb_track_deta<_kTightDetaMax&&TMath::Abs(_bb_track_dlayer)<=9)
+      if (_bb_track_layer>=0&&_bb_track_pT>_kTightPtMin&&_bb_track_deta<_kTightDetaMax&&TMath::Abs(_bb_track_dlayer)<9)
       {
         iTrack->identify();
         jTrack->identify();

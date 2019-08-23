@@ -42,17 +42,17 @@ void makeFactory(TTree* signalTree, TTree* backTree,std::string outfile,std::str
   factory->AddSpectator("track_pT",'F');
   factory->AddSpectator("track_dca",'F');
   factory->AddSpectator("cluster_prob",'F');
-  factory->AddVariable("abs(track_deta)",'F');
-  factory->AddVariable("abs(cluster_deta)",'F');
-  factory->AddVariable("abs(cluster_dphi)",'F');
-  factory->AddVariable("abs(track_dlayer)",'I');
-  factory->AddVariable("approach_dist",'F');
-  //factory->AddVariable("vtx_radius",'F');
+  factory->AddSpectator("abs(track_deta)",'F');
+  factory->AddSpectator("abs(cluster_deta)",'F');
+  factory->AddSpectator("abs(cluster_dphi)",'F');
+  factory->AddSpectator("abs(track_dlayer)",'I');
+  factory->AddSpectator("approach_dist",'F');
+  factory->AddVariable("vtx_radius",'F');
 //  factory->AddVariable("vtx_chi2",'F'); 
   //factory->AddVariable("vtxTrackRZ_dist",'F');
   //factory->AddVariable("abs(vtxTrackRPhi_dist-vtxTrackRZ_dist)",'F');
-  //factory->AddVariable("photon_m",'F');
-  //factory->AddVariable("photon_pT",'F');
+  factory->AddVariable("photon_m",'F');
+  factory->AddVariable("photon_pT",'F');
 
   string track_layer_cut = "track_layer>-1.";
   string track_pT_cut = "track_pT>2.0";
@@ -97,8 +97,8 @@ int train(){
   TChain *backpairTree = handleFile(treePath,treeExtension,"pairBackTree",nFiles);
   TChain *backVtxTree = handleFile(treePath,treeExtension,"vtxBackTree",nFiles);
   //makeFactory(signalTree,backtrackTree,outname,"trackback");
-  makeFactory(signalTree,backpairTree,outname,"pairback");
-  //makeFactory(signalTree,backVtxTree,outname,"vtxback");
+  //makeFactory(signalTree,backpairTree,outname,"pairback");
+  makeFactory(signalTree,backVtxTree,outname,"vtxback");
 /*  outname="cutTrainE.root";
   makeFactory(signalTree,backETree,outname,"eback");*/
 }
