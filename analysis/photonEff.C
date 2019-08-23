@@ -146,8 +146,8 @@ void makepTRes(TChain* ttree,TFile* out_file){
   for (int event = 0; event < ttree->GetEntries(); ++event)
   {
     ttree->GetEvent(event);
-    pTeffPlot->Fill((pT-tpT)/tpT);
-    pTefffuncPlot->Fill(tpT,(pT-tpT)/tpT);
+    pTeffPlot->Fill(pT/tpT);
+    pTefffuncPlot->Fill(tpT,pT/tpT);
     //trackpTDist->Fill(track_pT); 
   }
   pTeffPlot->Scale(1./ttree->GetEntries(),"width");
