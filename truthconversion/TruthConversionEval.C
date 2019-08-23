@@ -162,6 +162,7 @@ int TruthConversionEval::InitRun(PHCompositeNode *topNode)
     //_signalCutTree->Branch("vtxTrackRZ_dist", &_b_vtxTrackRZ_dist);
     //_signalCutTree->Branch("vtxTrackRPhi_dist", &_b_vtxTrackRPhi_dist);
     _signalCutTree->Branch("photon_m", &_b_photon_m);
+    _signalCutTree->Branch("tphoton_m", &_b_tphoton_m);
     _signalCutTree->Branch("photon_pT", &_b_photon_pT);
     _signalCutTree->Branch("tphoton_pT", &_b_tphoton_pT);
     _signalCutTree->Branch("cluster_prob", &_b_cluster_prob);
@@ -225,6 +226,7 @@ int TruthConversionEval::process_event(PHCompositeNode *topNode)
   std::vector<SvtxTrack*> backgroundTracks;
   std::vector<std::pair<SvtxTrack*,SvtxTrack*>> tightbackgroundTrackPairs; //used to find the pair for unmatched conversion tracks
   std::list<int> signalTracks;
+  //reset obervation variables
   _b_nMatched=0;
   _b_nUnmatched=0;
   _b_truth_pT.clear();
@@ -506,13 +508,15 @@ void TruthConversionEval::recordConversion(Conversion *conversion,TLorentzVector
   if (recoPhoton)
   {
     _b_photon_m=recoPhoton->Dot(*recoPhoton);
+    TLorentzVector truth_added_tlv = *tlv_electron+*tlv_positron;
+    _b_tphoton_m= truth_added_tlv.Dot(truth_added_tlv);
     _b_photon_pT=recoPhoton->Pt();
-    conversion->PrintPhotonRecoInfo(tlv_photon,tlv_electron,tlv_positron);
+    conversion->PrintPhotonRecoInfo(tlv_photon,tlv_electron,tlv_positron,_b_photon_m);
   }
   else{//photon was not reconstructed
     _b_photon_m =-1;
     _b_photon_pT=-1;
-    conversion->PrintPhotonRecoInfo();
+    conversion->PrintPhotonRecoInfo(tlv_photon,tlv_electron,tlv_positron,_b_photon_m);
   }
   _b_tphoton_pT=tlv_photon->Pt();
   //truth vertex info

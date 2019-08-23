@@ -30,31 +30,29 @@ TChain* handleFile(string name, string extension, string treename, unsigned int 
 
 void makephotonM(TChain* ttree,TFile* out_file){
   float photon_m;
-  float rephoton_m;
   float tphoton_m;
   std::vector<TH1F*> plots;
   ttree->SetBranchAddress("photon_m",     &photon_m   );
-  ttree->SetBranchAddress("rephoton_m",     &rephoton_m   );
+  //ttree->SetBranchAddress("rephoton_m",     &rephoton_m   );
   plots.push_back(new TH1F("m^{#gamma}_{reco}","",40,-2,10));
-  plots.push_back(new TH1F("m^{#gamma}_{recoRefit}","",40,-2,10));
+  //plots.push_back(new TH1F("m^{#gamma}_{recoRefit}","",40,-2,10));
   
-  plots[1]->SetLineColor(kRed);
-  for (int i = 0; i < 2; ++i)
+  for (int i = 0; i < plots.size(); ++i)
   {
     plots[i]->Sumw2();
   }
-
   for (int event = 0; event < ttree->GetEntries(); ++event)
   {
     ttree->GetEvent(event);
     plots[0]->Fill(photon_m);
-    plots[1]->Fill(rephoton_m);
+   // plots[1]->Fill(rephoton_m);
   }
-  for (int i = 0; i < 2; ++i)
+  for (int i = 0; i < plots.size(); ++i)
   {
     plots[i]->Scale(1./ttree->GetEntries(),"width");
   }
   out_file->Write();
+  ttree->ResetBranchAddresses();
 }
 
 void makeVtxR(TChain* ttree,TFile* out_file){
@@ -144,7 +142,7 @@ void makepTRes(TChain* ttree,TFile* out_file){
   //TH1F *trackpTDist = new TH1F("truthpt","",40,0,35);
   pTeffPlot->Sumw2();
   pTefffuncPlot->Sumw2();
-  //trackpTDist->Sumw2();
+  //t cout<<"here"<<endl;rackpTDist->Sumw2();
   for (int event = 0; event < ttree->GetEntries(); ++event)
   {
     ttree->GetEvent(event);
@@ -224,6 +222,7 @@ void testCuts(TChain* ttree,TFile* out_file){
   cout<<"error= "<<sqrt((float)shortRadiusCount)/ttree->GetEntries()<<endl;
   out_file->Write();
 }
+
 void makeRefitDist(TChain* ttree, TFile *out_file){
   float diffx;
   float diffy;
@@ -252,6 +251,7 @@ void makeRefitDist(TChain* ttree, TFile *out_file){
   diffplotz->Scale(1./ttree->GetEntries(),"width");
 
   out_file->Write();
+  ttree->ResetBranchAddresses();
 }
 
 void makepTCaloGraph(string filename,TFile* outfile){
@@ -287,7 +287,7 @@ void photonEff()
   TChain *ttree = handleFile(treePath,treeExtension,"cutTreeSignal",nFiles);
   cout<<"Total events= "<<ttree->GetEntries()<<'\n';
   //TChain *ttree2 = handleFile(treePath,treeExtension,"vtxingTree",nFiles);
-  //makephotonM(ttree,out_file);
+  makephotonM(ttree,out_file);
   makepTRes(ttree,out_file);
   makeVtxRes(ttree,out_file);
   makeVtxEff(ttree,out_file);

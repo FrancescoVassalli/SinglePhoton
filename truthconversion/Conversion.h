@@ -255,7 +255,7 @@ class Conversion
     void printReco();
     ///print the info relating to photon reconstruction
     void PrintPhotonRecoInfo();
-    void PrintPhotonRecoInfo(TLorentzVector *tlv_photon,TLorentzVector *tlv_electron, TLorentzVector *tlv_positron);
+    void PrintPhotonRecoInfo(TLorentzVector *tlv_photon,TLorentzVector *tlv_electron, TLorentzVector *tlv_positron,float mass);
   private:
     PHG4Particle* e1=NULL;
     PHG4Particle* e2=NULL;
@@ -276,7 +276,7 @@ class Conversion
     int embedID=0;
     int verbosity;
     int sourceId;
-    float _kElectronRestM=.5109989461;
+    float _kElectronRestM=.0005109989461;
     ///helper function 
     static float vtxTrackRZ(TVector3 recoVertPos,SvtxTrack *track);
     ///helper function 

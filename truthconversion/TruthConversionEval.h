@@ -95,7 +95,7 @@ class TruthConversionEval: public SubsysReco
     std::string _foutname; ///< name of the output file
     SVReco *_vertexer=NULL; ///< for reco vertex finding
     VtxRegressor *_regressor=NULL; ///<for reco vertex correction with TMVA
-    
+
     /** \defgroup  variables  for the TTrees
       @{*/
     /** # of clusters associated with each conversion that has 2 reco tracks
@@ -142,6 +142,7 @@ class TruthConversionEval: public SubsysReco
     float _b_vtxTrackRPhi_dist;
     float _b_vtx_chi2;
     float _b_photon_m;
+    float _b_tphoton_m;
     float _b_tphoton_pT;
     float _b_photon_pT;
     float _b_cluster_prob;

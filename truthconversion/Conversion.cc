@@ -560,7 +560,7 @@ void Conversion::PrintPhotonRecoInfo(){
     cout<<"Reco Photon: ";recoPhoton->Print();
   }
 }
-void Conversion::PrintPhotonRecoInfo(TLorentzVector *tlv_photon,TLorentzVector *tlv_electron, TLorentzVector *tlv_positron){
+void Conversion::PrintPhotonRecoInfo(TLorentzVector *tlv_photon,TLorentzVector *tlv_electron, TLorentzVector *tlv_positron,float mass){
   if(!recoPhoton) cerr<<"No photon reconstructed"<<endl;
   else{
     cout<<"Truth Track: ";tlv_electron->Print();
@@ -568,7 +568,7 @@ void Conversion::PrintPhotonRecoInfo(TLorentzVector *tlv_photon,TLorentzVector *
     cout<<"Truth Track: ";tlv_positron->Print();
     cout<<"Reco Track: ";reco2->identify(); 
     cout<<"Truth Photon: ";tlv_photon->Print();
-    cout<<"Reco Photon: ";recoPhoton->Print();
+    cout<<"Reco Photon with mass: "<<mass<<": ";recoPhoton->Print();
   }
 }
 
