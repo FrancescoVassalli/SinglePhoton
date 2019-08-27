@@ -130,6 +130,10 @@ void makeVtxEff(TChain* ttree,TFile* out_file){
   ttree->ResetBranchAddresses();
 }
 
+void pTResFunction(TH2F* plot2d){
+  
+}
+
 void makepTRes(TChain* ttree,TFile* out_file){
   float pT;
   float tpT;
@@ -154,8 +158,11 @@ void makepTRes(TChain* ttree,TFile* out_file){
     //trackpTDist->Fill(track_pT); 
   }
   pTeffPlot->Scale(1./ttree->GetEntries(),"width");
-  tpTspec->Scale(1./132000);
-  pTefffuncPlot->Scale(1./ttree->GetEntries(),"width");
+  tpTspec->Scale(1./247500);
+  cout<<"Total conversion rate "<<tpTspec->Integral()<<'\n';
+  pTefffuncPlot->Scale(1./ttree->GetEntries());
+  TProfile* resProfile = pTefffuncPlot->ProfileX("func_prof",5,30);
+  resProfile->Write();
   //trackpTDist->Scale(1./ttree->GetEntries(),"width");
   out_file->Write();
   ttree->ResetBranchAddresses();
@@ -285,18 +292,18 @@ void makepTCaloGraph(string filename,TFile* outfile){
 void photonEff()
 {
   TFile *out_file = new TFile("effplots.root","UPDATE");
-  //string treePath = "/sphenix/user/vassalli/RecoConversionTests/truthconversionembededonlineanalysis";
-  string treePath = "/sphenix/user/vassalli/gammasample/truthconversiononlineanalysis";
+  string treePath = "/sphenix/user/vassalli/RecoConversionTests/truthconversionembededonlineanalysis";
+  //string treePath = "/sphenix/user/vassalli/gammasample/truthconversiononlineanalysis";
   string treeExtension = ".root";
   unsigned int nFiles=200;
   TChain *ttree = handleFile(treePath,treeExtension,"cutTreeSignal",nFiles);
   TChain *observations = handleFile(treePath,treeExtension,"observTree",nFiles);
   cout<<"Total events= "<<ttree->GetEntries()<<'\n';
   //TChain *ttree2 = handleFile(treePath,treeExtension,"vtxingTree",nFiles);
-  //makephotonM(ttree,out_file);
+  makephotonM(ttree,out_file);
   makepTRes(ttree,out_file);
-  //makeVtxRes(ttree,out_file);
-  //makeVtxEff(ttree,out_file);
+  makeVtxRes(ttree,out_file);
+  makeVtxEff(ttree,out_file);
   //testCuts(ttree,out_file);
   //makepTCaloGraph("pTcalodata.csv",out_file);
   //makeVtxR(ttree2,out_file);
