@@ -35,7 +35,7 @@ for ($irun=0; $irun<30; $irun++){
   print FILE "Arguments = \$(Process) ${wrkdir}/\n";
   print FILE "Requirements = CPU_Speed>=1\n";
   print FILE "Rank = CPU_Speed\n";
-  print FILE "Priority = +18\n";
+  print FILE "Priority = +10\n";
   print FILE "run_as_owner = True\n";
   print FILE "Executable = $driver\n";
   print FILE "Log = ${logpath}log.auto${irun}.\$(Process)\n";

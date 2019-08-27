@@ -17,8 +17,6 @@ lib_LTLIBRARIES = \
 	libtruthconversion.la
   
 pkginclude_HEADERS = \
-	ConversionClusterTreeMaker.h \
-	ConversionClusterTreeMakerLinkDef.h \
 	TruthConversionEval.h \
 	TruthConversionEvalLinkDef.h \
 	Conversion.h \
@@ -33,7 +31,6 @@ pkginclude_HEADERS = \
 	RecoConversionEvalLinkDef.h
 
 libtruthconversion_la_SOURCES = \
-	ConversionClusterTreeMaker.C \
 	TruthConversionEval.C \
 	Conversion.cc \
   SVReco.C\
