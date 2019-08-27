@@ -128,7 +128,7 @@ class RecoConversionEval : public SubsysReco {
 		float _kVtxRZCut=.4;
 		float _kVtxChi2Cut=.4;
 
-		float _kElectronRestM=.5109989461;
+		float _kElectronRestM=.005109989461;
 };
 
 #endif // __RecoConversionEval_H__

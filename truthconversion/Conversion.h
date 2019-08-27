@@ -195,7 +195,8 @@ class Conversion
     //Deprecated 
     //float setRecoVtx(SvtxVertex* recovtx,SvtxClusterMap* cmap);
     TLorentzVector* setRecoPhoton();///< constructs a tlv for a photon by adding the tlvs for the reco tracks
-    TLorentzVector* getRecoPhoton();///<@return the constructed tlv
+    TLorentzVector* getRecoPhoton();///<@return the constructed tlv does not return ownserhip
+    static TLorentzVector* getRecoPhoton(SvtxTrack* reco1, SvtxTrack* reco2);///<@return the addition of respective tlvs, @return ownership
     ///Uses the {@link _refit_phgf_tracks} to set {@link recoPhoton}. Will delete any existing {@link recoPhoton}. @return NULL if either {@link _refit_phgf_tracks} are NULL.
     TLorentzVector* getRefitRecoPhoton();
     PHG4Particle* getTruthPhoton(PHG4TruthInfoContainer*);///<@return NULL if not valid conversion else return photon
@@ -276,7 +277,7 @@ class Conversion
     int embedID=0;
     int verbosity;
     int sourceId;
-    float _kElectronRestM=.0005109989461;
+    static const float _kElectronRestM;
     ///helper function 
     static float vtxTrackRZ(TVector3 recoVertPos,SvtxTrack *track);
     ///helper function 

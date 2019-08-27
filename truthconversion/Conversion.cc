@@ -14,6 +14,9 @@
 #include <TRandom3.h>
 #include <assert.h>
 
+
+const float Conversion::_kElectronRestM=.0005109989461;
+
 Conversion::Conversion(SvtxTrackEval* trackeval,int verbosity){
   this->trackeval=trackeval;
   this->verbosity=verbosity;
@@ -236,6 +239,15 @@ TLorentzVector* Conversion::setRecoPhoton(){
 
 TLorentzVector* Conversion::getRecoPhoton(){
   return setRecoPhoton();
+}
+
+TLorentzVector* Conversion::getRecoPhoton(SvtxTrack* reco1, SvtxTrack* reco2){
+  if(!(reco1&&reco2)) return NULL;
+  TLorentzVector tlv1(reco1->get_px(),reco1->get_py(),reco1->get_pz(),
+      sqrt(_kElectronRestM*_kElectronRestM+reco1->get_p()*reco1->get_p()));
+  TLorentzVector tlv2(reco2->get_px(),reco2->get_py(),reco2->get_pz(),
+      sqrt(_kElectronRestM*_kElectronRestM+reco2->get_p()*reco2->get_p()));
+  return new TLorentzVector(tlv1+tlv2);
 }
 
 TLorentzVector* Conversion::getRefitRecoPhoton(){

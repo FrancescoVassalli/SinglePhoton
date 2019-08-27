@@ -78,6 +78,7 @@ int TruthConversionEval::InitRun(PHCompositeNode *topNode)
     _observTree->Branch("nUnmatched", &_b_nUnmatched);
     _observTree->Branch("truth_pT", &_b_truth_pT);
     _observTree->Branch("reco_pT", &_b_reco_pT);
+    _observTree->Branch("track_pT",&_b_alltrack_pT) ;
 
     _vtxingTree = new TTree("vtxingTree","data predicting vtx from track pair");
     _vtxingTree->SetAutoSave(300);
@@ -231,6 +232,7 @@ int TruthConversionEval::process_event(PHCompositeNode *topNode)
   _b_nUnmatched=0;
   _b_truth_pT.clear();
   _b_reco_pT.clear();
+  _b_alltrack_pT.clear();
   cout<<"init truth loop"<<endl;
   for ( PHG4TruthInfoContainer::ConstIterator iter = range.first; iter != range.second; ++iter ) {
     PHG4Particle* g4particle = iter->second;
@@ -283,6 +285,7 @@ int TruthConversionEval::process_event(PHCompositeNode *topNode)
   cout<<"intit track loop"<<endl;
   //build the current backgroundSample
   for ( SvtxTrackMap::Iter iter = _allTracks->begin(); iter != _allTracks->end(); ++iter) {
+    _b_alltrack_pT.push_back(iter->second->get_pt());
     auto inCheck = std::find(signalTracks.begin(),signalTracks.end(),iter->first);
     //if the track is not in the list of signal tracks
     if (inCheck!=signalTracks.end())
@@ -453,8 +456,8 @@ void TruthConversionEval::processTrackBackground(std::vector<SvtxTrack*> *v_trac
       }
       else{ //clusters were not found
         _bb_nCluster=0;
-        _bb_cluster_deta=-1;
-        _bb_cluster_dphi=-1;
+        _bb_cluster_deta=-999;
+        _bb_cluster_dphi=-999;
       }
       /*_bb_track1_pid = (*iTruthTrack)->get_pid();
         _bb_track2_pid = (*jTruthTrack)->get_pid();
@@ -464,8 +467,8 @@ void TruthConversionEval::processTrackBackground(std::vector<SvtxTrack*> *v_trac
 
       if (_bb_track_layer>=0&&_bb_track_pT>_kTightPtMin&&_bb_track_deta<_kTightDetaMax&&TMath::Abs(_bb_track_dlayer)<9)
       {
-        iTrack->identify();
-        jTrack->identify();
+        //iTrack->identify();
+        //jTrack->identify();
         genfit::GFRaveVertex* recoVert = _vertexer->findSecondaryVertex(iTrack,jTrack);
         if (recoVert)
         {
@@ -474,12 +477,21 @@ void TruthConversionEval::processTrackBackground(std::vector<SvtxTrack*> *v_trac
           _bb_vtx_chi2 = recoVert->getChi2();
           _bb_vtxTrackRZ_dist = pairMath.vtxTrackRZ(recoVertPos,iTrack,jTrack);
           _bb_vtxTrackRPhi_dist = pairMath.vtxTrackRPhi(recoVertPos,iTrack,jTrack);
+          TLorentzVector* recoPhoton= pairMath.getRecoPhoton(iTrack,jTrack);
+          if(recoPhoton){
+            _bb_photon_m = recoPhoton->Dot(*recoPhoton);
+            _bb_photon_pT = recoPhoton->Pt();
+          }
+          else{
+            _bb_photon_m=-999;
+            _bb_photon_pT=-999;
+          }
         }
         else{
-          _bb_vtx_radius = -1;
-          _bb_vtx_chi2 = -1;
-          _bb_vtxTrackRZ_dist = -1;
-          _bb_vtxTrackRPhi_dist = -1;
+          _bb_vtx_radius = -999;
+          _bb_vtx_chi2 = -999;
+          _bb_vtxTrackRZ_dist =-999;
+          _bb_vtxTrackRPhi_dist =-999;
         }
         _vtxBackTree->Fill();
       }//pair cuts

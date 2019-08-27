@@ -167,6 +167,7 @@ class TruthConversionEval: public SubsysReco
     int _b_nUnmatched=0;
     std::vector<float> _b_truth_pT;
     std::vector<float> _b_reco_pT;
+    std::vector<float> _b_alltrack_pT;
     /**@}*/
     /** RawClusters associated with truth conversions
      * processed by other modules currently empty*/
