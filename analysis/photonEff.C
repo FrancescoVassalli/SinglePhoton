@@ -139,18 +139,22 @@ void makepTRes(TChain* ttree,TFile* out_file){
   
   TH1F *pTeffPlot = new TH1F("#frac{#it{p}^{T}}{#it{p}_{#it{truth}}^{T}}","",40,-2,2);
   TH2F *pTefffuncPlot = new TH2F("pT_resolution_to_truthpt","",40,1,35,40,-1.5,1.5);
+  TH1F *tpTspec = new TH1F("converted_photon_truth_pT","",25,5,31);
   //TH1F *trackpTDist = new TH1F("truthpt","",40,0,35);
   pTeffPlot->Sumw2();
+  tpTspec->Sumw2();
   pTefffuncPlot->Sumw2();
   //t cout<<"here"<<endl;rackpTDist->Sumw2();
   for (int event = 0; event < ttree->GetEntries(); ++event)
   {
     ttree->GetEvent(event);
     pTeffPlot->Fill(pT/tpT);
+    tpTspec->Fill(tpT);
     pTefffuncPlot->Fill(tpT,pT/tpT);
     //trackpTDist->Fill(track_pT); 
   }
   pTeffPlot->Scale(1./ttree->GetEntries(),"width");
+  tpTspec->Scale(1./ttree->GetEntries(),"width");
   pTefffuncPlot->Scale(1./ttree->GetEntries(),"width");
   //trackpTDist->Scale(1./ttree->GetEntries(),"width");
   out_file->Write();
@@ -281,18 +285,19 @@ void makepTCaloGraph(string filename,TFile* outfile){
 void photonEff()
 {
   TFile *out_file = new TFile("effplots.root","UPDATE");
-  string treePath = "/sphenix/user/vassalli/RecoConversionTests/truthconversionembededonlineanalysis";
+  //string treePath = "/sphenix/user/vassalli/RecoConversionTests/truthconversionembededonlineanalysis";
+  string treePath = "/sphenix/user/vassalli/gammasample/truthconversiononlineanalysis";
   string treeExtension = ".root";
-  unsigned int nFiles=100;
+  unsigned int nFiles=200;
   TChain *ttree = handleFile(treePath,treeExtension,"cutTreeSignal",nFiles);
   cout<<"Total events= "<<ttree->GetEntries()<<'\n';
   //TChain *ttree2 = handleFile(treePath,treeExtension,"vtxingTree",nFiles);
-  makephotonM(ttree,out_file);
+  //makephotonM(ttree,out_file);
   makepTRes(ttree,out_file);
-  makeVtxRes(ttree,out_file);
-  makeVtxEff(ttree,out_file);
+  //makeVtxRes(ttree,out_file);
+  //makeVtxEff(ttree,out_file);
   //testCuts(ttree,out_file);
-  makepTCaloGraph("pTcalodata.csv",out_file);
+  //makepTCaloGraph("pTcalodata.csv",out_file);
   //makeVtxR(ttree2,out_file);
   //makeRefitDist(ttree,out_file);
 }
