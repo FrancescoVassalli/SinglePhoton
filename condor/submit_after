@@ -45,10 +45,10 @@ Log          = /direct/phenix+u/vassalli/sphenix/single/condor_logs/log.p.$(Proc
 # Email address to send notification to.
 Notify_user     = frva5829@colorado.edu
 
-request_memory = 2000M
+request_memory = 4000M
 
 # This should be the last command and tells condor to queue the
 # job.  If a number is placed after the command (i.e. Queue 15)
 # then the job will be submitted N times.  Use the $(Process)
 # macro to make your input/output and log files unique.
-Queue 1
+Queue 200
