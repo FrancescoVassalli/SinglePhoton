@@ -154,7 +154,7 @@ void makepTRes(TChain* ttree,TFile* out_file){
     //trackpTDist->Fill(track_pT); 
   }
   pTeffPlot->Scale(1./ttree->GetEntries(),"width");
-  tpTspec->Scale(1./ttree->GetEntries(),"width");
+  tpTspec->Scale(1./132000);
   pTefffuncPlot->Scale(1./ttree->GetEntries(),"width");
   //trackpTDist->Scale(1./ttree->GetEntries(),"width");
   out_file->Write();
@@ -290,6 +290,7 @@ void photonEff()
   string treeExtension = ".root";
   unsigned int nFiles=200;
   TChain *ttree = handleFile(treePath,treeExtension,"cutTreeSignal",nFiles);
+  TChain *observations = handleFile(treePath,treeExtension,"observTree",nFiles);
   cout<<"Total events= "<<ttree->GetEntries()<<'\n';
   //TChain *ttree2 = handleFile(treePath,treeExtension,"vtxingTree",nFiles);
   //makephotonM(ttree,out_file);
