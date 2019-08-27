@@ -5,7 +5,7 @@
 using namespace Pythia8;
 using namespace std;
 
-void generator(std::string filename, long nEvents){
+void generator(std::string filename, long nEvents, bool signalOnly=false){
   using namespace HepMC;
   string hepName = filename+".dat";    //filenames
   HepMC::Pythia8ToHepMC ToHepMC;    // Interface for conversion from Pythia8::Event to HepMC event.
@@ -23,8 +23,9 @@ void generator(std::string filename, long nEvents){
   //pythiaengine.readString("111:onMode = off"); ///pi0 won't decay
   pythiaengine.init();
 
-  TFile *outFile = new TFile("pythiaObserv","some file");
-  TTree *photonTree = new TFile("photonTree","phat phirn tree");
+  string tfilename = filename+"_analysis.root";
+  TFile *outFile = new TFile(tfilename.c_str(),"some file");
+  TTree *photonTree = new TTree("photonTree","phat phirn tree");
   vector<float> photon_pT;
   photonTree->Branch("photon_pT",&photon_pT);
 
@@ -35,16 +36,18 @@ void generator(std::string filename, long nEvents){
       iEvent--;
       continue;
     } 
-    HepMC::GenEvent* hepmcevtfrag = new HepMC::GenEvent(); //create HepMC event
-    ToHepMC.fill_next_event( pythiaengine, hepmcevtfrag ); //convert event from pythia to HepMC
-    ascii_io << hepmcevtfrag;//write event to file
-    delete hepmcevtfrag; //delete event so it can be redeclared next time
+    photon_pT.clear();
     for(unsigned ipart=0; ipart!=pythiaengine.event.size(); ipart++){
       if(pythiaengine.event[ipart].id()==22&&pythiaengine.event[ipart].isFinal()&&pythiaengine.event[ipart].pT()>5
           &&TMath::Abs(pythiaengine.event[ipart].eta()))photon_pT.push_back(pythiaengine.event[ipart].pT());
-
     }
     photonTree->Fill();
+    if(!signalOnly||photon_pT.size()>0){
+      HepMC::GenEvent* hepmcevtfrag = new HepMC::GenEvent(); //create HepMC event
+      ToHepMC.fill_next_event( pythiaengine, hepmcevtfrag ); //convert event from pythia to HepMC
+      ascii_io << hepmcevtfrag;//write event to file
+      delete hepmcevtfrag; //delete event so it can be redeclared next time
+    }
   }
   outFile->Write();
 }
@@ -52,8 +55,10 @@ void generator(std::string filename, long nEvents){
 int main(int argc, char const *argv[] )
 {
   string fileOut = string(argv[1]);
+  bool signalOnly=false;
+  if(argv[2][0]=='1'||argv[2][0]=='t')signalOnly=true;
   long nEvents =strtol(argv[2],NULL,10);  // 5000000;
-  generator(fileOut,nEvents);
+  generator(fileOut,nEvents,signalOnly);
   cout<<"All done"<<endl;
   return 0;
 }
