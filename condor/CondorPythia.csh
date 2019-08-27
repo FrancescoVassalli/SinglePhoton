@@ -2,7 +2,7 @@
 @ p =  ${1} + 600
 #
 set OUT_LOCATION="/sphenix/user/vassalli/minBiasPythia/"
-set PYTHIA_FILE=${OUT_LOCATION}pythiaMinBiasHep${p}.dat
+set PYTHIA_FILE=${OUT_LOCATION}pythiaMinBiasHep${p}
 #
 set SCRATCH_AREA="$_CONDOR_SCRATCH_DIR"                                                              
 #

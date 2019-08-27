@@ -24,7 +24,7 @@ void generator(std::string filename, long nEvents, bool signalOnly=false){
   pythiaengine.init();
 
   string tfilename = filename+"_analysis.root";
-  TFile *outFile = new TFile(tfilename.c_str(),"some file");
+  TFile *outFile = new TFile(tfilename.c_str(),"RECREATE");
   TTree *photonTree = new TTree("photonTree","phat phirn tree");
   vector<float> photon_pT;
   photonTree->Branch("photon_pT",&photon_pT);
