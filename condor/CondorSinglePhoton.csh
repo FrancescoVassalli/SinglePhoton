@@ -2,9 +2,9 @@
 @ p = ( ${1} )
 #
 set OUT_LOCATION="/sphenix/user/vassalli/gammasample/"
-set ANA_LOCATION="/sphenix/user/vassalli/RecoConversionTests/"
-set OUT_FILE=conversionembededonlineanalysis${p}.root
-set IN_FILE=conversionembededout${p}.root
+set ANA_LOCATION="/sphenix/user/vassalli/gammasample/"
+set OUT_FILE=conversiononlineanalysis${p}.root
+set IN_FILE=conversionout${p}.root
 set PYTHIA_FILE="/sphenix/user/vassalli/gammasample/pythiahep${p}.dat.dat"
 #
 set SCRATCH_AREA="$_CONDOR_SCRATCH_DIR/fran_embed_photons${p}"                                                                                                              
