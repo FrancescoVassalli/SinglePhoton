@@ -158,8 +158,7 @@ void makepTRes(TChain* ttree,TFile* out_file){
     //trackpTDist->Fill(track_pT); 
   }
   pTeffPlot->Scale(1./ttree->GetEntries(),"width");
-  tpTspec->Scale(1./247500);
-  cout<<"Total conversion rate "<<tpTspec->Integral()<<'\n';
+  tpTspec->Scale(1./300000); //total number of embeded photon in nobgrd simulation 15 per event 100 events per run 200 runs 
   pTefffuncPlot->Scale(1./ttree->GetEntries());
   TProfile* resProfile = pTefffuncPlot->ProfileX("func_prof",5,30);
   resProfile->Write();
@@ -289,21 +288,40 @@ void makepTCaloGraph(string filename,TFile* outfile){
   outfile->Write();
 }
 
+void truthconversionRate(TTree* ttree){
+  int unmatched;
+  int matched;
+  ttree->SetBranchAddress("nMatched",&unmatched);
+  ttree->SetBranchAddress("nUnmatched",&matched);
+  int total=0;
+  for (int event = 0; event < ttree->GetEntries(); ++event)
+  {
+    ttree->GetEvent(event);
+    if((matched+unmatched)%2==0){
+      total+=matched;
+      total+=unmatched;
+    }
+  }
+  cout<<"Conversion rate: "<<total/6000.<<" +/- "<<sqrt((float)total)/6000<<"\%\n";
+  ttree->ResetBranchAddresses();
+}
+
 void photonEff()
 {
   TFile *out_file = new TFile("effplots.root","UPDATE");
-  string treePath = "/sphenix/user/vassalli/RecoConversionTests/truthconversionembededonlineanalysis";
-  //string treePath = "/sphenix/user/vassalli/gammasample/truthconversiononlineanalysis";
+  //string treePath = "/sphenix/user/vassalli/RecoConversionTests/truthconversionembededonlineanalysis";
+  string treePath = "/sphenix/user/vassalli/gammasample/truthconversiononlineanalysis";
   string treeExtension = ".root";
   unsigned int nFiles=200;
   TChain *ttree = handleFile(treePath,treeExtension,"cutTreeSignal",nFiles);
   TChain *observations = handleFile(treePath,treeExtension,"observTree",nFiles);
   cout<<"Total events= "<<ttree->GetEntries()<<'\n';
   //TChain *ttree2 = handleFile(treePath,treeExtension,"vtxingTree",nFiles);
-  makephotonM(ttree,out_file);
+  //makephotonM(ttree,out_file);
   makepTRes(ttree,out_file);
-  makeVtxRes(ttree,out_file);
-  makeVtxEff(ttree,out_file);
+  truthconversionRate(observations);
+  //makeVtxRes(ttree,out_file);
+  //makeVtxEff(ttree,out_file);
   //testCuts(ttree,out_file);
   //makepTCaloGraph("pTcalodata.csv",out_file);
   //makeVtxR(ttree2,out_file);
