@@ -1,4 +1,5 @@
 #include <iostream>
+#include <fstream>
 using namespace std;
 
 #include "TFile.h"
@@ -29,31 +30,29 @@ TChain* handleFile(string name, string extension, string treename, unsigned int 
 
 void makephotonM(TChain* ttree,TFile* out_file){
   float photon_m;
-  float rephoton_m;
   float tphoton_m;
   std::vector<TH1F*> plots;
   ttree->SetBranchAddress("photon_m",     &photon_m   );
-  ttree->SetBranchAddress("rephoton_m",     &rephoton_m   );
-  plots.push_back(new TH1F("m^{#gamma}_{reco}","",40,-2,10));
-  plots.push_back(new TH1F("m^{#gamma}_{recoRefit}","",40,-2,10));
+  //ttree->SetBranchAddress("rephoton_m",     &rephoton_m   );
+  plots.push_back(new TH1F("m^{#gamma}_{reco}","",60,0,.18));
+  //plots.push_back(new TH1F("m^{#gamma}_{recoRefit}","",40,-2,10));
   
-  plots[1]->SetLineColor(kRed);
-  for (int i = 0; i < 2; ++i)
+  for (int i = 0; i < plots.size(); ++i)
   {
     plots[i]->Sumw2();
   }
-
   for (int event = 0; event < ttree->GetEntries(); ++event)
   {
     ttree->GetEvent(event);
     plots[0]->Fill(photon_m);
-    plots[1]->Fill(rephoton_m);
+   // plots[1]->Fill(rephoton_m);
   }
-  for (int i = 0; i < 2; ++i)
+  for (int i = 0; i < plots.size(); ++i)
   {
     plots[i]->Scale(1./ttree->GetEntries(),"width");
   }
   out_file->Write();
+  ttree->ResetBranchAddresses();
 }
 
 void makeVtxR(TChain* ttree,TFile* out_file){
@@ -86,37 +85,88 @@ void makeVtxR(TChain* ttree,TFile* out_file){
   std::cout<<"mean deviation="<<calc<<std::endl;
 }
 
-void makepTEff(TChain* ttree,TFile* out_file){
+void makeVtxRes(TChain* ttree,TFile* out_file){
+  float r;
+  float tr;
+  ttree->SetBranchAddress("vtx_radius",&r);
+  ttree->SetBranchAddress("tvtx_radius",&tr);
+  TH1F *vtxeffPlot = new TH1F("#frac{#Deltar_{vtx}_^{#it{reco}}}{r_{vtx}^{#it{truth}}}","",40,-2,2);
+  TH2F *vtxefffuncPlot = new TH2F("vtx_resolution_to_truthvtx","",20,0,21,40,-1.5,1.5);
+  vtxeffPlot->Sumw2();
+  vtxefffuncPlot->Sumw2();
+  for (int event = 0; event < ttree->GetEntries(); ++event)
+  {
+    ttree->GetEvent(event);
+    if(r<0) continue;
+    vtxeffPlot->Fill((r-tr)/tr);
+    vtxefffuncPlot->Fill(tr,(r-tr)/tr);
+  }
+  vtxeffPlot->Scale(1./ttree->GetEntries(),"width");
+  vtxefffuncPlot->Scale(1./ttree->GetEntries(),"width");
+  out_file->Write();
+  ttree->ResetBranchAddresses();
+}
+
+void makeVtxEff(TChain* ttree,TFile* out_file){
+  float r;
+  float tr;
+  ttree->SetBranchAddress("vtx_radius",&r);
+  ttree->SetBranchAddress("tvtx_radius",&tr);
+  TEfficiency *vtxEff;
+  TH1F *recoR= new TH1F("vtxrecoR","",20,0,21);
+  TH1F *truthR= new TH1F("vtxtruthR","",20,0,21);
+  recoR->Sumw2();
+  truthR->Sumw2();
+  for (int event = 0; event < ttree->GetEntries(); ++event)
+  {
+    ttree->GetEvent(event);
+    if(r>0) recoR->Fill(tr);
+    truthR->Fill(tr);
+  }
+  vtxEff = new TEfficiency(*recoR,*truthR);
+  vtxEff->SetName("vtxEff");
+  vtxEff->Write();
+  out_file->Write();
+  ttree->ResetBranchAddresses();
+}
+
+void pTResFunction(TH2F* plot2d){
+  
+}
+
+void makepTRes(TChain* ttree,TFile* out_file){
   float pT;
   float tpT;
   float track_pT;
   ttree->SetBranchAddress("photon_pT",&pT);
   ttree->SetBranchAddress("tphoton_pT",&tpT);
-  ttree->SetBranchAddress("track_pT",&track_pT);
   
-  TH1F *pTeffPlot = new TH1F("#frac{#Delta#it{p}^{T}}{#it{p}_{#it{truth}}^{T}}","",40,-2,2);
+  TH1F *pTeffPlot = new TH1F("#frac{#it{p}^{T}}{#it{p}_{#it{truth}}^{T}}","",40,-2,2);
   TH2F *pTefffuncPlot = new TH2F("pT_resolution_to_truthpt","",40,1,35,40,-1.5,1.5);
-  TH1F *trackpTDist = new TH1F("truthpt","",40,0,35);
+  TH1F *tpTspec = new TH1F("converted_photon_truth_pT","",25,5,31);
+  //TH1F *trackpTDist = new TH1F("truthpt","",40,0,35);
   pTeffPlot->Sumw2();
+  tpTspec->Sumw2();
   pTefffuncPlot->Sumw2();
-  trackpTDist->Sumw2();
-  unsigned lowpTCount=0;
-
+  //t cout<<"here"<<endl;rackpTDist->Sumw2();
   for (int event = 0; event < ttree->GetEntries(); ++event)
   {
     ttree->GetEvent(event);
-    pTeffPlot->Fill((pT-tpT)/tpT);
-    pTefffuncPlot->Fill(tpT,(pT-tpT)/tpT);
-    trackpTDist->Fill(track_pT); 
-    if(tpT<.6)lowpTCount++;
+    pTeffPlot->Fill(pT/tpT);
+    tpTspec->Fill(tpT);
+    pTefffuncPlot->Fill(tpT,pT/tpT);
+    //trackpTDist->Fill(track_pT); 
   }
   pTeffPlot->Scale(1./ttree->GetEntries(),"width");
-  pTefffuncPlot->Scale(1./ttree->GetEntries(),"width");
-  trackpTDist->Scale(1./ttree->GetEntries(),"width");
-  cout<<"Signal rejection through pT cut= "<<(float)lowpTCount/ttree->GetEntries()<<endl;
-  cout<<"Signal rejection through pT cut= "<<sqrt((float)lowpTCount)/ttree->GetEntries()<<endl;
+  tpTspec->Scale(1./300000); //total number of embeded photon in nobgrd simulation 15 per event 100 events per run 200 runs 
+  pTefffuncPlot->Scale(1./ttree->GetEntries());
+  TProfile* resProfile = pTefffuncPlot->ProfileX("func_prof",5,30);
+  resProfile->Write();
+  //trackpTDist->Scale(1./ttree->GetEntries(),"width");
   out_file->Write();
+  ttree->ResetBranchAddresses();
 }
+
 void testCuts(TChain* ttree,TFile* out_file){
   float dphi;
   float prob;
@@ -182,6 +232,7 @@ void testCuts(TChain* ttree,TFile* out_file){
   cout<<"error= "<<sqrt((float)shortRadiusCount)/ttree->GetEntries()<<endl;
   out_file->Write();
 }
+
 void makeRefitDist(TChain* ttree, TFile *out_file){
   float diffx;
   float diffy;
@@ -210,20 +261,69 @@ void makeRefitDist(TChain* ttree, TFile *out_file){
   diffplotz->Scale(1./ttree->GetEntries(),"width");
 
   out_file->Write();
+  ttree->ResetBranchAddresses();
+}
+
+void makepTCaloGraph(string filename,TFile* outfile){
+  ifstream caloFile;
+  caloFile.open(filename.c_str());
+  double x,y;
+  string s;
+  vector<double> xData, yData;
+  /*if(!(caloFile >>x>>y)){
+    cout<<"file error"<<endl;
+    if(!caloFile.is_open()) cout<<"file not opened"<<endl;
+  }*/
+  while(caloFile >>x>>s>>y){
+    xData.push_back(x);
+    yData.push_back(y);
+  }
+  double *xArray, *yArray;
+  xArray=&xData[0];
+  yArray=&yData[0];
+  TGraph *pTResCaloGraph = new TGraph(xData.size(),xArray,yArray);
+  pTResCaloGraph->SetNameTitle("calopTRes","calopTRes");
+  pTResCaloGraph->Sort();
+  pTResCaloGraph->Write();
+  outfile->Write();
+}
+
+void truthconversionRate(TTree* ttree){
+  int unmatched;
+  int matched;
+  ttree->SetBranchAddress("nMatched",&unmatched);
+  ttree->SetBranchAddress("nUnmatched",&matched);
+  int total=0;
+  for (int event = 0; event < ttree->GetEntries(); ++event)
+  {
+    ttree->GetEvent(event);
+    if((matched+unmatched)%2==0){
+      total+=matched;
+      total+=unmatched;
+    }
+  }
+  cout<<"Conversion rate: "<<total/6000.<<" +/- "<<sqrt((float)total)/6000<<"\%\n";
+  ttree->ResetBranchAddresses();
 }
 
 void photonEff()
 {
-  string treePath = "/sphenix/user/vassalli/gammasample/conversionembededonlineanalysis";
+  TFile *out_file = new TFile("effplots.root","UPDATE");
+  //string treePath = "/sphenix/user/vassalli/RecoConversionTests/truthconversionembededonlineanalysis";
+  string treePath = "/sphenix/user/vassalli/gammasample/truthconversiononlineanalysis";
   string treeExtension = ".root";
-  unsigned int nFiles=100;
-  TFile *out_file = new TFile("effplots.root","RECREATE");
+  unsigned int nFiles=200;
   TChain *ttree = handleFile(treePath,treeExtension,"cutTreeSignal",nFiles);
+  TChain *observations = handleFile(treePath,treeExtension,"observTree",nFiles);
   cout<<"Total events= "<<ttree->GetEntries()<<'\n';
-  TChain *ttree2 = handleFile(treePath,treeExtension,"vtxingTree",nFiles);
+  //TChain *ttree2 = handleFile(treePath,treeExtension,"vtxingTree",nFiles);
   //makephotonM(ttree,out_file);
-//  makepTEff(ttree,out_file);
-  testCuts(ttree,out_file);
+  makepTRes(ttree,out_file);
+  truthconversionRate(observations);
+  //makeVtxRes(ttree,out_file);
+  //makeVtxEff(ttree,out_file);
+  //testCuts(ttree,out_file);
+  //makepTCaloGraph("pTcalodata.csv",out_file);
   //makeVtxR(ttree2,out_file);
   //makeRefitDist(ttree,out_file);
 }

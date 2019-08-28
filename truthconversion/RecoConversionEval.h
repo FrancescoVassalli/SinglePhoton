@@ -111,7 +111,7 @@ class RecoConversionEval : public SubsysReco {
 		unsigned int _kNSiliconLayer=7;
 		/** \defgroup  consts for the cuts
       	@{*/
-		float _kTrackPtCut=.6; 
+		float _kTrackPtCut=2.5; 
 		float _kEMProbCut=.0;
 		float _kVtxRCut=1.84;
 		float _kDetaCut=.008;
@@ -128,7 +128,7 @@ class RecoConversionEval : public SubsysReco {
 		float _kVtxRZCut=.4;
 		float _kVtxChi2Cut=.4;
 
-		float _kElectronRestM=.5109989461;
+		float _kElectronRestM=.005109989461;
 };
 
 #endif // __RecoConversionEval_H__

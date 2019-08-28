@@ -1,8 +1,8 @@
 #!/bin/csh 
-@ p =  ${1} + 200
+@ p =  ${1} + 600
 #
 set OUT_LOCATION="/sphenix/user/vassalli/minBiasPythia/"
-set PYTHIA_FILE=${OUT_LOCATION}pythiaMinBiasHep${p}.dat
+set PYTHIA_FILE=${OUT_LOCATION}pythiaMinBiasHep${p}
 #
 set SCRATCH_AREA="$_CONDOR_SCRATCH_DIR"                                                              
 #
@@ -13,7 +13,7 @@ mkdir $SCRATCH_AREA/fran_single_photons
 cp  $SOURCE_PHOTONMAKER $SCRATCH_AREA/fran_single_photons/
 #
 cd $SCRATCH_AREA/fran_single_photons
-./generator $PYTHIA_FILE 100
+./generator $PYTHIA_FILE 5000
 #
 rm -r $SCRATCH_AREA/fran_single_photons
 #

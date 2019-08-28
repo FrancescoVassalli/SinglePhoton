@@ -18,20 +18,22 @@ class PHCompositeNode;
 class PHG4TruthInfoContainer;
 class PHG4Particle;
 class PHG4VtxPoint;
-class Conversion;
 class SvtxTrackEval;
+class SvtxTrackMap;
 class SvtxVertex;
 class SvtxTrack;
 class SvtxHitMap;
 class SvtxHit;
 class SvtxClusterMap;
 class SvtxCluster;
+class TrkrClusterContainer;
 class RawClusterContainer;
-class TTree;
-class TFile;
 class SVReco;
 class VtxRegressor;
-class TrkrClusterContainer;
+class Conversion;
+class TTree;
+class TFile;
+class TLorentzVector;
 
 class TruthConversionEval: public SubsysReco
 {
@@ -64,9 +66,10 @@ class TruthConversionEval: public SubsysReco
     /** helper function for process_event
      * fills the member fields with information from the conversions 
      * finds the clusters associated with the truth conversions*/
-    void numUnique(std::map<int,Conversion>* map,SvtxTrackEval* trackEval,RawClusterContainer* mainClusterContainer);
+    void numUnique(std::map<int,Conversion>* map,SvtxTrackEval* trackEval,RawClusterContainer* mainClusterContainer,std::vector<std::pair<SvtxTrack*,SvtxTrack*>>* tightBackground);
     ///fills the member fields for all the background trees
-    void processTrackBackground(std::vector<PHG4Particle*>*v,SvtxTrackEval*);
+    void processTrackBackground(std::vector<SvtxTrack*>*v,SvtxTrackEval*);
+    void recordConversion(Conversion *conversion,TLorentzVector *tlv_photon,TLorentzVector *tlv_electron, TLorentzVector *tlv_positron);
 
     int get_embed(PHG4Particle* particle, PHG4TruthInfoContainer* truthinfo) const;
     float vtoR(PHG4VtxPoint* vtx)const;
@@ -83,14 +86,16 @@ class TruthConversionEval: public SubsysReco
     TTree *_pairBackTree=NULL;///< background for all possible track pairs
     TTree *_vtxBackTree=NULL;///< background that passes existing track pair cuts
     TTree *_vtxingTree=NULL; ///<data for training vtxing
+    TTree *_observTree=NULL; ///<per event observables
     RawClusterContainer *_mainClusterContainer; //< clusters from the node
     PHG4TruthInfoContainer *_truthinfo;
     TrkrClusterContainer* _clusterMap;
+    SvtxTrackMap* _allTracks;
     SvtxHitMap *_hitMap;
     std::string _foutname; ///< name of the output file
     SVReco *_vertexer=NULL; ///< for reco vertex finding
     VtxRegressor *_regressor=NULL; ///<for reco vertex correction with TMVA
-    
+
     /** \defgroup  variables  for the TTrees
       @{*/
     /** # of clusters associated with each conversion that has 2 reco tracks
@@ -137,6 +142,7 @@ class TruthConversionEval: public SubsysReco
     float _b_vtxTrackRPhi_dist;
     float _b_vtx_chi2;
     float _b_photon_m;
+    float _b_tphoton_m;
     float _b_tphoton_pT;
     float _b_photon_pT;
     float _b_cluster_prob;
@@ -157,6 +163,11 @@ class TruthConversionEval: public SubsysReco
     float _bb_cluster_prob;
     float _bb_track_dphi;
     int _bb_pid;
+    int  _b_nMatched=0;
+    int _b_nUnmatched=0;
+    std::vector<float> _b_truth_pT;
+    std::vector<float> _b_reco_pT;
+    std::vector<float> _b_alltrack_pT;
     /**@}*/
     /** RawClusters associated with truth conversions
      * processed by other modules currently empty*/
@@ -165,6 +176,8 @@ class TruthConversionEval: public SubsysReco
     const static int s_kTPCRADIUS=21; //in cm there is a way to get this from the simulation I should implement?
     ///<TPC radius currently hardcoded
     float _kRAPIDITYACCEPT=1; //<acceptance rapidity currently hard coded to |1|
+    float _kTightPtMin=2.5; //< pt cut for making tight background
+    float _kTightDetaMax=.0082;//< deta cut for making tight background
 };
 
 

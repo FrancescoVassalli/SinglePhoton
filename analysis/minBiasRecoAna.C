@@ -91,7 +91,7 @@ void reportCuts(TChain* _treeBackground,int signal){
   cout<<sum_passedPhoton<<" background events remain with "<<signal<<" signal events\n";
 }
 
-int analyzeSignal(TChain* _signalCutTree){
+int analyzeSignal(TChain* _signalCutTree,TFile *outFile){
   int _b_track_layer ;
   int _b_track_dlayer ;
   float _b_track_deta ;
@@ -101,6 +101,7 @@ int analyzeSignal(TChain* _signalCutTree){
   float _b_tvtx_radius ;
   float _b_cluster_prob ;
   float _b_photon_pT ;
+  float _b_tphoton_pT ;
   float _b_photon_m ;
   _signalCutTree->SetBranchAddress("track_deta", &_b_track_deta);
   _signalCutTree->SetBranchAddress("track_dlayer",&_b_track_dlayer);
@@ -113,7 +114,11 @@ int analyzeSignal(TChain* _signalCutTree){
   _signalCutTree->SetBranchAddress("cluster_prob", &_b_cluster_prob);
   _signalCutTree->SetBranchAddress("photon_m", &_b_photon_m);
   _signalCutTree->SetBranchAddress("photon_pT", &_b_photon_pT);
+  _signalCutTree->SetBranchAddress("tphoton_pT", &_b_tphoton_pT);
   unsigned pT=0, cluster=0, eta=0, photon=0,rsignal=0;
+
+  TH1F *rate_plot = new TH1F("rateplot","",60,0,15);
+  rate_plot->Sumw2();
 
   for(unsigned i=0; i<_signalCutTree->GetEntries();i++){
     _signalCutTree->GetEntry(i);
@@ -124,11 +129,14 @@ int analyzeSignal(TChain* _signalCutTree){
       if(_b_photon_m<.27||_b_photon_m>8.||_b_photon_pT<.039) photon++;
       else rsignal++;
     }
+    rate_plot->Fill(_b_tphoton_pT);
   }
   cout<<"pT cut "<<pT<<" events\n";
   cout<<"cluster cut "<<cluster<<" events\n";
   cout<<"eta cut "<<eta<<" events\n";
   cout<<"photon cut "<<photon<<" events\n";
+  rate_plot->Scale(1./6e5);
+  outFile->Wrtie();
   return rsignal;
 }
 

@@ -52,7 +52,7 @@ void makeMaps(TChain* ttree,TFile* out_file){
 
 void makeDists(TChain *vtxTree, TChain *mainTree, TFile *outf){
   TH1F *tmap = new TH1F("truthDist","",60,0,30);
-  TH1F *rmap = new TH1F("recoDist","",60,0,30);
+  TH1F *rmap = new TH1F("recoDist","",90,0,45);
   TH1F *cmap = new TH1F("correctedDist","",60,0,30);
   tmap->Sumw2();
   rmap->Sumw2();
@@ -82,7 +82,7 @@ void makeDists(TChain *vtxTree, TChain *mainTree, TFile *outf){
 
 void mapper()
 {
-  string treePath = "/sphenix/user/vassalli/gammasample/conversionembededonlineanalysis";
+  string treePath = "/sphenix/user/vassalli/RecoConversionTests/truthconversionembededonlineanalysis";
   string treeExtension = ".root";
   unsigned int nFiles=100;
   TFile *out_file = new TFile("maps.root","RECREATE");
