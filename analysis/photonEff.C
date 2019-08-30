@@ -152,13 +152,14 @@ void makepTRes(TChain* ttree,TFile* out_file){
   for (int event = 0; event < ttree->GetEntries(); ++event)
   {
     ttree->GetEvent(event);
-    pTeffPlot->Fill(pT/tpT);
+    if(pT>0)pTeffPlot->Fill(pT/tpT);
     tpTspec->Fill(tpT);
-    pTefffuncPlot->Fill(tpT,pT/tpT);
+    if(pT>0)pTefffuncPlot->Fill(tpT,pT/tpT);
     //trackpTDist->Fill(track_pT); 
   }
   pTeffPlot->Scale(1./ttree->GetEntries(),"width");
   tpTspec->Scale(1./300000); //total number of embeded photon in nobgrd simulation 15 per event 100 events per run 200 runs 
+  cout<<"Conversion pT spectrum integral: "<<tpTspec->Integral()<<'\n';
   pTefffuncPlot->Scale(1./ttree->GetEntries());
   TProfile* resProfile = pTefffuncPlot->ProfileX("func_prof",5,30);
   resProfile->Write();
@@ -297,10 +298,10 @@ void truthconversionRate(TTree* ttree){
   for (int event = 0; event < ttree->GetEntries(); ++event)
   {
     ttree->GetEvent(event);
-    if((matched+unmatched)%2==0){
+ //   if((matched+unmatched)%2==0){
       total+=matched;
       total+=unmatched;
-    }
+   // }
   }
   cout<<"Conversion rate: "<<total/6000.<<" +/- "<<sqrt((float)total)/6000<<"\%\n";
   ttree->ResetBranchAddresses();
