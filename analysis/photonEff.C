@@ -305,7 +305,7 @@ TH1F* makePythiaSpec(TChain* ttree,TFile* out_file){
       tpTspec->Fill(i);
     }
   }
-  tpTspec->Scale(1./tpTspec->Integral()); 
+  //tpTspec->Scale(1./tpTspec->Integral()); 
   out_file->Write();
   ttree->ResetBranchAddresses();
   return tpTspec;
