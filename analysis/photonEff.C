@@ -305,7 +305,6 @@ TH1F* makePythiaSpec(TChain* ttree,TFile* out_file){
       tpTspec->Fill(i);
     }
   }
-  //tpTspec->Scale(1./tpTspec->Integral()); 
   out_file->Write();
   ttree->ResetBranchAddresses();
   return tpTspec;
@@ -314,9 +313,8 @@ TH1F* makePythiaSpec(TChain* ttree,TFile* out_file){
 void calculateConversionRate(TH1F* converted, TH1F *pythia,TFile* out_file){
   TH1F* conversion_rate = NULL;
   conversion_rate = (TH1F*)  converted->Clone("rate");
-  for(unsigned i=0; i<converted->GetNbinsX();i++){
-    conversion_rate->SetBinContent(i,converted->GetBinContent(i)*pythia->GetBinContent(i));
-  }
+  conversion_rate->Divide(pythia);
+  conversion_rate->Scale(pythia->Integral());
   out_file->Write();
 }
 
