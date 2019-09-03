@@ -313,7 +313,7 @@ TH1F* makePythiaSpec(TChain* ttree,TFile* out_file){
 
 void calculateConversionRate(TH1F* converted, TH1F *pythia,TFile* out_file){
   TH1F* conversion_rate = NULL;
-  conversion_rate = (TH1F*)  converted->Clone();
+  conversion_rate = (TH1F*)  converted->Clone("rate");
   for(unsigned i=0; i<converted->GetNbinsX();i++){
     conversion_rate->SetBinContent(i,converted->GetBinContent(i)*pythia->GetBinContent(i));
   }
