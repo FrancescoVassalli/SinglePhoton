@@ -130,7 +130,7 @@ PHG4Particle* Conversion::getPositron(){
 }
 
 void Conversion::setParent(PHG4Particle* parent){
-  if(!parent) photon=parent;
+  if(!photon) photon=parent;
   else{
     if(!(*photon==*parent)) cerr<<"Bad photon matching!"<<endl;
   }

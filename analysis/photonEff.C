@@ -289,24 +289,6 @@ void makepTCaloGraph(string filename,TFile* outfile){
   outfile->Write();
 }
 
-void truthconversionRate(TTree* ttree){
-  int unmatched;
-  int matched;
-  ttree->SetBranchAddress("nMatched",&unmatched);
-  ttree->SetBranchAddress("nUnmatched",&matched);
-  int total=0;
-  for (int event = 0; event < ttree->GetEntries(); ++event)
-  {
-    ttree->GetEvent(event);
- //   if((matched+unmatched)%2==0){
-      total+=matched;
-      total+=unmatched;
-   // }
-  }
-  cout<<"Conversion rate: "<<total/6000.<<" +/- "<<sqrt((float)total)/6000<<"\%\n";
-  ttree->ResetBranchAddresses();
-}
-
 void photonEff()
 {
   TFile *out_file = new TFile("effplots.root","UPDATE");
@@ -320,7 +302,6 @@ void photonEff()
   //TChain *ttree2 = handleFile(treePath,treeExtension,"vtxingTree",nFiles);
   //makephotonM(ttree,out_file);
   makepTRes(ttree,out_file);
-  truthconversionRate(observations);
   //makeVtxRes(ttree,out_file);
   //makeVtxEff(ttree,out_file);
   //testCuts(ttree,out_file);
