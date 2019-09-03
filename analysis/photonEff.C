@@ -134,7 +134,7 @@ void pTResFunction(TH2F* plot2d){
   
 }
 
-void makepTRes(TChain* ttree,TFile* out_file){
+TH1F* makepTRes(TChain* ttree,TFile* out_file){
   float pT;
   float tpT;
   float track_pT;
@@ -143,7 +143,7 @@ void makepTRes(TChain* ttree,TFile* out_file){
   
   TH1F *pTeffPlot = new TH1F("#frac{#it{p}^{T}}{#it{p}_{#it{truth}}^{T}}","",40,-2,2);
   TH2F *pTefffuncPlot = new TH2F("pT_resolution_to_truthpt","",40,1,35,40,-1.5,1.5);
-  TH1F *tpTspec = new TH1F("converted_photon_truth_pT","",25,5,31);
+  TH1F *tpTspec = new TH1F("converted_photon_truth_pT","",25,5,30);
   //TH1F *trackpTDist = new TH1F("truthpt","",40,0,35);
   pTeffPlot->Sumw2();
   tpTspec->Sumw2();
@@ -166,6 +166,7 @@ void makepTRes(TChain* ttree,TFile* out_file){
   //trackpTDist->Scale(1./ttree->GetEntries(),"width");
   out_file->Write();
   ttree->ResetBranchAddresses();
+  return tpTspec;
 }
 
 void testCuts(TChain* ttree,TFile* out_file){
@@ -289,6 +290,36 @@ void makepTCaloGraph(string filename,TFile* outfile){
   outfile->Write();
 }
 
+TH1F* makePythiaSpec(TChain* ttree,TFile* out_file){
+  vector<float>* tpT= NULL;
+  ttree->SetBranchAddress("photon_pT",&tpT);
+  
+  TH1F *tpTspec = new TH1F("photon_truth_pT","",25,5,30);
+  tpTspec->Sumw2();
+  cout<<"pythia tree with: "<<ttree->GetEntries()<<" entries"<<endl;
+  for (int event = 0; event < ttree->GetEntries(); ++event)
+  {
+    ttree->GetEvent(event);
+    if(event%100==0)cout<<"pythia event:"<<event<<'\n';
+    for(auto i: *tpT){
+      tpTspec->Fill(i);
+    }
+  }
+  tpTspec->Scale(1./tpTspec->Integral()); 
+  out_file->Write();
+  ttree->ResetBranchAddresses();
+  return tpTspec;
+}
+
+void calculateConversionRate(TH1F* converted, TH1F *pythia,TFile* out_file){
+  TH1F* conversion_rate = NULL;
+  conversion_rate = (TH1F*)  converted->Clone();
+  for(unsigned i=0; i<converted->GetNbinsX();i++){
+    conversion_rate->SetBinContent(i,converted->GetBinContent(i)*pythia->GetBinContent(i));
+  }
+  out_file->Write();
+}
+
 void photonEff()
 {
   TFile *out_file = new TFile("effplots.root","UPDATE");
@@ -299,9 +330,18 @@ void photonEff()
   TChain *ttree = handleFile(treePath,treeExtension,"cutTreeSignal",nFiles);
   TChain *observations = handleFile(treePath,treeExtension,"observTree",nFiles);
   cout<<"Total events= "<<ttree->GetEntries()<<'\n';
+
+  string pythiaPath = "/sphenix/user/vassalli/minBiasPythia/pythia";
+  string pythiaExtension = "_analysis.root";
+  /*unsigned int nPythiaFiles=1700;
+  TChain *pythiaTree = handleFile(pythiaPath,pythiaExtension,"photonTree",nPythiaFiles);*/
+  TChain *pythiaTree = new TChain("photonTree");
+  string haddname = pythiaPath;
+  haddname+=pythiaExtension;
+  pythiaTree->Add(haddname.c_str());
   //TChain *ttree2 = handleFile(treePath,treeExtension,"vtxingTree",nFiles);
   //makephotonM(ttree,out_file);
-  makepTRes(ttree,out_file);
+  calculateConversionRate(makepTRes(ttree,out_file),makePythiaSpec(pythiaTree,out_file),out_file);
   //makeVtxRes(ttree,out_file);
   //makeVtxEff(ttree,out_file);
   //testCuts(ttree,out_file);
