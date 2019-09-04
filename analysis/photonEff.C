@@ -325,7 +325,7 @@ TH1F* addSpec(TH1F* soft, float softcrosssection,TH1F* hard,float hardcrosssecti
   TH1F* pythiaspec = (TH1F*) soft->Clone("pythia_pT_spec");
   pythiaspec->Scale(softcrosssection);
   pythiaspec->Add(hard,hardcrosssection);
-  pythiaspec->Scale(1/(softcrosssection+hardcrosssection));
+//  pythiaspec->Scale(1/(softcrosssection+hardcrosssection));
   out_file->Write();
   return pythiaspec;
 } 
