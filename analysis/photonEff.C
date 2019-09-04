@@ -317,7 +317,7 @@ TH1F* makePythiaSpec(TChain* ttree,TFile* out_file,string type=""){
 void calculateConversionRate(TH1F* converted, TH1F *pythia,TFile* out_file){
   TH1F* conversion_rate = (TH1F*)  pythia->Clone("rate");
   conversion_rate->Multiply(converted);
-  conversion_rate->Scale(1/pythia->Integral());
+//  conversion_rate->Scale(1/pythia->Integral());
   out_file->Write();
 }
 
@@ -325,7 +325,7 @@ TH1F* addSpec(TH1F* soft, float softcrosssection,TH1F* hard,float hardcrosssecti
   TH1F* pythiaspec = (TH1F*) soft->Clone("pythia_pT_spec");
   pythiaspec->Scale(softcrosssection);
   pythiaspec->Add(hard,hardcrosssection);
-//  pythiaspec->Scale(1/(softcrosssection+hardcrosssection));
+  pythiaspec->Scale(1/(softcrosssection+hardcrosssection));
   out_file->Write();
   return pythiaspec;
 } 
