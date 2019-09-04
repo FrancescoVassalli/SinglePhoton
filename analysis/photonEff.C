@@ -322,12 +322,13 @@ void calculateConversionRate(TH1F* converted, TH1F *pythia,TFile* out_file){
   out_file->Write();
 }
 
-void addSpec(TH1F* soft, float softcrosssection,TH1F* hard,float hardcrosssection,TFile* out_file){
+TH1F* addSpec(TH1F* soft, float softcrosssection,TH1F* hard,float hardcrosssection,TFile* out_file){
   TH1F* pythiaspec = (TH1F*) soft->Clone("pythia_pT_spec");
   pythiaspec->Scale(softcrosssection);
   pythiaspec->Add(hard,hardcrosssection);
   pythiaspec->Scale(1/(softcrosssection+hardcrosssection));
   out_file->Write();
+  return pythiaspec;
 } 
 
 void photonEff()
@@ -351,8 +352,8 @@ void photonEff()
   //makephotonM(ttree,out_file);
   /*makePythiaSpec(softTree,out_file,"soft");
   makePythiaSpec(hardTree,out_file,"hard");*/
-  addSpec(makePythiaSpec(softTree,out_file,"soft"),42.13,makePythiaSpec(hardTree,out_file,"hard"),.5562,out_file);
-  //calculateConversionRate(makepTRes(ttree,out_file),makePythiaSpec(pythiaTree,out_file),out_file);
+  auto pythiaSpec = addSpec(makePythiaSpec(softTree,out_file,"soft"),42.13,makePythiaSpec(hardTree,out_file,"hard"),.5562,out_file);
+  calculateConversionRate(makepTRes(ttree,out_file),pythiaSpec,out_file);
   //makeVtxRes(ttree,out_file);
   //makeVtxEff(ttree,out_file);
   //testCuts(ttree,out_file);
