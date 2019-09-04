@@ -17,7 +17,7 @@ void generator(std::string filename, long nEvents, bool signalOnly=false){
   pythiaengine.readString("SoftQCD:nonDiffractive = on");
   pythiaengine.readString("SoftQCD:singleDiffractive = on");
   pythiaengine.readString("SoftQCD:doubleDiffractive = on");
-  pythiaengine.readString("PhaseSpace:pTHatMin = 1.2");
+  pythiaengine.readString("PhaseSpace:pTHatMin = 3");
   pythiaengine.readString("Random::setSeed = on");
   pythiaengine.readString("Random::seed =0");
   //pythiaengine.readString("111:onMode = off"); ///pi0 won't decay
@@ -38,7 +38,7 @@ void generator(std::string filename, long nEvents, bool signalOnly=false){
     } 
     photon_pT.clear();
     for(unsigned ipart=0; ipart!=pythiaengine.event.size(); ipart++){
-      if(pythiaengine.event[ipart].id()==22&&pythiaengine.event[ipart].isFinal()&&pythiaengine.event[ipart].pT()>5
+      if(pythiaengine.event[ipart].id()==22&&pythiaengine.event[ipart].isFinal()&&pythiaengine.event[ipart].pT()>6.5
           &&TMath::Abs(pythiaengine.event[ipart].eta()))photon_pT.push_back(pythiaengine.event[ipart].pT());
     }
     if (photon_pT.size()>0)photonTree->Fill();

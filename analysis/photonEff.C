@@ -329,13 +329,12 @@ void photonEff()
   TChain *observations = handleFile(treePath,treeExtension,"observTree",nFiles);
   cout<<"Total events= "<<ttree->GetEntries()<<'\n';
 
-  string pythiaPath = "/sphenix/user/vassalli/minBiasPythia/pythia";
-  string pythiaExtension = "_analysis.root";
+  string pythiaPath = "/sphenix/user/vassalli/minBiasPythia/allPythiaAnan.root";
+//  string pythiaExtension = "_analysis.root";
   /*unsigned int nPythiaFiles=1700;
   TChain *pythiaTree = handleFile(pythiaPath,pythiaExtension,"photonTree",nPythiaFiles);*/
   TChain *pythiaTree = new TChain("photonTree");
   string haddname = pythiaPath;
-  haddname+=pythiaExtension;
   pythiaTree->Add(haddname.c_str());
   //TChain *ttree2 = handleFile(treePath,treeExtension,"vtxingTree",nFiles);
   //makephotonM(ttree,out_file);
