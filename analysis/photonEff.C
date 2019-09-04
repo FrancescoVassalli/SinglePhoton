@@ -290,11 +290,16 @@ void makepTCaloGraph(string filename,TFile* outfile){
   outfile->Write();
 }
 
-TH1F* makePythiaSpec(TChain* ttree,TFile* out_file){
+TH1F* makePythiaSpec(TChain* ttree,TFile* out_file,string type=""){
   vector<float>* tpT= NULL;
   ttree->SetBranchAddress("photon_pT",&tpT);
-  
-  TH1F *tpTspec = new TH1F("photon_truth_pT","",25,5,30);
+  string title;
+  if(!type.empty()){
+    title=type;
+    title+="_photon_truth_pT";
+  }  
+  else title="photon_truth_pT";
+  TH1F *tpTspec = new TH1F(title.c_str(),"",25,5,30);
   tpTspec->Sumw2();
   cout<<"pythia tree with: "<<ttree->GetEntries()<<" entries"<<endl;
   for (int event = 0; event < ttree->GetEntries(); ++event)
@@ -329,7 +334,8 @@ void photonEff()
   TChain *observations = handleFile(treePath,treeExtension,"observTree",nFiles);
   cout<<"Total events= "<<ttree->GetEntries()<<'\n';
 
-  string pythiaPath = "/sphenix/user/vassalli/minBiasPythia/allPythiaAnan.root";
+  string pythiaPath = "/sphenix/user/vassalli/minBiasPythia/softana.root";
+  //string pythiaPath = "/sphenix/user/vassalli/minBiasPythia/hardana.root";
 //  string pythiaExtension = "_analysis.root";
   /*unsigned int nPythiaFiles=1700;
   TChain *pythiaTree = handleFile(pythiaPath,pythiaExtension,"photonTree",nPythiaFiles);*/
@@ -338,7 +344,9 @@ void photonEff()
   pythiaTree->Add(haddname.c_str());
   //TChain *ttree2 = handleFile(treePath,treeExtension,"vtxingTree",nFiles);
   //makephotonM(ttree,out_file);
-  calculateConversionRate(makepTRes(ttree,out_file),makePythiaSpec(pythiaTree,out_file),out_file);
+  makePythiaSpec(pythiaTree,out_file,"soft");
+  //makePythiaSpec(pythiaTree,out_file,"hard");
+  //calculateConversionRate(makepTRes(ttree,out_file),makePythiaSpec(pythiaTree,out_file),out_file);
   //makeVtxRes(ttree,out_file);
   //makeVtxEff(ttree,out_file);
   //testCuts(ttree,out_file);
