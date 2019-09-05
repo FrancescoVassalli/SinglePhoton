@@ -79,7 +79,7 @@ int TruthConversionEval::InitRun(PHCompositeNode *topNode)
 		_observTree->Branch("truth_pT", &_b_truth_pT);
 		_observTree->Branch("reco_pT", &_b_reco_pT);
 		_observTree->Branch("track_pT",&_b_alltrack_pT) ;
-		_observTree->Branch("photon_pT",&_b_alltrack_pT) ;
+		_observTree->Branch("photon_pT",&_b_allphoton_pT) ;
 
 		_vtxingTree = new TTree("vtxingTree","data predicting vtx from track pair");
 		_vtxingTree->SetAutoSave(300);
@@ -233,10 +233,12 @@ int TruthConversionEval::process_event(PHCompositeNode *topNode)
 	_b_truth_pT.clear();
 	_b_reco_pT.clear();
 	_b_alltrack_pT.clear();
+  _b_allphoton_pT.clear();
 	cout<<"init truth loop"<<endl;
 
 	for ( PHG4TruthInfoContainer::ConstIterator iter = range.first; iter != range.second; ++iter ) {
 		PHG4Particle* g4particle = iter->second;
+    if(g4particle->get_pid()==22&&g4particle->get_track_id()==g4particle->get_primary_id())_b_allphoton_pT.push_back(sqrt(g4particle->get_px()*g4particle->get_px()+g4particle->get_py()*g4particle->get_py()));
 		PHG4Particle* parent =_truthinfo->GetParticle(g4particle->get_parent_id());
 		PHG4VtxPoint* vtx=_truthinfo->GetVtx(g4particle->get_vtx_id()); //get the vertex
 		if(!vtx){
