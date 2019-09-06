@@ -134,39 +134,49 @@ void pTResFunction(TH2F* plot2d){
   
 }
 
-TH1F* makepTRes(TChain* ttree,TFile* out_file){
+TEfficiency* makepTRes(TChain* ttree,TTree* allTree,TFile* out_file){
   float pT;
   float tpT;
   float track_pT;
   ttree->SetBranchAddress("photon_pT",&pT);
   ttree->SetBranchAddress("tphoton_pT",&tpT);
   
+  vector<float> *allpT=NULL;
+  allTree->SetBranchAddress("photon_pT",&allpT);
+
   TH1F *pTeffPlot = new TH1F("#frac{#it{p}^{T}}{#it{p}_{#it{truth}}^{T}}","",40,-2,2);
   TH2F *pTefffuncPlot = new TH2F("pT_resolution_to_truthpt","",40,1,35,40,-1.5,1.5);
-  TH1F *tpTspec = new TH1F("converted_photon_truth_pT","",25,5,30);
+  TH1F *converted_pTspec = new TH1F("converted_photon_truth_pT","",25,5,30);
+  TH1F *all_pTspec = new TH1F("all_photon_truth_pT","",25,5,30);
   //TH1F *trackpTDist = new TH1F("truthpt","",40,0,35);
   pTeffPlot->Sumw2();
-  tpTspec->Sumw2();
+  converted_pTspec->Sumw2();
+  all_pTspec->Sumw2();
   pTefffuncPlot->Sumw2();
-  //t cout<<"here"<<endl;rackpTDist->Sumw2();
   for (int event = 0; event < ttree->GetEntries(); ++event)
   {
     ttree->GetEvent(event);
     if(pT>0)pTeffPlot->Fill(pT/tpT);
-    tpTspec->Fill(tpT);
+    converted_pTspec->Fill(tpT);
     if(pT>0)pTefffuncPlot->Fill(tpT,pT/tpT);
     //trackpTDist->Fill(track_pT); 
   }
+  for (int event = 0; event < allTree->GetEntries(); ++event)
+  {
+    ttree->GetEvent(event);
+    for(auto i : *allpT){
+      all_pTspec->Fill(i);
+    }
+  }
+  TEfficiency* uni_rate = new TEfficiency(*converted_pTspec,*all_pTspec);
   pTeffPlot->Scale(1./ttree->GetEntries(),"width");
-  tpTspec->Scale(1./300000); //total number of embeded photon in nobgrd simulation 15 per event 100 events per run 200 runs 
-  cout<<"Conversion pT spectrum integral: "<<tpTspec->Integral()<<'\n';
   pTefffuncPlot->Scale(1./ttree->GetEntries());
   TProfile* resProfile = pTefffuncPlot->ProfileX("func_prof",5,30);
   resProfile->Write();
   //trackpTDist->Scale(1./ttree->GetEntries(),"width");
   out_file->Write();
   ttree->ResetBranchAddresses();
-  return tpTspec;
+  return uni_rate;
 }
 
 void testCuts(TChain* ttree,TFile* out_file){
@@ -314,9 +324,11 @@ TH1F* makePythiaSpec(TChain* ttree,TFile* out_file,string type=""){
   return tpTspec;
 }
 
-void calculateConversionRate(TH1F* converted, TH1F *pythia,TFile* out_file){
+void calculateConversionRate(TEfficiency* rate, TH1F *pythia,TFile* out_file){
   TH1F* conversion_rate = (TH1F*)  pythia->Clone("rate");
-  conversion_rate->Multiply(converted);
+  TH1* uni_rate = (TH1F*)rate->GetPassedHistogram()->Clone("uni_rate");
+  uni_rate->Divide(rate->GetTotalHistogram());
+  conversion_rate->Multiply(uni_rate);
 //  conversion_rate->Scale(1/pythia->Integral());
   out_file->Write();
 }
@@ -352,7 +364,7 @@ void photonEff()
   /*makePythiaSpec(softTree,out_file,"soft");
   makePythiaSpec(hardTree,out_file,"hard");*/
   auto pythiaSpec = addSpec(makePythiaSpec(softTree,out_file,"soft"),42.13,makePythiaSpec(hardTree,out_file,"hard"),.5562,out_file);
-  calculateConversionRate(makepTRes(ttree,out_file),pythiaSpec,out_file);
+  calculateConversionRate(makepTRes(ttree,observations,out_file),pythiaSpec,out_file);
   //makeVtxRes(ttree,out_file);
   //makeVtxEff(ttree,out_file);
   //testCuts(ttree,out_file);

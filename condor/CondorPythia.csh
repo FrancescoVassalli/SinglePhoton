@@ -1,5 +1,5 @@
 #!/bin/csh 
-@ p =  ${1}
+@ p =  ${1} + 500
 #
 set OUT_LOCATION="/sphenix/user/vassalli/minBiasPythia/"
 set PYTHIA_FILE=${OUT_LOCATION}pythia_hard${p}

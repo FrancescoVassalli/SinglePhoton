@@ -263,7 +263,7 @@ int TruthConversionEval::process_event(PHCompositeNode *topNode)
 				//initialize the conversion object -don't use constructor b/c setters have error handling
 				(mapConversions[vtx->get_id()]).setElectron(g4particle);
 				(mapConversions[vtx->get_id()]).setVtx(vtx);
-				(mapConversions[vtx->get_id()]).setParent(parent);
+				(mapConversions[vtx->get_id()]).setPrimaryPhoton(parent,_truthinfo);
 				(mapConversions[vtx->get_id()]).setEmbed(embedID);
 				PHG4Particle* grand =_truthinfo->GetParticle(parent->get_parent_id()); //grandparent
 				if (grand) (mapConversions[vtx->get_id()]).setSourceId(grand->get_pid());//record pid of the photon's source
@@ -324,7 +324,7 @@ void TruthConversionEval::numUnique(std::map<int,Conversion> *mymap=NULL,SvtxTra
   cout<<"start conversion analysis loop"<<endl;
   for (std::map<int,Conversion>::iterator i = mymap->begin(); i != mymap->end(); ++i) {
     TLorentzVector tlv_photon,tlv_electron,tlv_positron; //make tlv for each particle 
-    PHG4Particle *photon = i->second.getPhoton(); //set the photon
+    PHG4Particle *photon = i->second.getPrimaryPhoton(); //set the photon
 
     if(photon)tlv_photon.SetPxPyPzE(photon->get_px(),photon->get_py(),photon->get_pz(),photon->get_e()); //intialize
     else cerr<<"No truth photon for conversion"<<endl;
