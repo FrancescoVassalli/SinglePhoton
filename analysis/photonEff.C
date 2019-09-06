@@ -163,7 +163,7 @@ TEfficiency* makepTRes(TChain* ttree,TTree* allTree,TFile* out_file){
   }
   for (int event = 0; event < allTree->GetEntries(); ++event)
   {
-    ttree->GetEvent(event);
+    allTree->GetEvent(event);
     for(auto i : *allpT){
       all_pTspec->Fill(i);
     }
