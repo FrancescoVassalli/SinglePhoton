@@ -361,9 +361,9 @@ void photonEff()
   hardTree->Add(hardPath.c_str());
   //TChain *ttree2 = handleFile(treePath,treeExtension,"vtxingTree",nFiles);
   //makephotonM(ttree,out_file);
-  /*makePythiaSpec(softTree,out_file,"soft");
-  makePythiaSpec(hardTree,out_file,"hard");*/
-  auto pythiaSpec = addSpec(makePythiaSpec(softTree,out_file,"soft"),42.13,5e7,makePythiaSpec(hardTree,out_file,"hard"),.5562,5.5e8,out_file);
+  auto pythiaSpec=makePythiaSpec(softTree,out_file,"soft");
+  //makePythiaSpec(hardTree,out_file,"hard");
+  //auto pythiaSpec = addSpec(makePythiaSpec(softTree,out_file,"soft"),42.13,5e7,makePythiaSpec(hardTree,out_file,"hard"),.5562,5.5e8,out_file);
   calculateConversionRate(makepTRes(ttree,observations,out_file),pythiaSpec,out_file);
   //makeVtxRes(ttree,out_file);
   //makeVtxEff(ttree,out_file);
