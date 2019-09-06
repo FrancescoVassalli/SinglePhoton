@@ -1,13 +1,13 @@
 #!/bin/csh 
-@ p =  ${1} + 500
+@ p =  ${1}
 #
 set OUT_LOCATION="/sphenix/user/vassalli/minBiasPythia/"
-set PYTHIA_FILE=${OUT_LOCATION}pythia_hard4_${p}
+set PYTHIA_FILE=${OUT_LOCATION}pythia_soft_${p}
 #
 set SCRATCH_AREA="$_CONDOR_SCRATCH_DIR"                                                              
 #
 set SOURCE_PHOTONMAKER="/direct/phenix+u/vassalli/sphenix/single/pythia/*"
-set GENNAME="hardGenerator"
+set GENNAME="generator"
 #
 source /phenix/u/vassalli/.cshrc
 mkdir $SCRATCH_AREA/fran_single_photons

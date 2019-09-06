@@ -354,15 +354,19 @@ void photonEff()
   cout<<"Total events= "<<ttree->GetEntries()<<'\n';
 
   string softPath = "/sphenix/user/vassalli/minBiasPythia/softana.root";
-  string hardPath = "/sphenix/user/vassalli/minBiasPythia/hard0ana.root";
+  string hard0Path = "/sphenix/user/vassalli/minBiasPythia/hard0ana.root";
+  string hard4Path = "/sphenix/user/vassalli/minBiasPythia/hard0ana.root";
   TChain *softTree = new TChain("photonTree");
-  TChain *hardTree = new TChain("photonTree");
+  TChain *hard0Tree = new TChain("photonTree");
+  TChain *hard4Tree = new TChain("photonTree");
   softTree->Add(softPath.c_str());
-  hardTree->Add(hardPath.c_str());
+  hard0Tree->Add(hard0Path.c_str());
+  hard4Tree->Add(hard4Path.c_str());
   //TChain *ttree2 = handleFile(treePath,treeExtension,"vtxingTree",nFiles);
   //makephotonM(ttree,out_file);
   auto pythiaSpec=makePythiaSpec(softTree,out_file,"soft");
-  //makePythiaSpec(hardTree,out_file,"hard");
+  makePythiaSpec(hard0Tree,out_file,"hard0");
+  makePythiaSpec(hard4Tree,out_file,"hard4");
   //auto pythiaSpec = addSpec(makePythiaSpec(softTree,out_file,"soft"),42.13,5e7,makePythiaSpec(hardTree,out_file,"hard"),.5562,5.5e8,out_file);
   calculateConversionRate(makepTRes(ttree,observations,out_file),pythiaSpec,out_file);
   //makeVtxRes(ttree,out_file);
