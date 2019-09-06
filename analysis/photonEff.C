@@ -354,7 +354,7 @@ void photonEff()
   cout<<"Total events= "<<ttree->GetEntries()<<'\n';
 
   string softPath = "/sphenix/user/vassalli/minBiasPythia/softana.root";
-  string hardPath = "/sphenix/user/vassalli/minBiasPythia/hardana.root";
+  string hardPath = "/sphenix/user/vassalli/minBiasPythia/hard0ana.root";
   TChain *softTree = new TChain("photonTree");
   TChain *hardTree = new TChain("photonTree");
   softTree->Add(softPath.c_str());
