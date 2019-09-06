@@ -329,7 +329,7 @@ void calculateConversionRate(TEfficiency* rate, TH1F *pythia,TFile* out_file){
   TH1* uni_rate = (TH1F*)rate->GetPassedHistogram()->Clone("uni_rate");
   uni_rate->Divide(rate->GetTotalHistogram());
   conversion_rate->Multiply(uni_rate);
-//  conversion_rate->Scale(1/pythia->Integral());
+  conversion_rate->Scale(1/pythia->Integral());
   out_file->Write();
 }
 
