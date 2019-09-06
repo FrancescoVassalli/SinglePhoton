@@ -2,7 +2,7 @@
 @ p =  ${1} + 500
 #
 set OUT_LOCATION="/sphenix/user/vassalli/minBiasPythia/"
-set PYTHIA_FILE=${OUT_LOCATION}pythia_hard${p}
+set PYTHIA_FILE=${OUT_LOCATION}pythia_hard4_${p}
 #
 set SCRATCH_AREA="$_CONDOR_SCRATCH_DIR"                                                              
 #
