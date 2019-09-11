@@ -324,6 +324,42 @@ TH1F* makePythiaSpec(TChain* ttree,TFile* out_file,string type=""){
   return tpTspec;
 }
 
+void removeFirstBin(TH1F* h){
+  if(h&&h->GetNbinsX()>1){
+  TH1F* r = new TH1F("temp",h->GetTitle(),h->GetNbinsX()-1,h->GetBinLowEdge(2),h->GetBinLowEdge(h->GetNbinsX()+1));
+  for(unsigned i=1; i<r->GetNbinsX();++i){
+    r->SetBinContent(i,h->GetBinContent(i+1));
+    r->SetBinError(i,h->GetBinError(i+1));
+  }
+  string name = h->GetName();
+  delete h;
+  h = r->Clone(name.c_str());
+  }
+  else {
+    if(h){
+      delete h;
+      h=NULL;
+    }
+  }
+}
+
+bool hardSoftAgree(TH1F hard, TH1F soft){
+  if(hard.Integral()!=1.){
+    hard.Scale(1/hard.Integral());  
+  }
+  if(soft.Integral()!=1.){
+    soft.Scale(1/soft.Integral());  
+  }
+  cout<<"Hard/Soft p="<<hard.Chi2Test(soft)<<endl;
+  return  hard.Chi2Test(soft)<.05;
+}
+
+void chopHard(TH1F* hard,TH1F *soft){
+  while(!hardSoftAgree(*hard,*soft)&&hard){
+    removeFirstBin(hard);
+  }
+}
+
 void calculateConversionRate(TEfficiency* rate, TH1F *pythia,TFile* out_file){
   TH1F* conversion_rate = (TH1F*)  pythia->Clone("rate");
   TH1* uni_rate = (TH1F*)rate->GetPassedHistogram()->Clone("uni_rate");
