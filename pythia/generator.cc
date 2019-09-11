@@ -51,6 +51,7 @@ void generator(std::string filename, long nEvents, bool signalOnly=false){
     }
   }
   outFile->Write();
+  outFile->Close();
   pythiaengine.stat();
 }
 
