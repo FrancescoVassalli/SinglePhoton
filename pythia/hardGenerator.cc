@@ -24,6 +24,7 @@ void generator(std::string filename, long nEvents, bool signalOnly=false){
   string tfilename = filename+"_analysis.root";
   TFile *outFile = new TFile(tfilename.c_str(),"RECREATE");
   TTree *photonTree = new TTree("photonTree","phat phirn tree");
+  photonTree->SetAutoSave(300);
   vector<float> photon_pT;
   photonTree->Branch("photon_pT",&photon_pT);
 
