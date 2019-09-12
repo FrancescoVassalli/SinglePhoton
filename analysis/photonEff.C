@@ -14,6 +14,10 @@ using namespace std;
 #include "TLine.h"
 #include "TGraphAsymmErrors.h"
 
+namespace {
+  unsigned replot=0;
+}
+
 TChain* handleFile(string name, string extension, string treename, unsigned int filecount){
   TChain *all = new TChain(treename.c_str());
   string temp;
@@ -36,7 +40,7 @@ void makephotonM(TChain* ttree,TFile* out_file){
   //ttree->SetBranchAddress("rephoton_m",     &rephoton_m   );
   plots.push_back(new TH1F("m^{#gamma}_{reco}","",60,0,.18));
   //plots.push_back(new TH1F("m^{#gamma}_{recoRefit}","",40,-2,10));
-  
+
   for (int i = 0; i < plots.size(); ++i)
   {
     plots[i]->Sumw2();
@@ -45,7 +49,7 @@ void makephotonM(TChain* ttree,TFile* out_file){
   {
     ttree->GetEvent(event);
     plots[0]->Fill(photon_m);
-   // plots[1]->Fill(rephoton_m);
+    // plots[1]->Fill(rephoton_m);
   }
   for (int i = 0; i < plots.size(); ++i)
   {
@@ -64,7 +68,7 @@ void makeVtxR(TChain* ttree,TFile* out_file){
   std::vector<TH1F*> plots;
   plots.push_back(new TH1F("vtx_reco","",40,0,30));
   plots.push_back(new TH1F("vtx_truth","",40,0,30));
-  
+
   plots[0]->Sumw2();
   plots[1]->Sumw2();
 
@@ -131,7 +135,7 @@ void makeVtxEff(TChain* ttree,TFile* out_file){
 }
 
 void pTResFunction(TH2F* plot2d){
-  
+
 }
 
 TEfficiency* makepTRes(TChain* ttree,TTree* allTree,TFile* out_file){
@@ -140,7 +144,7 @@ TEfficiency* makepTRes(TChain* ttree,TTree* allTree,TFile* out_file){
   float track_pT;
   ttree->SetBranchAddress("photon_pT",&pT);
   ttree->SetBranchAddress("tphoton_pT",&tpT);
-  
+
   vector<float> *allpT=NULL;
   allTree->SetBranchAddress("photon_pT",&allpT);
 
@@ -194,7 +198,7 @@ void testCuts(TChain* ttree,TFile* out_file){
   ttree->SetBranchAddress("track_pT",&track_pT);
   ttree->SetBranchAddress("track_deta",&deta);
   ttree->SetBranchAddress("vtx_radius",&radius);
-  
+
   TH1F *layerDist = new TH1F("layer","",16,-.5,15.5);
   TH1F *probDist = new TH1F("clust_prob","",30,-.5,1.);
   TH1F *deta_plot = new TH1F("deta","",30,-.001,.01);
@@ -267,7 +271,7 @@ void makeRefitDist(TChain* ttree, TFile *out_file){
     diffploty->Fill(diffy);
     diffplotz->Fill(diffz);
   }
-  
+
   diffplotx->Scale(1./ttree->GetEntries(),"width");
   diffploty->Scale(1./ttree->GetEntries(),"width");
   diffplotz->Scale(1./ttree->GetEntries(),"width");
@@ -285,7 +289,7 @@ void makepTCaloGraph(string filename,TFile* outfile){
   /*if(!(caloFile >>x>>y)){
     cout<<"file error"<<endl;
     if(!caloFile.is_open()) cout<<"file not opened"<<endl;
-  }*/
+    }*/
   while(caloFile >>x>>s>>y){
     xData.push_back(x);
     yData.push_back(y);
@@ -324,23 +328,35 @@ TH1F* makePythiaSpec(TChain* ttree,TFile* out_file,string type=""){
   return tpTspec;
 }
 
-void removeFirstBin(TH1F* h){
+bool removeFirstBin(TH1F* h){
   if(h&&h->GetNbinsX()>1){
-  TH1F* r = new TH1F("temp",h->GetTitle(),h->GetNbinsX()-1,h->GetBinLowEdge(2),h->GetBinLowEdge(h->GetNbinsX()+1));
-  for(unsigned i=1; i<r->GetNbinsX();++i){
-    r->SetBinContent(i,h->GetBinContent(i+1));
-    r->SetBinError(i,h->GetBinError(i+1));
-  }
-  string name = h->GetName();
-  delete h;
-  h = r->Clone(name.c_str());
+    string rname = h->GetName();
+    rname+=to_string(replot++);
+    TH1F* r = new TH1F(rname.c_str(),h->GetTitle(),h->GetNbinsX()-1,h->GetBinLowEdge(2),h->GetBinLowEdge(h->GetNbinsX()+1));
+    for(unsigned i=1; i<r->GetNbinsX();++i){
+      r->SetBinContent(i,h->GetBinContent(i+1));
+      r->SetBinError(i,h->GetBinError(i+1));
+    }
+    h = r;
+    return true;
   }
   else {
     if(h){
-      delete h;
+      //obs memleak
       h=NULL;
     }
+    return false;
   }
+}
+
+float smartChi2(TH1F hard, TH1F soft){
+  bool validSoft=true;
+  while(soft.GetNbinsX()!=hard.GetNbinsX()&&validSoft){
+    validSoft=removeFirstBin(&soft) ;
+    cout<<"settting up chi2"<<endl;
+  }
+  if(validSoft)  return hard.Chi2Test(&soft);
+  else return 2;
 }
 
 bool hardSoftAgree(TH1F hard, TH1F soft){
@@ -350,12 +366,13 @@ bool hardSoftAgree(TH1F hard, TH1F soft){
   if(soft.Integral()!=1.){
     soft.Scale(1/soft.Integral());  
   }
-  cout<<"Hard/Soft p="<<hard.Chi2Test(soft)<<endl;
-  return  hard.Chi2Test(soft)<.05;
+  float chi2 = smartChi2(hard,soft);
+  cout<<"Hard/Soft p="<<chi2<<endl;
+  return  chi2<.05;
 }
 
 void chopHard(TH1F* hard,TH1F *soft){
-  while(!hardSoftAgree(*hard,*soft)&&hard){
+  while(!hardSoftAgree(*hard,*soft)&&hard&&soft){
     removeFirstBin(hard);
   }
   TH1F* temp = (TH1F*) hard->Clone("hard_chopped");
@@ -393,7 +410,7 @@ void photonEff()
 
   string softPath = "/sphenix/user/vassalli/minBiasPythia/softana.root";
   //string hard0Path = "/sphenix/user/vassalli/minBiasPythia/hard0ana.root";
-  string hard4Path = "/sphenix/user/vassalli/minBiasPythia/hard0ana.root";
+  string hard4Path = "/sphenix/user/vassalli/minBiasPythia/hard4ana.root";
   TChain *softTree = new TChain("photonTree");
   //TChain *hard0Tree = new TChain("photonTree");
   TChain *hard4Tree = new TChain("photonTree");
@@ -404,7 +421,8 @@ void photonEff()
   //makephotonM(ttree,out_file);
   auto pythiaSpec=makePythiaSpec(softTree,out_file,"soft");
   //makePythiaSpec(hard0Tree,out_file,"hard0");
-  makePythiaSpec(hard4Tree,out_file,"hard4");
+  auto hardSpec = makePythiaSpec(hard4Tree,out_file,"hard4");
+  chopHard(hardSpec,pythiaSpec);
   //auto pythiaSpec = addSpec(makePythiaSpec(softTree,out_file,"soft"),42.13,5e7,makePythiaSpec(hardTree,out_file,"hard"),.5562,5.5e8,out_file);
   calculateConversionRate(makepTRes(ttree,observations,out_file),pythiaSpec,out_file);
   //makeVtxRes(ttree,out_file);
