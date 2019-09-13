@@ -313,8 +313,7 @@ TH1F* makePythiaSpec(TChain* ttree,TFile* out_file,string type=""){
     title+="_photon_truth_pT";
   }  
   else title="photon_truth_pT";
-  double bins[12]= {5,6,7,8,9,10,11,12,13,14,16,30};
-  TH1F *tpTspec = new TH1F(title.c_str(),"",11,bins);
+  TH1F *tpTspec = new TH1F(title.c_str(),"",20,5,25);
   tpTspec->Sumw2();
   cout<<"pythia tree with: "<<ttree->GetEntries()<<" entries"<<endl;
   for (int event = 0; event < ttree->GetEntries(); ++event)
@@ -420,7 +419,7 @@ void photonEff()
   auto pythiaSpec=makePythiaSpec(softTree,out_file,"soft");
   //makePythiaSpec(hard0Tree,out_file,"hard0");
   auto hardSpec = makePythiaSpec(hard4Tree,out_file,"hard4");
-  chopHard(*hardSpec,*pythiaSpec);
+  //chopHard(*hardSpec,*pythiaSpec);
   //auto pythiaSpec = addSpec(makePythiaSpec(softTree,out_file,"soft"),42.13,5e7,makePythiaSpec(hardTree,out_file,"hard"),.5562,5.5e8,out_file);
   //calculateConversionRate(makepTRes(ttree,observations,out_file),pythiaSpec,out_file);
   //makeVtxRes(ttree,out_file);
