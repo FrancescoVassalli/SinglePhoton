@@ -349,33 +349,24 @@ bool removeFirstBin(TH1F* h){
   }
 }
 
-float smartChi2(TH1F hard, TH1F soft){
-  bool validSoft=true;
-  while(soft.GetNbinsX()!=hard.GetNbinsX()&&validSoft){
-    validSoft=removeFirstBin(&soft) ;
-    cout<<"settting up chi2"<<endl;
+float ADtoP(float ad){
+  if(ad<.2) return 1-TMath::Exp(-13.436+101.14*ad-223.74*ad*ad);
+  else if (ad<.34) return 1-TMath::Exp(-8.31+42.79*ad-59.938*ad*ad);
+  else{
+    cout<<"out of domain"<<endl;
+    return -1;
   }
-  if(validSoft)  return hard.Chi2Test(&soft);
-  else return 2;
 }
 
-bool hardSoftAgree(TH1F hard, TH1F soft){
-  if(hard.Integral()!=1.){
-    hard.Scale(1/hard.Integral());  
+void chopHard(TH1F hard,TH1F soft){
+  unsigned bins = soft.GetNbinsX();
+  while(ADtoP(hard.AndersonDarlingTest(&soft))>.05&&bins>1){
+    removeFirstBin(&hard);
+    removeFirstBin(&soft);
+    bins--;
+    cout<<"Hard/Soft p="<<ADtoP(hard.AndersonDarlingTest(&soft))<<endl;
   }
-  if(soft.Integral()!=1.){
-    soft.Scale(1/soft.Integral());  
-  }
-  float chi2 = smartChi2(hard,soft);
-  cout<<"Hard/Soft p="<<chi2<<endl;
-  return  chi2<.05;
-}
-
-void chopHard(TH1F* hard,TH1F *soft){
-  while(!hardSoftAgree(*hard,*soft)&&hard&&soft){
-    removeFirstBin(hard);
-  }
-  TH1F* temp = (TH1F*) hard->Clone("hard_chopped");
+  TH1F* temp = (TH1F*) hard.Clone("hard_chopped");
   temp->Write();
 }
 
@@ -396,6 +387,7 @@ TH1F* addSpec(TH1F* soft, float softcrosssection,unsigned nSoft,TH1F* hard,float
   out_file->Write();
   return pythiaspec;
 } 
+
 
 void photonEff()
 {
@@ -422,7 +414,7 @@ void photonEff()
   auto pythiaSpec=makePythiaSpec(softTree,out_file,"soft");
   //makePythiaSpec(hard0Tree,out_file,"hard0");
   auto hardSpec = makePythiaSpec(hard4Tree,out_file,"hard4");
-  chopHard(hardSpec,pythiaSpec);
+  chopHard(*hardSpec,*pythiaSpec);
   //auto pythiaSpec = addSpec(makePythiaSpec(softTree,out_file,"soft"),42.13,5e7,makePythiaSpec(hardTree,out_file,"hard"),.5562,5.5e8,out_file);
   calculateConversionRate(makepTRes(ttree,observations,out_file),pythiaSpec,out_file);
   //makeVtxRes(ttree,out_file);
