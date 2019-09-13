@@ -328,43 +328,40 @@ TH1F* makePythiaSpec(TChain* ttree,TFile* out_file,string type=""){
   return tpTspec;
 }
 
-bool removeFirstBin(TH1F* h){
-  if(h&&h->GetNbinsX()>1){
-    string rname = h->GetName();
+TH1F removeFirstBin(TH1F h){
+  if(h.GetNbinsX()>1){
+    string rname = h.GetName();
     rname+=to_string(replot++);
-    TH1F* r = new TH1F(rname.c_str(),h->GetTitle(),h->GetNbinsX()-1,h->GetBinLowEdge(2),h->GetBinLowEdge(h->GetNbinsX()+1));
-    for(unsigned i=1; i<r->GetNbinsX();++i){
-      r->SetBinContent(i,h->GetBinContent(i+1));
-      r->SetBinError(i,h->GetBinError(i+1));
+    TH1F r = TH1F(rname.c_str(),h.GetTitle(),h.GetNbinsX()-1,h.GetBinLowEdge(2),h.GetBinLowEdge(h.GetNbinsX()+1));
+    for(unsigned i=1; i<r.GetNbinsX();++i){
+      r.SetBinContent(i,h.GetBinContent(i+1));
+      r.SetBinError(i,h.GetBinError(i+1));
     }
-    h = r;
-    return true;
+    return r;
   }
   else {
-    if(h){
-      //obs memleak
-      h=NULL;
-    }
-    return false;
+    return h;
   }
 }
 
-float ADtoP(float ad){
-  if(ad<.2) return 1-TMath::Exp(-13.436+101.14*ad-223.74*ad*ad);
-  else if (ad<.34) return 1-TMath::Exp(-8.31+42.79*ad-59.938*ad*ad);
-  else{
-    cout<<"out of domain"<<endl;
-    return -1;
-  }
+double ADtoP(double ad){
+  cout<<"AD:"<<ad<<endl;
+  double r=-1;
+  if(ad<.2) r= 1-TMath::Exp(-13.436+101.14*ad-223.74*ad*ad);
+  else if (ad<.34) r= 1-TMath::Exp(-8.31+42.79*ad-59.938*ad*ad);
+  else if (ad<.6) r= 1-TMath::Exp(.917-4.279*ad-1.38*ad*ad);
+  else r= 1-TMath::Exp(1.29-5.709*ad+.0186*ad*ad);
+  cout<<"P:"<<r<<endl;
+  return r;
 }
 
 void chopHard(TH1F hard,TH1F soft){
   unsigned bins = soft.GetNbinsX();
   while(ADtoP(hard.AndersonDarlingTest(&soft))>.05&&bins>1){
-    removeFirstBin(&hard);
-    removeFirstBin(&soft);
+    cout<<"Hard/Soft p="<<ADtoP(hard.AndersonDarlingTest(&soft))<<" n bins="<<hard.GetNbinsX()<<endl;
+    hard=removeFirstBin(hard);
+    soft=removeFirstBin(soft);
     bins--;
-    cout<<"Hard/Soft p="<<ADtoP(hard.AndersonDarlingTest(&soft))<<endl;
   }
   TH1F* temp = (TH1F*) hard.Clone("hard_chopped");
   temp->Write();
