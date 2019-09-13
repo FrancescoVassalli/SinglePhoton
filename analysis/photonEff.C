@@ -313,7 +313,8 @@ TH1F* makePythiaSpec(TChain* ttree,TFile* out_file,string type=""){
     title+="_photon_truth_pT";
   }  
   else title="photon_truth_pT";
-  TH1F *tpTspec = new TH1F(title.c_str(),"",25,5,30);
+  double bins[12]= {5,6,7,8,9,10,11,12,13,14,16,30};
+  TH1F *tpTspec = new TH1F(title.c_str(),"",11,bins);
   tpTspec->Sumw2();
   cout<<"pythia tree with: "<<ttree->GetEntries()<<" entries"<<endl;
   for (int event = 0; event < ttree->GetEntries(); ++event)
@@ -333,6 +334,7 @@ TH1F removeFirstBin(TH1F h){
     string rname = h.GetName();
     rname+=to_string(replot++);
     TH1F r = TH1F(rname.c_str(),h.GetTitle(),h.GetNbinsX()-1,h.GetBinLowEdge(2),h.GetBinLowEdge(h.GetNbinsX()+1));
+    r.Sumw2();
     for(unsigned i=1; i<r.GetNbinsX();++i){
       r.SetBinContent(i,h.GetBinContent(i+1));
       r.SetBinError(i,h.GetBinError(i+1));
@@ -355,10 +357,17 @@ double ADtoP(double ad){
   return r;
 }
 
+float smartChi2(TH1F hard, TH1F soft){
+  hard.Scale(1/hard.Integral());
+  soft.Scale(1/soft.Integral());
+  return soft.Chi2Test(&hard,"WW CHI2/NDF");
+}
+
 void chopHard(TH1F hard,TH1F soft){
   unsigned bins = soft.GetNbinsX();
-  while(ADtoP(hard.AndersonDarlingTest(&soft))>.05&&bins>1){
+  while(ADtoP(hard.AndersonDarlingTest(&soft))>.05&&bins>2){
     cout<<"Hard/Soft p="<<ADtoP(hard.AndersonDarlingTest(&soft))<<" n bins="<<hard.GetNbinsX()<<endl;
+    cout<<"chi2 p="<<smartChi2(hard,soft)<<" n bins="<<hard.GetNbinsX()<<endl;
     hard=removeFirstBin(hard);
     soft=removeFirstBin(soft);
     bins--;
@@ -413,7 +422,7 @@ void photonEff()
   auto hardSpec = makePythiaSpec(hard4Tree,out_file,"hard4");
   chopHard(*hardSpec,*pythiaSpec);
   //auto pythiaSpec = addSpec(makePythiaSpec(softTree,out_file,"soft"),42.13,5e7,makePythiaSpec(hardTree,out_file,"hard"),.5562,5.5e8,out_file);
-  calculateConversionRate(makepTRes(ttree,observations,out_file),pythiaSpec,out_file);
+  //calculateConversionRate(makepTRes(ttree,observations,out_file),pythiaSpec,out_file);
   //makeVtxRes(ttree,out_file);
   //makeVtxEff(ttree,out_file);
   //testCuts(ttree,out_file);
