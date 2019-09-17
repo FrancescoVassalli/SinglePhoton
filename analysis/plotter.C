@@ -167,6 +167,48 @@ void recoRefit(TFile* thisFile){
 	tc->SaveAs("plots/deltaRefit.pdf");	
 }
 
+unsigned topFilledBin(TH1* hard){
+	unsigned r= hard->GetNbinsX();
+	while(hard->GetBinContent(r--)==0);
+	return r;
+}
+
+unsigned getMatchingBin(TH1* hard, TH1* soft){
+	unsigned r=1;
+	while(soft->GetBinLowEdge((r++)+1)!=hard->GetBinLowEdge(1));
+	return r;
+}
+
+
+
+void truthPtMix(TFile* thisFile){
+	gStyle->SetOptStat(0);
+	TH1F*  soft= (TH1F*) thisFile->Get("soft_photon_truth_pT");
+	TH1F*  hard= (TH1F*) thisFile->Get("hard4_photon_truth_pT");
+	TCanvas* tc = new TCanvas();
+	tc->SetLogy();
+	soft->Draw();
+	hard->SetLineColor(kRed);
+	hard->Draw("same");
+	TH1F* combined = new TH1F("combinedpythia","",soft->GetNbinsX(),soft->GetBinLowEdge(1),hard->GetBinLowEdge(topFilledBin(hard)));
+	unsigned matchBin = 11;//getMatchingBin(hard,soft);
+	for (int i = 1; i < matchBin; ++i)
+	{
+		combined->SetBinContent(i,soft->GetBinContent(i));
+		combined->SetBinError(i,soft->GetBinError(i));
+	}
+	hard->Scale(hardWeightFactor(hard,soft,matchBin));
+	for (int i = matchBin; i < combined->GetNbinsX()+1; ++i)
+	{
+		combined->SetBinContent(i,hard->GetBinContent(i));
+		combined->SetBinError(i,hard->GetBinError(i));
+	}
+	TCanvas* tc2 = new TCanvas();
+	tc2->Draw();
+	tc2->SetLogy();
+	combined->Draw();
+}
+
 
 
 void plotter(){
@@ -174,16 +216,17 @@ void plotter(){
 	TFile *thisOtherFile = new TFile("maps.root","READ");
 	//photon_m(thisFile);
 	//recoRefit(thisFile);
-	pTRes(thisFile);
-	pTRes2D(thisFile);
-	vtxRes(thisFile);
-	vtxRes2D(thisFile);
-	vtxEff(thisFile);
+	//pTRes(thisFile);
+	//pTRes2D(thisFile);
+	//vtxRes(thisFile);
+	//vtxRes2D(thisFile);
+	//vtxEff(thisFile);
 	//layer(thisFile);
 	//dlayer(thisFile);
 	//deta(thisFile);
 	//signalVtxR(thisFile);
-	vtxR(thisOtherFile);
+	//vtxR(thisOtherFile);
+	truthPtMix(thisFile);
 	//TFile *backFile = new TFile("backplots.root","READ");
 
 }
