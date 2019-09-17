@@ -421,7 +421,7 @@ void photonEff()
   auto hardSpec = makePythiaSpec(hard4Tree,out_file,"hard4");
   //chopHard(*hardSpec,*pythiaSpec);
   //auto pythiaSpec = addSpec(makePythiaSpec(softTree,out_file,"soft"),42.13,5e7,makePythiaSpec(hardTree,out_file,"hard"),.5562,5.5e8,out_file);
-  //calculateConversionRate(makepTRes(ttree,observations,out_file),pythiaSpec,out_file);
+  calculateConversionRate(makepTRes(ttree,observations,out_file),pythiaSpec,out_file);
   //makeVtxRes(ttree,out_file);
   //makeVtxEff(ttree,out_file);
   //testCuts(ttree,out_file);
