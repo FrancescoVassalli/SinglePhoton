@@ -12,7 +12,14 @@ TChain* handleFile(string name, string extension, string treename, unsigned int 
   }
   return all;
 }
-TEfficiency* makepTRes(TChain* ttree,TTree* allTree,TFile* out_file){
+TEfficiency* makepTRes(TFile* out_file,TChain* ttree=NULL,TTree* allTree=NULL){
+  out_file->ReOpen("READ");
+  if(out_file->Get("converted_photon_truth_pT")&&out_file->Get("all_photon_truth_pT")) 
+    return new TEfficiency(*(TH1F*)out_file->Get("converted_photon_truth_pT"),*(TH1F*)out_file->Get("all_photon_truth_pT"));
+  else if(!ttree||!allTree){
+    return NULL;
+  }
+  out_file->ReOpen("UPDATE");
   float pT;
   float tpT;
   float track_pT;
@@ -64,21 +71,24 @@ void calculateRate(TEfficiency* rate,TFile* file){
   TH1* uni_rate = (TH1F*)rate->GetPassedHistogram()->Clone("uni_rate");
   uni_rate->Divide(rate->GetTotalHistogram());
   conversion_rate->Multiply(uni_rate);
-//  conversion_rate->Scale(1/pythia->Integral());//this is probably wrong
+  //  conversion_rate->Scale(1/pythia->Integral());//this is probably wrong
   file->ReOpen("UPDATE");
   file->Write();
 }
 
 void conversionRate(){
   TFile *out_file = new TFile("effplots.root","UPDATE");
-  string treePath = "/sphenix/user/vassalli/gammasample/truthconversiononlineanalysis";
-  string treeExtension = ".root";
-  unsigned int nFiles=200;
-  TChain *ttree = handleFile(treePath,treeExtension,"cutTreeSignal",nFiles);
-  TChain *observations = handleFile(treePath,treeExtension,"observTree",nFiles);
-  cout<<"Got tree: "<<ttree->GetName()<<" and "<<ttree->GetEntries()<<" entries"<<endl;
-  cout<<"Got tree: "<<observations->GetName()<<" and "<<observations->GetEntries()<<" entries"<<endl;
-  TEfficiency* uni_rate=makepTRes(ttree,observations,out_file);
+  TEfficiency* uni_rate=makepTRes(out_file);
+  if(!uni_rate){
+    string treePath = "/sphenix/user/vassalli/gammasample/truthconversiononlineanalysis";
+    string treeExtension = ".root";
+    unsigned int nFiles=200;
+    TChain *ttree = handleFile(treePath,treeExtension,"cutTreeSignal",nFiles);
+    TChain *observations = handleFile(treePath,treeExtension,"observTree",nFiles);
+    cout<<"Got tree: "<<ttree->GetName()<<" and "<<ttree->GetEntries()<<" entries"<<endl;
+    cout<<"Got tree: "<<observations->GetName()<<" and "<<observations->GetEntries()<<" entries"<<endl;
+    uni_rate=makepTRes(out_file,ttree,observations);
+  }
   out_file->ReOpen("READ");
   calculateRate(uni_rate,out_file);
 }
