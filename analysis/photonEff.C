@@ -384,12 +384,6 @@ void calculateConversionRate(TEfficiency* rate, TH1F *pythia,TFile* out_file){
   out_file->Write();
 }
 
-unsigned topFilledBin(TH1* hard){
-  unsigned r= hard->GetNbinsX();
-  while(hard->GetBinContent(r--)==0);
-  return r;
-}
-
 double hardWeightFactor(TH1F* hard,TH1F* soft, unsigned matchBin){
   cout<<soft->Integral(matchBin,soft->GetNbinsX())<<endl;
   cout<<hard->Integral(matchBin,soft->GetNbinsX())<<endl;
@@ -397,7 +391,7 @@ double hardWeightFactor(TH1F* hard,TH1F* soft, unsigned matchBin){
 }
 
 TH1F* addSpec(TH1F* soft,TH1F* hard,TFile* file){
-  TH1F* combined = new TH1F("combinedpythia","",soft->GetNbinsX(),soft->GetBinLowEdge(1),hard->GetBinLowEdge(topFilledBin(hard)));
+  TH1F* combined = new TH1F("combinedpythia","",soft->GetNbinsX(),soft->GetBinLowEdge(1),hard->GetBinLowEdge(hard->GetNbinsX()+1));
   unsigned matchBin = 11;//getMatchingBin(hard,soft); //hard coded by eye
   for (int i = 1; i < matchBin; ++i)
   {
