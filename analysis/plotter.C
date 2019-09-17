@@ -179,8 +179,6 @@ unsigned getMatchingBin(TH1* hard, TH1* soft){
 	return r;
 }
 
-
-
 void truthPtMix(TFile* thisFile){
 	gStyle->SetOptStat(0);
 	TH1F*  soft= (TH1F*) thisFile->Get("soft_photon_truth_pT");

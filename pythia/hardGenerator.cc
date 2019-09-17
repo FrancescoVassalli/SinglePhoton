@@ -41,6 +41,10 @@ void generator(std::string filename, long nEvents, bool signalOnly=false){
           &&TMath::Abs(pythiaengine.event[ipart].eta()))photon_pT.push_back(pythiaengine.event[ipart].pT());
     }
     if (photon_pT.size()>0)photonTree->Fill();
+    else{
+      photon_pT.push_back(0);
+      photonTree->Fill();
+    }
 /*    if(!signalOnly||photon_pT.size()>0){
       HepMC::GenEvent* hepmcevtfrag = new HepMC::GenEvent(); //create HepMC event
       ToHepMC.fill_next_event( pythiaengine, hepmcevtfrag ); //convert event from pythia to HepMC
