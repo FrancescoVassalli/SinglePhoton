@@ -71,7 +71,7 @@ void calculateRate(TEfficiency* rate,TFile* file){
   TH1* uni_rate = (TH1F*)rate->GetPassedHistogram()->Clone("uni_rate");
   uni_rate->Divide(rate->GetTotalHistogram());
   conversion_rate->Multiply(uni_rate);
-  //  conversion_rate->Scale(1/pythia->Integral());//this is probably wrong
+  conversion_rate->Scale(1./365209);
   file->ReOpen("UPDATE");
   file->Write();
 }
