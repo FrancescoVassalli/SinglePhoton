@@ -396,7 +396,7 @@ double hardWeightFactor(TH1F* hard,TH1F* soft, unsigned matchBin){
   return soft->Integral(matchBin,soft->GetNbinsX())/hard->Integral(matchBin,hard->GetNbinsX());
 }
 
-TH1F* addSpec(TH1F* soft, float softcrosssection,unsigned nSoft,TH1F* hard,float hardcrosssection,unsigned nHard,TFile* out_file){
+TH1F* addSpec(TH1F* soft,TH1F* hard,TFile* file){
   TH1F* combined = new TH1F("combinedpythia","",soft->GetNbinsX(),soft->GetBinLowEdge(1),hard->GetBinLowEdge(topFilledBin(hard)));
   unsigned matchBin = 11;//getMatchingBin(hard,soft); //hard coded by eye
   for (int i = 1; i < matchBin; ++i)
@@ -410,6 +410,7 @@ TH1F* addSpec(TH1F* soft, float softcrosssection,unsigned nSoft,TH1F* hard,float
     combined->SetBinContent(i,hard->GetBinContent(i));
     combined->SetBinError(i,hard->GetBinError(i));
   }
+  file->Write();
   return combined;
 } 
 
@@ -417,12 +418,6 @@ void photonEff()
 {
   TFile *out_file = new TFile("effplots.root","UPDATE");
   //string treePath = "/sphenix/user/vassalli/RecoConversionTests/truthconversionembededonlineanalysis";
-  string treePath = "/sphenix/user/vassalli/gammasample/truthconversiononlineanalysis";
-  string treeExtension = ".root";
-  unsigned int nFiles=200;
-  TChain *ttree = handleFile(treePath,treeExtension,"cutTreeSignal",nFiles);
-  TChain *observations = handleFile(treePath,treeExtension,"observTree",nFiles);
-  cout<<"Total events= "<<ttree->GetEntries()<<'\n';
 
   string softPath = "/sphenix/user/vassalli/minBiasPythia/softana.root";
   //string hard0Path = "/sphenix/user/vassalli/minBiasPythia/hard0ana.root";
@@ -439,8 +434,8 @@ void photonEff()
   //makePythiaSpec(hard0Tree,out_file,"hard0");
   auto hardSpec = makePythiaSpec(hard4Tree,out_file,"hard4");
   //chopHard(*hardSpec,*pythiaSpec);
-  //auto pythiaSpec = addSpec(makePythiaSpec(softTree,out_file,"soft"),42.13,5e7,makePythiaSpec(hardTree,out_file,"hard"),.5562,5.5e8,out_file);
-  calculateConversionRate(makepTRes(ttree,observations,out_file),pythiaSpec,out_file);
+  pythiaSpec = addSpec(pythiaSpec,hardSpec,out_file);
+  //calculateConversionRate(makepTRes(ttree,observations,out_file),pythiaSpec,out_file);
   //makeVtxRes(ttree,out_file);
   //makeVtxEff(ttree,out_file);
   //testCuts(ttree,out_file);
