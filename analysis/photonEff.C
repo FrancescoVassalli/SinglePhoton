@@ -384,15 +384,34 @@ void calculateConversionRate(TEfficiency* rate, TH1F *pythia,TFile* out_file){
   out_file->Write();
 }
 
-TH1F* addSpec(TH1F* soft, float softcrosssection,unsigned nSoft,TH1F* hard,float hardcrosssection,unsigned nHard,TFile* out_file){
-  TH1F* pythiaspec = (TH1F*) soft->Clone("pythia_pT_spec");
-  pythiaspec->Scale(softcrosssection/nSoft);
-  pythiaspec->Add(hard,hardcrosssection/nHard);
-  pythiaspec->Scale(1/(nSoft/softcrosssection+nHard/hardcrosssection));
-  out_file->Write();
-  return pythiaspec;
-} 
+unsigned topFilledBin(TH1* hard){
+  unsigned r= hard->GetNbinsX();
+  while(hard->GetBinContent(r--)==0);
+  return r;
+}
 
+double hardWeightFactor(TH1F* hard,TH1F* soft, unsigned matchBin){
+  cout<<soft->Integral(matchBin,soft->GetNbinsX())<<endl;
+  cout<<hard->Integral(matchBin,soft->GetNbinsX())<<endl;
+  return soft->Integral(matchBin,soft->GetNbinsX())/hard->Integral(matchBin,hard->GetNbinsX());
+}
+
+TH1F* addSpec(TH1F* soft, float softcrosssection,unsigned nSoft,TH1F* hard,float hardcrosssection,unsigned nHard,TFile* out_file){
+  TH1F* combined = new TH1F("combinedpythia","",soft->GetNbinsX(),soft->GetBinLowEdge(1),hard->GetBinLowEdge(topFilledBin(hard)));
+  unsigned matchBin = 11;//getMatchingBin(hard,soft); //hard coded by eye
+  for (int i = 1; i < matchBin; ++i)
+  {
+    combined->SetBinContent(i,soft->GetBinContent(i));
+    combined->SetBinError(i,soft->GetBinError(i));
+  }
+  hard->Scale(hardWeightFactor(hard,soft,matchBin));
+  for (int i = matchBin; i < combined->GetNbinsX()+1; ++i)
+  {
+    combined->SetBinContent(i,hard->GetBinContent(i));
+    combined->SetBinError(i,hard->GetBinError(i));
+  }
+  return combined;
+} 
 
 void photonEff()
 {
