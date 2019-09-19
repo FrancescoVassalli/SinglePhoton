@@ -65,7 +65,7 @@ TEfficiency* makepTRes(TFile* out_file,TChain* ttree=NULL,TTree* allTree=NULL){
   return uni_rate;
 }
 
-void calculateRate(TEfficiency* rate,TFile* file){
+TH1F* calculateRate(TEfficiency* rate,TFile* file){
   //get the combined pythiaspec from the file then clone it to rate
   TH1F* conversion_rate = (TH1F*)((TH1F*) file->Get("combinedpythia"))->Clone("rate");
   TH1* uni_rate = (TH1F*)rate->GetPassedHistogram()->Clone("uni_rate");
@@ -73,7 +73,19 @@ void calculateRate(TEfficiency* rate,TFile* file){
   conversion_rate->Multiply(uni_rate);
   conversion_rate->Scale(1./365209);
   file->ReOpen("UPDATE");
-  file->Write();
+  conversion_rate->Write();
+  return conversion_rate;
+}
+
+void derivitvePlot(TH1F* finalrate){
+  TH1F *dplot = new TH1F("derivative","",finalrate->GetNbinsX(),5,25);
+  for (int i = 1; i < finalrate->GetNbinsX(); ++i)
+  {
+    double error;
+    dplot->SetBinContent(i,finalrate->ItegralAndError(i,finalrate->GetNbinsX(),error));
+    dplot->SetBinError(i,error);
+  }
+  dplot->Write();
 }
 
 void conversionRate(){
@@ -90,5 +102,6 @@ void conversionRate(){
     uni_rate=makepTRes(out_file,ttree,observations);
   }
   out_file->ReOpen("READ");
-  calculateRate(uni_rate,out_file);
+  auto conversion_rate=calculateRate(uni_rate,out_file);
+  derivitvePlot(conversion_rate);
 }
