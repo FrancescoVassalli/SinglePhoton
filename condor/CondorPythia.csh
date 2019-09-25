@@ -10,7 +10,7 @@ set GENNAME="photonJetGenerator"
 #
 source /phenix/u/vassalli/.cshrc
 mkdir $SCRATCH_AREA
-cp  $GENNAME $SCRATCH_AREA
+cp ./pythia/$GENNAME $SCRATCH_AREA
 #
 cd $SCRATCH_AREA
 ./$GENNAME $PYTHIA_FILE 100
