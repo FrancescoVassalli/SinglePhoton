@@ -179,7 +179,7 @@ unsigned getMatchingBin(TH1* hard, TH1* soft){
 	return r;
 }
 
-void truthPtMix(TFile* thisFile){
+/*void truthPtMix(TFile* thisFile){
 	gStyle->SetOptStat(0);
 	TH1F*  soft= (TH1F*) thisFile->Get("soft_photon_truth_pT");
 	TH1F*  hard= (TH1F*) thisFile->Get("hard4_photon_truth_pT");
@@ -205,6 +205,31 @@ void truthPtMix(TFile* thisFile){
 	tc2->Draw();
 	tc2->SetLogy();
 	combined->Draw();
+}*/
+
+void drawMaps(TFile *thisFile){
+	gStyle->SetOptStat(0);
+	TH2F* tmap = (TH2F*) thisFile->Get("truthMap");
+	TH2F* rmap = (TH2F*) thisFile->Get("recoMap");
+	TCanvas *tc;
+
+	if (tmap)
+	{
+		tc=new TCanvas();
+		tmap->Draw("colz");
+	}
+	if (rmap)
+	{
+		if (!tc)
+		{
+			tc=new TCanvas();
+			rmap->Draw("colz");
+		}
+		else{
+			TCanvas *tc2 = new TCanvas();
+			rmap->Draw("colz");
+		}
+	}
 }
 
 
@@ -224,7 +249,8 @@ void plotter(){
 	//deta(thisFile);
 	//signalVtxR(thisFile);
 	//vtxR(thisOtherFile);
-	truthPtMix(thisFile);
+	//truthPtMix(thisFile);
+	drawMaps(thisOtherFile);
 	//TFile *backFile = new TFile("backplots.root","READ");
 
 }
