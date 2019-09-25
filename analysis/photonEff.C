@@ -320,7 +320,7 @@ TH1F* makePythiaSpec(TChain* ttree,TFile* out_file,string type=""){
   {
     ttree->GetEvent(event);
     for(auto i: *tpT){
-      tpTspec->Fill(i);
+      if(i>5)tpTspec->Fill(i);
     }
   }
   out_file->Write();
