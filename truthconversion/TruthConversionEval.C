@@ -159,6 +159,7 @@ int TruthConversionEval::InitRun(PHCompositeNode *topNode)
 		_signalCutTree->Branch("approach_dist", &_b_approach);
 		_signalCutTree->Branch("vtx_radius", &_b_vtx_radius);
 		_signalCutTree->Branch("vtx_phi", &_b_vtx_phi);
+		_signalCutTree->Branch("tvtx_phi", &_b_tvtx_phi);
 		_signalCutTree->Branch("tvtx_radius", &_b_tvtx_radius);
 		_signalCutTree->Branch("vtx_chi2", &_b_vtx_chi2);
 		//_signalCutTree->Branch("vtxTrackRZ_dist", &_b_vtxTrackRZ_dist);
@@ -234,7 +235,7 @@ int TruthConversionEval::process_event(PHCompositeNode *topNode)
 	_b_truth_pT.clear();
 	_b_reco_pT.clear();
 	_b_alltrack_pT.clear();
-  _b_allphoton_pT.clear();
+  	_b_allphoton_pT.clear();
 	cout<<"init truth loop"<<endl;
 
 	for ( PHG4TruthInfoContainer::ConstIterator iter = range.first; iter != range.second; ++iter ) {

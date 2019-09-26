@@ -107,11 +107,22 @@ void compareDeta(TFile *thisFile){
 	TH1F *sig  = (TH1F*) thisFile->Get("detaS");
 	TH1F *back  = (TH1F*) thisFile->Get("detaB");
 	TCanvas* tc = new TCanvas();
+	tc->SetTicky();
+	TLegend *tl =new TLegend(.6,.8,.9,.9);
 	tc->Draw();
 	sig->SetXTitle("#Delta#eta");
 	sig->SetYTitle("1/N");
-	sig->Draw("e1");
-	back->Draw("e1 same");
+	sig->GetXaxis()->SetRangeUser(0,.005);
+	sig->GetYaxis()->SetTitleOffset(1);
+	sig->Draw("p");
+	back->SetLineColor(kRed);
+	back->SetMarkerColor(kRed);
+	back->SetMarkerStyle(kFullTriangleUp);
+	sig->SetMarkerStyle(kFullCircle);
+	tl->AddEntry(sig,"Conversions","p");
+	tl->AddEntry(back,"Pythia Photon-Jet Background","p");
+	back->Draw("p same");
+	tl->Draw();
 }
 
 void dlayer(TFile *thisFile){
