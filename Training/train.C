@@ -96,7 +96,7 @@ int train(){
   TChain *signalTree = handleFile(treePath,treeExtension,"cutTreeSignal",nFiles);
   TChain *backPairTree = handleFile(treePath,treeExtension,"pairBackTree",nFiles);
   TChain *backtrackTree = handleFile(treePath,treeExtension,"trackBackTree",nFiles);
-  TChain *backvtxTree = handleFile(treePath,treeExtension,"vtxBackTree",nFiles);
+  TChain *backVtxTree = handleFile(treePath,treeExtension,"vtxBackTree",nFiles);
   //makeFactory(signalTree,backtrackTree,outname,"trackback");
   //makeFactory(signalTree,backvtxTree,outname,"pairback");
   makeFactory(signalTree,backVtxTree,outname,"vtxback");
