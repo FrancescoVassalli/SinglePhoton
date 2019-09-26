@@ -83,9 +83,9 @@ void makeDists(TChain *vtxTree, TChain *mainTree, TFile *outf){
 void mapper()
 {
   TFile *out_file = new TFile("maps.root","RECREATE");
-  string treePath = "/sphenix/user/vassalli/gammasample/truthconversiononlineanalysis";
+  string treePath = "/sphenix/user/vassalli/gammasample/truthconversionembededanalysis";
   string treeExtension = ".root";
-  unsigned int nFiles=100;
+  unsigned int nFiles=1000;
   TChain *vtx_tree = handleFile(treePath,treeExtension,"vtxingTree",nFiles);
   TChain *main_tree = handleFile(treePath,treeExtension,"cutTreeSignal",nFiles);
   cout<<"mapping with "<<vtx_tree->GetEntries()<<" verticies"<<endl;
