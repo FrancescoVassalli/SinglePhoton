@@ -10,24 +10,26 @@ void myText(Double_t x,Double_t y,Color_t color, const char *text, Double_t tsiz
 void photon_m(TFile* thisFile){
 	gStyle->SetOptStat(0);
 	std::vector<TH1F*> plots;
-	plots.push_back((TH1F*) thisFile->Get("m^{#gamma}_{recoRefit}"));
+	//plots.push_back((TH1F*) thisFile->Get("m^{#gamma}_{recoRefit}"));
 	plots.push_back((TH1F*) thisFile->Get("m^{#gamma}_{reco}"));
 
 	TCanvas* tc = new TCanvas();
 	tc->Draw();
-	TLegend* tl = new TLegend(.7,.7,.9,.9);
-	plots[0]->SetLineColor(kRed);
-	plots[1]->SetLineColor(kGreen+2);
+	//TLegend* tl = new TLegend(.7,.7,.9,.9);
+	//plots[0]->SetLineColor(kRed);
+	//plots[1]->SetLineColor(kGreen+2);
 	for (int i = 0; i < plots.size(); ++i)
 	{
 		plots[i]->SetYTitle("#frac{dN}{dm *N_{#gamma}}");
+		plots[i]->GetYaxis()->SetTitleOffset(1);
+		plots[i]->GetXaxis()->SetRangeUser(0,.1);
 		plots[i]->SetXTitle("invarient mass GeV/c^{2}");
 		if(i==0) plots[i]->Draw("e1");
 		else plots[i]->Draw("e1 same");
-		tl->AddEntry(plots[i],plots[i]->GetName(),"l");
+		//tl->AddEntry(plots[i],plots[i]->GetName(),"l");
 	}
-	tl->Draw();
-	tc->SaveAs("plots/gamma_dm_eff.pdf");	
+	//tl->Draw();
+	//tc->SaveAs("plots/gamma_dm_eff.pdf");	
 }
 
 void pTRes(TFile *thisFile){
@@ -102,7 +104,7 @@ void deta(TFile *thisFile){
 	plot->Draw("e1");
 }
 
-void compareDeta(TFile *thisFile){
+void compareDeta(TFile *thisFile, bool zoom=true){
 	gStyle->SetOptStat(0);
 	TH1F *sig  = (TH1F*) thisFile->Get("detaS");
 	TH1F *back  = (TH1F*) thisFile->Get("detaB");
@@ -112,7 +114,11 @@ void compareDeta(TFile *thisFile){
 	tc->Draw();
 	sig->SetXTitle("#Delta#eta");
 	sig->SetYTitle("1/N");
-	sig->GetXaxis()->SetRangeUser(0,.005);
+	if(zoom)sig->GetXaxis()->SetRangeUser(0,.005);
+	else{
+		sig= (TH1F*) sig->Rebin(100);
+		back= (TH1F*) back->Rebin(100);
+	}
 	sig->GetYaxis()->SetTitleOffset(1);
 	sig->Draw("p");
 	back->SetLineColor(kRed);
@@ -262,7 +268,7 @@ void drawMaps(TFile *thisFile){
 void plotter(){
 	TFile *thisFile = new TFile("effplots.root","READ");
 	TFile *thisOtherFile = new TFile("maps.root","READ");
-	//photon_m(thisFile);
+	photon_m(thisFile);
 	//recoRefit(thisFile);
 	//pTRes(thisFile);
 	//pTRes2D(thisFile);
@@ -276,6 +282,7 @@ void plotter(){
 	//vtxR(thisOtherFile);
 	//truthPtMix(thisFile);
 	compareDeta(thisFile);
+	compareDeta(thisFile,false);
 	drawMaps(thisOtherFile);
 	//TFile *backFile = new TFile("backplots.root","READ");
 
