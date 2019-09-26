@@ -89,7 +89,7 @@ void makeVtxR(TChain* ttree, TTree* vtxTree,TFile* out_file){
   calc/=ttree->GetEntries();
   for (int i = 0; i < vtxTree->GetEntries(); ++i)
   {
-    vtxTree->GetEvent(event);
+    vtxTree->GetEvent(i);
     plots[1]->Fill(sqrt(vtxX*vtxX+vtxY*vtxY));
   }
   for (int i = 0; i < 3; ++i)
@@ -198,8 +198,8 @@ void compareDeta(TTree* signalTree, TTree* background){
   float detas,detab;
   signalTree->SetBranchAddress("track_deta",&detas);
   background->SetBranchAddress("track_deta",&detab);
-  TH1F *detaS_plot = new TH1F("deta","",30,-.001,.01);
-  TH1F *detaB_plot = new TH1F("deta","",30,-.001,.01);
+  TH1F *detaS_plot = new TH1F("detaS","",30,-.001,.01);
+  TH1F *detaB_plot = new TH1F("detaB","",30,-.001,.01);
   detaS_plot->Sumw2();
   detaB_plot->Sumw2();
 
@@ -211,7 +211,7 @@ void compareDeta(TTree* signalTree, TTree* background){
   for (int i = 0; i < background->GetEntries(); ++i)
   {
     background->GetEvent(i);
-    detaB_plot->Fill(detaB);
+    detaB_plot->Fill(detab);
   }
   detaB_plot->Scale(1/detaB_plot->Integral());
   detaS_plot->Scale(1/detaS_plot->Integral());
@@ -447,8 +447,9 @@ TH1F* addSpec(TH1F* soft,TH1F* hard,TFile* file){
 void photonEff()
 {
   TFile *out_file = new TFile("effplots.root","UPDATE");
-  //string treePath = "/sphenix/user/vassalli/RecoConversionTests/truthconversionembededAnaAdded.root";
-
+  string treePath = "/sphenix/user/vassalli/gammasample/truthconversionembededanalysis";
+  string treeExtension = ".root";
+  unsigned int nFiles=1000;
   //string softPath = "/sphenix/user/vassalli/minBiasPythia/softana.root";
   //string hard0Path = "/sphenix/user/vassalli/minBiasPythia/hard0ana.root";
   //string hard4Path = "/sphenix/user/vassalli/minBiasPythia/hard4ana.root";

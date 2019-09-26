@@ -27,14 +27,12 @@ TChain* handleFile(string name, string extension, string treename, unsigned int 
 }
 
 void makeMaps(TChain* ttree,TFile* out_file){
-  float vtxX;
-  float tvtxX;
-  float vtxY;
-  float tvtxY;
-  ttree->SetBranchAddress("vtx_x",&vtxX);
-  ttree->SetBranchAddress("tvtx_x",&tvtxX);
-  ttree->SetBranchAddress("vtx_y",&vtxY);
-  ttree->SetBranchAddress("tvtx_y",&tvtxY);
+  float vtxR;
+  float tvtxR;
+  float vtx_phi;
+  ttree->SetBranchAddress("vtx_radius",&vtxR);
+  ttree->SetBranchAddress("tvtx_radius",&tvtxR);
+  ttree->SetBranchAddress("vtx_phi",&vtx_phi);
 
   TH2F *map = new TH2F("recoMap","",100,-30,30,100,-30,30);
   TH2F *tmap = new TH2F("truthMap","",100,-30,30,100,-30,30);
@@ -44,8 +42,8 @@ void makeMaps(TChain* ttree,TFile* out_file){
   for (int event = 0; event < ttree->GetEntries(); ++event)
   {
     ttree->GetEvent(event);
-    map->Fill(vtxX,vtxY);
-    tmap->Fill(tvtxX,tvtxY);
+    map->Fill(vtxR*TMath::Cos(vtx_phi),vtxR*TMath::Sin(vtx_phi));
+    tmap->Fill(tvtxR*TMath::Cos(vtx_phi),tvtxR*TMath::Sin(vtx_phi));
   }
   out_file->Write();
 }
@@ -89,6 +87,6 @@ void mapper()
   TChain *vtx_tree = handleFile(treePath,treeExtension,"vtxingTree",nFiles);
   TChain *main_tree = handleFile(treePath,treeExtension,"cutTreeSignal",nFiles);
   cout<<"mapping with "<<vtx_tree->GetEntries()<<" verticies"<<endl;
-  makeMaps(vtx_tree,out_file);
+  makeMaps(main_tree,out_file);
 //  makeDists(vtx_tree,main_tree,out_file);
 }
