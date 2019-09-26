@@ -198,8 +198,8 @@ void compareDeta(TTree* signalTree, TTree* background){
   float detas,detab;
   signalTree->SetBranchAddress("track_deta",&detas);
   background->SetBranchAddress("track_deta",&detab);
-  TH1F *detaS_plot = new TH1F("detaS","",30,-.001,.01);
-  TH1F *detaB_plot = new TH1F("detaB","",30,-.001,.01);
+  TH1F *detaS_plot = new TH1F("detaS","",3000,-.001,1);
+  TH1F *detaB_plot = new TH1F("detaB","",3000,-.001,1);
   detaS_plot->Sumw2();
   detaB_plot->Sumw2();
 

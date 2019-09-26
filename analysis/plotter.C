@@ -102,6 +102,18 @@ void deta(TFile *thisFile){
 	plot->Draw("e1");
 }
 
+void compareDeta(TFile *thisFile){
+	gStyle->SetOptStat(0);
+	TH1F *sig  = (TH1F*) thisFile->Get("detaS");
+	TH1F *back  = (TH1F*) thisFile->Get("detaB");
+	TCanvas* tc = new TCanvas();
+	tc->Draw();
+	sig->SetXTitle("#Delta#eta");
+	sig->SetYTitle("1/N");
+	sig->Draw("e1");
+	back->Draw("e1 same");
+}
+
 void dlayer(TFile *thisFile){
 	gStyle->SetOptStat(0);
 	TH1F *plot  = (TH1F*) thisFile->Get("dlayer");
@@ -234,6 +246,8 @@ void drawMaps(TFile *thisFile){
 
 
 
+
+
 void plotter(){
 	TFile *thisFile = new TFile("effplots.root","READ");
 	TFile *thisOtherFile = new TFile("maps.root","READ");
@@ -250,6 +264,7 @@ void plotter(){
 	//signalVtxR(thisFile);
 	//vtxR(thisOtherFile);
 	//truthPtMix(thisFile);
+	compareDeta(thisFile);
 	drawMaps(thisOtherFile);
 	//TFile *backFile = new TFile("backplots.root","READ");
 
