@@ -23,7 +23,7 @@ Rank		= CPU_Speed
 
 # Jobs with higher numerical priority will run before jobs 
 # with lower numerical priority (-20 to 20).
-Priority        = +18
+Priority        = +19
 
 # Used to give jobs a directory with respect to file input 
 # and output.
@@ -33,13 +33,13 @@ Initialdir   = /phenix/u/vassalli/sphenix/single/Training/
 Input           = /dev/null
 
 # The job's stdout is sent to this file.
-Output       = /direct/phenix+u/vassalli/sphenix/single/condor_logs/out.t.$(Process)
+Output       = /sphenix/users/vassalli/condor_logs/out.t.$(Process)
 
 # The job's stderr is sent to this file.
-Error        = /direct/phenix+u/vassalli/sphenix/single/condor_logs/err.t.$(Process)
+Error        = /sphenix/users/vassalli/condor_logs/err.t.$(Process)
 
 # The condor log file for this job, useful when debuggin
-Log          = /direct/phenix+u/vassalli/sphenix/single/condor_logs/log.t.$(Process)
+Log          = /sphenix/users/vassalli/condor_logs/log.t.$(Process)
 
 # Email address to send notification to.
 Notify_user     = frva5829@colorado.edu

@@ -38,24 +38,24 @@ void makeFactory(TTree* signalTree, TTree* backTree,std::string outfile,std::str
   if(bgTree2){
     factory->AddBackgroundTree(bgTree2,1.0);
   }
-  factory->AddSpectator("track_layer",'I');
-  factory->AddSpectator("track_pT",'F');
-  factory->AddSpectator("track_dca",'F');
-  factory->AddSpectator("cluster_prob",'F');
-  factory->AddSpectator("abs(track_deta)",'F');
-  factory->AddSpectator("abs(cluster_deta)",'F');
-  factory->AddSpectator("abs(cluster_dphi)",'F');
-  factory->AddSpectator("abs(track_dlayer)",'I');
-  factory->AddSpectator("approach_dist",'F');
-  factory->AddVariable("vtx_radius",'F');
+  factory->AddVariable("track_layer",'I');
+  factory->AddVariable("track_pT",'F');
+  factory->AddVariable("track_dca",'F');
+  factory->AddVariable("cluster_prob",'F');
+  factory->AddVariable("abs(track_deta)",'F');
+  factory->AddVariable("abs(cluster_deta)",'F');
+  factory->AddVariable("abs(cluster_dphi)",'F');
+  factory->AddVariable("abs(track_dlayer)",'I');
+  factory->AddVariable("approach_dist",'F');
+  //factory->AddVariable("vtx_radius",'F');
 //  factory->AddVariable("vtx_chi2",'F'); 
   //factory->AddVariable("vtxTrackRZ_dist",'F');
   //factory->AddVariable("abs(vtxTrackRPhi_dist-vtxTrackRZ_dist)",'F');
-  factory->AddVariable("photon_m",'F');
-  factory->AddVariable("photon_pT",'F');
+  //factory->AddVariable("photon_m",'F');
+  //factory->AddVariable("photon_pT",'F');
 
   string track_layer_cut = "track_layer>-1.";
-  string track_pT_cut = "track_pT>2.0";
+  string track_pT_cut = "track_pT>2.5";
   string track_dca_cut = "50>track_dca>0";
   string em_prob_cut = "cluster_prob>-0.1";
   string track_deta_cut = ".0082>=track_deta";
@@ -83,22 +83,19 @@ void makeFactory(TTree* signalTree, TTree* backTree,std::string outfile,std::str
 
 int train(){
   using namespace std;
-  string treePath = "/sphenix/user/vassalli/RecoConversionTests/truthconversionembededonlineanalysis";
-  string treeExtension = ".root";
+  string treePath = "/sphenix/user/vassalli/gammasample/truthconversionembededAnaAdded.root";
   string outname = "cutTrainA.root";
-  unsigned int nFiles=100;
   
-  /*TChain *backVtxTree = new TChain("vtxBackTree");
-  TChain *signalTree = new TChain("cutTreeSignal");
-  backVtxTree->Add(treePath.c_str());
-  signalTree->Add(treePath.c_str());*/
-  TChain *signalTree = handleFile(treePath,treeExtension,"cutTreeSignal",nFiles);
-  TChain *backtrackTree = handleFile(treePath,treeExtension,"trackBackTree",nFiles);
-  TChain *backpairTree = handleFile(treePath,treeExtension,"pairBackTree",nFiles);
-  TChain *backVtxTree = handleFile(treePath,treeExtension,"vtxBackTree",nFiles);
+//  TChain *backVtxTree = new TChain("vtxBackTree");
+  TChain *backPairTree = new TChain("pairBackTree");
+ // TChain *signalTree = new TChain("cutTreeSignal");
+  //backVtxTree->Add(treePath.c_str());
+  backPairTree->Add(treePath.c_str());
+  //signalTree->Add(treePath.c_str());
+  //TChain *backtrackTree = handleFile(treePath,treeExtension,"trackBackTree",nFiles);
   //makeFactory(signalTree,backtrackTree,outname,"trackback");
-  //makeFactory(signalTree,backpairTree,outname,"pairback");
-  makeFactory(signalTree,backVtxTree,outname,"vtxback");
+  makeFactory(signalTree,backPairTree,outname,"pairback");
+  //makeFactory(signalTree,backVtxTree,outname,"vtxback");
 /*  outname="cutTrainE.root";
   makeFactory(signalTree,backETree,outname,"eback");*/
 }
