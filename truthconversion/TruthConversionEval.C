@@ -158,6 +158,7 @@ int TruthConversionEval::InitRun(PHCompositeNode *topNode)
 		//_signalCutTree->Branch("ttrack_pT", &_b_ttrack_pT);
 		_signalCutTree->Branch("approach_dist", &_b_approach);
 		_signalCutTree->Branch("vtx_radius", &_b_vtx_radius);
+		_signalCutTree->Branch("vtx_phi", &_b_vtx_phi);
 		_signalCutTree->Branch("tvtx_radius", &_b_tvtx_radius);
 		_signalCutTree->Branch("vtx_chi2", &_b_vtx_chi2);
 		//_signalCutTree->Branch("vtxTrackRZ_dist", &_b_vtxTrackRZ_dist);
