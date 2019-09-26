@@ -194,6 +194,31 @@ TEfficiency* makepTRes(TChain* ttree,TTree* allTree,TFile* out_file){
   return uni_rate;
 }
 
+void compareDeta(TTree* signalTree, TTree* background){
+  float detas,detab;
+  signalTree->SetBranchAddress("track_deta",&detas);
+  background->SetBranchAddress("track_deta",&detab);
+  TH1F *detaS_plot = new TH1F("deta","",30,-.001,.01);
+  TH1F *detaB_plot = new TH1F("deta","",30,-.001,.01);
+  detaS_plot->Sumw2();
+  detaB_plot->Sumw2();
+
+  for (int i = 0; i < signalTree->GetEntries(); ++i)
+  {
+    signalTree->GetEvent(i);
+    detaS_plot->Fill(detas);
+  }
+  for (int i = 0; i < background->GetEntries(); ++i)
+  {
+    background->GetEvent(i);
+    detaB_plot->Fill(detaB);
+  }
+  detaB_plot->Scale(1/detaB_plot->Integral());
+  detaS_plot->Scale(1/detaS_plot->Integral());
+  detaS_plot->Write();
+  detaB_plot->Write();
+}
+
 void testCuts(TChain* ttree,TFile* out_file){
   float dphi;
   float prob;
@@ -422,7 +447,7 @@ TH1F* addSpec(TH1F* soft,TH1F* hard,TFile* file){
 void photonEff()
 {
   TFile *out_file = new TFile("effplots.root","UPDATE");
-  /tring treePath = "/sphenix/user/vassalli/RecoConversionTests/truthconversionembededAnaAdded.root";
+  //string treePath = "/sphenix/user/vassalli/RecoConversionTests/truthconversionembededAnaAdded.root";
 
   //string softPath = "/sphenix/user/vassalli/minBiasPythia/softana.root";
   //string hard0Path = "/sphenix/user/vassalli/minBiasPythia/hard0ana.root";
@@ -433,16 +458,19 @@ void photonEff()
   //softTree->Add(softPath.c_str());
   //hard0Tree->Add(hard0Path.c_str());
   //hard4Tree->Add(hard4Path.c_str());
-  //TChain *ttree2 = handleFile(treePath,treeExtension,"vtxingTree",nFiles);
-  //makephotonM(ttree,out_file);
+  TChain *ttree = handleFile(treePath,treeExtension,"cutTreeSignal",nFiles);
+  TChain *pairBackTree = handleFile(treePath,treeExtension,"pairBackTree",nFiles);
+  TChain *vertexingTree = handleFile(treePath,treeExtension,"vtxingTree",nFiles);
+  makephotonM(ttree,out_file);
   //auto pythiaSpec=makePythiaSpec(softTree,out_file,"soft");
   //makePythiaSpec(hard0Tree,out_file,"hard0");
   //auto hardSpec = makePythiaSpec(hard4Tree,out_file,"hard4");
   //chopHard(*hardSpec,*pythiaSpec);
   //pythiaSpec = addSpec(pythiaSpec,hardSpec,out_file);
   //calculateConversionRate(makepTRes(ttree,observations,out_file),pythiaSpec,out_file);
-  //makeVtxRes(ttree,out_file);
-  //makeVtxEff(ttree,out_file);
+  makeVtxRes(ttree,out_file);
+  makeVtxEff(ttree,out_file);
+  compareDeta(ttree,pairBackTree);
   //testCuts(ttree,out_file);
   //makepTCaloGraph("pTcalodata.csv",out_file);
   //makeVtxR(ttree2,out_file);
