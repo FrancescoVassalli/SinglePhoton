@@ -3,7 +3,6 @@ Universe        = vanilla
 # We want email if the job completed successfully. This can
 # be set to Always, Error, or Never.
 Notification    = Never
-
 # The executable we want to run.
 Executable   =  /phenix/u/vassalli/sphenix/single/condor/CondorTrain.csh
 
@@ -33,13 +32,13 @@ Initialdir   = /phenix/u/vassalli/sphenix/single/Training/
 Input           = /dev/null
 
 # The job's stdout is sent to this file.
-Output       = /sphenix/users/vassalli/condor_logs/out.t.$(Process)
+Output       = /sphenix/user/vassalli/condor_logs/out.t.$(Process)
 
 # The job's stderr is sent to this file.
-Error        = /sphenix/users/vassalli/condor_logs/err.t.$(Process)
+Error        = /sphenix/user/vassalli/condor_logs/err.t.$(Process)
 
 # The condor log file for this job, useful when debuggin
-Log          = /sphenix/users/vassalli/condor_logs/log.t.$(Process)
+Log          = /sphenix/user/vassalli/condor_logs/log.t.$(Process)
 
 # Email address to send notification to.
 Notify_user     = frva5829@colorado.edu

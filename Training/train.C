@@ -83,16 +83,20 @@ void makeFactory(TTree* signalTree, TTree* backTree,std::string outfile,std::str
 
 int train(){
   using namespace std;
-  string treePath = "/sphenix/user/vassalli/gammasample/truthconversionembededAnaAdded.root";
+  string treePath = "/sphenix/user/vassalli/gammasample/truthconversionembededanalysis";
+  string treeExtension = ".root";
   string outname = "cutTrainA.root";
+  unsigned nFiles=1000;
   
 //  TChain *backVtxTree = new TChain("vtxBackTree");
-  TChain *backPairTree = new TChain("pairBackTree");
+//  TChain *backPairTree = new TChain("pairBackTree");
  // TChain *signalTree = new TChain("cutTreeSignal");
   //backVtxTree->Add(treePath.c_str());
-  backPairTree->Add(treePath.c_str());
+  //backPairTree->Add(treePath.c_str());
   //signalTree->Add(treePath.c_str());
-  //TChain *backtrackTree = handleFile(treePath,treeExtension,"trackBackTree",nFiles);
+  TChain *signalTree = handleFile(treePath,treeExtension,"cutTreeSignal",nFiles);
+  TChain *backPairTree = handleFile(treePath,treeExtension,"pairBackTree",nFiles);
+  TChain *backtrackTree = handleFile(treePath,treeExtension,"trackBackTree",nFiles);
   //makeFactory(signalTree,backtrackTree,outname,"trackback");
   makeFactory(signalTree,backPairTree,outname,"pairback");
   //makeFactory(signalTree,backVtxTree,outname,"vtxback");
