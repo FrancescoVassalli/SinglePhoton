@@ -82,12 +82,12 @@ void makeDists(TChain *vtxTree, TChain *mainTree, TFile *outf){
 
 void mapper()
 {
-  string treePath = "/sphenix/user/vassalli/gammasample/truthconversiononlineanalysis";
-  string treeExtension = ".root";
-  unsigned int nFiles=100;
+  string treePath = "/sphenix/user/vassalli/gammasample/truthconversionembededAnaAdded.root";
   TFile *out_file = new TFile("maps.root","RECREATE");
-  TChain *vtx_tree = handleFile(treePath,treeExtension,"vtxingTree",nFiles);
-  TChain *main_tree = handleFile(treePath,treeExtension,"cutTreeSignal",nFiles);
+  TChain *vtx_tree = new TChain("vtxingTree");
+  TChain *main_tree = new TChain("cutTreeSignal");
+  vtx_tree->Add(treePath.c_str());
+  main_tree->Add(treePath.c_str());
   makeMaps(vtx_tree,out_file);
 //  makeDists(vtx_tree,main_tree,out_file);
 }
