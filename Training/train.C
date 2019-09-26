@@ -38,21 +38,21 @@ void makeFactory(TTree* signalTree, TTree* backTree,std::string outfile,std::str
   if(bgTree2){
     factory->AddBackgroundTree(bgTree2,1.0);
   }
-  factory->AddVariable("track_layer",'I');
-  factory->AddVariable("track_pT",'F');
-  factory->AddVariable("track_dca",'F');
-  factory->AddVariable("cluster_prob",'F');
-  factory->AddVariable("abs(track_deta)",'F');
-  factory->AddVariable("abs(cluster_deta)",'F');
-  factory->AddVariable("abs(cluster_dphi)",'F');
-  factory->AddVariable("abs(track_dlayer)",'I');
-  factory->AddVariable("approach_dist",'F');
-  //factory->AddVariable("vtx_radius",'F');
-//  factory->AddVariable("vtx_chi2",'F'); 
+  factory->AddSpectator("track_layer",'I');
+  factory->AddSpectator("track_pT",'F');
+  factory->AddSpectator("track_dca",'F');
+  factory->AddSpectator("cluster_prob",'F');
+  factory->AddSpectator("abs(track_deta)",'F');
+  factory->AddSpectator("abs(cluster_deta)",'F');
+  factory->AddSpectator("abs(cluster_dphi)",'F');
+  factory->AddSpectator("abs(track_dlayer)",'I');
+  factory->AddSpectator("approach_dist",'F');
+  factory->AddVariable("vtx_radius",'F');
+  //factory->AddVariable("vtx_chi2",'F'); 
   //factory->AddVariable("vtxTrackRZ_dist",'F');
   //factory->AddVariable("abs(vtxTrackRPhi_dist-vtxTrackRZ_dist)",'F');
-  //factory->AddVariable("photon_m",'F');
-  //factory->AddVariable("photon_pT",'F');
+  factory->AddVariable("photon_m",'F');
+  factory->AddVariable("photon_pT",'F');
 
   string track_layer_cut = "track_layer>-1.";
   string track_pT_cut = "track_pT>2.5";
@@ -62,8 +62,7 @@ void makeFactory(TTree* signalTree, TTree* backTree,std::string outfile,std::str
   string track_dlayer_cut = "2>=abs(track_dlayer)";
   string approach_dist_cut = "69.34>approach_dist>0";
   string vtx_radius_cut = "vtx_radius>0";
-  //do I need photon cuts? 
-  string tCutInitializer = track_pT_cut+"&&"+em_prob_cut+"&&"+track_layer_cut;//+"&&"+track_deta_cut+"&&"+track_dlayer_cut+"&&"+approach_dist_cut+"&&"+vtx_radius_cut;
+  string tCutInitializer = track_pT_cut+"&&"+em_prob_cut+"&&"+track_layer_cut+"&&"+track_deta_cut+"&&"+vtx_radius_cut;
   TCut preTraingCuts(tCutInitializer.c_str());
 
   factory->PrepareTrainingAndTestTree(preTraingCuts,"nTrain_Signal=0:nTrain_Background=0:nTest_Signal=0:nTest_Background=0");
@@ -97,9 +96,10 @@ int train(){
   TChain *signalTree = handleFile(treePath,treeExtension,"cutTreeSignal",nFiles);
   TChain *backPairTree = handleFile(treePath,treeExtension,"pairBackTree",nFiles);
   TChain *backtrackTree = handleFile(treePath,treeExtension,"trackBackTree",nFiles);
+  TChain *backvtxTree = handleFile(treePath,treeExtension,"vtxBackTree",nFiles);
   //makeFactory(signalTree,backtrackTree,outname,"trackback");
-  makeFactory(signalTree,backPairTree,outname,"pairback");
-  //makeFactory(signalTree,backVtxTree,outname,"vtxback");
+  //makeFactory(signalTree,backvtxTree,outname,"pairback");
+  makeFactory(signalTree,backVtxTree,outname,"vtxback");
 /*  outname="cutTrainE.root";
   makeFactory(signalTree,backETree,outname,"eback");*/
 }

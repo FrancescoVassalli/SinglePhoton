@@ -1,5 +1,5 @@
 #!/bin/csh 
-@ p = ( ${1} )
+@ p = ( ${1})
 #
 set OUT_LOCATION="/sphenix/user/vassalli/gammasample/"
 set ANA_LOCATION="/sphenix/user/vassalli/gammasample/"

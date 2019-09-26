@@ -30,9 +30,11 @@ void makeMaps(TChain* ttree,TFile* out_file){
   float vtxR;
   float tvtxR;
   float vtx_phi;
+  float tvtx_phi;
   ttree->SetBranchAddress("vtx_radius",&vtxR);
   ttree->SetBranchAddress("tvtx_radius",&tvtxR);
   ttree->SetBranchAddress("vtx_phi",&vtx_phi);
+  ttree->SetBranchAddress("tvtx_phi",&tvtx_phi);
 
   TH2F *map = new TH2F("recoMap","",100,-30,30,100,-30,30);
   TH2F *tmap = new TH2F("truthMap","",100,-30,30,100,-30,30);
@@ -43,7 +45,7 @@ void makeMaps(TChain* ttree,TFile* out_file){
   {
     ttree->GetEvent(event);
     map->Fill(vtxR*TMath::Cos(vtx_phi),vtxR*TMath::Sin(vtx_phi));
-    tmap->Fill(tvtxR*TMath::Cos(vtx_phi),tvtxR*TMath::Sin(vtx_phi));
+    tmap->Fill(tvtxR*TMath::Cos(tvtx_phi),tvtxR*TMath::Sin(tvtx_phi));
   }
   out_file->Write();
 }
