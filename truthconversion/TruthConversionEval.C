@@ -11,7 +11,7 @@
 #include <calobase/RawCluster.h>
 #include <calobase/RawClusterv1.h>
 
-#include <g4main/PHG4TruthInfoContainer.h>
+#include <g4main/PHG4TruthInfoContainer.h>	
 #include <g4main/PHG4Particle.h>
 #include <g4main/PHG4Particlev1.h>
 #include <g4main/PHG4Particlev2.h>
@@ -631,7 +631,7 @@ void TruthConversionEval::recordConversion(Conversion *conversion,TLorentzVector
 		pair<int,int> clusterIds = conversion->get_cluster_ids();
 		RawCluster *clustemp;
 		if(_mainClusterContainer->getCluster(clusterIds.first)){//if there is matching cluster 
-			clustemp =   dynamic_cast<RawCluster*>(_mainClusterContainer->getCluster(clusterIds.first)->Clone());
+			clustemp =   dynamic_cast<RawCluster*>(_mainClusterContainer->getCluster(clusterIds.first)->CloneMe());
 			//this is for cluster subtraction which will not be implented soon
 
 			// _conversionClusters.AddCluster(clustemp); //add the calo cluster to the container
@@ -734,7 +734,7 @@ void TruthConversionEval::recordConversion(Conversion *conversion,TLorentzVector
 		pair<int,int> clusterIds = conversion->get_cluster_ids();
 		RawCluster *clustemp;
 		if(_mainClusterContainer->getCluster(clusterIds.first)){//if there is matching cluster 
-			clustemp =   dynamic_cast<RawCluster*>(_mainClusterContainer->getCluster(clusterIds.first)->Clone());
+			clustemp =   dynamic_cast<RawCluster*>(_mainClusterContainer->getCluster(clusterIds.first)->CloneMe());
 			//this is for cluster subtraction which will not be implented soon
 
 			// _conversionClusters.AddCluster(clustemp); //add the calo cluster to the container
