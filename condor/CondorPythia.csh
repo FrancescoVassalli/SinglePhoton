@@ -1,21 +1,20 @@
 #!/bin/csh 
 @ p =  ${1}
 #
-set OUT_LOCATION="/sphenix/user/vassalli/minBiasPythia/"
-set PYTHIA_FILE=${OUT_LOCATION}pythia_hard4_${p}
+set OUT_LOCATION="/sphenix/user/vassalli/gammasample/pythiahep/"
+set PYTHIA_FILE=${OUT_LOCATION}pythia_photonJet_${p}
 #
-set SCRATCH_AREA="$_CONDOR_SCRATCH_DIR"                                                              
+set SCRATCH_AREA="$_CONDOR_SCRATCH_DIR/fran_photons${p}"
 #
-set SOURCE_PHOTONMAKER="/direct/phenix+u/vassalli/sphenix/single/pythia/*"
-set GENNAME="hardGenerator"
+set GENNAME="photonJetGenerator"
 #
 source /phenix/u/vassalli/.cshrc
-mkdir $SCRATCH_AREA/fran_single_photons
-cp  $SOURCE_PHOTONMAKER $SCRATCH_AREA/fran_single_photons/
+mkdir $SCRATCH_AREA
+cp  $GENNAME $SCRATCH_AREA
 #
-cd $SCRATCH_AREA/fran_single_photons
-./$GENNAME $PYTHIA_FILE 2000000
+cd $SCRATCH_AREA
+./$GENNAME $PYTHIA_FILE 100
 #
-rm -r $SCRATCH_AREA/fran_single_photons
+rm -r $SCRATCH_AREA
 #
 exit 0
