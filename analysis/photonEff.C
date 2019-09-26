@@ -59,29 +59,40 @@ void makephotonM(TChain* ttree,TFile* out_file){
   ttree->ResetBranchAddresses();
 }
 
-void makeVtxR(TChain* ttree,TFile* out_file){
+void makeVtxR(TChain* ttree, TTree* vtxTree,TFile* out_file){
   float vtxr;
+  float vtxX;
+  float vtxY;
   float tvtxr;
   ttree->SetBranchAddress("vtx_radius",&vtxr);
   ttree->SetBranchAddress("tvtx_radius",&tvtxr);
+  vtxTree->SetBranchAddress("vtx_x",&vtxX);
+  vtxTree->SetBranchAddress("vtx_y",&vtxY);
 
   std::vector<TH1F*> plots;
   plots.push_back(new TH1F("vtx_reco","",40,0,30));
+  plots.push_back(new TH1F("vtx_corrected","",40,0,30));
   plots.push_back(new TH1F("vtx_truth","",40,0,30));
 
   plots[0]->Sumw2();
   plots[1]->Sumw2();
+  plots[2]->Sumw2();
 
   double calc=0;
   for (int event = 0; event < ttree->GetEntries(); ++event)
   {
     ttree->GetEvent(event);
     plots[0]->Fill(vtxr);
-    plots[1]->Fill(tvtxr);
+    plots[2]->Fill(tvtxr);
     calc+=TMath::Abs(vtxr-tvtxr);
   }
   calc/=ttree->GetEntries();
-  for (int i = 0; i < 2; ++i)
+  for (int i = 0; i < vtxTree->GetEntries(); ++i)
+  {
+    vtxTree->GetEvent(event);
+    plots[1]->Fill(sqrt(vtxX*vtxX+vtxY*vtxY));
+  }
+  for (int i = 0; i < 3; ++i)
   {
     plots[i]->Scale(1./ttree->GetEntries(),"width");
   }
@@ -411,24 +422,24 @@ TH1F* addSpec(TH1F* soft,TH1F* hard,TFile* file){
 void photonEff()
 {
   TFile *out_file = new TFile("effplots.root","UPDATE");
-  //string treePath = "/sphenix/user/vassalli/RecoConversionTests/truthconversionembededonlineanalysis";
+  /tring treePath = "/sphenix/user/vassalli/RecoConversionTests/truthconversionembededAnaAdded.root";
 
-  string softPath = "/sphenix/user/vassalli/minBiasPythia/softana.root";
+  //string softPath = "/sphenix/user/vassalli/minBiasPythia/softana.root";
   //string hard0Path = "/sphenix/user/vassalli/minBiasPythia/hard0ana.root";
-  string hard4Path = "/sphenix/user/vassalli/minBiasPythia/hard4ana.root";
-  TChain *softTree = new TChain("photonTree");
+  //string hard4Path = "/sphenix/user/vassalli/minBiasPythia/hard4ana.root";
+  //TChain *softTree = new TChain("photonTree");
   //TChain *hard0Tree = new TChain("photonTree");
-  TChain *hard4Tree = new TChain("photonTree");
-  softTree->Add(softPath.c_str());
+  //TChain *hard4Tree = new TChain("photonTree");
+  //softTree->Add(softPath.c_str());
   //hard0Tree->Add(hard0Path.c_str());
-  hard4Tree->Add(hard4Path.c_str());
+  //hard4Tree->Add(hard4Path.c_str());
   //TChain *ttree2 = handleFile(treePath,treeExtension,"vtxingTree",nFiles);
   //makephotonM(ttree,out_file);
-  auto pythiaSpec=makePythiaSpec(softTree,out_file,"soft");
+  //auto pythiaSpec=makePythiaSpec(softTree,out_file,"soft");
   //makePythiaSpec(hard0Tree,out_file,"hard0");
-  auto hardSpec = makePythiaSpec(hard4Tree,out_file,"hard4");
+  //auto hardSpec = makePythiaSpec(hard4Tree,out_file,"hard4");
   //chopHard(*hardSpec,*pythiaSpec);
-  pythiaSpec = addSpec(pythiaSpec,hardSpec,out_file);
+  //pythiaSpec = addSpec(pythiaSpec,hardSpec,out_file);
   //calculateConversionRate(makepTRes(ttree,observations,out_file),pythiaSpec,out_file);
   //makeVtxRes(ttree,out_file);
   //makeVtxEff(ttree,out_file);
