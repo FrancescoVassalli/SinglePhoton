@@ -57,9 +57,10 @@ void makephotonM(TChain* ttree,TChain* back,TFile* out_file){
   for (int event = 0; event < back->GetEntries(); ++event)
   {
     back->GetEvent(event);
-    plots[0]->Fill(back_m);
+    plots[1]->Fill(back_m);
     // plots[1]->Fill(rephoton_m);
   }
+  cout<<"Background mass in range count= "<<plots[1]->Integral()<<'\n';
   for (int i = 0; i < plots.size(); ++i)
   {
     plots[i]->Scale(1./ttree->GetEntries(),"width");
