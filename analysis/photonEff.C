@@ -174,7 +174,7 @@ void makepTRes(TChain* ttree){
     ttree->GetEvent(event);
     if(pT>0)pTRes->Fill((pT-tpT)/tpT);
   }
-  pTRes->Scale(1./pTRes->Integral());
+  //pTRes->Scale(1./pTRes->Integral());
   ttree->ResetBranchAddresses();
   pTRes->Write();
 }
