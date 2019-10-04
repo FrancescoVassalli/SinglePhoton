@@ -107,7 +107,7 @@ void makeVtxR(TChain* ttree, TTree* vtxTree,TFile* out_file){
   }
   for (int i = 0; i < 3; ++i)
   {
-    plots[i]->Scale(1./plots[i]->GetEntries(),"width");
+    plots[i]->Scale(1./plots[2]->GetEntries(),"width");
   }
   out_file->Write();
   std::cout<<"mean deviation="<<calc<<std::endl;
