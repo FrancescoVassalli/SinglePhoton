@@ -167,12 +167,12 @@ void makepTRes(TChain* ttree){
   float tpT;
   ttree->SetBranchAddress("photon_pT",&pT);
   ttree->SetBranchAddress("tphoton_pT",&tpT);
-  TH1F *pTRes = new TH1F("#frac{#it{p}^{T}_{reco}-#it{p}^{T}_{truth}}{#it{p}_{#it{truth}}^{T}}","",40,-2,2);
+  TH1F *pTRes = new TH1F("#frac{#it{p}^{T}_{reco}}{#it{p}_{#it{truth}}^{T}}","",40,-2,2);
   pTRes->Sumw2();
   for (int event = 0; event < ttree->GetEntries(); ++event)
   {
     ttree->GetEvent(event);
-    if(pT>0)pTRes->Fill((pT-tpT)/tpT);
+    if(pT>0)pTRes->Fill(pT/tpT);
   }
   pTRes->Scale(1./pTRes->Integral());
   ttree->ResetBranchAddresses();
