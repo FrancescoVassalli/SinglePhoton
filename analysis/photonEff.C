@@ -174,7 +174,7 @@ void makepTRes(TChain* ttree){
     ttree->GetEvent(event);
     if(pT>0)pTRes->Fill((pT-tpT)/tpT);
   }
-  //pTRes->Scale(1./pTRes->Integral());
+  pTRes->Scale(1./pTRes->Integral());
   ttree->ResetBranchAddresses();
   pTRes->Write();
 }
@@ -356,10 +356,13 @@ void makepTCaloGraph(string filename,TFile* outfile){
     cout<<"file error"<<endl;
     if(!caloFile.is_open()) cout<<"file not opened"<<endl;
     }*/
+  double integral=0;
   while(caloFile >>x>>s>>y){
     xData.push_back(x);
     yData.push_back(y);
+    integral+=x*y;
   }
+  for(auto a : yData) a/=integral;
   double *xArray, *yArray;
   xArray=&xData[0];
   yArray=&yData[0];
