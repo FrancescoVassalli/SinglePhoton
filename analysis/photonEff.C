@@ -364,7 +364,9 @@ void makepTCaloGraph(string filename,TFile* outfile){
     integral+=(x-lastx)*y;
     lastx=x;
   }
-  for(auto a : yData) a/=integral;
+  for(unsigned i=0; i<xData.size();i++){
+    yData[i]=yData[i]/integral;
+  } 
   double *xArray, *yArray;
   xArray=&xData[0];
   yArray=&yData[0];
