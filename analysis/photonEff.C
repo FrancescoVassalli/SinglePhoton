@@ -357,10 +357,12 @@ void makepTCaloGraph(string filename,TFile* outfile){
     if(!caloFile.is_open()) cout<<"file not opened"<<endl;
     }*/
   double integral=0;
+  double lastx=0.2;
   while(caloFile >>x>>s>>y){
     xData.push_back(x);
     yData.push_back(y);
-    integral+=x*y;
+    integral+=(x-lastx)*y;
+    lastx=x;
   }
   for(auto a : yData) a/=integral;
   double *xArray, *yArray;
