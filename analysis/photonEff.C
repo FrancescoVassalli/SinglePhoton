@@ -37,10 +37,12 @@ void makephotonM(TChain* ttree,TChain* back,TFile* out_file){
   float tphoton_m;
   float back_m;
   float back_Vtx;
+  float back_pt;
   std::vector<TH1F*> plots;
   ttree->SetBranchAddress("photon_m",     &photon_m   );
   back->SetBranchAddress("photon_m",     &back_m   );
   back->SetBranchAddress("vtx_radius",     &back_Vtx   );
+  back->SetBranchAddress("track_pT",     &back_pt   );
   //ttree->SetBranchAddress("rephoton_m",     &rephoton_m   );
   plots.push_back(new TH1F("m^{#gamma}_{reco}","",60,0,.18));
   plots.push_back(new TH1F("m^{bkgd}_{reco}","",60,0,.18));
@@ -59,7 +61,7 @@ void makephotonM(TChain* ttree,TChain* back,TFile* out_file){
   for (int event = 0; event < back->GetEntries(); ++event)
   {
     back->GetEvent(event);
-    if(back_Vtx<21.)
+    if(back_Vtx<21.&&back_pt>2.5)
     plots[1]->Fill(back_m);
     // plots[1]->Fill(rephoton_m);
   }
