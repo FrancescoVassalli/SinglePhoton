@@ -162,11 +162,24 @@ void makeVtxEff(TChain* ttree,TFile* out_file){
   ttree->ResetBranchAddresses();
 }
 
-void pTResFunction(TH2F* plot2d){
-
+void makepTRes(TChain* ttree){
+  float pT;
+  float tpT;
+  ttree->SetBranchAddress("photon_pT",&pT);
+  ttree->SetBranchAddress("tphoton_pT",&tpT);
+  TH1F *pTRes = new TH1F("#frac{#it{p}^{T}}{#it{p}_{#it{truth}}^{T}}","",40,-2,2);
+  pTRes->Sumw2();
+  for (int event = 0; event < ttree->GetEntries(); ++event)
+  {
+    ttree->GetEvent(event);
+    if(pT>0)pTRes->Fill((pT-tpT)/tpT);
+  }
+  pTRes->Scale(1./pTRes->Integral());
+  ttree->ResetBranchAddresses();
+  pTRes->Write();
 }
 
-TEfficiency* makepTRes(TChain* ttree,TTree* allTree,TFile* out_file){
+TEfficiency* makepTDist(TChain* ttree,TTree* allTree,TFile* out_file){
   float pT;
   float tpT;
   float track_pT;
@@ -486,9 +499,10 @@ void photonEff()
   //auto hardSpec = makePythiaSpec(hard4Tree,out_file,"hard4");
   //chopHard(*hardSpec,*pythiaSpec);
   //pythiaSpec = addSpec(pythiaSpec,hardSpec,out_file);
-  //calculateConversionRate(makepTRes(ttree,observations,out_file),pythiaSpec,out_file);
+  //makepTDist(ttree,observations,out_file);
   makeVtxRes(ttree,out_file);
   makeVtxEff(ttree,out_file);
+  makepTRes(ttree);
   compareDeta(ttree,pairBackTree);
   //testCuts(ttree,out_file);
   makepTCaloGraph("pTcalodata.csv",out_file);
