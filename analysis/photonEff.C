@@ -95,7 +95,7 @@ void makeVtxR(TChain* ttree, TTree* vtxTree,TFile* out_file){
   for (int event = 0; event < ttree->GetEntries(); ++event)
   {
     ttree->GetEvent(event);
-    plots[0]->Fill(vtxr);
+    plots[1]->Fill(vtxr);
     plots[2]->Fill(tvtxr);
     calc+=TMath::Abs(vtxr-tvtxr);
   }
@@ -103,7 +103,7 @@ void makeVtxR(TChain* ttree, TTree* vtxTree,TFile* out_file){
   for (int i = 0; i < vtxTree->GetEntries(); ++i)
   {
     vtxTree->GetEvent(i);
-    plots[1]->Fill(sqrt(vtxX*vtxX+vtxY*vtxY));
+    plots[0]->Fill(sqrt(vtxX*vtxX+vtxY*vtxY));
   }
   for (int i = 0; i < 3; ++i)
   {
