@@ -491,7 +491,7 @@ void photonEff()
   makeVtxEff(ttree,out_file);
   compareDeta(ttree,pairBackTree);
   //testCuts(ttree,out_file);
-  //makepTCaloGraph("pTcalodata.csv",out_file);
+  makepTCaloGraph("pTcalodata.csv",out_file);
   makeVtxR(ttree,vertexingTree,out_file);
   //makeRefitDist(ttree,out_file);
 }
