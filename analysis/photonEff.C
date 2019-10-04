@@ -138,8 +138,10 @@ void makeVtxRes(TChain* ttree,TFile* out_file){
 void makeVtxEff(TChain* ttree,TFile* out_file){
   float r;
   float tr;
+  float pT;
   ttree->SetBranchAddress("vtx_radius",&r);
   ttree->SetBranchAddress("tvtx_radius",&tr);
+  ttree->SetBranchAddress("track_pT",&pT);
   TEfficiency *vtxEff;
   TH1F *recoR= new TH1F("vtxrecoR","",20,0,21);
   TH1F *truthR= new TH1F("vtxtruthR","",20,0,21);
@@ -148,7 +150,7 @@ void makeVtxEff(TChain* ttree,TFile* out_file){
   for (int event = 0; event < ttree->GetEntries(); ++event)
   {
     ttree->GetEvent(event);
-    if(r>0) recoR->Fill(tr);
+    if(r>0&&r<21&&pT>2.5) recoR->Fill(tr);
     truthR->Fill(tr);
   }
   vtxEff = new TEfficiency(*recoR,*truthR);
