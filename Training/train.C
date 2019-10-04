@@ -61,7 +61,7 @@ void makeFactory(TTree* signalTree, TTree* backTree,std::string outfile,std::str
   string track_deta_cut = ".0082>=track_deta";
   string track_dlayer_cut = "2>=abs(track_dlayer)";
   string approach_dist_cut = "69.34>approach_dist>0";
-  string vtx_radius_cut = "vtx_radius>0";
+  string vtx_radius_cut = "vtx_radius>0&&vtx_radius<21";
   string tCutInitializer = track_pT_cut+"&&"+em_prob_cut+"&&"+track_layer_cut+"&&"+track_deta_cut+"&&"+vtx_radius_cut;
   TCut preTraingCuts(tCutInitializer.c_str());
 
