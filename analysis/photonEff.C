@@ -83,9 +83,9 @@ void makeVtxR(TChain* ttree, TTree* vtxTree,TFile* out_file){
   vtxTree->SetBranchAddress("vtx_y",&vtxY);
 
   std::vector<TH1F*> plots;
-  plots.push_back(new TH1F("vtx_reco","",40,0,30));
-  plots.push_back(new TH1F("vtx_corrected","",40,0,30));
-  plots.push_back(new TH1F("vtx_truth","",40,0,30));
+  plots.push_back(new TH1F("vtx_reco","",40,0,40));
+  plots.push_back(new TH1F("vtx_corrected","",40,0,40));
+  plots.push_back(new TH1F("vtx_truth","",40,0,40));
 
   plots[0]->Sumw2();
   plots[1]->Sumw2();
