@@ -150,7 +150,7 @@ void makeVtxEff(TChain* ttree,TFile* out_file){
   for (int event = 0; event < ttree->GetEntries(); ++event)
   {
     ttree->GetEvent(event);
-    if(r>0&&r<21&&pT>2.5) recoR->Fill(tr);
+    if(r>0) recoR->Fill(tr);
     truthR->Fill(tr);
   }
   vtxEff = new TEfficiency(*recoR,*truthR);
