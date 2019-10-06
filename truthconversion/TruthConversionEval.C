@@ -393,7 +393,7 @@ void TruthConversionEval::numUnique(std::map<int,Conversion> *mymap=NULL,SvtxTra
 	}//map loop
 }
 
-void TruthConversionEval::cleanBackground(std::map<int,Conversion> *mymap=NULL,std::vector<SvtxTrack*> *v_tracks){
+void TruthConversionEval::cleanBackground(std::map<int,Conversion> *mymap,std::vector<SvtxTrack*> *v_tracks){
 	std::vector<SvtxTrack*>::iterator prev;
 	bool erase=false;
 	for(auto a : *mymap){
@@ -406,10 +406,10 @@ void TruthConversionEval::cleanBackground(std::map<int,Conversion> *mymap=NULL,s
 					v_tracks->erase(prev);
 					erase=false;
 				}
-				TLorentzVector *track_tlv = tracktoTLV(iTrack);
+				TLorentzVector *track_tlv = tracktoTLV(*iTrack);
 				TLorentzVector *truth_tlv1 = particletoTLV(thisConversion.getElectron());
 				TLorentzVector *truth_tlv2 = particletoTLV(thisConversion.getPositron());
-				if (track_tlv.DeltaR(truth_tlv1)<.2||track_tlv.DeltaR(truth_tlv2)<.2)
+				if (track_tlv->DeltaR(*truth_tlv1)<.2||track_tlv->DeltaR(*truth_tlv2)<.2)
 				{
 					erase=true;
 				}

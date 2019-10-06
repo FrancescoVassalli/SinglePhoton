@@ -12,8 +12,9 @@
 
 #include <fun4all/SubsysReco.h>
 #include <calobase/RawClusterContainer.h>
+#include <g4main/PHG4Particle.h>
+#include <trackbase_historic/SvtxTrack.h>
 #include <TLorentzVector.h>
-#include <PHG4Particle.h>
 #include <queue>
 
 class PHCompositeNode;
@@ -22,7 +23,6 @@ class PHG4VtxPoint;
 class SvtxTrackEval;
 class SvtxTrackMap;
 class SvtxVertex;
-class SvtxTrack;
 class SvtxHitMap;
 class SvtxHit;
 class SvtxClusterMap;
@@ -76,7 +76,7 @@ class TruthConversionEval: public SubsysReco
      * finds the clusters associated with the truth conversions*/
     void numUnique(std::map<int,Conversion>* map,SvtxTrackEval* trackEval,RawClusterContainer* mainClusterContainer,std::vector<std::pair<SvtxTrack*,SvtxTrack*>>* tightBackground);
     /// remove background that is too close to signal
-    void TruthConversionEval::cleanBackground(std::map<int,Conversion> *mymap=NULL,std::vector<SvtxTrack*> *v_tracks);
+    void cleanBackground(std::map<int,Conversion> *mymap,std::vector<SvtxTrack*> *v_tracks);
     ///fills the member fields for all the background trees
     void processTrackBackground(std::vector<SvtxTrack*>*v,SvtxTrackEval*);
     void recordConversion(Conversion *conversion,TLorentzVector *tlv_photon,TLorentzVector *tlv_electron, TLorentzVector *tlv_positron);
