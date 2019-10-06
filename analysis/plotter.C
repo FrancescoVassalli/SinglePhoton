@@ -12,12 +12,17 @@ void photon_m(TFile* thisFile){
 	std::vector<TH1F*> plots;
 	//plots.push_back((TH1F*) thisFile->Get("m^{#gamma}_{recoRefit}"));
 	plots.push_back((TH1F*) thisFile->Get("m^{#gamma}_{reco}"));
+	plots.push_back((TH1F*) thisFile->Get("m^{bkgd}_{reco}"));
 
 	TCanvas* tc = new TCanvas();
 	tc->Draw();
-	//TLegend* tl = new TLegend(.7,.7,.9,.9);
+	TLegend* tl = new TLegend(.7,.7,.9,.9);
 	//plots[0]->SetLineColor(kRed);
-	//plots[1]->SetLineColor(kGreen+2);
+	plots[0]->SetMarkerStyle(kFullCircle);
+	plots[1]->SetMarkerStyle(kFullTriangleUp);
+	plots[1]->SetLineColor(kGreen+2);
+	plots[1]->SetMarkerColor(kGreen+2);
+
 	for (int i = 0; i < plots.size(); ++i)
 	{
 		plots[i]->SetYTitle("#frac{dN}{dm *N_{#gamma}}");
@@ -26,9 +31,9 @@ void photon_m(TFile* thisFile){
 		plots[i]->SetXTitle("invarient mass GeV/c^{2}");
 		if(i==0) plots[i]->Draw("e1");
 		else plots[i]->Draw("e1 same");
-		//tl->AddEntry(plots[i],plots[i]->GetName(),"l");
+		tl->AddEntry(plots[i],plots[i]->GetName(),"l");
 	}
-	//tl->Draw();
+	tl->Draw();
 	//tc->SaveAs("plots/gamma_dm_eff.pdf");	
 }
 
@@ -83,7 +88,7 @@ void vtxRes2D(TFile *thisFile){
 	TCanvas* tc = new TCanvas();
 	tc->Draw();
 	plot->SetXTitle("radius_{#it{truth}} [cm]");
-	plot->SetYTitle("conversion vertex radius resolution");
+	plot->SetYTitle("#frac{r_{#it{reco}}-r_{#it{truth}}}{r_{#it{truth}}}");
 	//plot->SetZTitle("1/N #Delta#it{p}^{T}");
 	plot->Draw("colz");
 }
@@ -93,7 +98,7 @@ void vtxEff(TFile *thisFile){
 	TEfficiency *plot  = (TEfficiency*) thisFile->Get("vtxEff");
 	TCanvas* tc = new TCanvas();
 	tc->Draw();
-	plot->SetTitle(";radius_{#it{truth}} [cm];conversion vertex reco efficiency");
+	plot->SetTitle(";radius_{#it{truth}} [cm];#frac{N_{reco}}{N_{truth}}");
 	plot->Draw("");
 }
 
@@ -132,7 +137,7 @@ void compareDeta(TFile *thisFile, bool zoom=true){
 		sig= (TH1F*) sig->Rebin(100);
 		back= (TH1F*) back->Rebin(100);
 	}
-	sig->GetYaxis()->SetTitleOffset(1);
+	sig->GetYaxis()->SetTitleOffset(1);	
 	sig->Draw("p");
 	back->SetLineColor(kRed);
 	back->SetMarkerColor(kRed);
@@ -164,19 +169,26 @@ void signalVtxR(TFile *thisFile){
 
 void vtxR(TFile *thisFile){
 	gStyle->SetOptStat(0);
-	TH1F *plotTruth  = (TH1F*) thisFile->Get("truthDist");
-	TH1F *plotReco  = (TH1F*) thisFile->Get("recoDist");
-	TH1F *plotCorr = (TH1F*) thisFile->Get("correctedDist");
+	TH1F *plotTruth  = (TH1F*) thisFile->Get("vtx_truth");
+	TH1F *plotReco  = (TH1F*) thisFile->Get("vtx_reco");
+	TH1F *plotCorr = (TH1F*) thisFile->Get("vtx_corrected");
+	TEfficiency *eff = (TEfficiency*) thisFile->Get("vtxEff");
+	plotTruth->Multiply(eff->GetPassedHistogram());
+	plotTruth->Divide(eff->GetTotalHistogram());
 	plotReco->SetLineColor(kRed);
 	plotReco->SetMarkerColor(kRed);
 	plotCorr->SetLineColor(kGreen+2);
 	plotCorr->SetMarkerColor(kGreen+2);
+	plotReco->SetMarkerStyle(kOpenSquare);
+	plotTruth->SetMarkerStyle(kFullCircle);
+	plotCorr->SetMarkerStyle(kFullTriangleUp);
 	TCanvas* tc = new TCanvas();
 	tc->Draw();
+	tc->SetTicky();
 	TLegend *tl = new TLegend(.8,.8,.9,.9);
-	tl->AddEntry(plotTruth,"Truth","l");
-	tl->AddEntry(plotReco,"Reco","l");
-	tl->AddEntry(plotCorr,"Corrected Reco","l");
+	tl->AddEntry(plotTruth,"Truth","p");
+	tl->AddEntry(plotReco,"Reco","p");
+	tl->AddEntry(plotCorr,"Corrected Reco","p");
 	plotTruth->SetYTitle("1/N");
 	plotTruth->SetXTitle("r_{vtx} [cm]");
 	plotReco->Draw("e1 ");
@@ -253,6 +265,7 @@ void drawMaps(TFile *thisFile){
 	gStyle->SetOptStat(0);
 	TH2F* tmap = (TH2F*) thisFile->Get("truthMap");
 	TH2F* rmap = (TH2F*) thisFile->Get("recoMap");
+	rmap = (TH2F*) rmap->Rebin2D();
 	TCanvas *tc;
 
 	if (tmap)
@@ -285,17 +298,17 @@ void plotter(){
 	//recoRefit(thisFile);
 	pTRes(thisFile);
 	//pTRes2D(thisFile);
-	//vtxRes(thisFile);
-	//vtxRes2D(thisFile);
-	//vtxEff(thisFile);
+	vtxRes(thisFile);
+	vtxRes2D(thisFile);
+	vtxEff(thisFile);
 	//layer(thisFile);
 	//dlayer(thisFile);
 	//deta(thisFile);
 	//signalVtxR(thisFile);
-	//vtxR(thisOtherFile);
+	vtxR(thisFile);
 	//truthPtMix(thisFile);
-	compareDeta(thisFile);
-	compareDeta(thisFile,false);
+	//compareDeta(thisFile);
+	//compareDeta(thisFile,false);
 	drawMaps(thisOtherFile);
 	//TFile *backFile = new TFile("backplots.root","READ");
 
