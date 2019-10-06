@@ -12,7 +12,6 @@
 #include <calobase/RawClusterv1.h>
 
 #include <g4main/PHG4TruthInfoContainer.h>	
-#include <g4main/PHG4Particle.h>
 #include <g4main/PHG4Particlev1.h>
 #include <g4main/PHG4Particlev2.h>
 #include <g4main/PHG4VtxPoint.h>
@@ -45,7 +44,6 @@
 
 #include <TFile.h>
 #include <TTree.h>
-#include <TLorentzVector.h>
 
 #include <math.h>
 #include <utility>
@@ -306,6 +304,7 @@ int TruthConversionEval::process_event(PHCompositeNode *topNode)
 	}
 	//pass the map to this helper method which fills the fields for the TTree 
 	numUnique(&mapConversions,trackeval,_mainClusterContainer,&tightbackgroundTrackPairs);
+	cleanBackground(&mapConversions,&backgroundTracks);
 	/*Deprecated
 	 * if (Verbosity()==10)
 	 {
@@ -380,7 +379,7 @@ void TruthConversionEval::numUnique(std::map<int,Conversion> *mymap=NULL,SvtxTra
 						}
 					case 0: //no reco tracks
 						//TODO maybe try to find the reco tracks? for now just record the bad info
-            recordConversion(&(i->second),&tlv_photon,&tlv_electron,&tlv_positron);
+            			recordConversion(&(i->second),&tlv_photon,&tlv_electron,&tlv_positron);
 						break;
 					default:
 						if (Verbosity()>1)
@@ -392,6 +391,31 @@ void TruthConversionEval::numUnique(std::map<int,Conversion> *mymap=NULL,SvtxTra
 			}//rapidity cut
 		}// has 2 truth tracks
 	}//map loop
+}
+
+void TruthConversionEval::cleanBackground(std::map<int,Conversion> *mymap=NULL,std::vector<SvtxTrack*> *v_tracks){
+	std::vector<SvtxTrack*>::iterator prev;
+	bool erase=false;
+	for(auto a : *mymap){
+		Conversion thisConversion = a.second;
+		if (thisConversion.recoCount()!=2&&thisConversion.hasPair())//try to reduce background from events with truth pairs without reco pairs
+		{
+			for (std::vector<SvtxTrack*>::iterator iTrack = v_tracks->begin(); iTrack != v_tracks->end(); prev=iTrack++)
+			{
+				if (erase) {
+					v_tracks->erase(prev);
+					erase=false;
+				}
+				TLorentzVector *track_tlv = tracktoTLV(iTrack);
+				TLorentzVector *truth_tlv1 = particletoTLV(thisConversion.getElectron());
+				TLorentzVector *truth_tlv2 = particletoTLV(thisConversion.getPositron());
+				if (track_tlv.DeltaR(truth_tlv1)<.2||track_tlv.DeltaR(truth_tlv2)<.2)
+				{
+					erase=true;
+				}
+			}
+		}
+	}
 }
 
 //only call if _kMakeTTree is true
