@@ -34,13 +34,26 @@ void photon_m(TFile* thisFile){
 
 void pTRes(TFile *thisFile){
 	gStyle->SetOptStat(0);
-	TH1F *plot  = (TH1F*) thisFile->Get("#frac{#Delta#it{p}^{T}}{#it{p}_{#it{truth}}^{T}}");
-	//TGraph *graph  = (TH1F*) thisFile->Get("#frac{#Delta#it{p}^{T}}{#it{p}_{#it{truth}}^{T}}");
+	TH1F *plot  = (TH1F*) thisFile->Get("#frac{#it{p}^{T}_{reco}}{#it{p}_{#it{truth}}^{T}}");
+	TGraph *graph  = (TGraph*) thisFile->Get("calopTRes");
+	graph->Print("all");
+	double graphMax = 0;
+	cout<<"here: "<<graphMax<<endl;
+	for (int i=0;i<graph->GetN();i++) if(graph->GetY()[i]>graphMax) graphMax = graph->GetY()[i];
+	double scale  = graphMax / plot->GetMaximum();
+	for (int i=0;i<graph->GetN();i++) graph->GetY()[i] /= scale;
+	graph->SetMarkerSize(.4);
 	TCanvas* tc = new TCanvas();
+	TLegend *tl = new TLegend(.7,.7,.9,.9);
+	tl->AddEntry(plot,"Converted","l");
+	tl->AddEntry(graph,"Unconverted", "p");
 	tc->Draw();
 	plot->GetXaxis()->SetTitle(plot->GetName());
-	plot->GetYaxis()->SetTitle("1/N #frac{#Delta#it{p}^{T}}{#it{p}_{#it{truth}}^{T}}");
-	plot->Draw("e1");
+	plot->GetYaxis()->SetTitle("1/N");
+	plot->DrawCopy("e1");
+	graph->Draw("P*");
+	graph->Print("all");
+	tl->Draw();
 }
 
 void pTRes2D(TFile *thisFile){
@@ -270,7 +283,7 @@ void plotter(){
 	TFile *thisOtherFile = new TFile("maps.root","READ");
 	photon_m(thisFile);
 	//recoRefit(thisFile);
-	//pTRes(thisFile);
+	pTRes(thisFile);
 	//pTRes2D(thisFile);
 	//vtxRes(thisFile);
 	//vtxRes2D(thisFile);
