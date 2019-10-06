@@ -72,6 +72,7 @@ int TruthConversionEval::InitRun(PHCompositeNode *topNode)
 		_runNumber=_kRunNumber;
 		_f = new TFile( _foutname.c_str(), "RECREATE");
 		_observTree = new TTree("observTree","per event observables");
+		_observTree->SetAutoSave(300);
 		_observTree->Branch("nMatched", &_b_nMatched);
 		_observTree->Branch("nUnmatched", &_b_nUnmatched);
 		_observTree->Branch("truth_pT", &_b_truth_pT);
@@ -390,18 +391,25 @@ void TruthConversionEval::numUnique(std::map<int,Conversion> *mymap=NULL,SvtxTra
 				}//switch
 			}//rapidity cut
 		}// has 2 truth tracks
+    cout<<"map loop"<<endl;
 	}//map loop
+  cout<<"done num"<<endl;
 }
 
 void TruthConversionEval::cleanBackground(std::map<int,Conversion> *mymap,std::vector<SvtxTrack*> *v_tracks){
+  cout<<"cleaning"<<endl;
 	std::vector<SvtxTrack*>::iterator prev;
 	bool erase=false;
 	for(auto a : *mymap){
 		Conversion thisConversion = a.second;
+    cout<<"got conversion"<<endl;
+    cout<<"count="<<thisConversion.recoCount()<<endl;
+    cout<<"pair="<<thisConversion.hasPair()<<endl;
 		if (thisConversion.recoCount()!=2&&thisConversion.hasPair())//try to reduce background from events with truth pairs without reco pairs
 		{
-			for (std::vector<SvtxTrack*>::iterator iTrack = v_tracks->begin(); iTrack != v_tracks->end(); prev=iTrack++)
+			for (std::vector<SvtxTrack*>::iterator iTrack = v_tracks->begin(); iTrack != v_tracks->end(); iTrack++)
 			{
+        cout<<"here clean"<<endl;
 				if (erase) {
 					v_tracks->erase(prev);
 					erase=false;
@@ -413,7 +421,8 @@ void TruthConversionEval::cleanBackground(std::map<int,Conversion> *mymap,std::v
 				{
 					erase=true;
 				}
-			}
+        prev=iTrack;
+			}//track loop
 		}
 	}
 }
@@ -659,7 +668,6 @@ void TruthConversionEval::recordConversion(Conversion *conversion,TLorentzVector
 		if(_mainClusterContainer->getCluster(clusterIds.first)){//if there is matching cluster 
 			clustemp =   dynamic_cast<RawCluster*>(_mainClusterContainer->getCluster(clusterIds.first)->CloneMe());
 			//this is for cluster subtraction which will not be implented soon
-
 			// _conversionClusters.AddCluster(clustemp); //add the calo cluster to the container
 			if (_kMakeTTree)
 			{
@@ -728,6 +736,7 @@ void TruthConversionEval::recordConversion(Conversion *conversion,TLorentzVector
 		//truth vertex info
 		_b_tvtx_radius = sqrt(conversion->getVtx()->get_x()*conversion->getVtx()->get_x()+conversion->getVtx()->get_y()*conversion->getVtx()->get_y());
 		TVector3 tVertPos(conversion->getVtx()->get_x(),conversion->getVtx()->get_y(),conversion->getVtx()->get_z());
+    cout<<"still here"<<endl;
 		_b_tvtx_phi = tVertPos.Phi();
 		_b_tvtx_eta = tVertPos.Eta();
 		_b_tvtx_z = tVertPos.Z();
@@ -792,6 +801,7 @@ void TruthConversionEval::recordConversion(Conversion *conversion,TLorentzVector
 			}
 		}
 	}
+  cout<<"Filling"<<endl;
 	_signalCutTree->Fill();  
 }
 
