@@ -497,6 +497,7 @@ void TruthConversionEval::processTrackBackground(std::vector<SvtxTrack*> *v_trac
 				genfit::GFRaveVertex* recoVert = _vertexer->findSecondaryVertex(iTrack,jTrack);
 				if (recoVert)
 				{
+					recoVert=pairMath.correctSecondaryVertex(_vertexer,recoVert,iTrack,jTrack);
 					TVector3 recoVertPos = recoVert->getPos();
 					_bb_vtx_radius = sqrt(recoVertPos.x()*recoVertPos.x()+recoVertPos.y()*recoVertPos.y());
 					_bb_vtx_chi2 = recoVert->getChi2();
