@@ -454,7 +454,7 @@ double hardWeightFactor(TH1F* hard,TH1F* soft, unsigned matchBin, double* error)
   double hardTotal=hard->Integral(matchBin,hard->GetNbinsX());
   double softTotal=soft->Integral(matchBin,soft->GetNbinsX());
   double r= softTotal/hardTotal;
-  *error = (softTotal+TMath::Power(softTotal,-1./2))/hardTotal;
+  *error = (softTotal+TMath::Power(softTotal,1./2))/hardTotal;
   cout<<soft->Integral(matchBin,soft->GetNbinsX())<<endl;
   cout<<hard->Integral(matchBin,soft->GetNbinsX())<<endl;
   return r;
