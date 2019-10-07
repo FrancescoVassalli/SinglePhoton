@@ -32,20 +32,14 @@ TChain* handleFile(string name, string extension, string treename, unsigned int 
   return all;
 }
 
-void makephotonM(TChain* ttree,TChain* back,TFile* out_file){
+void makephotonM(TChain* ttree,TFile* out_file){
   float photon_m;
   float tphoton_m;
-  float back_m;
-  float back_Vtx;
-  float back_pt;
   std::vector<TH1F*> plots;
   ttree->SetBranchAddress("photon_m",     &photon_m   );
-  back->SetBranchAddress("photon_m",     &back_m   );
-  back->SetBranchAddress("vtx_radius",     &back_Vtx   );
-  back->SetBranchAddress("track_pT",     &back_pt   );
   //ttree->SetBranchAddress("rephoton_m",     &rephoton_m   );
   plots.push_back(new TH1F("m^{#gamma}_{reco}","",60,0,.18));
-  plots.push_back(new TH1F("m^{bkgd}_{reco}","",60,0,.18));
+  //plots.push_back(new TH1F("m^{bkgd}_{reco}","",60,0,.18));
   //plots.push_back(new TH1F("m^{#gamma}_{recoRefit}","",40,-2,10));
 
   for (int i = 0; i < plots.size(); ++i)
@@ -58,14 +52,14 @@ void makephotonM(TChain* ttree,TChain* back,TFile* out_file){
     plots[0]->Fill(photon_m);
     // plots[1]->Fill(rephoton_m);
   }
-  for (int event = 0; event < back->GetEntries(); ++event)
+  /*for (int event = 0; event < back->GetEntries(); ++event)
   {
     back->GetEvent(event);
     if(back_Vtx<21.&&back_pt>2.5)
     plots[1]->Fill(back_m);
     // plots[1]->Fill(rephoton_m);
-  }
-  cout<<"Background mass in range count= "<<plots[1]->Integral()<<'\n';
+  }*/
+ // cout<<"Background mass in range count= "<<plots[1]->Integral()<<'\n';
   for (int i = 0; i < plots.size(); ++i)
   {
     plots[i]->Scale(1./ttree->GetEntries(),"width");
@@ -474,38 +468,38 @@ TH1F* addSpec(TH1F* soft,TH1F* hard,TFile* file){
   return combined;
 } 
 
-void photonEff()
+void photonEff2()
 {
-  TFile *out_file = new TFile("effplots.root","UPDATE");
-  //string treePath = "/sphenix/user/vassalli/gammasample/truthconversionembededanalysis";
+  TFile *out_file = new TFile("effplots2.root","UPDATE");
+  string treePath = "/sphenix/user/vassalli/gammasample/truthconversionembededanalysis";
   string treeExtension = ".root";
   unsigned int nFiles=1000;
-  string softPath = "/sphenix/user/vassalli/minBiasPythia/softana.root";
+  //string softPath = "/sphenix/user/vassalli/minBiasPythia/softana.root";
   //string hard0Path = "/sphenix/user/vassalli/minBiasPythia/hard0ana.root";
-  string hard4Path = "/sphenix/user/vassalli/minBiasPythia/hard4ana.root";
-  TChain *softTree = new TChain("photonTree");
+  //string hard4Path = "/sphenix/user/vassalli/minBiasPythia/hard4ana.root";
+  //TChain *softTree = new TChain("photonTree");
   //TChain *hard0Tree = new TChain("photonTree");
-  TChain *hard4Tree = new TChain("photonTree");
-  softTree->Add(softPath.c_str());
+  //TChain *hard4Tree = new TChain("photonTree");
+  //softTree->Add(softPath.c_str());
   //hard0Tree->Add(hard0Path.c_str());
-  hard4Tree->Add(hard4Path.c_str());
-  /*TChain *ttree = handleFile(treePath,treeExtension,"cutTreeSignal",nFiles);
+  //hard4Tree->Add(hard4Path.c_str());
+  TChain *ttree = handleFile(treePath,treeExtension,"cutTreeSignal",nFiles);
   TChain *pairBackTree = handleFile(treePath,treeExtension,"pairBackTree",nFiles);
   TChain *vtxBackTree = handleFile(treePath,treeExtension,"vtxBackTree",nFiles);
   TChain *vertexingTree = handleFile(treePath,treeExtension,"vtxingTree",nFiles);
-  makephotonM(ttree,vtxBackTree,out_file);*/
-  auto pythiaSpec=makePythiaSpec(softTree,out_file,"soft");
+  makephotonM(ttree,out_file);
+  //auto pythiaSpec=makePythiaSpec(softTree,out_file,"soft");
   //makePythiaSpec(hard0Tree,out_file,"hard0");
-  auto hardSpec = makePythiaSpec(hard4Tree,out_file,"hard4");
+  //auto hardSpec = makePythiaSpec(hard4Tree,out_file,"hard4");
   //chopHard(*hardSpec,*pythiaSpec);
-  pythiaSpec = addSpec(pythiaSpec,hardSpec,out_file);
+  //pythiaSpec = addSpec(pythiaSpec,hardSpec,out_file);
   //makepTDist(ttree,observations,out_file);
-  /*makeVtxRes(ttree,out_file);
+  makeVtxRes(ttree,out_file);
   makeVtxEff(ttree,out_file);
   makepTRes(ttree);
   compareDeta(ttree,pairBackTree);
   //testCuts(ttree,out_file);
   makepTCaloGraph("pTcalodata.csv",out_file);
-  makeVtxR(ttree,vertexingTree,out_file);*/
+  makeVtxR(ttree,vertexingTree,out_file);
   //makeRefitDist(ttree,out_file);
 }
