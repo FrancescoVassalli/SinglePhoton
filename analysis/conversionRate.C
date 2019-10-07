@@ -67,6 +67,8 @@ TEfficiency* makepTRes(TFile* out_file,TChain* ttree=NULL,TTree* allTree=NULL){
   }
   //format and save the data
   TEfficiency* uni_rate = new TEfficiency(*converted_pTspec,*all_pTspec);
+  uni_rate->SetName("uni_rate");
+  uni_rate->Write();
   pTeffPlot->Scale(1./ttree->GetEntries(),"width");
   pTefffuncPlot->Scale(1./ttree->GetEntries());
   TProfile* resProfile = pTefffuncPlot->ProfileX("func_prof",5,30);
