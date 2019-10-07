@@ -397,34 +397,33 @@ void TruthConversionEval::numUnique(std::map<int,Conversion> *mymap=NULL,SvtxTra
 }
 
 void TruthConversionEval::cleanBackground(std::map<int,Conversion> *mymap,std::vector<SvtxTrack*> *v_tracks){
-  cout<<"cleaning"<<endl;
-	std::vector<SvtxTrack*>::iterator prev;
 	bool erase=false;
-	for(auto a : *mymap){
-		Conversion thisConversion = a.second;
+	for(std::map<int,Conversion>::iterator a=mymap->begin();a!=mymap->end();a++){
+		Conversion thisConversion = a->second;
     cout<<"got conversion"<<endl;
-    cout<<"count="<<thisConversion.recoCount()<<endl;
-    cout<<"pair="<<thisConversion.hasPair()<<endl;
-		if (thisConversion.recoCount()!=2&&thisConversion.hasPair())//try to reduce background from events with truth pairs without reco pairs
-		{
-			for (std::vector<SvtxTrack*>::iterator iTrack = v_tracks->begin(); iTrack != v_tracks->end(); iTrack++)
-			{
-        cout<<"here clean"<<endl;
-				if (erase) {
-					v_tracks->erase(prev);
-					erase=false;
-				}
-				TLorentzVector *track_tlv = tracktoTLV(*iTrack);
-				TLorentzVector *truth_tlv1 = particletoTLV(thisConversion.getElectron());
-				TLorentzVector *truth_tlv2 = particletoTLV(thisConversion.getPositron());
-				if (track_tlv->DeltaR(*truth_tlv1)<.2||track_tlv->DeltaR(*truth_tlv2)<.2)
-				{
-					erase=true;
-				}
-        prev=iTrack;
-			}//track loop
-		}
-	}
+    if (thisConversion.recoCount()!=2&&thisConversion.hasPair())//try to reduce background from events with truth pairs without reco pairs
+    {
+      cout<<"here llop"<<endl;
+      for (std::vector<SvtxTrack*>::iterator iTrack = v_tracks->begin(); iTrack != v_tracks->end(); )
+      {
+        TLorentzVector *track_tlv = tracktoTLV(*iTrack);
+        TLorentzVector *truth_tlv1 = particletoTLV(thisConversion.getElectron());
+        TLorentzVector *truth_tlv2 = particletoTLV(thisConversion.getPositron());
+        cout<<"here vecs"<<endl;
+        if (track_tlv->DeltaR(*truth_tlv1)<.2||track_tlv->DeltaR(*truth_tlv2)<.2)
+        {
+          erase=true;
+        }
+        if(erase){
+          iTrack=v_tracks->erase(iTrack);
+          erase=false;
+        }
+        else iTrack++;
+      }//track loop
+      cout<<"did track loop"<<endl;
+    }
+    cout<<"did if "<<endl;
+  }
 }
 
 //only call if _kMakeTTree is true
@@ -434,6 +433,7 @@ void TruthConversionEval::processTrackBackground(std::vector<SvtxTrack*> *v_trac
 	unsigned nNullTrack=0;
 	cout<<"The total possible background track count is "<<v_tracks->size()<<'\n';
 	for (std::vector<SvtxTrack*>::iterator iter = v_tracks->begin(); iter != v_tracks->end(); ++iter) {
+    cout<<"looping"<<endl;
 		SvtxTrack* iTrack = *iter;
 		//get the SvtxTrack it must not be NULL
 		if(!iTrack){
@@ -463,6 +463,7 @@ void TruthConversionEval::processTrackBackground(std::vector<SvtxTrack*> *v_trac
 			SvtxTrack* jTrack = *jter;
 			if(!jTrack||TMath::Abs(jTrack->get_eta())>1.1)continue;
 			//record pair geometry
+      cout<<"calculations"<<endl;
 			_bb_track_deta = pairMath.trackDEta(iTrack,jTrack);
 			_bb_track_dphi = pairMath.trackDPhi(iTrack,jTrack);
 			_bb_track_dlayer = pairMath.trackDLayer(_clusterMap,iTrack,jTrack);
@@ -498,20 +499,27 @@ void TruthConversionEval::processTrackBackground(std::vector<SvtxTrack*> *v_trac
 				PHG4Particle* parent  = _truthinfo->GetParticle((*iTruthTrack)->get_parent_id());
 				if(parent) _bb_parent_pid = parent->get_pid();
 				else _bb_parent_pid=0;*/
-
+      //if the track pairs pass the pair cuts make them part of the vertex background
 			if (_bb_track_layer>=0&&_bb_track_pT>_kTightPtMin&&_bb_track_deta<_kTightDetaMax&&TMath::Abs(_bb_track_dlayer)<9)
 			{
 				//iTrack->identify();
 				//jTrack->identify();
+        cout<<"here vertex"<<endl;
+        //make the vertex
 				genfit::GFRaveVertex* recoVert = _vertexer->findSecondaryVertex(iTrack,jTrack);
+        cout<<"made vertex"<<endl;
+        //if the vertex is made record its info
 				if (recoVert)
 				{
-					recoVert=pairMath.correctSecondaryVertex(_vertexer,recoVert,iTrack,jTrack);
+					recoVert=pairMath.correctSecondaryVertex(_regressor,recoVert,iTrack,jTrack);
+          cout<<"corrected vertex"<<endl;
 					TVector3 recoVertPos = recoVert->getPos();
+          //fill the tree values 
 					_bb_vtx_radius = sqrt(recoVertPos.x()*recoVertPos.x()+recoVertPos.y()*recoVertPos.y());
 					_bb_vtx_chi2 = recoVert->getChi2();
 					_bb_vtxTrackRZ_dist = pairMath.vtxTrackRZ(recoVertPos,iTrack,jTrack);
 					_bb_vtxTrackRPhi_dist = pairMath.vtxTrackRPhi(recoVertPos,iTrack,jTrack);
+          //then make the photon
 					TLorentzVector* recoPhoton= pairMath.getRecoPhoton(iTrack,jTrack);
 					if(recoPhoton){
 						_bb_photon_m = recoPhoton->Dot(*recoPhoton);
@@ -522,17 +530,21 @@ void TruthConversionEval::processTrackBackground(std::vector<SvtxTrack*> *v_trac
 						_bb_photon_pT=-999;
 					}
 				}
-				else{
+				else{ // no vtx could be found for thre track pair
 					_bb_vtx_radius = -999;
 					_bb_vtx_chi2 = -999;
 					_bb_vtxTrackRZ_dist =-999;
 					_bb_vtxTrackRPhi_dist =-999;
 				}
+        cout<<"fill vtx"<<endl;
 				_vtxBackTree->Fill();
 			}//pair cuts
 			_pairBackTree->Fill();
+      cout<<"filled pair"<<endl;
 		}//jTrack loop
+    cout<<"filling track"<<endl;
 		_trackBackTree->Fill();
+    cout<<"filled track"<<endl;
 	}//iTrack loop
 	cout<<"Null track count ="<<nNullTrack<<'\n';
 }
