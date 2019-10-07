@@ -2,11 +2,11 @@
 @ p =  ${1}
 #
 set OUT_LOCATION="/sphenix/user/vassalli/minBiasPythia/"
-set PYTHIA_FILE=${OUT_LOCATION}pythia_soft_${p}
+set PYTHIA_FILE=${OUT_LOCATION}pythia_hard4_${p}
 #
 set SCRATCH_AREA="$_CONDOR_SCRATCH_DIR/fran_photons${p}"
 #
-set GENNAME="generator"
+set GENNAME="hardGenerator"
 #
 source /phenix/u/vassalli/.cshrc
 mkdir $SCRATCH_AREA

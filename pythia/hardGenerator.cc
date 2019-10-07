@@ -6,11 +6,11 @@ using namespace Pythia8;
 using namespace std;
 
 void generator(std::string filename, long nEvents, bool signalOnly=false){
-  using namespace HepMC;
+  /*using namespace HepMC;
   string hepName = filename+".dat";    //filenames
   HepMC::Pythia8ToHepMC ToHepMC;    // Interface for conversion from Pythia8::Event to HepMC event.
   HepMC::IO_GenEvent ascii_io(hepName, std::ios::out); //file where HepMC events will be stored.
-
+  */
   /*pythia set up*/
   Pythia pythiaengine;
   pythiaengine.readString("Beams:eCM = 200.");
