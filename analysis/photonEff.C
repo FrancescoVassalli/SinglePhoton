@@ -462,7 +462,7 @@ double hardWeightFactor(TH1F* hard,TH1F* soft, unsigned matchBin, double* error)
 
 TH1F* addSpec(TH1F* soft,TH1F* hard,TFile* file){
   TH1F* combined = new TH1F("combinedpythia","",soft->GetNbinsX(),soft->GetBinLowEdge(1),hard->GetBinLowEdge(hard->GetNbinsX()+1));
-  unsigned matchBin = 11;//getMatchingBin(hard,soft); //hard coded by eye
+  unsigned matchBin = 10;//getMatchingBin(hard,soft); //hard coded by eye
   for (int i = 1; i < matchBin; ++i)
   {
     combined->SetBinContent(i,soft->GetBinContent(i));
