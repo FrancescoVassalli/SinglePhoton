@@ -34,13 +34,13 @@ Initialdir   = /phenix/u/vassalli/sphenix/single/
 Input           = /dev/null
 
 # The job's stdout is sent to this file.
-Output       = /direct/phenix+u/vassalli/sphenix/single/condor_logs/out.p.$(Process)
+Output       = /sphenix/user/vassalli/condor_logs/out.p.$(Process)
 
 # The job's stderr is sent to this file.
-Error        = /direct/phenix+u/vassalli/sphenix/single/condor_logs/err.p.$(Process)
+Error        = /sphenix/user/vassalli/condor_logs/err.p.$(Process)
 
 # The condor log file for this job, useful when debuggin
-Log          = /direct/phenix+u/vassalli/sphenix/single/condor_logs/log.p.$(Process)
+Log          = /sphenix/user/vassalli/condor_logs/log.p.$(Process)
 
 # Email address to send notification to.
 Notify_user     = frva5829@colorado.edu
