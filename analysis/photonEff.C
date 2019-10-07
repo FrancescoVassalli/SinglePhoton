@@ -465,10 +465,11 @@ TH1F* addSpec(TH1F* soft,TH1F* hard,TFile* file){
     combined->SetBinError(i,soft->GetBinError(i));
   }
   hard->Scale(hardWeightFactor(hard,soft,matchBin));
+  double systematic= TMath::Power(soft->Integral(matchBin,soft->GetNbinsX()),-1./2);
   for (int i = matchBin; i < combined->GetNbinsX()+1; ++i)
   {
     combined->SetBinContent(i,hard->GetBinContent(i));
-    combined->SetBinError(i,hard->GetBinError(i));
+    combined->SetBinError(i,sqrt(hard->GetBinError(i)*hard->GetBinError(i)+systematic*systematic));
   }
   file->Write();
   return combined;
