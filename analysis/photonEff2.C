@@ -471,7 +471,7 @@ TH1F* addSpec(TH1F* soft,TH1F* hard,TFile* file){
 void photonEff2()
 {
   TFile *out_file = new TFile("effplots2.root","UPDATE");
-  string treePath = "/sphenix/user/vassalli/gammasample/truthconversionembededanalysis";
+  string treePath = "/sphenix/user/vassalli/gammasample/embeded/truthconversionembededanalysis";
   string treeExtension = ".root";
   unsigned int nFiles=1000;
   //string softPath = "/sphenix/user/vassalli/minBiasPythia/softana.root";

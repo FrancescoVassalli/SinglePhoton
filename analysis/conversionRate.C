@@ -12,10 +12,19 @@ TChain* handleFile(string name, string extension, string treename, unsigned int 
   }
   return all;
 }
+
+/**makes a TEff holding the hists for a uniform conversion rate
+ * @param out_file file data is saved to this is used for read and write needs converted and truth pT spectra to be inside these are created by photonEff
+ * if the pT spectra are not inside the file @param ttree and @param allTree will be used to calculate these spectra
+ * @param ttree tree for converted data 
+ * @param allTree tree for nonconverted data 
+ * @return NULL if the spectra are not in the existing data and the passes trees are not valid*/
 TEfficiency* makepTRes(TFile* out_file,TChain* ttree=NULL,TTree* allTree=NULL){
+  //check if the spectra are in the file
   out_file->ReOpen("READ");
   if(out_file->Get("converted_photon_truth_pT")&&out_file->Get("all_photon_truth_pT")) 
     return new TEfficiency(*(TH1F*)out_file->Get("converted_photon_truth_pT"),*(TH1F*)out_file->Get("all_photon_truth_pT"));
+  //if they are not in the file check if the trees are NULL
   else if(!ttree||!allTree){
     return NULL;
   }
@@ -39,6 +48,7 @@ TEfficiency* makepTRes(TFile* out_file,TChain* ttree=NULL,TTree* allTree=NULL){
   all_pTspec->Sumw2();
   pTefffuncPlot->Sumw2();
   //TODO need to turn off other branches 
+  //make the pT spectra fo converted
   for (int event = 0; event < ttree->GetEntries(); ++event)
   {
     ttree->GetEvent(event);
@@ -47,6 +57,7 @@ TEfficiency* makepTRes(TFile* out_file,TChain* ttree=NULL,TTree* allTree=NULL){
     if(pT>0)pTefffuncPlot->Fill(tpT,pT/tpT);
     //trackpTDist->Fill(track_pT); 
   }
+  //make the pT spectra for unconverted
   for (int event = 0; event < allTree->GetEntries(); ++event)
   {
     allTree->GetEvent(event);
@@ -54,6 +65,7 @@ TEfficiency* makepTRes(TFile* out_file,TChain* ttree=NULL,TTree* allTree=NULL){
       all_pTspec->Fill(i);
     }
   }
+  //format and save the data
   TEfficiency* uni_rate = new TEfficiency(*converted_pTspec,*all_pTspec);
   pTeffPlot->Scale(1./ttree->GetEntries(),"width");
   pTefffuncPlot->Scale(1./ttree->GetEntries());
@@ -65,13 +77,29 @@ TEfficiency* makepTRes(TFile* out_file,TChain* ttree=NULL,TTree* allTree=NULL){
   return uni_rate;
 }
 
-TH1F* calculateRate(TEfficiency* rate,TFile* file){
+unsigned totalMB(string path, string extension, string hardname, string softname){
+  string name = path+hardname+extension;
+  TFile *hardFile=new TFile(name.c_str(),"READ");
+  name=path+softname+extension;
+  TFile *softFile=new TFile(name.c_str(),"READ");
+  TTree* noPhoton = (TTree*) softFile->Get("nophotonTree");
+  unsigned r=noPhoton->GetEntries()*2000000;
+  noPhoton = (TTree*) hardFile->Get("nophotonTree");
+  r+=noPhoton->GetEntries()*2000000;
+  return r;
+}
+
+/**@param rate the uniform conversion rate
+ * @param file file to get the pythia pT spectra from
+ * @return the pT dependent conversion rate*/
+TH1F* calculateRate(TEfficiency* rate,TFile* file,unsigned nMB){
   //get the combined pythiaspec from the file then clone it to rate
   TH1F* conversion_rate = (TH1F*)((TH1F*) file->Get("combinedpythia"))->Clone("rate");
+  //make a histogram for the uniform rate
   TH1* uni_rate = (TH1F*)rate->GetPassedHistogram()->Clone("uni_rate");
   uni_rate->Divide(rate->GetTotalHistogram());
   conversion_rate->Multiply(uni_rate);
-  conversion_rate->Scale(1./365209);
+  conversion_rate->Scale(1./nMB);
   file->ReOpen("UPDATE");
   conversion_rate->Write();
   return conversion_rate;
@@ -82,7 +110,7 @@ void derivitvePlot(TH1F* finalrate){
   for (int i = 1; i < finalrate->GetNbinsX(); ++i)
   {
     double error;
-    dplot->SetBinContent(i,finalrate->ItegralAndError(i,finalrate->GetNbinsX(),error));
+    dplot->SetBinContent(i,finalrate->IntegralAndError(i,finalrate->GetNbinsX(),error));
     dplot->SetBinError(i,error);
   }
   dplot->Write();
@@ -91,9 +119,9 @@ void derivitvePlot(TH1F* finalrate){
 void conversionRate(){
   TFile *out_file = new TFile("effplots.root","UPDATE");
   TEfficiency* uni_rate=makepTRes(out_file);
+  string treeExtension = ".root";
   if(!uni_rate){
     string treePath = "/sphenix/user/vassalli/gammasample/truthconversiononlineanalysis";
-    string treeExtension = ".root";
     unsigned int nFiles=200;
     TChain *ttree = handleFile(treePath,treeExtension,"cutTreeSignal",nFiles);
     TChain *observations = handleFile(treePath,treeExtension,"observTree",nFiles);
@@ -102,6 +130,9 @@ void conversionRate(){
     uni_rate=makepTRes(out_file,ttree,observations);
   }
   out_file->ReOpen("READ");
-  auto conversion_rate=calculateRate(uni_rate,out_file);
+  string treePath="/sphenix/user/vassalli/minBiasPythia/";
+  string softname = "softana";
+  string hardname = "hard4ana";
+  auto conversion_rate=calculateRate(uni_rate,out_file,totalMB(treePath,treeExtension,softname,hardname));
   derivitvePlot(conversion_rate);
 }

@@ -28,7 +28,7 @@ void generator(std::string filename, long nEvents, bool signalOnly=false){
   vector<float> photon_pT;
   photonTree->Branch("photon_pT",&photon_pT);
   TTree *nophotonTree = new TTree("nophotonTree","phat phirn tree");
-  unsigned long noPhotonEvents=0;
+  unsigned noPhotonEvents=0;
   nophotonTree->Branch("n",&noPhotonEvents);
 
   for (int iEvent = 0; iEvent < nEvents; ++iEvent)
