@@ -306,7 +306,7 @@ int TruthConversionEval::process_event(PHCompositeNode *topNode)
 	}
 	//pass the map to this helper method which fills the fields for the TTree 
 	numUnique(&mapConversions,trackeval,_mainClusterContainer,&tightbackgroundTrackPairs);
-  //FIXME I cannot get the cleaning to work
+  //FIXME I cannot get the cleaning to work there is some memory error in the function
 	//backgroundTracks=cleanBackground(&mapConversions,backgroundTracks);
 	/*Deprecated
 	 * if (Verbosity()==10)
