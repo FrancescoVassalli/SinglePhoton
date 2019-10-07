@@ -40,7 +40,7 @@ void generator(std::string filename, long nEvents, bool signalOnly=false){
     } 
     photon_pT.clear();
     for(unsigned ipart=0; ipart!=pythiaengine.event.size(); ipart++){
-      if(pythiaengine.event[ipart].id()==22&&pythiaengine.event[ipart].isFinal()&&pythiaengine.event[ipart].pT()>5
+      if(pythiaengine.event[ipart].id()==22&&pythiaengine.event[ipart].isFinal()&&pythiaengine.event[ipart].pT()>10
           &&TMath::Abs(pythiaengine.event[ipart].eta()))photon_pT.push_back(pythiaengine.event[ipart].pT());
     }
     if (photon_pT.size()>0)photonTree->Fill();

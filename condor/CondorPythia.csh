@@ -1,7 +1,7 @@
 #!/bin/csh 
 @ p =  ${1}
 #
-set OUT_LOCATION="/sphenix/user/vassalli/gammasample/pythiahep/"
+set OUT_LOCATION="/sphenix/user/vassalli/minBiasPythia/"
 set PYTHIA_FILE=${OUT_LOCATION}pythia_soft_${p}
 #
 set SCRATCH_AREA="$_CONDOR_SCRATCH_DIR/fran_photons${p}"
@@ -13,7 +13,7 @@ mkdir $SCRATCH_AREA
 cp ./pythia/$GENNAME $SCRATCH_AREA
 #
 cd $SCRATCH_AREA
-./$GENNAME $PYTHIA_FILE 100
+./$GENNAME $PYTHIA_FILE 2000000
 #
 rm -r $SCRATCH_AREA
 #
