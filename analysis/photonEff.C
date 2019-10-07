@@ -450,10 +450,14 @@ void calculateConversionRate(TEfficiency* rate, TH1F *pythia,TFile* out_file){
   out_file->Write();
 }
 
-double hardWeightFactor(TH1F* hard,TH1F* soft, unsigned matchBin){
+double hardWeightFactor(TH1F* hard,TH1F* soft, unsigned matchBin, double* error){
   cout<<soft->Integral(matchBin,soft->GetNbinsX())<<endl;
   cout<<hard->Integral(matchBin,soft->GetNbinsX())<<endl;
-  return soft->Integral(matchBin,soft->GetNbinsX())/hard->Integral(matchBin,hard->GetNbinsX());
+  double r= soft->Integral(matchBin,soft->GetNbinsX())/hard->Integral(matchBin,hard->GetNbinsX());
+  double n = hard->Integral(matchBin,soft->GetNbinsX())/r;
+  double n1 = hard->Integral(matchBin,soft->GetNbinsX())/(r+TMath::Power(r,-1./2));
+  *error = TMath::Abs(n-n1);
+  return r;
 }
 
 TH1F* addSpec(TH1F* soft,TH1F* hard,TFile* file){
@@ -464,8 +468,8 @@ TH1F* addSpec(TH1F* soft,TH1F* hard,TFile* file){
     combined->SetBinContent(i,soft->GetBinContent(i));
     combined->SetBinError(i,soft->GetBinError(i));
   }
-  hard->Scale(hardWeightFactor(hard,soft,matchBin));
-  double systematic= TMath::Power(soft->Integral(matchBin,soft->GetNbinsX()),-1./2);
+  double systematic;
+  hard->Scale(hardWeightFactor(hard,soft,matchBin,&systematic));
   for (int i = matchBin; i < combined->GetNbinsX()+1; ++i)
   {
     combined->SetBinContent(i,hard->GetBinContent(i));
