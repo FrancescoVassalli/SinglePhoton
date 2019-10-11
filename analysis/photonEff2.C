@@ -45,7 +45,7 @@ void makephotonM(TChain* ttree,TChain* back, TFile* out_file){
   back->SetBranchAddress("track_pT",     &back_pt   );
   //ttree->SetBranchAddress("rephoton_m",     &rephoton_m   );
   plots.push_back(new TH1F("m^{#gamma}_{reco}","",60,0,.18));
-  plots.push_back(new TH1F("m^{bkgd}_{reco}","",60,0,.18));
+  plots.push_back(new TH1F("m^{bkgd}_{reco}_wide","",60,0,1));
   //plots.push_back(new TH1F("m^{#gamma}_{recoRefit}","",40,-2,10));
 
   for (int i = 0; i < plots.size(); ++i)
