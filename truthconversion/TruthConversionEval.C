@@ -307,7 +307,7 @@ int TruthConversionEval::process_event(PHCompositeNode *topNode)
 	//pass the map to this helper method which fills the fields for the TTree 
 	numUnique(&mapConversions,trackeval,_mainClusterContainer,&tightbackgroundTrackPairs);
 	//FIXME I cannot get the cleaning to work there is some memory error in the function
-	backgroundTracks=cleanBackground(&mapConversions,&backgroundTracks);
+  cleanBackground(&mapConversions,backgroundTracks);
 	/*Deprecated
 	 * if (Verbosity()==10)
 	 {
@@ -400,31 +400,29 @@ void TruthConversionEval::numUnique(std::map<int,Conversion> *mymap=NULL,SvtxTra
 	cout<<"done num"<<endl;
 }
 
-void TruthConversionEval::cleanBackground(std::map<int,Conversion> *mymap,std::vector<SvtxTrack*>* v_tracks){
-	std::vector<SvtxTrack*>* nextvec;
+std::vector<SvtxTrack*> TruthConversionEval::cleanBackground(std::map<int,Conversion> *mymap,std::vector<SvtxTrack*> v_tracks){
+	std::vector<SvtxTrack*> nextvec;
 	for(std::map<int,Conversion>::iterator a=mymap->begin();a!=mymap->end();a++){
-		Conversion thisConversion = a->second;
-		cout<<"got conversion"<<endl;
-		if (thisConversion.recoCount()!=2&&thisConversion.hasPair())//try to reduce background from events with truth pairs without reco pairs
+		cout<<"got conversion with recoCount= "<<a->second.recoCount()<<endl;
+		if (a->second.recoCount()!=2&&a->second.hasPair())//try to reduce background from events with truth pairs without reco pairs
 		{
 			cout<<"here loop"<<endl;
-			TLorentzVector truth_tlv1 = particletoTLV(thisConversion.getElectron());
-			TLorentzVector truth_tlv2 = particletoTLV(thisConversion.getPositron());
-			for (std::vector<SvtxTrack*>::iterator iTrack = v_tracks->begin(); iTrack != v_tracks->end(); ++iTrack)
+			TLorentzVector truth_tlv1 = particletoTLV(a->second.getElectron());
+			TLorentzVector truth_tlv2 = particletoTLV(a->second.getPositron());
+			for (std::vector<SvtxTrack*>::iterator iTrack = v_tracks.begin(); iTrack != v_tracks.end(); ++iTrack)
 			{
 				TLorentzVector track_tlv = tracktoTLV(*iTrack);
 				cout<<"here vecs"<<endl;
-				if (track_tlv->DeltaR(*truth_tlv1)>.2&&track_tlv->DeltaR(*truth_tlv2)>.2)
+				if (track_tlv.DeltaR(truth_tlv1)>.2&&track_tlv.DeltaR(truth_tlv2)>.2)
 				{
-					nextvec->push_back(*iTrack);
+					nextvec.push_back(*iTrack);
 				}
 			}//track loop
 			cout<<"did track loop"<<endl;
 		}
 	}//conversion loop
 	//do not delete the underlying tracks	
-	v_tracks->clear();
-	v_tracks=nextvec;
+  return nextvec;
 }
 
 //only call if _kMakeTTree is true

@@ -1,8 +1,8 @@
 #!/bin/csh 
 @ p = ( ${1})
 #
-set OUT_LOCATION="/sphenix/user/vassalli/gammasample/"
-set ANA_LOCATION="/sphenix/user/vassalli/gammasample/"
+set OUT_LOCATION="/sphenix/user/vassalli/gammasample/embeded/"
+set ANA_LOCATION="/sphenix/user/vassalli/gammasample/embeded/"
 set OUT_FILE=conversionembededanalysis${p}.root
 set IN_FILE=conversionembededout${p}.root
 set PYTHIA_FILE=${OUT_LOCATION}/pythiahep/pythia_photonJet_${p}.dat

@@ -1,15 +1,15 @@
 #!/bin/csh 
 @ p = ( ${1} )
 #
-set OUT_LOCATION="/sphenix/user/vassalli/gammasample/"
-set ANA_LOCATION="/sphenix/user/vassalli/RecoConversionTests/"
+set OUT_LOCATION="/sphenix/user/vassalli/gammasample/embeded/"
+set ANA_LOCATION="/sphenix/user/vassalli/gammasample/embeded/"
 set OUT_FILE=conversionembededonlineanalysis${p}.root
 set IN_FILE=conversionembededout${p}.root
-set PYTHIA_FILE="/sphenix/user/vassalli/gammasample/pythiahep${p}.dat.dat"
+set PYTHIA_FILE=${OUT_LOCATION}/pythiahep/pythia_photonJet_${p}.dat
 #
 set SCRATCH_AREA="/sphenix/user/vassalli/srtch"                                                                                                              
 #
-set SOURCE_PHOTONMAKER="../gen/*"
+set SOURCE_PHOTONMAKER="/direct/phenix+u/vassalli/sphenix/single/gen/*"
 set BURNER="./after_*.C"
 #
 source /phenix/u/vassalli/.cshrc
