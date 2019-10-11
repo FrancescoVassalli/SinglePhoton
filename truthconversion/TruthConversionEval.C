@@ -228,6 +228,7 @@ int TruthConversionEval::process_event(PHCompositeNode *topNode)
 	//h is for hadronic e is for EM
 	std::vector<SvtxTrack*> backgroundTracks;
 	std::vector<std::pair<SvtxTrack*,SvtxTrack*>> tightbackgroundTrackPairs; //used to find the pair for unmatched conversion tracks
+	std::vector<PHG4Particle*> truthPhotons;
 	std::list<int> signalTracks;
 	//reset obervation variables
 	_b_nMatched=0;
@@ -240,7 +241,10 @@ int TruthConversionEval::process_event(PHCompositeNode *topNode)
 
 	for ( PHG4TruthInfoContainer::ConstIterator iter = range.first; iter != range.second; ++iter ) {
 		PHG4Particle* g4particle = iter->second;
-		if(g4particle->get_pid()==22&&g4particle->get_track_id()==g4particle->get_primary_id())_b_allphoton_pT.push_back(sqrt(g4particle->get_px()*g4particle->get_px()+g4particle->get_py()*g4particle->get_py()));
+		if(g4particle->get_pid()==22&&g4particle->get_track_id()==g4particle->get_primary_id()){
+			_b_allphoton_pT.push_back(sqrt(g4particle->get_px()*g4particle->get_px()+g4particle->get_py()*g4particle->get_py()));
+			truthPhotons.push_back(g4particle);
+		}
 		PHG4Particle* parent =_truthinfo->GetParticle(g4particle->get_parent_id());
 		PHG4VtxPoint* vtx=_truthinfo->GetVtx(g4particle->get_vtx_id()); //get the vertex
 		if(!vtx){
@@ -293,21 +297,36 @@ int TruthConversionEval::process_event(PHCompositeNode *topNode)
 		_b_alltrack_pT.push_back(iter->second->get_pt());
 		auto inCheck = std::find(signalTracks.begin(),signalTracks.end(),iter->first);
 		//if the track is not in the list of signal tracks
-		if (inCheck!=signalTracks.end())
+		if (inCheck==signalTracks.end())
 		{
-			backgroundTracks.push_back(iter->second);
-		}
-		for ( SvtxTrackMap::Iter jter = std::next(iter,1); jter != _allTracks->end()&&iter->second->get_pt()>_kTightPtMin; ++jter){
-			if(jter->second->get_pt()>_kTightPtMin&&TMath::Abs(jter->second->get_eta()-iter->second->get_eta())<_kTightDetaMax&&
-					iter->second->get_charge()==jter->second->get_charge()*-1){
-				tightbackgroundTrackPairs.push_back(std::pair<SvtxTrack*,SvtxTrack*>(iter->second,jter->second));
+			TLorentzVector track_tlv = tracktoTLV(*iter);
+			bool addTrack=true;
+			//make sure the track is not too close to a photon
+			for (std::vector<PHG4Particle*>::iterator iPhoton = truthPhotons.begin(); iPhoton != truthPhotons.end()&&addTrack; ++iPhoton)
+			{
+				TLorentzVector photon_tlv = particletoTLV(*iPhoton);
+				if (photon_tlv.DeltaR(track_tlv)>.2)
+				{
+					addTrack=false;
+				}
+			}
+			if(addTrack){
+				backgroundTracks.push_back(iter->second);
+				//see if it is a good tight background cannidate
+				for ( SvtxTrackMap::Iter jter = std::next(iter,1); jter != _allTracks->end()&&iter->second->get_pt()>_kTightPtMin; ++jter){
+					if(jter->second->get_pt()>_kTightPtMin&&TMath::Abs(jter->second->get_eta()-iter->second->get_eta())<_kTightDetaMax&&
+							iter->second->get_charge()==jter->second->get_charge()*-1){
+						tightbackgroundTrackPairs.push_back(std::pair<SvtxTrack*,SvtxTrack*>(iter->second,jter->second));
+					}
+				} 
+
 			}
 		}
 	}
 	//pass the map to this helper method which fills the fields for the TTree 
 	numUnique(&mapConversions,trackeval,_mainClusterContainer,&tightbackgroundTrackPairs);
-	//FIXME I cannot get the cleaning to work there is some memory error in the function
-  cleanBackground(&mapConversions,backgroundTracks);
+	
+	//cleanBackground(&mapConversions,backgroundTracks);
 	/*Deprecated
 	 * if (Verbosity()==10)
 	 {
@@ -400,7 +419,7 @@ void TruthConversionEval::numUnique(std::map<int,Conversion> *mymap=NULL,SvtxTra
 	cout<<"done num"<<endl;
 }
 
-std::vector<SvtxTrack*> TruthConversionEval::cleanBackground(std::map<int,Conversion> *mymap,std::vector<SvtxTrack*> v_tracks){
+std::vector<SvtxTrack*> TruthConversionEval::cleanBackground(std::vector<SvtxTrack*> v_tracks){
 	std::vector<SvtxTrack*> nextvec;
 	for(std::map<int,Conversion>::iterator a=mymap->begin();a!=mymap->end();a++){
 		cout<<"got conversion with recoCount= "<<a->second.recoCount()<<endl;
@@ -422,7 +441,7 @@ std::vector<SvtxTrack*> TruthConversionEval::cleanBackground(std::map<int,Conver
 		}
 	}//conversion loop
 	//do not delete the underlying tracks	
-  return nextvec;
+	return nextvec;
 }
 
 //only call if _kMakeTTree is true

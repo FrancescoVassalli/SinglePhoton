@@ -12,16 +12,16 @@ void photon_m(TFile* thisFile){
 	std::vector<TH1F*> plots;
 	//plots.push_back((TH1F*) thisFile->Get("m^{#gamma}_{recoRefit}"));
 	plots.push_back((TH1F*) thisFile->Get("m^{#gamma}_{reco}"));
-	//plots.push_back((TH1F*) thisFile->Get("m^{bkgd}_{reco}"));
+	plots.push_back((TH1F*) thisFile->Get("m^{bkgd}_{reco}"));
 
 	TCanvas* tc = new TCanvas();
 	tc->Draw();
 	TLegend* tl = new TLegend(.7,.7,.9,.9);
 	//plots[0]->SetLineColor(kRed);
 	plots[0]->SetMarkerStyle(kFullCircle);
-	/*plots[1]->SetMarkerStyle(kFullTriangleUp);
+	plots[1]->SetMarkerStyle(kFullTriangleUp);
 	plots[1]->SetLineColor(kGreen+2);
-	plots[1]->SetMarkerColor(kGreen+2);*/
+	plots[1]->SetMarkerColor(kGreen+2);
 
 	for (int i = 0; i < plots.size(); ++i)
 	{
@@ -31,8 +31,9 @@ void photon_m(TFile* thisFile){
 		plots[i]->SetXTitle("m_{ee} [#frac{GeV}{c^{2}}]");
 		if(i==0) plots[i]->Draw("e1");
 		else plots[i]->Draw("e1 same");
-		tl->AddEntry(plots[i],"Photon Candidates","p");
 	}
+	tl->AddEntry(plots[0],"Photon Candidates","p");
+	tl->AddEntry(plots[1],"Background","p");
 	tl->Draw();
 	//tc->SaveAs("plots/gamma_dm_eff.pdf");	
 }
