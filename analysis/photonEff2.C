@@ -32,14 +32,20 @@ TChain* handleFile(string name, string extension, string treename, unsigned int 
   return all;
 }
 
-void makephotonM(TChain* ttree,TFile* out_file){
+void makephotonM(TChain* ttree,TChain* back, TFile* out_file){
   float photon_m;
   float tphoton_m;
+  float back_Vtx;
+  float back_pt;
+  float back_m; 
   std::vector<TH1F*> plots;
   ttree->SetBranchAddress("photon_m",     &photon_m   );
+  back->SetBranchAddress("photon_m",     &back_m   );
+  back->SetBranchAddress("vtx_radius",     &back_Vtx   );
+  back->SetBranchAddress("track_pT",     &back_pt   );
   //ttree->SetBranchAddress("rephoton_m",     &rephoton_m   );
   plots.push_back(new TH1F("m^{#gamma}_{reco}","",60,0,.18));
-  //plots.push_back(new TH1F("m^{bkgd}_{reco}","",60,0,.18));
+  plots.push_back(new TH1F("m^{bkgd}_{reco}","",60,0,.18));
   //plots.push_back(new TH1F("m^{#gamma}_{recoRefit}","",40,-2,10));
 
   for (int i = 0; i < plots.size(); ++i)
@@ -52,13 +58,13 @@ void makephotonM(TChain* ttree,TFile* out_file){
     plots[0]->Fill(photon_m);
     // plots[1]->Fill(rephoton_m);
   }
-  /*for (int event = 0; event < back->GetEntries(); ++event)
+  for (int event = 0; event < back->GetEntries(); ++event)
   {
     back->GetEvent(event);
     if(back_Vtx<21.&&back_pt>2.5)
     plots[1]->Fill(back_m);
     // plots[1]->Fill(rephoton_m);
-  }*/
+  }
  // cout<<"Background mass in range count= "<<plots[1]->Integral()<<'\n';
   for (int i = 0; i < plots.size(); ++i)
   {
@@ -487,7 +493,7 @@ void photonEff2()
   TChain *pairBackTree = handleFile(treePath,treeExtension,"pairBackTree",nFiles);
   TChain *vtxBackTree = handleFile(treePath,treeExtension,"vtxBackTree",nFiles);
   TChain *vertexingTree = handleFile(treePath,treeExtension,"vtxingTree",nFiles);
-  makephotonM(ttree,out_file);
+  makephotonM(ttree,vtxBackTree,out_file);
   //auto pythiaSpec=makePythiaSpec(softTree,out_file,"soft");
   //makePythiaSpec(hard0Tree,out_file,"hard0");
   //auto hardSpec = makePythiaSpec(hard4Tree,out_file,"hard4");
