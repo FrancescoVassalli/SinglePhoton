@@ -299,7 +299,7 @@ int TruthConversionEval::process_event(PHCompositeNode *topNode)
 		//if the track is not in the list of signal tracks
 		if (inCheck==signalTracks.end())
 		{
-			TLorentzVector track_tlv = tracktoTLV(*iter);
+			TLorentzVector track_tlv = tracktoTLV(iter->second);
 			bool addTrack=true;
 			//make sure the track is not too close to a photon
 			for (std::vector<PHG4Particle*>::iterator iPhoton = truthPhotons.begin(); iPhoton != truthPhotons.end()&&addTrack; ++iPhoton)
@@ -419,7 +419,7 @@ void TruthConversionEval::numUnique(std::map<int,Conversion> *mymap=NULL,SvtxTra
 	cout<<"done num"<<endl;
 }
 
-std::vector<SvtxTrack*> TruthConversionEval::cleanBackground(std::vector<SvtxTrack*> v_tracks){
+/*std::vector<SvtxTrack*> TruthConversionEval::cleanBackground(std::vector<SvtxTrack*> v_tracks){
 	std::vector<SvtxTrack*> nextvec;
 	for(std::map<int,Conversion>::iterator a=mymap->begin();a!=mymap->end();a++){
 		cout<<"got conversion with recoCount= "<<a->second.recoCount()<<endl;
@@ -442,7 +442,7 @@ std::vector<SvtxTrack*> TruthConversionEval::cleanBackground(std::vector<SvtxTra
 	}//conversion loop
 	//do not delete the underlying tracks	
 	return nextvec;
-}
+}*/
 
 //only call if _kMakeTTree is true
 void TruthConversionEval::processTrackBackground(std::vector<SvtxTrack*> *v_tracks,SvtxTrackEval* trackeval){

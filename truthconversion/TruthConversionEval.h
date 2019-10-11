@@ -77,8 +77,8 @@ class TruthConversionEval: public SubsysReco
      * fills the member fields with information from the conversions 
      * finds the clusters associated with the truth conversions*/
     void numUnique(std::map<int,Conversion>* map,SvtxTrackEval* trackEval,RawClusterContainer* mainClusterContainer,std::vector<std::pair<SvtxTrack*,SvtxTrack*>>* tightBackground);
-    /// remove background that is too close to signal
-    std::vector<SvtxTrack*> cleanBackground(std::map<int,Conversion> *mymap,std::vector<SvtxTrack*> v_tracks);
+    // remove background that is too close to signal
+    //std::vector<SvtxTrack*> cleanBackground(std::map<int,Conversion> *mymap,std::vector<SvtxTrack*> v_tracks);
     ///fills the member fields for all the background trees
     void processTrackBackground(std::vector<SvtxTrack*>*v,SvtxTrackEval*);
     void recordConversion(Conversion *conversion,TLorentzVector *tlv_photon,TLorentzVector *tlv_electron, TLorentzVector *tlv_positron);
