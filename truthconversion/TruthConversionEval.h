@@ -62,14 +62,14 @@ class TruthConversionEval: public SubsysReco
 
   private:
     //@return ownsership
-    inline TLorentzVector* tracktoTLV(SvtxTrack* track){
-        TLorentzVector* r= new TLorentzVector();
-        r->SetPtEtaPhiM(track->get_pt(),track->get_eta(),track->get_phi(),.0005109989461);//assume electron
+    inline TLorentzVector tracktoTLV(SvtxTrack* track){
+        TLorentzVector r;
+        r.SetPtEtaPhiM(track->get_pt(),track->get_eta(),track->get_phi(),.0005109989461);//assume electron
         return r;
     }
     //@return ownsership
-    inline TLorentzVector* particletoTLV(PHG4Particle* particle){
-        return new TLorentzVector(particle->get_px(),particle->get_py(),particle->get_pz(),particle->get_e());
+    inline TLorentzVector particletoTLV(PHG4Particle* particle){
+        return TLorentzVector(particle->get_px(),particle->get_py(),particle->get_pz(),particle->get_e());
     }
     bool doNodePointers(PHCompositeNode* topNode);
     SvtxVertex* get_primary_vertex(PHCompositeNode* topNode)const;
@@ -78,7 +78,7 @@ class TruthConversionEval: public SubsysReco
      * finds the clusters associated with the truth conversions*/
     void numUnique(std::map<int,Conversion>* map,SvtxTrackEval* trackEval,RawClusterContainer* mainClusterContainer,std::vector<std::pair<SvtxTrack*,SvtxTrack*>>* tightBackground);
     /// remove background that is too close to signal
-    std::vector<SvtxTrack*> cleanBackground(std::map<int,Conversion> *mymap,std::vector<SvtxTrack*> v_tracks);
+    void cleanBackground(std::map<int,Conversion> *mymap,std::vector<SvtxTrack*> *v_tracks);
     ///fills the member fields for all the background trees
     void processTrackBackground(std::vector<SvtxTrack*>*v,SvtxTrackEval*);
     void recordConversion(Conversion *conversion,TLorentzVector *tlv_photon,TLorentzVector *tlv_electron, TLorentzVector *tlv_positron);

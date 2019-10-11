@@ -12,26 +12,26 @@ void photon_m(TFile* thisFile){
 	std::vector<TH1F*> plots;
 	//plots.push_back((TH1F*) thisFile->Get("m^{#gamma}_{recoRefit}"));
 	plots.push_back((TH1F*) thisFile->Get("m^{#gamma}_{reco}"));
-	plots.push_back((TH1F*) thisFile->Get("m^{bkgd}_{reco}"));
+	//plots.push_back((TH1F*) thisFile->Get("m^{bkgd}_{reco}"));
 
 	TCanvas* tc = new TCanvas();
 	tc->Draw();
 	TLegend* tl = new TLegend(.7,.7,.9,.9);
 	//plots[0]->SetLineColor(kRed);
 	plots[0]->SetMarkerStyle(kFullCircle);
-	plots[1]->SetMarkerStyle(kFullTriangleUp);
+	/*plots[1]->SetMarkerStyle(kFullTriangleUp);
 	plots[1]->SetLineColor(kGreen+2);
-	plots[1]->SetMarkerColor(kGreen+2);
+	plots[1]->SetMarkerColor(kGreen+2);*/
 
 	for (int i = 0; i < plots.size(); ++i)
 	{
-		plots[i]->SetYTitle("#frac{dN}{dm *N_{#gamma}}");
+		plots[i]->SetYTitle("#frac{1}{dN_{#gamma}}#frac{dN}{dm}");
 		plots[i]->GetYaxis()->SetTitleOffset(1);
 		plots[i]->GetXaxis()->SetRangeUser(0,.1);
-		plots[i]->SetXTitle("invarient mass GeV/c^{2}");
+		plots[i]->SetXTitle("m_{ee} [#frac{GeV}{c^{2}}]");
 		if(i==0) plots[i]->Draw("e1");
 		else plots[i]->Draw("e1 same");
-		tl->AddEntry(plots[i],plots[i]->GetName(),"l");
+		tl->AddEntry(plots[i],"Photon Candidates","p");
 	}
 	tl->Draw();
 	//tc->SaveAs("plots/gamma_dm_eff.pdf");	
@@ -186,13 +186,13 @@ void vtxR(TFile *thisFile){
 	tc->Draw();
 	tc->SetTicky();
 	TLegend *tl = new TLegend(.8,.8,.9,.9);
-	tl->AddEntry(plotTruth,"Truth","p");
+	tl->AddEntry(plotTruth,"Truth * Vertex Efficiency","p");
 	tl->AddEntry(plotReco,"Reco","p");
 	tl->AddEntry(plotCorr,"Corrected Reco","p");
 	plotTruth->SetYTitle("1/N");
 	plotTruth->SetXTitle("r_{vtx} [cm]");
-	plotReco->Draw("e1 ");
-	plotTruth->Draw("e1 same");
+	plotTruth->Draw("e1");
+	plotReco->Draw("e1 same");
 	plotCorr->Draw("e1 same");
 	tl->Draw();
 }
@@ -264,6 +264,7 @@ unsigned getMatchingBin(TH1* hard, TH1* soft){
 void drawMaps(TFile *thisFile){
 	gStyle->SetOptStat(0);
 	TH2F* tmap = (TH2F*) thisFile->Get("truthMap");
+	tmap->SetTitle("Truth Conversion Location XY Plane;x [cm];y [cm]");
 	TH2F* rmap = (TH2F*) thisFile->Get("recoMap");
 	rmap = (TH2F*) rmap->Rebin2D();
 	TCanvas *tc;
@@ -287,20 +288,65 @@ void drawMaps(TFile *thisFile){
 	}
 }
 
+void uni_rate(TFile* MBFile){
+	gStyle->SetOptStat(0);
+	TEfficiency* uni_rate = (TEfficiency*) MBFile->Get("uni_rate");
+	TCanvas* tc = new TCanvas();
+	tc->SetTicky();
+	uni_rate->SetTitle("Uniform pT convertion rate;pT [GeV];#frac{N_{#it{converted}}}{N_{#it{photon}}}");
+	uni_rate->Draw();
+	TH1F* passed = (TH1F*) uni_rate->GetPassedHistogram();
+	TH1F* total= (TH1F*) uni_rate->GetTotalHistogram();
+	double e1,e2,i1,i2;
+	i1=passed->IntegralAndError(1,passed->GetNbinsX(),e1);
+	i2=total->IntegralAndError(1,total->GetNbinsX(),e2);
+	double rerror = sqrt(e1/i1*e1/i1+e2/i2*e2/i2);
+	cout<<"average uni_rate: "<<i1/i2<<"#pm"<<i1/i2*rerror<<'\n';
+}
 
+void real_rate(TFile *MBFile){
+	gStyle->SetOptStat(0);
+	TCanvas *tc = new TCanvas();
+	tc->SetLogy();
+	TH1F* rate= (TH1F*) MBFile->Get("rate");
+	rate->SetTitle("sPHENIX MinBias Conversion Rate;pT[GeV];#frac{dN_{#it{converted}}}{dN_{MB}}");
+	rate->Draw();
+}
 
+void conversion_derivative(TFile *MBFile){
+	gStyle->SetOptStat(0);
+	TCanvas *tc = new TCanvas();
+	tc->SetLogy();
+	TH1F* derivative= (TH1F*) MBFile->Get("derivative");
+	derivative->SetTitle(";pT[GeV];#frac{1}{N_{MB}} #int_{p_{T,min}}^{25} #frac{dN_{converted}}{dp_{T}} dp_{T}");
+	derivative->Draw();
+}
 
+void rateWithSystematic(TFile* MBFile, TFile* MB2){
+	gStyle->SetOptStat(0);
+	TCanvas *tc = new TCanvas();
+	tc->SetLogy();
+	TH1F* rate1= (TH1F*) MBFile->Get("rate");
+	TH1F* rate2= (TH1F*) MB2->Get("rate");
+	rate2->SetLineColor(kRed);
+	rate1->SetTitle("sPHENIX MinBias Conversion Rate;pT[GeV];#frac{dN_{#it{converted}}}{dN_{MB}}");
+	rate1->Draw();
+	rate2->Draw("same");
+}
 
 void plotter(){
-	TFile *thisFile = new TFile("effplots.root","READ");
+	TFile *thisFile = new TFile("effplots2.root","READ");
+	TFile *MBFile = new TFile("effhighmatch.root","READ");
+	TFile *MBFile2 = new TFile("efflowmatch.root","READ");
 	TFile *thisOtherFile = new TFile("maps.root","READ");
 	photon_m(thisFile);
+	cout<<"mass done"<<endl;
 	//recoRefit(thisFile);
 	pTRes(thisFile);
 	//pTRes2D(thisFile);
-	vtxRes(thisFile);
-	vtxRes2D(thisFile);
-	vtxEff(thisFile);
+	//vtxRes(thisFile);
+	//vtxRes2D(thisFile);
+	//vtxEff(thisFile);
 	//layer(thisFile);
 	//dlayer(thisFile);
 	//deta(thisFile);
@@ -310,6 +356,10 @@ void plotter(){
 	//compareDeta(thisFile);
 	//compareDeta(thisFile,false);
 	drawMaps(thisOtherFile);
+	uni_rate(MBFile);
+	real_rate(MBFile2);
+	conversion_derivative(MBFile);
+	//rateWithSystematic(MBFile,MBFile2);
 	//TFile *backFile = new TFile("backplots.root","READ");
 
 }
