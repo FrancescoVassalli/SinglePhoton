@@ -238,6 +238,7 @@ void compareDeta(TTree* signalTree, TTree* background){
     signalTree->GetEvent(i);
     detaS_plot->Fill(detas);
   }
+  cout<<"background has "<<background->GetEntries()<<" entries"<<endl;
   for (int i = 0; i < background->GetEntries(); ++i)
   {
     background->GetEvent(i);
@@ -247,6 +248,8 @@ void compareDeta(TTree* signalTree, TTree* background){
   detaS_plot->Scale(1/detaS_plot->Integral());
   detaS_plot->Write();
   detaB_plot->Write();
+  signalTree->ResetBranchAddresses();
+  background->ResetBranchAddresses();
 }
 
 void testCuts(TChain* ttree,TFile* out_file){

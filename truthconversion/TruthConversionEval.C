@@ -305,7 +305,7 @@ int TruthConversionEval::process_event(PHCompositeNode *topNode)
 			for (std::vector<PHG4Particle*>::iterator iPhoton = truthPhotons.begin(); iPhoton != truthPhotons.end()&&addTrack; ++iPhoton)
 			{
 				TLorentzVector photon_tlv = particletoTLV(*iPhoton);
-				if (photon_tlv.DeltaR(track_tlv)>.2)
+				if (photon_tlv.DeltaR(track_tlv)<.2)
 				{
 					addTrack=false;
 				}
