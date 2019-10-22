@@ -323,15 +323,9 @@ int TruthConversionEval::process_event(PHCompositeNode *topNode)
 			}
 		}
 	}
-	//pass the map to this helper method which fills the fields for the TTree 
+	//pass the map to this helper method which fills the fields for the signal ttree 
 	numUnique(&mapConversions,trackeval,_mainClusterContainer,&tightbackgroundTrackPairs);
 	
-	//cleanBackground(&mapConversions,backgroundTracks);
-	/*Deprecated
-	 * if (Verbosity()==10)
-	 {
-	 cout<<Name()<<"# conversion clusters="<<_conversionClusters.size()<<'\n';
-	 }*/
 	if (_kMakeTTree)
 	{
 		cout<<"intit background process"<<endl;
@@ -374,9 +368,11 @@ void TruthConversionEval::numUnique(std::map<int,Conversion> *mymap=NULL,SvtxTra
 					case 1: //there's one reco track try to find the other
 						{
 							PHG4Particle *truthe;
+							//get the truth particle that is missing a reco track
 							if(!i->second.getRecoTrack(e1->get_track_id()))truthe = e1;
 							else truthe=e2;
 							if(!truthe) cerr<<"critical error"<<endl;
+							//look through the background for the missing pair
 							for(auto pair : *backgroundTracks){
 								if(!pair.first||!pair.second) cerr<<"critical error2"<<endl;
 								if ((pair.first->get_charge()>0&&truthe->get_pid()<0)||(pair.first->get_charge()<0&&truthe->get_pid()>0))
@@ -418,31 +414,6 @@ void TruthConversionEval::numUnique(std::map<int,Conversion> *mymap=NULL,SvtxTra
 	}//map loop
 	cout<<"done num"<<endl;
 }
-
-/*std::vector<SvtxTrack*> TruthConversionEval::cleanBackground(std::vector<SvtxTrack*> v_tracks){
-	std::vector<SvtxTrack*> nextvec;
-	for(std::map<int,Conversion>::iterator a=mymap->begin();a!=mymap->end();a++){
-		cout<<"got conversion with recoCount= "<<a->second.recoCount()<<endl;
-		if (a->second.recoCount()!=2&&a->second.hasPair())//try to reduce background from events with truth pairs without reco pairs
-		{
-			cout<<"here loop"<<endl;
-			TLorentzVector truth_tlv1 = particletoTLV(a->second.getElectron());
-			TLorentzVector truth_tlv2 = particletoTLV(a->second.getPositron());
-			for (std::vector<SvtxTrack*>::iterator iTrack = v_tracks.begin(); iTrack != v_tracks.end(); ++iTrack)
-			{
-				TLorentzVector track_tlv = tracktoTLV(*iTrack);
-				cout<<"here vecs"<<endl;
-				if (track_tlv.DeltaR(truth_tlv1)>.2&&track_tlv.DeltaR(truth_tlv2)>.2)
-				{
-					nextvec.push_back(*iTrack);
-				}
-			}//track loop
-			cout<<"did track loop"<<endl;
-		}
-	}//conversion loop
-	//do not delete the underlying tracks	
-	return nextvec;
-}*/
 
 //only call if _kMakeTTree is true
 void TruthConversionEval::processTrackBackground(std::vector<SvtxTrack*> *v_tracks,SvtxTrackEval* trackeval){

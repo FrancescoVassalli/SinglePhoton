@@ -340,10 +340,10 @@ void plotter(){
 	TFile *MBFile = new TFile("effhighmatch.root","READ");
 	TFile *MBFile2 = new TFile("efflowmatch.root","READ");
 	TFile *thisOtherFile = new TFile("maps.root","READ");
-	photon_m(thisFile);
+	//photon_m(thisFile);
 	cout<<"mass done"<<endl;
 	//recoRefit(thisFile);
-	pTRes(thisFile);
+	//pTRes(thisFile);
 	//pTRes2D(thisFile);
 	//vtxRes(thisFile);
 	//vtxRes2D(thisFile);
@@ -352,14 +352,15 @@ void plotter(){
 	//dlayer(thisFile);
 	//deta(thisFile);
 	//signalVtxR(thisFile);
-	vtxR(thisFile);
+	//vtxR(thisFile);
 	//truthPtMix(thisFile);
-	//compareDeta(thisFile);
+	compareDeta(thisFile);
 	//compareDeta(thisFile,false);
-	drawMaps(thisOtherFile);
-	uni_rate(MBFile);
-	real_rate(MBFile2);
-	conversion_derivative(MBFile);
+	//compareDeta(thisFile,false);
+	//drawMaps(thisOtherFile);
+	//uni_rate(MBFile);
+	//real_rate(MBFile2);
+	//conversion_derivative(MBFile);
 	//rateWithSystematic(MBFile,MBFile2);
 	//TFile *backFile = new TFile("backplots.root","READ");
 
