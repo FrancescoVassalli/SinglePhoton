@@ -167,7 +167,7 @@ void makeERes(TChain* ttree){
   float tE;
   ttree->SetBranchAddress("photon_E",&E);
   ttree->SetBranchAddress("tphoton_E",&tE);
-  TH1F *Res = new TH1F("convertRes","",40,0,2.5);
+  TH1F *Res = new TH1F("convertRes","",30,0,2);
   Res->Sumw2();
   for (int event = 0; event < ttree->GetEntries(); ++event)
   {
