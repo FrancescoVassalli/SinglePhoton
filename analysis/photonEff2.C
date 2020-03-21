@@ -479,6 +479,9 @@ TH1F* addSpec(TH1F* soft,TH1F* hard,TFile* file){
 
 void photonEff2()
 {
-  TFile *out_file = new TFile("effplots2.root","UPDATE");
-  makeERes(ttree);
+  TFile *out_file = new TFile("neffplots.root","UPDATE");
+  string inName="/sphenix/user/vassalli/gammasample/conversionana.root";
+  TChain *singleTree = new TChain("cutTreeSignal");
+  singleTree->Add(inName.c_str());
+  makeERes(singleTree);
 }

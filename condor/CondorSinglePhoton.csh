@@ -1,10 +1,10 @@
 #!/bin/csh 
-@ p = ( ${1} + 200 )
+@ p = ( ${1} )
 #
-set OUT_LOCATION="/sphenix/user/vassalli/gammasample/"
-set ANA_LOCATION="/sphenix/user/vassalli/gammasample/"
+set OUT_LOCATION="/sphenix/user/vassalli/gammasample/embeded/"
+set ANA_LOCATION="/sphenix/user/vassalli/gammasample/embeded/"
 set OUT_FILE=conversiononlineanalysis${p}.root
-set IN_FILE=conversionout${p}.root
+set IN_FILE=conversionembededout${p}.root
 #
 set SCRATCH_AREA="$_CONDOR_SCRATCH_DIR/fran_embed_photons${p}"                                                                                                              
 #
@@ -18,12 +18,9 @@ cp $BURNER $SCRATCH_AREA
 cp truthconversion/* $SCRATCH_AREA
 #
 cd $SCRATCH_AREA
-root -b -q Fun4All_G4_sPHENIX.C\(100,\"$IN_FILE\"\) 
-cp -f $IN_FILE $OUT_LOCATION$IN_FILE
-#root -l -b -q after_Reco.C\(\"$OUT_LOCATION$IN_FILE\",\"$OUT_FILE\"\)
-#cp -f $OUT_FILE $ANA_LOCATION$OUT_FILE
+#root -b -q Fun4All_G4_sPHENIX.C\(100,\"$IN_FILE\"\) 
 root -l -b -q after_embeded.C\(\"$OUT_LOCATION$IN_FILE\",\"$OUT_FILE\"\)
-cp -f $OUT_FILE $ANA_LOCATION"truth"$OUT_FILE
+cp -f $OUT_FILE $ANA_LOCATION$OUT_FILE
 #
 rm -rf $SCRATCH_AREA
 #
