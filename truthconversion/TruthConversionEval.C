@@ -168,6 +168,8 @@ int TruthConversionEval::InitRun(PHCompositeNode *topNode)
 		_signalCutTree->Branch("tphoton_m", &_b_tphoton_m);
 		_signalCutTree->Branch("photon_pT", &_b_photon_pT);
 		_signalCutTree->Branch("tphoton_pT", &_b_tphoton_pT);
+		_signalCutTree->Branch("photon_E", &_b_photon_E);
+		_signalCutTree->Branch("tphoton_E", &_b_tphoton_E);
 		_signalCutTree->Branch("cluster_prob", &_b_cluster_prob);
 		//_signalCutTree->Branch("nCluster", &_b_nCluster);
 		_signalCutTree->Branch("cluster_dphi", &_b_cluster_dphi);
@@ -563,14 +565,17 @@ void TruthConversionEval::recordConversion(Conversion *conversion,TLorentzVector
 			TLorentzVector truth_added_tlv = *tlv_electron+*tlv_positron;
 			_b_tphoton_m= truth_added_tlv.Dot(truth_added_tlv);
 			_b_photon_pT=recoPhoton->Pt();
+			_b_photon_E=recoPhoton->E();
 			conversion->PrintPhotonRecoInfo(tlv_photon,tlv_electron,tlv_positron,_b_photon_m);
 		}
 		else{//photon was not reconstructed
 			_b_photon_m =-999;
 			_b_photon_pT=-999;
+			_b_photon_E=-999;
 			conversion->PrintPhotonRecoInfo(tlv_photon,tlv_electron,tlv_positron,_b_photon_m);
 		}
 		_b_tphoton_pT=tlv_photon->Pt();
+		_b_tphoton_E=tlv_photon->E();
 		cout<<"second"<<endl;
 		//truth vertex info
 		_b_tvtx_radius = sqrt(conversion->getVtx()->get_x()*conversion->getVtx()->get_x()+conversion->getVtx()->get_y()*conversion->getVtx()->get_y());

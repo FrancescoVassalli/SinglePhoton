@@ -162,21 +162,21 @@ void makeVtxEff(TChain* ttree,TFile* out_file){
   ttree->ResetBranchAddresses();
 }
 
-void makepTRes(TChain* ttree){
-  float pT;
-  float tpT;
-  ttree->SetBranchAddress("photon_pT",&pT);
-  ttree->SetBranchAddress("tphoton_pT",&tpT);
-  TH1F *pTRes = new TH1F("#frac{#it{p}^{T}_{reco}}{#it{p}_{#it{truth}}^{T}}","",40,0,2.5);
-  pTRes->Sumw2();
+void makeERes(TChain* ttree){
+  float E;
+  float tE;
+  ttree->SetBranchAddress("photon_E",&E);
+  ttree->SetBranchAddress("tphoton_E",&tE);
+  TH1F *Res = new TH1F("#frac{E_{#it{reco}}}{E_{#it{truth}}^{T}}","",40,0,2.5);
+  Res->Sumw2();
   for (int event = 0; event < ttree->GetEntries(); ++event)
   {
     ttree->GetEvent(event);
-    if(pT>0)pTRes->Fill(pT/tpT);
+    if(E>5&&E<13)Res->Fill(E/tE);
   }
-  pTRes->Scale(1./pTRes->Integral());
+  Res->Scale(1./Res->Integral());
   ttree->ResetBranchAddresses();
-  pTRes->Write();
+  Res->Write();
 }
 
 TEfficiency* makepTDist(TChain* ttree,TTree* allTree,TFile* out_file){
@@ -480,35 +480,5 @@ TH1F* addSpec(TH1F* soft,TH1F* hard,TFile* file){
 void photonEff2()
 {
   TFile *out_file = new TFile("effplots2.root","UPDATE");
-  string treePath = "/sphenix/user/vassalli/gammasample/embeded/truthconversionembededanalysis";
-  string treeExtension = ".root";
-  unsigned int nFiles=1000;
-  //string softPath = "/sphenix/user/vassalli/minBiasPythia/softana.root";
-  //string hard0Path = "/sphenix/user/vassalli/minBiasPythia/hard0ana.root";
-  //string hard4Path = "/sphenix/user/vassalli/minBiasPythia/hard4ana.root";
-  //TChain *softTree = new TChain("photonTree");
-  //TChain *hard0Tree = new TChain("photonTree");
-  //TChain *hard4Tree = new TChain("photonTree");
-  //softTree->Add(softPath.c_str());
-  //hard0Tree->Add(hard0Path.c_str());
-  //hard4Tree->Add(hard4Path.c_str());
-  TChain *ttree = handleFile(treePath,treeExtension,"cutTreeSignal",nFiles);
-  TChain *pairBackTree = handleFile(treePath,treeExtension,"pairBackTree",nFiles);
-  TChain *vtxBackTree = handleFile(treePath,treeExtension,"vtxBackTree",nFiles);
-  TChain *vertexingTree = handleFile(treePath,treeExtension,"vtxingTree",nFiles);
-  makephotonM(ttree,vtxBackTree,out_file);
-  //auto pythiaSpec=makePythiaSpec(softTree,out_file,"soft");
-  //makePythiaSpec(hard0Tree,out_file,"hard0");
-  //auto hardSpec = makePythiaSpec(hard4Tree,out_file,"hard4");
-  //chopHard(*hardSpec,*pythiaSpec);
-  //pythiaSpec = addSpec(pythiaSpec,hardSpec,out_file);
-  //makepTDist(ttree,observations,out_file);
-  makeVtxRes(ttree,out_file);
-  makeVtxEff(ttree,out_file);
-  makepTRes(ttree);
-  compareDeta(ttree,pairBackTree);
-  //testCuts(ttree,out_file);
-  makepTCaloGraph("pTcalodata.csv",out_file);
-  makeVtxR(ttree,vertexingTree,out_file);
-  //makeRefitDist(ttree,out_file);
+  makeERes(ttree);
 }
